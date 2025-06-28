@@ -1,0 +1,106 @@
+--- PROMPT ---
+SystemMessage: You are a professional content moderator who filters out content based on your master's preferences.
+Your task is to analyze each content item and determine if it should be rejected based on:
+  The specific filter preferences provided by the user
+
+For each rejected item, you must provide a clear and specific reason for rejection. Keep the reason below 10 words.
+The reason should reference either the user's filter preferences or the general guidelines.
+
+You should be thorough in your analysis but also efficient. For each item, consider all the details provided to make a decision.
+
+Your response should be formatted as a valid JSON object matching this schema:
+"rejected_items": [
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  },
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  }
+]
+
+Return only the raw JSON output. Do not include markdown formatting, code blocks, or any other text.
+The response must be plain JSON, beginning with { and ending with }.
+
+HumanMessage: Please analyze the following content items and identify any that should be rejected.
+Use the 'title' as the primary basis for moderation decisions. If the title is ambiguous or insufficient, consider 'tags' and 'categories' as supporting signals. 
+Prioritize rejection based on strong matches in the title first, then use tags/categories only if they reinforce or clarify relevance to the filter preferences.
+
+User's filter preferences (reject content matching these):
+Reject content mainly for UPSC prep—strategy, coaching, syllabus, toppers, study tips. Allow general news where UPSC is only mentioned briefly or in tags.
+
+Content items to analyze:
+{
+  "items": [
+    {
+      "id": "-0G4QSYkGas",
+      "title": "Operation Sindhu: Iran opens airspace for Indian evacuation flights | Ankit Agrawal Study IQ",
+      "tags": [
+        "operation sindhu",
+        "operation sindhu news",
+        "operation sindhu iran",
+        "operation sindhu india",
+        "operation sindhu live"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "GFd8P6G8NqI",
+      "title": "Indian National Parks Explained Through Animation | StudyIQ IAS",
+      "tags": [
+        "upsc",
+        "national parks of india",
+        "national parks in india",
+        "national parks of india upsc",
+        "national parks"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "IoCfbqoViGQ",
+      "title": "UK Navy Declines Air India's Hangar Space Offer To F-35B in Kerala | Ankit Agrawal Study IQ",
+      "tags": [
+        "UK Navy F-35",
+        "UK F-35 stranded India",
+        "British fighter jet India",
+        "F-35 India update",
+        "UK military jet India"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "fjNjwzRT9n0",
+      "title": "Ayatollah Ali Khamenei - The Supreme Leader of Iran |  Secrets REVEALED |\u00a0Varun\u00a0Jauhari",
+      "tags": [
+        "Iran",
+        "Tehran",
+        "supreme leader ayatollah ali khamenei",
+        "Israel Iran war",
+        "benjamin netanyahu"
+      ],
+      "categories": [
+        "Education"
+      ]
+    }
+  ],
+  "filter_preferences": [
+    "Reject content mainly for UPSC prep\u2014strategy, coaching, syllabus, toppers, study tips. Allow general news where UPSC is only mentioned briefly or in tags."
+  ]
+}
+
+--- RAW RESPONSE ---
+{
+  "rejected_items": [
+    {
+      "id": "GFd8P6G8NqI",
+      "reason": "UPSC prep content"
+    }
+  ]
+}

@@ -1,0 +1,2044 @@
+1
+00:00:00,200 --> 00:00:03,260
+[Music]
+
+2
+00:00:03,439 --> 00:00:09,280
+All right. So, today was Apple's big
+
+3
+00:00:05,520 --> 00:00:11,440
+software event for 2025, WWDC. And it
+
+4
+00:00:09,280 --> 00:00:12,719
+was a really, it was actually a really
+
+5
+00:00:11,440 --> 00:00:14,320
+interesting one. I was kind of wondering
+
+6
+00:00:12,719 --> 00:00:17,279
+how this would go cuz in this landscape
+
+7
+00:00:14,320 --> 00:00:20,240
+of AI, AI, AI, everyone's talking about
+
+8
+00:00:17,279 --> 00:00:23,119
+Gemini and GPT everywhere where it feels
+
+9
+00:00:20,240 --> 00:00:24,880
+like Apple is being left behind. They
+
+10
+00:00:23,119 --> 00:00:26,960
+could kind of go one of two ways. They
+
+11
+00:00:24,880 --> 00:00:28,880
+could either double down on Apple
+
+12
+00:00:26,960 --> 00:00:30,480
+intelligence and just lean right in like
+
+13
+00:00:28,880 --> 00:00:33,680
+everything's fine, everything's going to
+
+14
+00:00:30,480 --> 00:00:35,440
+plan, or they could shelf some of that
+
+15
+00:00:33,680 --> 00:00:36,960
+stuff, but show a whole bunch of other
+
+16
+00:00:35,440 --> 00:00:38,640
+stuff and hope that that's good enough.
+
+17
+00:00:36,960 --> 00:00:40,640
+So, now we've seen the keynote and I've
+
+18
+00:00:38,640 --> 00:00:42,960
+gotten to try a lot of these software
+
+19
+00:00:40,640 --> 00:00:44,879
+features and think about them a lot. And
+
+20
+00:00:42,960 --> 00:00:46,399
+they definitely did the second thing.
+
+21
+00:00:44,879 --> 00:00:49,039
+Don't get me wrong, there's much more
+
+22
+00:00:46,399 --> 00:00:51,039
+other stuff than AI versus what like
+
+23
+00:00:49,039 --> 00:00:53,280
+Google was doing earlier. But I do think
+
+24
+00:00:51,039 --> 00:00:54,719
+that that other stuff was actually kind
+
+25
+00:00:53,280 --> 00:00:56,640
+of a lot. And so maybe you can leave a
+
+26
+00:00:54,719 --> 00:00:58,239
+comment below if you agree with me after
+
+27
+00:00:56,640 --> 00:01:00,079
+you subscribe, of course. But this is
+
+28
+00:00:58,239 --> 00:01:02,399
+everything you need to know about WWDC
+
+29
+00:01:00,079 --> 00:01:04,320
+2025. So first of all, they always talk
+
+30
+00:01:02,399 --> 00:01:06,799
+about all of their OSS, all their
+
+31
+00:01:04,320 --> 00:01:09,119
+platforms this year, and they are now
+
+32
+00:01:06,799 --> 00:01:10,799
+all unified in their version number just
+
+33
+00:01:09,119 --> 00:01:16,640
+to keep it simple. So instead of having
+
+34
+00:01:10,799 --> 00:01:20,240
+iOS 19, iPad OS 19, tvOS 19, Mac OS 16,
+
+35
+00:01:16,640 --> 00:01:22,560
+Watch OS 12, and Vision OS 3, they're
+
+36
+00:01:20,240 --> 00:01:23,840
+now just doing version 26 for
+
+37
+00:01:22,560 --> 00:01:25,360
+everything. kind of the same thing
+
+38
+00:01:23,840 --> 00:01:27,439
+Samsung just did with their phones in
+
+39
+00:01:25,360 --> 00:01:30,080
+2020. How they match the year even
+
+40
+00:01:27,439 --> 00:01:32,640
+though it's a year ahead. Cool. Easy.
+
+41
+00:01:30,080 --> 00:01:35,680
+And everything is getting this fresh
+
+42
+00:01:32,640 --> 00:01:37,600
+glassy coat of paint over everything to
+
+43
+00:01:35,680 --> 00:01:39,280
+be unified as well. So, it's more
+
+44
+00:01:37,600 --> 00:01:41,759
+obvious in some places that I'll show
+
+45
+00:01:39,280 --> 00:01:43,920
+you and less noticeable in some others,
+
+46
+00:01:41,759 --> 00:01:46,079
+but in general, they're calling this
+
+47
+00:01:43,920 --> 00:01:48,159
+liquid glass. And they're treating
+
+48
+00:01:46,079 --> 00:01:50,640
+basically every window, every dialogue
+
+49
+00:01:48,159 --> 00:01:53,840
+box, every icon, every sidebar that they
+
+50
+00:01:50,640 --> 00:01:56,240
+possibly can as like a piece of physical
+
+51
+00:01:53,840 --> 00:01:57,920
+glass that's mostly transparent to the
+
+52
+00:01:56,240 --> 00:02:00,159
+things below it. Even the lock screen
+
+53
+00:01:57,920 --> 00:02:02,240
+clock and some text, some fonts are
+
+54
+00:02:00,159 --> 00:02:04,880
+clear and transparent. So, we might as
+
+55
+00:02:02,240 --> 00:02:07,600
+well start here with iOS 26 because this
+
+56
+00:02:04,880 --> 00:02:09,599
+is the biggest one. All of the icons are
+
+57
+00:02:07,600 --> 00:02:11,920
+slightly updated. The lock screen clock
+
+58
+00:02:09,599 --> 00:02:14,160
+is just this big glassy clear time that
+
+59
+00:02:11,920 --> 00:02:16,000
+adapts to the size of what's behind it.
+
+60
+00:02:14,160 --> 00:02:18,000
+Once you unlock the iPhone, overall like
+
+61
+00:02:16,000 --> 00:02:20,319
+zoomed out, it doesn't look that
+
+62
+00:02:18,000 --> 00:02:23,120
+different. It's slightly different, but
+
+63
+00:02:20,319 --> 00:02:24,879
+they also kept showing this clear home
+
+64
+00:02:23,120 --> 00:02:27,720
+screen setup where all of the widgets
+
+65
+00:02:24,879 --> 00:02:30,800
+and icons are all clear. This is a new
+
+66
+00:02:27,720 --> 00:02:33,440
+option. And I don't know about this one.
+
+67
+00:02:30,800 --> 00:02:35,120
+I mean, it is new and you can do that if
+
+68
+00:02:33,440 --> 00:02:37,280
+you want to or never turn it on if you
+
+69
+00:02:35,120 --> 00:02:39,680
+don't want to. But I just think that's a
+
+70
+00:02:37,280 --> 00:02:41,120
+it's a little much and readability might
+
+71
+00:02:39,680 --> 00:02:42,480
+be kind of tough. But beyond the liquid
+
+72
+00:02:41,120 --> 00:02:44,400
+glass thing, there are also some new
+
+73
+00:02:42,480 --> 00:02:47,280
+features like they redesigned the camera
+
+74
+00:02:44,400 --> 00:02:50,160
+app really for the first time in a
+
+75
+00:02:47,280 --> 00:02:52,879
+decade plus. It's now going to be super
+
+76
+00:02:50,160 --> 00:02:54,720
+simplified to just photo and video
+
+77
+00:02:52,879 --> 00:02:57,840
+buttons and the shutter. And then
+
+78
+00:02:54,720 --> 00:02:59,280
+there's a whole bunch of hidden UI. So
+
+79
+00:02:57,840 --> 00:03:02,000
+you have to swipe to reveal the
+
+80
+00:02:59,280 --> 00:03:03,840
+additional modes. And those still work
+
+81
+00:03:02,000 --> 00:03:05,680
+the way they did before. But then also
+
+82
+00:03:03,840 --> 00:03:08,159
+the frames per second and resolution
+
+83
+00:03:05,680 --> 00:03:09,519
+settings are also super hidden. you have
+
+84
+00:03:08,159 --> 00:03:11,519
+to know to hit that little button up
+
+85
+00:03:09,519 --> 00:03:13,040
+there in the corner to change to 30 or
+
+86
+00:03:11,519 --> 00:03:14,400
+60 fps, which is a really interesting
+
+87
+00:03:13,040 --> 00:03:16,400
+choice there. I mean, especially on an
+
+88
+00:03:14,400 --> 00:03:18,400
+iPhone where you kind of have to assume
+
+89
+00:03:16,400 --> 00:03:20,159
+Apple knows which things people click
+
+90
+00:03:18,400 --> 00:03:22,480
+most of the time. This kind of implies
+
+91
+00:03:20,159 --> 00:03:24,959
+that nobody ever changes a lot of these
+
+92
+00:03:22,480 --> 00:03:27,360
+things. The swipe up to reveal a lot of
+
+93
+00:03:24,959 --> 00:03:28,640
+those settings. Most people will never
+
+94
+00:03:27,360 --> 00:03:30,640
+see that. But hey, you're watching this
+
+95
+00:03:28,640 --> 00:03:32,879
+video, so now you know that the live
+
+96
+00:03:30,640 --> 00:03:35,599
+photos setting toggle is there under
+
+97
+00:03:32,879 --> 00:03:38,080
+that swipe. So, good for you. There's
+
+98
+00:03:35,599 --> 00:03:39,840
+also uh a new FaceTime app with a new
+
+99
+00:03:38,080 --> 00:03:42,400
+landing page to quickly hit up your main
+
+100
+00:03:39,840 --> 00:03:44,959
+contacts. And then also the phone app is
+
+101
+00:03:42,400 --> 00:03:47,360
+updated to bring voicemail and miss
+
+102
+00:03:44,959 --> 00:03:49,040
+calls and contacts all into one unified
+
+103
+00:03:47,360 --> 00:03:51,840
+place. Kind of like that. And they've
+
+104
+00:03:49,040 --> 00:03:53,519
+also matched or copied. You could say it
+
+105
+00:03:51,840 --> 00:03:56,000
+however you want. Matched or copied. But
+
+106
+00:03:53,519 --> 00:03:58,159
+they've matched two of my favorite Pixel
+
+107
+00:03:56,000 --> 00:04:00,159
+features from the dialer from the phone
+
+108
+00:03:58,159 --> 00:04:01,519
+app, which is call screening and hold
+
+109
+00:04:00,159 --> 00:04:03,360
+for me. Those are the Pixel feature
+
+110
+00:04:01,519 --> 00:04:04,959
+names. So now in iOS 26, there's a
+
+111
+00:04:03,360 --> 00:04:06,720
+feature that can automatically screen
+
+112
+00:04:04,959 --> 00:04:08,480
+unknown numbers and it'll answer the
+
+113
+00:04:06,720 --> 00:04:10,560
+call for you and then transcribe
+
+114
+00:04:08,480 --> 00:04:12,480
+whatever the person says before trying
+
+115
+00:04:10,560 --> 00:04:13,840
+to ring you and showing you who's
+
+116
+00:04:12,480 --> 00:04:16,160
+calling, which is interesting because
+
+117
+00:04:13,840 --> 00:04:18,320
+the Pixel would let me choose that for
+
+118
+00:04:16,160 --> 00:04:20,320
+every single call manually. But then
+
+119
+00:04:18,320 --> 00:04:21,919
+also the hold assist feature is a
+
+120
+00:04:20,320 --> 00:04:23,280
+no-brainer. Just waits on hold for you
+
+121
+00:04:21,919 --> 00:04:24,800
+while you do other things and when it's
+
+122
+00:04:23,280 --> 00:04:26,240
+time to come back, it rings you again.
+
+123
+00:04:24,800 --> 00:04:28,000
+Both super useful. And there's also a
+
+124
+00:04:26,240 --> 00:04:30,880
+couple iMessage features like you can do
+
+125
+00:04:28,000 --> 00:04:32,639
+native polls inside of iMessage. Now,
+
+126
+00:04:30,880 --> 00:04:34,560
+typing indicators and group chats will
+
+127
+00:04:32,639 --> 00:04:37,120
+show you which person is typing, which
+
+128
+00:04:34,560 --> 00:04:39,040
+is sweet. And you can add pictures as
+
+129
+00:04:37,120 --> 00:04:40,800
+backgrounds for each of your iMessage
+
+130
+00:04:39,040 --> 00:04:42,240
+chats. None of this is groundbreaking or
+
+131
+00:04:40,800 --> 00:04:43,680
+unheard of, but it is nice that they're
+
+132
+00:04:42,240 --> 00:04:47,280
+finally adding it. And then I would say
+
+133
+00:04:43,680 --> 00:04:50,320
+the most AI focused thing here is
+
+134
+00:04:47,280 --> 00:04:52,160
+translate. And I I feel like there's
+
+135
+00:04:50,320 --> 00:04:53,520
+like a storm of like a video idea
+
+136
+00:04:52,160 --> 00:04:56,000
+brewing where I might have to make an
+
+137
+00:04:53,520 --> 00:04:57,759
+entire essay about how this is the year
+
+138
+00:04:56,000 --> 00:05:00,000
+of live translation. It's just happening
+
+139
+00:04:57,759 --> 00:05:01,919
+all at once now. Uh but yeah, in short,
+
+140
+00:05:00,000 --> 00:05:04,639
+Apple added live translation to
+
+141
+00:05:01,919 --> 00:05:06,880
+FaceTime, to messages, and the phone
+
+142
+00:05:04,639 --> 00:05:09,600
+app. And it it works basically as you'd
+
+143
+00:05:06,880 --> 00:05:11,600
+expect with the ondevice AI models. If
+
+144
+00:05:09,600 --> 00:05:13,120
+you turn it on during a phone call, you
+
+145
+00:05:11,600 --> 00:05:14,720
+can hear a person speak in their own
+
+146
+00:05:13,120 --> 00:05:16,560
+language, and then it gets translated
+
+147
+00:05:14,720 --> 00:05:18,080
+and read in your language. And then if
+
+148
+00:05:16,560 --> 00:05:19,840
+you want to speak back, it gets
+
+149
+00:05:18,080 --> 00:05:22,000
+translated again and read back in
+
+150
+00:05:19,840 --> 00:05:24,240
+another voice to that person. It's a
+
+151
+00:05:22,000 --> 00:05:25,440
+little laggy, but it gets the job done.
+
+152
+00:05:24,240 --> 00:05:28,479
+There's also a little bit more stuff in
+
+153
+00:05:25,440 --> 00:05:30,720
+maps and in Apple Music and a new games
+
+154
+00:05:28,479 --> 00:05:32,880
+app. Uh I plan on breaking all of this
+
+155
+00:05:30,720 --> 00:05:34,800
+down in a dedicated best new features of
+
+156
+00:05:32,880 --> 00:05:36,160
+iOS video. Definitely get subscribed if
+
+157
+00:05:34,800 --> 00:05:37,520
+you want to see that right when it comes
+
+158
+00:05:36,160 --> 00:05:39,520
+out. I always do this when the public
+
+159
+00:05:37,520 --> 00:05:42,080
+beta rolls around. So that's coming
+
+160
+00:05:39,520 --> 00:05:44,400
+soon. But my main concern from seeing
+
+161
+00:05:42,080 --> 00:05:48,479
+Apple's demo videos and playing with it
+
+162
+00:05:44,400 --> 00:05:51,880
+a little bit myself is readability. this
+
+163
+00:05:48,479 --> 00:05:54,320
+glass aesthetic. It looks cool
+
+164
+00:05:51,880 --> 00:05:56,479
+sometimes, but it also is a little hard
+
+165
+00:05:54,320 --> 00:05:59,199
+to read sometimes. Like, I get that the
+
+166
+00:05:56,479 --> 00:06:01,039
+clear and glassy sheen is very modern
+
+167
+00:05:59,199 --> 00:06:03,360
+and it looks like Vision OS and it's
+
+168
+00:06:01,039 --> 00:06:05,759
+fresh, but also there's a reason that we
+
+169
+00:06:03,360 --> 00:06:07,759
+add backgrounds to things in the video
+
+170
+00:06:05,759 --> 00:06:10,080
+world a lot, even if it's subtle,
+
+171
+00:06:07,759 --> 00:06:12,000
+because it's to provide more contrast to
+
+172
+00:06:10,080 --> 00:06:14,400
+make things easier to see. Just basic
+
+173
+00:06:12,000 --> 00:06:18,080
+stuff. and there were so many bits of
+
+174
+00:06:14,400 --> 00:06:21,360
+text like notifications or menus or even
+
+175
+00:06:18,080 --> 00:06:23,360
+UI elements that just looked kind of
+
+176
+00:06:21,360 --> 00:06:25,360
+harder to read. Now, the OS is supposed
+
+177
+00:06:23,360 --> 00:06:27,360
+to adapt to it by giving light things
+
+178
+00:06:25,360 --> 00:06:29,120
+dark backgrounds and dark things light
+
+179
+00:06:27,360 --> 00:06:32,080
+backgrounds, but sometimes you'll have
+
+180
+00:06:29,120 --> 00:06:34,720
+like a half light half dark background
+
+181
+00:06:32,080 --> 00:06:36,160
+and that's where things get weird. So,
+
+182
+00:06:34,720 --> 00:06:37,280
+I'm curious how this is going to play
+
+183
+00:06:36,160 --> 00:06:40,319
+out. Now, some of the other smaller
+
+184
+00:06:37,280 --> 00:06:42,080
+updates, Watch OS 26 also got a lot of
+
+185
+00:06:40,319 --> 00:06:44,400
+these glassy UI elements, and it's
+
+186
+00:06:42,080 --> 00:06:46,960
+noticeable. There's big touch areas and
+
+187
+00:06:44,400 --> 00:06:48,240
+reflections and glassy buttons galore.
+
+188
+00:06:46,960 --> 00:06:49,919
+And you can also definitely feel that
+
+189
+00:06:48,240 --> 00:06:52,080
+fresh coat of paint. But beyond that, I
+
+190
+00:06:49,919 --> 00:06:54,000
+really like the new wrist flick gesture,
+
+191
+00:06:52,080 --> 00:06:56,160
+which is just that. So, if you ever get
+
+192
+00:06:54,000 --> 00:06:57,360
+a notification and you don't want to do
+
+193
+00:06:56,160 --> 00:06:59,039
+anything with it, you know how it just
+
+194
+00:06:57,360 --> 00:07:01,599
+kind of sits on the watch for a while,
+
+195
+00:06:59,039 --> 00:07:03,120
+you can just flip it and it goes away.
+
+196
+00:07:01,599 --> 00:07:04,800
+So, if you're getting a notification,
+
+197
+00:07:03,120 --> 00:07:06,319
+you don't care, flip it. you're getting
+
+198
+00:07:04,800 --> 00:07:08,160
+a phone call, you don't want to accept
+
+199
+00:07:06,319 --> 00:07:09,599
+the phone call, dismiss it. If you got
+
+200
+00:07:08,160 --> 00:07:10,800
+an alarm that's starting to ring or
+
+201
+00:07:09,599 --> 00:07:12,240
+anything else like that you don't want
+
+202
+00:07:10,800 --> 00:07:14,639
+to be on your screen, just flip your
+
+203
+00:07:12,240 --> 00:07:16,160
+wrist and it goes away. I think I'll be
+
+204
+00:07:14,639 --> 00:07:18,880
+doing this all the time. And the other
+
+205
+00:07:16,160 --> 00:07:21,840
+big thing is this uh workout buddy,
+
+206
+00:07:18,880 --> 00:07:25,360
+which feels I'm going to describe it as
+
+207
+00:07:21,840 --> 00:07:27,759
+Spotify DJ but for Apple Watch workouts.
+
+208
+00:07:25,360 --> 00:07:30,800
+Like it's basically a new customizable
+
+209
+00:07:27,759 --> 00:07:32,560
+high energy voice that talks to you at
+
+210
+00:07:30,800 --> 00:07:34,639
+various times that it thinks you need
+
+211
+00:07:32,560 --> 00:07:36,479
+some energy or motivation during your
+
+212
+00:07:34,639 --> 00:07:38,240
+workout just by telling you stuff like
+
+213
+00:07:36,479 --> 00:07:40,080
+random stats like your heart rate or
+
+214
+00:07:38,240 --> 00:07:41,759
+your mile splits or hey this is your
+
+215
+00:07:40,080 --> 00:07:45,120
+third workout of the week. Great job.
+
+216
+00:07:41,759 --> 00:07:47,599
+Keep it up. Stuff like that. Uh still no
+
+217
+00:07:45,120 --> 00:07:49,440
+group fitness challenges though. I'm
+
+218
+00:07:47,599 --> 00:07:50,960
+going to just keep saying that every
+
+219
+00:07:49,440 --> 00:07:52,319
+year because every year I think they're
+
+220
+00:07:50,960 --> 00:07:54,080
+going to do it and every year they don't
+
+221
+00:07:52,319 --> 00:07:56,800
+do it. Still no group fitness
+
+222
+00:07:54,080 --> 00:07:59,520
+challenges. But then there was tvOS 26.
+
+223
+00:07:56,800 --> 00:08:02,319
+That also got new liquid glass. And I'll
+
+224
+00:07:59,520 --> 00:08:04,000
+be honest with this one. I barely notice
+
+225
+00:08:02,319 --> 00:08:05,800
+it here. But apparently the icons are
+
+226
+00:08:04,000 --> 00:08:08,960
+shimmering a little differently
+
+227
+00:08:05,800 --> 00:08:11,039
+allegedly. Uh but also just more content
+
+228
+00:08:08,960 --> 00:08:13,520
+obviously. Otherwise, not a huge upgrade
+
+229
+00:08:11,039 --> 00:08:17,120
+there. But then there's Mac OS 26, which
+
+230
+00:08:13,520 --> 00:08:18,879
+is also called Tahoe. And this one,
+
+231
+00:08:17,120 --> 00:08:21,360
+yeah, this one you notice this one's got
+
+232
+00:08:18,879 --> 00:08:24,160
+way more very clear elements to it. And
+
+233
+00:08:21,360 --> 00:08:26,879
+some of it kind of can look cool. Others
+
+234
+00:08:24,160 --> 00:08:28,720
+I really don't like as much personally.
+
+235
+00:08:26,879 --> 00:08:30,240
+And I I thought this again about some
+
+236
+00:08:28,720 --> 00:08:32,159
+older versions of Mac OS, so I'm sure
+
+237
+00:08:30,240 --> 00:08:34,839
+we'll get used to it, but like the
+
+238
+00:08:32,159 --> 00:08:37,839
+control center with the super
+
+239
+00:08:34,839 --> 00:08:39,760
+glassified feels a little more cartoony
+
+240
+00:08:37,839 --> 00:08:42,399
+buttons. I'm just not a huge fan of
+
+241
+00:08:39,760 --> 00:08:45,120
+that. You can also do clear widgets,
+
+242
+00:08:42,399 --> 00:08:46,800
+clear dock, and the menu bar is
+
+243
+00:08:45,120 --> 00:08:48,160
+completely clear at the top, which is
+
+244
+00:08:46,800 --> 00:08:50,000
+also sweet. Makes your screen feel
+
+245
+00:08:48,160 --> 00:08:51,920
+bigger. And so, yeah, there's there's
+
+246
+00:08:50,000 --> 00:08:53,760
+some stuff to get used to here. I think
+
+247
+00:08:51,920 --> 00:08:55,440
+I like some of it. It's just not totally
+
+248
+00:08:53,760 --> 00:08:57,120
+like winning me over yet. One really
+
+249
+00:08:55,440 --> 00:08:58,800
+good feature now though is live
+
+250
+00:08:57,120 --> 00:09:00,240
+activities, which is already a nice
+
+251
+00:08:58,800 --> 00:09:02,080
+thing on the iPhone. If you have an
+
+252
+00:09:00,240 --> 00:09:03,680
+iPhone and a Mac, it'll show up in the
+
+253
+00:09:02,080 --> 00:09:05,839
+little menu bar in the Mac when
+
+254
+00:09:03,680 --> 00:09:08,080
+something is like happening, a delivery
+
+255
+00:09:05,839 --> 00:09:09,440
+or a flight information, whatever it is,
+
+256
+00:09:08,080 --> 00:09:10,959
+you can click on it and that'll view
+
+257
+00:09:09,440 --> 00:09:12,160
+that convenient information from the
+
+258
+00:09:10,959 --> 00:09:13,839
+live activity. And then if you want to
+
+259
+00:09:12,160 --> 00:09:16,399
+click on it again, you can bring up the
+
+260
+00:09:13,839 --> 00:09:18,560
+whole iPhone mirrored app to keep track
+
+261
+00:09:16,399 --> 00:09:20,320
+of that live activity. Makes a lot of
+
+262
+00:09:18,560 --> 00:09:22,240
+sense. Nice continuity feature. Anyway,
+
+263
+00:09:20,320 --> 00:09:23,440
+the Mac also gets the new phone app. So,
+
+264
+00:09:22,240 --> 00:09:25,360
+you know, your voicemail and everything
+
+265
+00:09:23,440 --> 00:09:27,600
+in one place and the hold for me, all
+
+266
+00:09:25,360 --> 00:09:30,080
+those features. But the number one
+
+267
+00:09:27,600 --> 00:09:33,279
+biggest update I'm interested in on the
+
+268
+00:09:30,080 --> 00:09:34,240
+Mac is actually the new Spotlight. Now,
+
+269
+00:09:33,279 --> 00:09:35,839
+some of you might not care about
+
+270
+00:09:34,240 --> 00:09:37,279
+Spotlight, but some of you are
+
+271
+00:09:35,839 --> 00:09:38,640
+productivity nerds like me because
+
+272
+00:09:37,279 --> 00:09:39,760
+you're subscribed to a tech YouTube
+
+273
+00:09:38,640 --> 00:09:41,680
+channel. And you might already know
+
+274
+00:09:39,760 --> 00:09:43,600
+about this, but my favorite productivity
+
+275
+00:09:41,680 --> 00:09:45,680
+app on the Mac, and it has been for
+
+276
+00:09:43,600 --> 00:09:49,160
+years. Every fresh new Mac, I install it
+
+277
+00:09:45,680 --> 00:09:51,839
+first, is called Raycast. And it's it's
+
+278
+00:09:49,160 --> 00:09:54,320
+basically Spotlight on steroids. It lets
+
+279
+00:09:51,839 --> 00:09:56,880
+you open apps, but also do shortcuts and
+
+280
+00:09:54,320 --> 00:09:58,800
+do window management and find files and
+
+281
+00:09:56,880 --> 00:10:00,800
+do even more useful things like viewing
+
+282
+00:09:58,800 --> 00:10:02,320
+my clipboard history. So now Apple comes
+
+283
+00:10:00,800 --> 00:10:07,160
+out and shows us the new spotlight in
+
+284
+00:10:02,320 --> 00:10:09,279
+Mac OS 26 and it does almost all of that
+
+285
+00:10:07,160 --> 00:10:11,920
+stuff. This is what we call in the
+
+286
+00:10:09,279 --> 00:10:13,200
+industry getting sherlocked. Basically,
+
+287
+00:10:11,920 --> 00:10:14,880
+Apple showed a whole bunch of really
+
+288
+00:10:13,200 --> 00:10:16,640
+cool stuff you can do now with the new
+
+289
+00:10:14,880 --> 00:10:18,800
+spotlight. It's got this sweet animation
+
+290
+00:10:16,640 --> 00:10:21,600
+which separates out things like file
+
+291
+00:10:18,800 --> 00:10:24,320
+searches or Siri shortcut searches. You
+
+292
+00:10:21,600 --> 00:10:27,200
+can do shortcuts from the keyboard to
+
+293
+00:10:24,320 --> 00:10:29,600
+open actions inside of certain apps and
+
+294
+00:10:27,200 --> 00:10:31,279
+perform them straight up entire strings
+
+295
+00:10:29,600 --> 00:10:33,839
+of commands without even opening an app
+
+296
+00:10:31,279 --> 00:10:35,920
+or touching your mouse. Real power user
+
+297
+00:10:33,839 --> 00:10:37,920
+stuff. Productivity nerd stuff right
+
+298
+00:10:35,920 --> 00:10:39,440
+here. It doesn't do fully every single
+
+299
+00:10:37,920 --> 00:10:41,440
+thing that I've done with Raycast. like
+
+300
+00:10:39,440 --> 00:10:44,320
+in Raycast I can tab over and and start
+
+301
+00:10:41,440 --> 00:10:46,160
+a new search or conversation with GPT or
+
+302
+00:10:44,320 --> 00:10:48,240
+Gemini or a bunch of other stuff. The
+
+303
+00:10:46,160 --> 00:10:50,320
+spotlight doesn't do that yet, but who's
+
+304
+00:10:48,240 --> 00:10:52,800
+to say if next year they might add that
+
+305
+00:10:50,320 --> 00:10:54,720
+feature or might slowly start doing all
+
+306
+00:10:52,800 --> 00:10:56,560
+the things that Raycast does. It's an
+
+307
+00:10:54,720 --> 00:10:59,440
+interesting step. It's definitely
+
+308
+00:10:56,560 --> 00:11:00,959
+better. But then, okay, Vision OS, this
+
+309
+00:10:59,440 --> 00:11:02,399
+is where all the glass came from. This
+
+310
+00:11:00,959 --> 00:11:04,720
+is technically only the third version of
+
+311
+00:11:02,399 --> 00:11:06,000
+Vision OS, but now it's Vision OS 26.
+
+312
+00:11:04,720 --> 00:11:09,680
+And there's some smaller updates to this
+
+313
+00:11:06,000 --> 00:11:11,440
+one, but I think the new widgets, even
+
+314
+00:11:09,680 --> 00:11:14,079
+though they're kind of silly and not
+
+315
+00:11:11,440 --> 00:11:15,600
+really that functional, I think they're
+
+316
+00:11:14,079 --> 00:11:19,120
+awesome. I think they're super cool.
+
+317
+00:11:15,600 --> 00:11:21,680
+Basically, you can pin these things to
+
+318
+00:11:19,120 --> 00:11:24,399
+persistent locations and customize the
+
+319
+00:11:21,680 --> 00:11:25,680
+size and depth and color of them exactly
+
+320
+00:11:24,399 --> 00:11:28,160
+how you want. So, they showed things
+
+321
+00:11:25,680 --> 00:11:30,320
+like clocks and weather widgets and
+
+322
+00:11:28,160 --> 00:11:33,279
+picture frames, but then they have these
+
+323
+00:11:30,320 --> 00:11:35,519
+like really convincing location pinning
+
+324
+00:11:33,279 --> 00:11:38,480
+plus all the reflectivity and depth that
+
+325
+00:11:35,519 --> 00:11:40,640
+they always have. And I just I don't
+
+326
+00:11:38,480 --> 00:11:42,399
+know. I thought it was super cool. I was
+
+327
+00:11:40,640 --> 00:11:44,880
+sold. But really, this is also pinned
+
+328
+00:11:42,399 --> 00:11:46,800
+with the fact that Vision OS or the
+
+329
+00:11:44,880 --> 00:11:49,680
+Vision Pro will remember where you put
+
+330
+00:11:46,800 --> 00:11:51,040
+your Windows now all the time, like
+
+331
+00:11:49,680 --> 00:11:52,640
+through a reboot and everything, which
+
+332
+00:11:51,040 --> 00:11:53,920
+it didn't do before. It was one of my
+
+333
+00:11:52,640 --> 00:11:56,560
+biggest complaints I talked about in the
+
+334
+00:11:53,920 --> 00:11:58,079
+original Vision OS review. So, yes, it
+
+335
+00:11:56,560 --> 00:11:59,760
+will remember where you put your windows
+
+336
+00:11:58,079 --> 00:12:02,880
+and where you put your widgets. The
+
+337
+00:11:59,760 --> 00:12:04,399
+updated fidelity of the personas also,
+
+338
+00:12:02,880 --> 00:12:05,680
+uh, it was it's inevitable. Like, we
+
+339
+00:12:04,399 --> 00:12:07,360
+just knew they were going to continually
+
+340
+00:12:05,680 --> 00:12:09,839
+get more and more photorealistic, so
+
+341
+00:12:07,360 --> 00:12:10,800
+they showed another pretty big jump. Not
+
+342
+00:12:09,839 --> 00:12:13,360
+sure if you're going to have to do
+
+343
+00:12:10,800 --> 00:12:16,240
+another scan to get the updated Persona,
+
+344
+00:12:13,360 --> 00:12:18,720
+but either way, looks much better and
+
+345
+00:12:16,240 --> 00:12:20,800
+less cartoon ghosty. And there's also
+
+346
+00:12:18,720 --> 00:12:22,800
+they added PlayStation VR2 sense
+
+347
+00:12:20,800 --> 00:12:24,560
+controller support which no doubt will
+
+348
+00:12:22,800 --> 00:12:27,200
+be much better for some of the more
+
+349
+00:12:24,560 --> 00:12:29,040
+precise controls in certain games. Uh
+
+350
+00:12:27,200 --> 00:12:30,720
+there's also a new Jupiter environment.
+
+351
+00:12:29,040 --> 00:12:33,600
+So you're on one of Jupiter's moons with
+
+352
+00:12:30,720 --> 00:12:36,320
+Jupiter in the sky above you. Cool. They
+
+353
+00:12:33,600 --> 00:12:39,440
+also added native 360 video support
+
+354
+00:12:36,320 --> 00:12:41,839
+playback for cameras from GoPro, Insta
+
+355
+00:12:39,440 --> 00:12:43,279
+360, and Canon. It's pretty cool. We're
+
+356
+00:12:41,839 --> 00:12:45,680
+still hoping to see like more
+
+357
+00:12:43,279 --> 00:12:47,839
+highquality 360 content for these
+
+358
+00:12:45,680 --> 00:12:49,440
+headsets to view. There's some on
+
+359
+00:12:47,839 --> 00:12:52,320
+YouTube, but not a ton. But then the
+
+360
+00:12:49,440 --> 00:12:58,560
+biggest, most interesting update of the
+
+361
+00:12:52,320 --> 00:13:00,959
+day by far to me was iPad OS 26. This
+
+362
+00:12:58,560 --> 00:13:04,000
+was fascinating because, you know, every
+
+363
+00:13:00,959 --> 00:13:05,519
+iPad Pro video for the last 6 years or
+
+364
+00:13:04,000 --> 00:13:08,320
+however long it's been has always said
+
+365
+00:13:05,519 --> 00:13:10,320
+the same thing. It's great. It's amazing
+
+366
+00:13:08,320 --> 00:13:11,920
+hardware. It's very powerful, but it's
+
+367
+00:13:10,320 --> 00:13:13,760
+still an iPad. Meaning, it's still going
+
+368
+00:13:11,920 --> 00:13:16,560
+to have lots of limitations. And we
+
+369
+00:13:13,760 --> 00:13:19,519
+never really expect Apple to add those
+
+370
+00:13:16,560 --> 00:13:21,519
+really computer-like extra features
+
+371
+00:13:19,519 --> 00:13:22,639
+because they make computers, too. Why?
+
+372
+00:13:21,519 --> 00:13:24,000
+They're a business. They're not going to
+
+373
+00:13:22,639 --> 00:13:25,600
+cannibalize their own products. They're
+
+374
+00:13:24,000 --> 00:13:27,040
+not going to overlap that stuff. So,
+
+375
+00:13:25,600 --> 00:13:29,800
+there's iPads and then there's
+
+376
+00:13:27,040 --> 00:13:32,399
+computers. But with this update, I feel
+
+377
+00:13:29,800 --> 00:13:34,000
+like they they they use the word game
+
+378
+00:13:32,399 --> 00:13:35,959
+changer, which they use that word all
+
+379
+00:13:34,000 --> 00:13:38,880
+the time. But I actually feel like this
+
+380
+00:13:35,959 --> 00:13:42,040
+genuinely fit the bill because they
+
+381
+00:13:38,880 --> 00:13:44,639
+added things multitasking, file
+
+382
+00:13:42,040 --> 00:13:46,720
+management, things straight from the
+
+383
+00:13:44,639 --> 00:13:48,800
+Mac. So, yes, it still has the liquid
+
+384
+00:13:46,720 --> 00:13:51,519
+glass, of course. It has the new phone
+
+385
+00:13:48,800 --> 00:13:54,320
+app, the new lock screen, all the new
+
+386
+00:13:51,519 --> 00:13:56,320
+icons and widgets and all that, but then
+
+387
+00:13:54,320 --> 00:13:59,279
+this whole new multitasking and
+
+388
+00:13:56,320 --> 00:14:00,959
+multi-wind system where in any app, you
+
+389
+00:13:59,279 --> 00:14:02,880
+can just grab that handle in the bottom
+
+390
+00:14:00,959 --> 00:14:04,320
+right corner and shrink it in and make
+
+391
+00:14:02,880 --> 00:14:06,320
+the app whatever size you want
+
+392
+00:14:04,320 --> 00:14:07,680
+immediately to a floating window. And
+
+393
+00:14:06,320 --> 00:14:09,600
+then you can just start stacking
+
+394
+00:14:07,680 --> 00:14:11,199
+floating windows and and putting them
+
+395
+00:14:09,600 --> 00:14:14,160
+side by side and messing around with
+
+396
+00:14:11,199 --> 00:14:15,440
+window management very very freely. I'm
+
+397
+00:14:14,160 --> 00:14:17,600
+sure there's a limit to how many windows
+
+398
+00:14:15,440 --> 00:14:20,000
+you can have open. I got as many as four
+
+399
+00:14:17,600 --> 00:14:23,279
+open at the same time. But not only
+
+400
+00:14:20,000 --> 00:14:25,519
+that, they added this three dot window
+
+401
+00:14:23,279 --> 00:14:27,040
+control to the corner of each window,
+
+402
+00:14:25,519 --> 00:14:29,519
+the stop lightss that we have straight
+
+403
+00:14:27,040 --> 00:14:32,000
+from the Mac, so you can minimize or
+
+404
+00:14:29,519 --> 00:14:35,440
+change the shape of any app, just like
+
+405
+00:14:32,000 --> 00:14:38,720
+on a Mac. And on top of that, there's a
+
+406
+00:14:35,440 --> 00:14:40,800
+new literal Mac menu bar at the top of
+
+407
+00:14:38,720 --> 00:14:43,360
+the screen just giving you file, edit,
+
+408
+00:14:40,800 --> 00:14:46,000
+view, menu, help, just stuff that you
+
+409
+00:14:43,360 --> 00:14:48,399
+see in Mac apps. There's also a
+
+410
+00:14:46,000 --> 00:14:50,240
+redesigned cursor that seems a lot more
+
+411
+00:14:48,399 --> 00:14:52,000
+like a Mac cursor. It's less of a
+
+412
+00:14:50,240 --> 00:14:54,399
+floating blob that had like the aim
+
+413
+00:14:52,000 --> 00:14:56,639
+assist that we had before. Now it's just
+
+414
+00:14:54,399 --> 00:14:58,000
+a normal mouse. There's also a new files
+
+415
+00:14:56,639 --> 00:14:59,360
+app that lets you sort through things
+
+416
+00:14:58,000 --> 00:15:01,440
+with different ways, the same way you
+
+417
+00:14:59,360 --> 00:15:02,959
+would with the Finder app on a Mac.
+
+418
+00:15:01,440 --> 00:15:05,040
+There's now like you can have downloads
+
+419
+00:15:02,959 --> 00:15:07,199
+in your doc. There's all kinds of things
+
+420
+00:15:05,040 --> 00:15:09,079
+that I mean as someone who's used a Mac
+
+421
+00:15:07,199 --> 00:15:11,600
+for years.
+
+422
+00:15:09,079 --> 00:15:13,920
+Uh feels exactly like a Mac. There is
+
+423
+00:15:11,600 --> 00:15:16,320
+even an audio input selector built in
+
+424
+00:15:13,920 --> 00:15:17,920
+now for all media apps, which sounds
+
+425
+00:15:16,320 --> 00:15:20,160
+like such a small thing, but do you know
+
+426
+00:15:17,920 --> 00:15:23,839
+how hard it's been to change your
+
+427
+00:15:20,160 --> 00:15:25,440
+microphone input source on an iPad for
+
+428
+00:15:23,839 --> 00:15:27,920
+all these years? It's like they're
+
+429
+00:15:25,440 --> 00:15:29,760
+they're choosing now to add it. Great.
+
+430
+00:15:27,920 --> 00:15:32,000
+Also, background activities. So, if
+
+431
+00:15:29,760 --> 00:15:34,720
+you're exporting something from Final
+
+432
+00:15:32,000 --> 00:15:37,440
+Cut Pro for iPad, you can close the
+
+433
+00:15:34,720 --> 00:15:39,959
+Final Cut Pro app and do other things
+
+434
+00:15:37,440 --> 00:15:42,160
+and the export will continue in the
+
+435
+00:15:39,959 --> 00:15:43,600
+background just like a computer. So,
+
+436
+00:15:42,160 --> 00:15:46,000
+yeah, as a computer user, I'm
+
+437
+00:15:43,600 --> 00:15:48,000
+fascinated. This moves the iPad,
+
+438
+00:15:46,000 --> 00:15:51,000
+especially like the most powerful iPad
+
+439
+00:15:48,000 --> 00:15:53,839
+Pro, way further on the spectrum of
+
+440
+00:15:51,000 --> 00:15:55,360
+compelling laptop alternatives for
+
+441
+00:15:53,839 --> 00:15:56,880
+certain people. It certainly doesn't do
+
+442
+00:15:55,360 --> 00:15:58,800
+everything. Obviously, it still doesn't
+
+443
+00:15:56,880 --> 00:16:00,320
+have multiple profile support. There are
+
+444
+00:15:58,800 --> 00:16:02,399
+some basics that we're still going to be
+
+445
+00:16:00,320 --> 00:16:04,720
+missing, but I never thought that they
+
+446
+00:16:02,399 --> 00:16:06,800
+would go this far. And it definitely
+
+447
+00:16:04,720 --> 00:16:08,720
+feels like in lie of some other AI
+
+448
+00:16:06,800 --> 00:16:09,920
+stuff, they took a lot of wishlist
+
+449
+00:16:08,720 --> 00:16:11,839
+things that people have been talking
+
+450
+00:16:09,920 --> 00:16:13,040
+about with the iPads and gave them to
+
+451
+00:16:11,839 --> 00:16:14,720
+us. But speaking of that, I mean, the
+
+452
+00:16:13,040 --> 00:16:18,320
+real question is, were all of those
+
+453
+00:16:14,720 --> 00:16:20,480
+features enough to, you know, tide us
+
+454
+00:16:18,320 --> 00:16:22,160
+over, to distract us from the lack of AI
+
+455
+00:16:20,480 --> 00:16:23,600
+stuff? I looked at the transcript and if
+
+456
+00:16:22,160 --> 00:16:25,560
+if the transcript that I have is
+
+457
+00:16:23,600 --> 00:16:28,480
+accurate, they said the word
+
+458
+00:16:25,560 --> 00:16:30,399
+Siri times in that entire 90minute
+
+459
+00:16:28,480 --> 00:16:32,399
+keynote. So that clearly wasn't a big
+
+460
+00:16:30,399 --> 00:16:35,759
+focus. And to me, it just feels like
+
+461
+00:16:32,399 --> 00:16:37,959
+Apple's AI strength, if they have one,
+
+462
+00:16:35,759 --> 00:16:40,320
+is really much more in how well
+
+463
+00:16:37,959 --> 00:16:42,639
+integrated their features are. It's not
+
+464
+00:16:40,320 --> 00:16:44,079
+going to be how good the AI is. It's
+
+465
+00:16:42,639 --> 00:16:45,680
+just how plugged in they are to their
+
+466
+00:16:44,079 --> 00:16:48,320
+ecosystem. Like a lot of features they
+
+467
+00:16:45,680 --> 00:16:50,320
+showed us do use AI, but they aren't
+
+468
+00:16:48,320 --> 00:16:52,880
+necessarily branded as AI or Apple
+
+469
+00:16:50,320 --> 00:16:54,639
+intelligence all the time. And then also
+
+470
+00:16:52,880 --> 00:16:56,480
+some of this Apple intelligence stuff is
+
+471
+00:16:54,639 --> 00:16:58,399
+slowly taking steps forward, including
+
+472
+00:16:56,480 --> 00:17:00,320
+them making their own foundational
+
+473
+00:16:58,399 --> 00:17:03,279
+models available for developers to have
+
+474
+00:17:00,320 --> 00:17:05,520
+access to those ondevice models and
+
+475
+00:17:03,279 --> 00:17:06,959
+build more AI features into their apps.
+
+476
+00:17:05,520 --> 00:17:09,520
+Now, are those going to be the best
+
+477
+00:17:06,959 --> 00:17:11,760
+models in the world? No, probably not.
+
+478
+00:17:09,520 --> 00:17:14,000
+At least not right now. but they are on
+
+479
+00:17:11,760 --> 00:17:15,600
+device and local and can be used offline
+
+480
+00:17:14,000 --> 00:17:16,559
+and will probably be the fastest since
+
+481
+00:17:15,600 --> 00:17:17,919
+they don't have to go to the internet
+
+482
+00:17:16,559 --> 00:17:20,160
+and back. So, you can probably expect
+
+483
+00:17:17,919 --> 00:17:21,600
+many more apps to have little AI
+
+484
+00:17:20,160 --> 00:17:23,839
+features built into them, whether it's
+
+485
+00:17:21,600 --> 00:17:25,600
+just summarizations here and there or
+
+486
+00:17:23,839 --> 00:17:27,480
+shortening things that were longer,
+
+487
+00:17:25,600 --> 00:17:31,440
+things like that. Now, as for the big
+
+488
+00:17:27,480 --> 00:17:33,440
+LLM Siri upgrade that we kind of in the
+
+489
+00:17:31,440 --> 00:17:35,039
+background knew was taking too long,
+
+490
+00:17:33,440 --> 00:17:36,160
+they had a statement at the very
+
+491
+00:17:35,039 --> 00:17:37,840
+beginning of the keynote. If you
+
+492
+00:17:36,160 --> 00:17:40,559
+blinked, you might have missed it, but
+
+493
+00:17:37,840 --> 00:17:43,520
+the statement was, "This work required
+
+494
+00:17:40,559 --> 00:17:44,960
+more time to reach our high quality bar,
+
+495
+00:17:43,520 --> 00:17:48,360
+and we look forward to sharing more
+
+496
+00:17:44,960 --> 00:17:50,559
+about it in the coming year,
+
+497
+00:17:48,360 --> 00:17:52,400
+2026." We'll see. I just like that they
+
+498
+00:17:50,559 --> 00:17:53,840
+added the onscreen capabilities for
+
+499
+00:17:52,400 --> 00:17:56,320
+visual intelligence. So, it was just
+
+500
+00:17:53,840 --> 00:17:58,080
+from the camera feed before, but now,
+
+501
+00:17:56,320 --> 00:18:01,120
+you know how every Android phone has
+
+502
+00:17:58,080 --> 00:18:02,799
+circle to search? Well, yeah. Now, with
+
+503
+00:18:01,120 --> 00:18:05,360
+screenshots, the iPhone's going to get
+
+504
+00:18:02,799 --> 00:18:07,120
+that, too. This was a fascinating WWDC.
+
+505
+00:18:05,360 --> 00:18:09,520
+I am very excited to dig into these
+
+506
+00:18:07,120 --> 00:18:10,799
+betas and see what's actually good,
+
+507
+00:18:09,520 --> 00:18:12,559
+what's new about them. Stay tuned for
+
+508
+00:18:10,799 --> 00:18:14,360
+those videos. But let me know in the
+
+509
+00:18:12,559 --> 00:18:16,160
+comments what you think. Thanks for
+
+510
+00:18:14,360 --> 00:18:20,039
+watching. Catch you guys in the next
+
+511
+00:18:16,160 --> 00:18:20,039
+one. Peace.
+

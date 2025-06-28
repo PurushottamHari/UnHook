@@ -1,0 +1,14 @@
+Your response should be formatted as a valid JSON object matching this schema:
+"rejected_items": [
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  },
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  }
+]
+
+Return only the raw JSON output. Do not include markdown formatting, code blocks, or any other text.
+The response must be plain JSON, beginning with { and ending with }.

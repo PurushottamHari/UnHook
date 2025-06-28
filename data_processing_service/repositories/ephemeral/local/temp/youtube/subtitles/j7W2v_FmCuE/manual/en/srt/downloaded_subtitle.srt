@@ -1,0 +1,1356 @@
+1
+00:00:00,370 --> 00:00:04,799
+[Music]
+
+2
+00:00:02,960 --> 00:00:07,040
+The dessert names may be gone, but the
+
+3
+00:00:04,799 --> 00:00:09,840
+Android updates, well, they keep coming.
+
+4
+00:00:07,040 --> 00:00:12,639
+I've been running the Android 16 beta on
+
+5
+00:00:09,840 --> 00:00:13,679
+my Pixel 9 Pro for the past couple days
+
+6
+00:00:12,639 --> 00:00:15,599
+now. Now, if you've been paying
+
+7
+00:00:13,679 --> 00:00:17,119
+attention to these updates over the
+
+8
+00:00:15,599 --> 00:00:19,039
+years to Android, you've noticed the
+
+9
+00:00:17,119 --> 00:00:21,039
+trend now is less and less like major
+
+10
+00:00:19,039 --> 00:00:23,840
+overhauls and more, you know, little
+
+11
+00:00:21,039 --> 00:00:25,359
+subtle tweaks and refinements, little
+
+12
+00:00:23,840 --> 00:00:27,760
+things here and there. And this latest
+
+13
+00:00:25,359 --> 00:00:29,359
+update is almost almost purely
+
+14
+00:00:27,760 --> 00:00:30,400
+aesthetic, especially in this first
+
+15
+00:00:29,359 --> 00:00:32,920
+beta. Matter of fact, there aren't
+
+16
+00:00:30,400 --> 00:00:35,360
+really any any big new
+
+17
+00:00:32,920 --> 00:00:36,960
+capabilities in this build of Android
+
+18
+00:00:35,360 --> 00:00:39,280
+16. It's more just that it's it's just
+
+19
+00:00:36,960 --> 00:00:41,040
+it's built different. It it just acts a
+
+20
+00:00:39,280 --> 00:00:43,600
+little different. It looks a little
+
+21
+00:00:41,040 --> 00:00:44,800
+different. It feels a little different.
+
+22
+00:00:43,600 --> 00:00:45,920
+And I like it. You know, they started
+
+23
+00:00:44,800 --> 00:00:48,879
+down this path a few years ago with
+
+24
+00:00:45,920 --> 00:00:50,559
+material design and then material u and
+
+25
+00:00:48,879 --> 00:00:51,840
+then now of course Google has to name
+
+26
+00:00:50,559 --> 00:00:55,600
+everything. So, this latest version is
+
+27
+00:00:51,840 --> 00:00:56,879
+called Material 3 Expressive, but it
+
+28
+00:00:55,600 --> 00:00:58,719
+actually makes sense because everything
+
+29
+00:00:56,879 --> 00:01:00,879
+here is a little brighter, a little more
+
+30
+00:00:58,719 --> 00:01:03,440
+playful, and just a little bit more
+
+31
+00:01:00,879 --> 00:01:04,799
+expressive. Kind of like real physical
+
+32
+00:01:03,440 --> 00:01:05,920
+objects. So, let's just jump right in.
+
+33
+00:01:04,799 --> 00:01:07,360
+I'm going to give you a tour of this
+
+34
+00:01:05,920 --> 00:01:09,600
+fresh coat of paint that you'll probably
+
+35
+00:01:07,360 --> 00:01:12,240
+only ever get on your phone if you also
+
+36
+00:01:09,600 --> 00:01:14,640
+have a Google Pixel. Uh, either way,
+
+37
+00:01:12,240 --> 00:01:18,240
+these are my top five favorite new
+
+38
+00:01:14,640 --> 00:01:20,479
+things in Android 16. So, number five is
+
+39
+00:01:18,240 --> 00:01:22,640
+lock screen customization. You know,
+
+40
+00:01:20,479 --> 00:01:25,119
+they they say we unlock our phones a h
+
+41
+00:01:22,640 --> 00:01:26,720
+100 times a day, so we might as well
+
+42
+00:01:25,119 --> 00:01:29,119
+like what we see when we get there. And
+
+43
+00:01:26,720 --> 00:01:31,360
+Android 16 has a slightly different lock
+
+44
+00:01:29,119 --> 00:01:33,119
+screen picker than 15. You still get
+
+45
+00:01:31,360 --> 00:01:34,880
+there the same way by long pressing lock
+
+46
+00:01:33,119 --> 00:01:37,200
+screen and then hitting customize down
+
+47
+00:01:34,880 --> 00:01:38,960
+there. But then in here, it's just a
+
+48
+00:01:37,200 --> 00:01:41,119
+little more neatly organized. First of
+
+49
+00:01:38,960 --> 00:01:43,600
+all, I like this animation here to
+
+50
+00:01:41,119 --> 00:01:45,520
+reveal the wallpaper selector. That's
+
+51
+00:01:43,600 --> 00:01:47,360
+nice. They didn't have to do that. But
+
+52
+00:01:45,520 --> 00:01:49,439
+from there, then there's the new clock
+
+53
+00:01:47,360 --> 00:01:50,960
+customization. And with this one, all
+
+54
+00:01:49,439 --> 00:01:53,280
+the way on the left here, you have this
+
+55
+00:01:50,960 --> 00:01:55,439
+slider to pretty drastically change the
+
+56
+00:01:53,280 --> 00:01:57,040
+font thickness from this bold one all
+
+57
+00:01:55,439 --> 00:01:58,880
+the way to razor thin if you're into
+
+58
+00:01:57,040 --> 00:02:00,399
+that. But then also, you choose for your
+
+59
+00:01:58,880 --> 00:02:02,000
+notifications on the lock screen if you
+
+60
+00:02:00,399 --> 00:02:04,799
+want them to either be the full list
+
+61
+00:02:02,000 --> 00:02:06,079
+with everything or a compact view. The
+
+62
+00:02:04,799 --> 00:02:07,759
+compact view is just going to show the
+
+63
+00:02:06,079 --> 00:02:09,759
+little icons underneath the time, but
+
+64
+00:02:07,759 --> 00:02:11,840
+the full view just shows every single
+
+65
+00:02:09,759 --> 00:02:13,040
+thing from every notification. And then
+
+66
+00:02:11,840 --> 00:02:15,120
+you can still of course change your
+
+67
+00:02:13,040 --> 00:02:16,959
+shortcuts for the left side and the
+
+68
+00:02:15,120 --> 00:02:18,560
+right side. Just everything here. It's
+
+69
+00:02:16,959 --> 00:02:20,080
+not like new capabilities. It's just
+
+70
+00:02:18,560 --> 00:02:22,160
+more neatly organized to help you dial
+
+71
+00:02:20,080 --> 00:02:23,440
+in the perfect lock screen for you. So,
+
+72
+00:02:22,160 --> 00:02:26,160
+that's a nice little update there. So,
+
+73
+00:02:23,440 --> 00:02:28,720
+then number four, recent apps. Now,
+
+74
+00:02:26,160 --> 00:02:30,640
+normally the multitasking menu of recent
+
+75
+00:02:28,720 --> 00:02:31,760
+apps on your phone is not the most
+
+76
+00:02:30,640 --> 00:02:33,760
+exciting thing in the world, but I'm
+
+77
+00:02:31,760 --> 00:02:35,280
+putting this as my number four here for
+
+78
+00:02:33,760 --> 00:02:36,720
+two main reasons. Actually, I'm going to
+
+79
+00:02:35,280 --> 00:02:38,959
+throw in three. The first is that they
+
+80
+00:02:36,720 --> 00:02:40,720
+added this drop-down to every app. And
+
+81
+00:02:38,959 --> 00:02:42,160
+if you click that, it gives you more
+
+82
+00:02:40,720 --> 00:02:44,160
+actions for things you might want to do.
+
+83
+00:02:42,160 --> 00:02:45,680
+And split screen is in there. So before
+
+84
+00:02:44,160 --> 00:02:48,000
+you, you know, you had to know to hit
+
+85
+00:02:45,680 --> 00:02:49,280
+the app icon at the top and then find
+
+86
+00:02:48,000 --> 00:02:51,760
+that. I think most people didn't know
+
+87
+00:02:49,280 --> 00:02:54,640
+about that hidden UI. So exposing this
+
+88
+00:02:51,760 --> 00:02:57,920
+to the not so hidden is good. And then
+
+89
+00:02:54,640 --> 00:03:00,319
+two is the physics. And this one's more
+
+90
+00:02:57,920 --> 00:03:02,560
+subtle, but part of a bigger theme with
+
+91
+00:03:00,319 --> 00:03:04,560
+Android 16 here, which is playful and
+
+92
+00:03:02,560 --> 00:03:07,599
+reactive physics that makes these
+
+93
+00:03:04,560 --> 00:03:09,120
+windows and pieces of UI feel like
+
+94
+00:03:07,599 --> 00:03:11,200
+physical objects. So you can see when
+
+95
+00:03:09,120 --> 00:03:13,200
+I'm dragging the window around, the ones
+
+96
+00:03:11,200 --> 00:03:14,720
+next to it also move a little bit. And
+
+97
+00:03:13,200 --> 00:03:16,239
+then when you finally release it, then
+
+98
+00:03:14,720 --> 00:03:18,080
+the neighboring windows bounce in.
+
+99
+00:03:16,239 --> 00:03:20,720
+Again, it's subtle, but it's all good
+
+100
+00:03:18,080 --> 00:03:22,560
+stuff. And also, shout out to 95 Google.
+
+101
+00:03:20,720 --> 00:03:24,640
+They made a video showing the same beta,
+
+102
+00:03:22,560 --> 00:03:26,560
+but on a Pixel Pro Fold. And there's
+
+103
+00:03:24,640 --> 00:03:29,360
+even more fun animations with the dock
+
+104
+00:03:26,560 --> 00:03:31,120
+at the bottom and free form floating
+
+105
+00:03:29,360 --> 00:03:33,280
+windows as well. It kind of makes me
+
+106
+00:03:31,120 --> 00:03:35,280
+want to daily drive a Pixel 9 Pro Fold
+
+107
+00:03:33,280 --> 00:03:36,400
+again. It's all good stuff. But then
+
+108
+00:03:35,280 --> 00:03:37,920
+number three, I just decided to throw in
+
+109
+00:03:36,400 --> 00:03:39,680
+at the end is just the you can't feel
+
+110
+00:03:37,920 --> 00:03:42,799
+it, but the haptics as you're scrolling
+
+111
+00:03:39,680 --> 00:03:44,239
+through these is obviously you can't
+
+112
+00:03:42,799 --> 00:03:47,120
+like tell through the screen, but it's
+
+113
+00:03:44,239 --> 00:03:49,760
+like a like a every every one has a
+
+114
+00:03:47,120 --> 00:03:51,959
+little hitch point. It's kind of nice. I
+
+115
+00:03:49,760 --> 00:03:54,720
+like it. But anyway, okay, number three,
+
+116
+00:03:51,959 --> 00:03:56,080
+customizing the launcher. Now, again,
+
+117
+00:03:54,720 --> 00:03:57,280
+it's going to be subtle with this one,
+
+118
+00:03:56,080 --> 00:03:59,120
+so I'm going to hit you with a side by
+
+119
+00:03:57,280 --> 00:04:00,959
+side to hopefully, you know, better show
+
+120
+00:03:59,120 --> 00:04:02,239
+you the difference between 15 and 16.
+
+121
+00:04:00,959 --> 00:04:04,159
+But right off the bat, the non-
+
+122
+00:04:02,239 --> 00:04:06,319
+removable at a glance widget, which is
+
+123
+00:04:04,159 --> 00:04:08,480
+still non- removable, uh, but it's at
+
+124
+00:04:06,319 --> 00:04:10,000
+least a little bit smaller now in that
+
+125
+00:04:08,480 --> 00:04:12,720
+top left corner. It's a little bit of a
+
+126
+00:04:10,000 --> 00:04:14,720
+slimmer, trimmer font, and also made
+
+127
+00:04:12,720 --> 00:04:15,920
+room for an entire new row of icons on
+
+128
+00:04:14,720 --> 00:04:17,919
+the home screen. So, there's new grid
+
+129
+00:04:15,920 --> 00:04:20,880
+sizes available as well. But then
+
+130
+00:04:17,919 --> 00:04:22,320
+wallpaper customization. So, hey, if you
+
+131
+00:04:20,880 --> 00:04:24,320
+know me, you know I like wallpapers. No,
+
+132
+00:04:22,320 --> 00:04:26,800
+no shame to that. So, select a new
+
+133
+00:04:24,320 --> 00:04:29,280
+wallpaper in Android 16. And at the
+
+134
+00:04:26,800 --> 00:04:31,280
+bottom, you'll see an effect button that
+
+135
+00:04:29,280 --> 00:04:33,840
+shows up. And if you hit that, it brings
+
+136
+00:04:31,280 --> 00:04:36,800
+up this whole customizer just to add
+
+137
+00:04:33,840 --> 00:04:38,320
+effects to your background. So the shape
+
+138
+00:04:36,800 --> 00:04:40,320
+one is pretty straightforward. It
+
+139
+00:04:38,320 --> 00:04:43,040
+basically creates a window into your
+
+140
+00:04:40,320 --> 00:04:44,720
+background image behind a solid color
+
+141
+00:04:43,040 --> 00:04:46,560
+which is picked from the colors in your
+
+142
+00:04:44,720 --> 00:04:47,840
+picture. So it kind of matches and you
+
+143
+00:04:46,560 --> 00:04:49,280
+can flip through all these shapes and
+
+144
+00:04:47,840 --> 00:04:51,040
+colors and just kind of mess around and
+
+145
+00:04:49,280 --> 00:04:53,199
+it's kind of cool. It creates a unique
+
+146
+00:04:51,040 --> 00:04:57,360
+look with the cutout. But then there's
+
+147
+00:04:53,199 --> 00:05:00,160
+also weather, which literally adds live
+
+148
+00:04:57,360 --> 00:05:02,800
+weather effects over your wallpaper. So
+
+149
+00:05:00,160 --> 00:05:04,479
+if I hit fog and then hit next and
+
+150
+00:05:02,800 --> 00:05:06,479
+select everything, basically the next
+
+151
+00:05:04,479 --> 00:05:08,639
+time I unlock my phone, there's a bunch
+
+152
+00:05:06,479 --> 00:05:10,800
+of fog that appears floating across my
+
+153
+00:05:08,639 --> 00:05:12,000
+lock screen and then I unlock and it's
+
+154
+00:05:10,800 --> 00:05:13,840
+still there and it takes a few seconds
+
+155
+00:05:12,000 --> 00:05:17,600
+and then kind of burns away. The the fog
+
+156
+00:05:13,840 --> 00:05:19,919
+parts away. It's kind of random, but all
+
+157
+00:05:17,600 --> 00:05:22,160
+right. There's also rain, which as you
+
+158
+00:05:19,919 --> 00:05:24,080
+can see just rains full screen like that
+
+159
+00:05:22,160 --> 00:05:26,880
+weather app in iOS used to do, or maybe
+
+160
+00:05:24,080 --> 00:05:28,880
+it still does. Uh, there's also snow,
+
+161
+00:05:26,880 --> 00:05:31,199
+which has given me PTSD of this past
+
+162
+00:05:28,880 --> 00:05:34,800
+winter, but you can do that. And there's
+
+163
+00:05:31,199 --> 00:05:36,639
+even sun, which warms up and glows with
+
+164
+00:05:34,800 --> 00:05:38,240
+some moving lens flare across the home
+
+165
+00:05:36,639 --> 00:05:40,000
+screen. And this this slider at the
+
+166
+00:05:38,240 --> 00:05:42,320
+bottom, you can drag it all the way left
+
+167
+00:05:40,000 --> 00:05:44,880
+or right to add more or less of this
+
+168
+00:05:42,320 --> 00:05:46,400
+effect. And apparently you could even
+
+169
+00:05:44,880 --> 00:05:48,800
+mirror the weather at your current
+
+170
+00:05:46,400 --> 00:05:52,240
+location if you wanted to. Anyway, last
+
+171
+00:05:48,800 --> 00:05:53,360
+but not least is cinematic. So the first
+
+172
+00:05:52,240 --> 00:05:54,880
+time you try this, you actually have to
+
+173
+00:05:53,360 --> 00:05:56,720
+download a cinematic model from the
+
+174
+00:05:54,880 --> 00:05:59,280
+internet. But once you check that box on
+
+175
+00:05:56,720 --> 00:06:01,199
+a wallpaper, it just adds some subtle 3D
+
+176
+00:05:59,280 --> 00:06:02,639
+motion to your photo. So on like a more
+
+177
+00:06:01,199 --> 00:06:04,319
+abstract wallpaper, it doesn't do much.
+
+178
+00:06:02,639 --> 00:06:06,560
+But if you have a picture of a kid, a
+
+179
+00:06:04,319 --> 00:06:08,400
+person, or a pet, then it kind of does
+
+180
+00:06:06,560 --> 00:06:10,080
+this thing where it tries to separate it
+
+181
+00:06:08,400 --> 00:06:11,600
+from the background. You know, like the
+
+182
+00:06:10,080 --> 00:06:13,680
+classic freshman year Adobe After
+
+183
+00:06:11,600 --> 00:06:16,720
+Effects project where you make a video
+
+184
+00:06:13,680 --> 00:06:18,479
+out of a photo. Anyway, I assume AI is
+
+185
+00:06:16,720 --> 00:06:20,240
+doing this, but yeah, it's fine. It kind
+
+186
+00:06:18,479 --> 00:06:24,160
+of brings it to life a little bit. But
+
+187
+00:06:20,240 --> 00:06:26,240
+that brings me to number two, new
+
+188
+00:06:24,160 --> 00:06:28,639
+physics. And it kind of sounds cheesy at
+
+189
+00:06:26,240 --> 00:06:30,560
+first, but it kind of this is this is
+
+190
+00:06:28,639 --> 00:06:32,400
+more in the expressive thing. Like it it
+
+191
+00:06:30,560 --> 00:06:34,400
+actually feels like they consciously
+
+192
+00:06:32,400 --> 00:06:37,759
+went through Android and tried to make
+
+193
+00:06:34,400 --> 00:06:39,520
+sure more things feel like physical
+
+194
+00:06:37,759 --> 00:06:42,000
+objects. So, lots of menus that were
+
+195
+00:06:39,520 --> 00:06:43,520
+previously flat are now, it seems, more
+
+196
+00:06:42,000 --> 00:06:45,120
+intentionally separated. So, you can
+
+197
+00:06:43,520 --> 00:06:47,120
+tell that they're all touch targets and
+
+198
+00:06:45,120 --> 00:06:48,400
+separate items. The multitasking
+
+199
+00:06:47,120 --> 00:06:49,600
+windows, like I mentioned earlier, they
+
+200
+00:06:48,400 --> 00:06:51,280
+have a little bit of bounce to them and
+
+201
+00:06:49,600 --> 00:06:53,440
+they engage slightly with the windows
+
+202
+00:06:51,280 --> 00:06:55,759
+around them, like they have gravity. And
+
+203
+00:06:53,440 --> 00:06:57,600
+even in notifications, I think this is
+
+204
+00:06:55,759 --> 00:07:00,039
+where it's the most obvious, like when
+
+205
+00:06:57,600 --> 00:07:02,319
+you go to swipe to dismiss a
+
+206
+00:07:00,039 --> 00:07:03,599
+notification, you can feel that it's
+
+207
+00:07:02,319 --> 00:07:05,680
+it's not just removing that one
+
+208
+00:07:03,599 --> 00:07:07,960
+notification and sliding it out. you're
+
+209
+00:07:05,680 --> 00:07:10,400
+like unsticking it from the
+
+210
+00:07:07,960 --> 00:07:12,160
+notifications around it. And the the
+
+211
+00:07:10,400 --> 00:07:14,720
+haptics that go along with all of this
+
+212
+00:07:12,160 --> 00:07:16,479
+that you feel is a nice bonus, too. So,
+
+213
+00:07:14,720 --> 00:07:18,400
+it really feels like you can tell the
+
+214
+00:07:16,479 --> 00:07:20,639
+exact point that it breaks the like
+
+215
+00:07:18,400 --> 00:07:23,039
+rubber band physics and lets you pull
+
+216
+00:07:20,639 --> 00:07:25,039
+the notification out from the rest and
+
+217
+00:07:23,039 --> 00:07:26,960
+swipe it away. It's really well done. I
+
+218
+00:07:25,039 --> 00:07:29,520
+think it's the best expression of this
+
+219
+00:07:26,960 --> 00:07:31,199
+Material 3 style in this whole phone.
+
+220
+00:07:29,520 --> 00:07:32,880
+It's completely unnecessary. It doesn't
+
+221
+00:07:31,199 --> 00:07:35,280
+add It's not a feature that adds
+
+222
+00:07:32,880 --> 00:07:37,680
+functionality. It's just it's just feels
+
+223
+00:07:35,280 --> 00:07:40,240
+nice. But anyway, this brings me to my
+
+224
+00:07:37,680 --> 00:07:42,560
+number one favorite new thing in this
+
+225
+00:07:40,240 --> 00:07:44,240
+Android 16 beta, and I I think it's
+
+226
+00:07:42,560 --> 00:07:46,479
+probably everyone's favorite number one
+
+227
+00:07:44,240 --> 00:07:48,720
+thing, which is the quick settings. The
+
+228
+00:07:46,479 --> 00:07:50,960
+quick settings and notification panel.
+
+229
+00:07:48,720 --> 00:07:53,680
+So, I've always been a fan of Android
+
+230
+00:07:50,960 --> 00:07:55,840
+over iOS specifically because of these
+
+231
+00:07:53,680 --> 00:07:58,400
+quick settings, and this update levels
+
+232
+00:07:55,840 --> 00:08:00,479
+it up again. First of all, on the
+
+233
+00:07:58,400 --> 00:08:02,400
+surface, you can see when you pull down,
+
+234
+00:08:00,479 --> 00:08:04,960
+the background is this glassy
+
+235
+00:08:02,400 --> 00:08:07,199
+transparent overlay instead of solid
+
+236
+00:08:04,960 --> 00:08:08,319
+like Android 15 was. I kind of love it.
+
+237
+00:08:07,199 --> 00:08:09,919
+And then there's a big new brightness
+
+238
+00:08:08,319 --> 00:08:12,639
+slider at the top. And then these
+
+239
+00:08:09,919 --> 00:08:14,879
+buttons up here are fun. They kind of
+
+240
+00:08:12,639 --> 00:08:18,319
+they slightly change shape actually from
+
+241
+00:08:14,879 --> 00:08:19,759
+round to more boxy when they're toggled.
+
+242
+00:08:18,319 --> 00:08:22,000
+Honestly, not really sure why it does
+
+243
+00:08:19,759 --> 00:08:24,160
+that, but it does. And then when you hit
+
+244
+00:08:22,000 --> 00:08:25,840
+that edit button, this is where you can
+
+245
+00:08:24,160 --> 00:08:28,000
+jump in and go crazy. So any one of
+
+246
+00:08:25,840 --> 00:08:30,080
+these toggles can be shrunken down into
+
+247
+00:08:28,000 --> 00:08:31,440
+half size and then you can rearrange
+
+248
+00:08:30,080 --> 00:08:33,279
+them and move them around however you
+
+249
+00:08:31,440 --> 00:08:35,039
+want and do your own thing. So you can
+
+250
+00:08:33,279 --> 00:08:37,200
+combine some bigger targets like
+
+251
+00:08:35,039 --> 00:08:39,599
+flashlight with some smaller ones that
+
+252
+00:08:37,200 --> 00:08:42,000
+you maybe don't use as often. And I'm
+
+253
+00:08:39,599 --> 00:08:43,519
+just loving the customization here. And
+
+254
+00:08:42,000 --> 00:08:44,880
+it's funny if you ever slip up and do
+
+255
+00:08:43,519 --> 00:08:46,320
+anything you regret or move something
+
+256
+00:08:44,880 --> 00:08:48,399
+and you don't like it anymore, you can
+
+257
+00:08:46,320 --> 00:08:50,480
+just hit that big undo button in the
+
+258
+00:08:48,399 --> 00:08:52,000
+corner. Very nice. And I'm dead serious.
+
+259
+00:08:50,480 --> 00:08:53,760
+Like this is one of my favorite things
+
+260
+00:08:52,000 --> 00:08:56,160
+about Android is the quick settings and
+
+261
+00:08:53,760 --> 00:08:58,080
+notifications. And this update is it
+
+262
+00:08:56,160 --> 00:09:00,000
+feels like someone really thought a lot
+
+263
+00:08:58,080 --> 00:09:01,440
+about it and considered it. Especially
+
+264
+00:09:00,000 --> 00:09:03,120
+even like this is a subtle thing, but
+
+265
+00:09:01,440 --> 00:09:05,040
+the Bluetooth button here. If you touch
+
+266
+00:09:03,120 --> 00:09:06,800
+the larger whole button, it brings up
+
+267
+00:09:05,040 --> 00:09:08,720
+the Bluetooth menu. But if you just hit
+
+268
+00:09:06,800 --> 00:09:10,880
+the little logo on the side, that's just
+
+269
+00:09:08,720 --> 00:09:12,320
+a toggle to turn Bluetooth on and off.
+
+270
+00:09:10,880 --> 00:09:14,480
+And once you know that, once you get
+
+271
+00:09:12,320 --> 00:09:15,920
+used to it, that's smart. Like that's
+
+272
+00:09:14,480 --> 00:09:17,760
+nice. I want I want to have my phone
+
+273
+00:09:15,920 --> 00:09:20,160
+dialed in exactly how I want and that's
+
+274
+00:09:17,760 --> 00:09:22,240
+convenient. So that is my top five. But
+
+275
+00:09:20,160 --> 00:09:23,839
+you know what? As a bonus, since this
+
+276
+00:09:22,240 --> 00:09:25,760
+really is a fresh coat of paint, here
+
+277
+00:09:23,839 --> 00:09:28,640
+are all the other little interesting
+
+278
+00:09:25,760 --> 00:09:30,800
+things that I noticed are overhauled in
+
+279
+00:09:28,640 --> 00:09:33,120
+this Android 16 beta. The bottom buttons
+
+280
+00:09:30,800 --> 00:09:34,800
+in notifications are bigger. Like the
+
+281
+00:09:33,120 --> 00:09:36,959
+clear all button is huge. And then they
+
+282
+00:09:34,800 --> 00:09:39,200
+also added a notification history button
+
+283
+00:09:36,959 --> 00:09:40,720
+to the left. That's nice. And
+
+284
+00:09:39,200 --> 00:09:42,560
+notification settings stays to the
+
+285
+00:09:40,720 --> 00:09:44,560
+right. The status bar icons are also
+
+286
+00:09:42,560 --> 00:09:47,279
+slightly redesigned, including slipping
+
+287
+00:09:44,560 --> 00:09:49,200
+the battery indicator to sideways. So,
+
+288
+00:09:47,279 --> 00:09:50,959
+it used to be vertical, but this one is
+
+289
+00:09:49,200 --> 00:09:53,440
+a little bigger and they put the numbers
+
+290
+00:09:50,959 --> 00:09:55,200
+inside the battery icon and so I think
+
+291
+00:09:53,440 --> 00:09:56,640
+it's a little bit more readable. Other
+
+292
+00:09:55,200 --> 00:09:59,440
+phones do this already, but now it's in
+
+293
+00:09:56,640 --> 00:10:01,360
+stock Android, too. The app drawer is
+
+294
+00:09:59,440 --> 00:10:03,440
+technically a slightly transparent
+
+295
+00:10:01,360 --> 00:10:05,440
+overlay as well now instead of an opaque
+
+296
+00:10:03,440 --> 00:10:06,720
+full screen app drawer. So, interesting
+
+297
+00:10:05,440 --> 00:10:09,040
+because we know Apple's going to start
+
+298
+00:10:06,720 --> 00:10:11,120
+doing this glassy stuff, too. And then
+
+299
+00:10:09,040 --> 00:10:14,320
+the whole settings app is aesthetically
+
+300
+00:10:11,120 --> 00:10:16,240
+updated, but also very much reorganized,
+
+301
+00:10:14,320 --> 00:10:18,560
+especially inside of each section, which
+
+302
+00:10:16,240 --> 00:10:20,240
+is mostly for the better and very much
+
+303
+00:10:18,560 --> 00:10:21,760
+appreciated. And then the new volume
+
+304
+00:10:20,240 --> 00:10:23,600
+slider matches the new brightness
+
+305
+00:10:21,760 --> 00:10:25,440
+slider. So it's the same size as before,
+
+306
+00:10:23,600 --> 00:10:27,200
+but it just has this very clear bar now
+
+307
+00:10:25,440 --> 00:10:29,680
+at the top where the current volume
+
+308
+00:10:27,200 --> 00:10:31,279
+level is. And that's the same throughout
+
+309
+00:10:29,680 --> 00:10:33,839
+everything when you jump in that full
+
+310
+00:10:31,279 --> 00:10:35,600
+volume pane, which now that I'm thinking
+
+311
+00:10:33,839 --> 00:10:38,560
+about it, I feel like, shouldn't this
+
+312
+00:10:35,600 --> 00:10:40,240
+also be glassy instead of opaque as
+
+313
+00:10:38,560 --> 00:10:41,440
+well? I don't know, maybe in the next
+
+314
+00:10:40,240 --> 00:10:43,600
+beta. But yeah, speaking of the next
+
+315
+00:10:41,440 --> 00:10:45,839
+beta, I expect there to be more coming.
+
+316
+00:10:43,600 --> 00:10:47,040
+This is beta 1. I was excited to get my
+
+317
+00:10:45,839 --> 00:10:48,800
+hands on it. It just came out a couple
+
+318
+00:10:47,040 --> 00:10:51,279
+days ago, but there are more in the way
+
+319
+00:10:48,800 --> 00:10:54,480
+of actual features as well in Android
+
+320
+00:10:51,279 --> 00:10:56,640
+16. Things like uh glancible, like
+
+321
+00:10:54,480 --> 00:10:58,720
+ongoing notifications. So, very similar
+
+322
+00:10:56,640 --> 00:11:00,160
+to what iOS launched for ongoing
+
+323
+00:10:58,720 --> 00:11:03,040
+activities. Android is going to have a
+
+324
+00:11:00,160 --> 00:11:05,360
+version of that too here. And also a new
+
+325
+00:11:03,040 --> 00:11:07,200
+Find Hub, which is very similar to the
+
+326
+00:11:05,360 --> 00:11:09,839
+Find My app on the iPhone. It's going to
+
+327
+00:11:07,200 --> 00:11:12,320
+combine all your contacts and items that
+
+328
+00:11:09,839 --> 00:11:13,680
+you keep track of the location of in one
+
+329
+00:11:12,320 --> 00:11:16,160
+single place. But yeah, as of right now,
+
+330
+00:11:13,680 --> 00:11:17,839
+I've been totally fine and pretty stable
+
+331
+00:11:16,160 --> 00:11:19,760
+testing this beta 1 other than Android
+
+332
+00:11:17,839 --> 00:11:21,360
+Auto not working. Uh, but yeah, I'm
+
+333
+00:11:19,760 --> 00:11:22,880
+looking forward to more. But this is my
+
+334
+00:11:21,360 --> 00:11:24,000
+top five. And make sure you share this
+
+335
+00:11:22,880 --> 00:11:26,880
+with other people who want to see the
+
+336
+00:11:24,000 --> 00:11:28,480
+top five in Android 16 as well. And get
+
+337
+00:11:26,880 --> 00:11:31,120
+subscribed for more stuff coming. Thanks
+
+338
+00:11:28,480 --> 00:11:34,120
+for watching. Catch you in the next one.
+
+339
+00:11:31,120 --> 00:11:34,120
+Peace.
+
