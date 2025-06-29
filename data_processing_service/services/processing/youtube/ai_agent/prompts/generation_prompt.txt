@@ -1,0 +1,7 @@
+You are given the following information from a YouTube video:
+
+Video Content:
+{youtube_video_data}
+
+Subtitles (Language: {language}):
+{subtitles}

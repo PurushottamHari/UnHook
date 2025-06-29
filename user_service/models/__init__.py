@@ -2,20 +2,20 @@
 Models package containing all user-related data models.
 """
 
-from .user import User
-from .enums import CategoryName, Weekday, OutputType
+from .enums import CategoryName, OutputType, Weekday
 from .interests import Interest, NotInterested
 from .manual_config import ManualConfig
-from .youtube_config import YoutubeConfig, YoutubeChannelConfig
+from .user import User
+from .youtube_config import YoutubeChannelConfig, YoutubeConfig
 
 __all__ = [
-    'User',
-    'CategoryName',
-    'Weekday',
-    'OutputType',
-    'Interest',
-    'NotInterested',
-    'ManualConfig',
-    'YoutubeConfig',
-    'YoutubeChannelConfig'
-] 
+    "User",
+    "CategoryName",
+    "Weekday",
+    "OutputType",
+    "Interest",
+    "NotInterested",
+    "ManualConfig",
+    "YoutubeConfig",
+    "YoutubeChannelConfig",
+]

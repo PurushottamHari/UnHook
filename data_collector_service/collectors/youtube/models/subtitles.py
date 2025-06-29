@@ -1,4 +1,5 @@
 from collections import UserDict
+
 import langcodes
 
 
@@ -6,7 +7,7 @@ class SubtitleInfo(UserDict[str, str]):
     """Model for subtitle information, mapping extension to URL."""
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'SubtitleInfo':
+    def from_dict(cls, data: dict) -> "SubtitleInfo":
         return cls(data)
 
     def to_dict(self) -> dict[str, str]:
@@ -22,7 +23,7 @@ class SubtitleData(UserDict[str, SubtitleInfo]):
         super().__setitem__(key, value)
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'SubtitleData':
+    def from_dict(cls, data: dict) -> "SubtitleData":
         instance = cls()
         for lang, info_dict in data.items():
             instance[lang] = SubtitleInfo.from_dict(info_dict)
@@ -40,15 +41,12 @@ class Subtitles:
         self.manual = manual
 
     def to_dict(self) -> dict:
-        return {
-            'automatic': self.automatic.to_dict(),
-            'manual': self.manual.to_dict()
-        }
+        return {"automatic": self.automatic.to_dict(), "manual": self.manual.to_dict()}
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'Subtitles':
-        automatic = SubtitleData.from_dict(data.get('automatic', {}))
-        manual = SubtitleData.from_dict(data.get('manual', {}))
+    def from_dict(cls, data: dict) -> "Subtitles":
+        automatic = SubtitleData.from_dict(data.get("automatic", {}))
+        manual = SubtitleData.from_dict(data.get("manual", {}))
         return cls(automatic=automatic, manual=manual)
 
     def validate_not_empty(self):
@@ -57,8 +55,15 @@ class Subtitles:
         Raises:
             ValueError: If no valid subtitles are found.
         """
-        has_manual_subtitles = any(info and any(url for url in info.values()) for info in self.manual.values())
-        has_automatic_subtitles = any(info and any(url for url in info.values()) for info in self.automatic.values())
+        has_manual_subtitles = any(
+            info and any(url for url in info.values()) for info in self.manual.values()
+        )
+        has_automatic_subtitles = any(
+            info and any(url for url in info.values())
+            for info in self.automatic.values()
+        )
 
         if not has_manual_subtitles and not has_automatic_subtitles:
-            raise ValueError("Subtitles object must have at least one language with a valid subtitle URL.") 
+            raise ValueError(
+                "Subtitles object must have at least one language with a valid subtitle URL."
+            )

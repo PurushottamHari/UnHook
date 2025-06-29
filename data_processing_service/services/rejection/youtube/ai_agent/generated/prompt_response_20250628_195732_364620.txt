@@ -1,0 +1,402 @@
+--- PROMPT ---
+SystemMessage: You are a professional content moderator who filters out content based on your master's preferences.
+Your task is to analyze each content item and determine if it should be rejected based on:
+  The specific filter preferences provided by the user
+
+For each rejected item, you must provide a clear and specific reason for rejection. Keep the reason below 10 words.
+The reason should reference either the user's filter preferences or the general guidelines.
+
+You should be thorough in your analysis but also efficient. For each item, consider all the details provided to make a decision.
+
+Your response should be formatted as a valid JSON object matching this schema:
+"rejected_items": [
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  },
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  }
+]
+
+Return only the raw JSON output. Do not include markdown formatting, code blocks, or any other text.
+The response must be plain JSON, beginning with { and ending with }.
+
+HumanMessage: Please analyze the following content items and identify any that should be rejected.
+Use the 'title' as the primary basis for moderation decisions. If the title is ambiguous or insufficient, consider 'tags' and 'categories' as supporting signals. 
+Prioritize rejection based on strong matches in the title first, then use tags/categories only if they reinforce or clarify relevance to the filter preferences.
+
+User's filter preferences (reject content matching these):
+Reject content focused on UPSC exam prep—strategy, coaching, syllabus, toppers, tips. Allow news or case studies where UPSC is only mentioned, not the main focus.
+
+Content items to analyze:
+{
+  "items": [
+    {
+      "id": "51ksU9nTf2s",
+      "title": "India breaks into top 100 of SDG Index for the first time | Ankit Agrawal Study IQ",
+      "tags": [
+        "StudyIQ IAS",
+        "UPSC",
+        "UPSC 2026",
+        "India SDG Index 2025",
+        "SDG India ranking"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "AR_nB35Dfvs",
+      "title": "Who Won the Israel - Iran War? What's next for middle-east? Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "BIW9S7cC7Zc",
+      "title": "Best UPSC IAS Study Plan for Working Professionals | Ankit Agrawal StudyIQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc",
+        "upsc for working professionals"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "E-RKCGGeDrU",
+      "title": "Complete Class 7 NCERT Science for UPSC 2026\u201327 | StudyIQ IAS",
+      "tags": [
+        "Science Ncert",
+        "ncert for upsc",
+        "upsc preparation",
+        "science class 10",
+        "complete ncert science class 6 to 12"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "GQLlftTZo6w",
+      "title": "How Ayatollah Khamenei ESCAPED Death Multiple Times? | Assassination Attempts Report | Varun Jauhari",
+      "tags": [
+        "Ayatollah Khamenei assassination attempts",
+        "ali Khamenei attacks",
+        "Attempts to kill Khamenei",
+        "Indian youtuber",
+        "iran israel"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "I1FNBPLRzoo",
+      "title": "India Refuses To Sign SCO Document That Skipped Pahalgam, Had Balochistan | Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "JzZNoNjEa74",
+      "title": "Indian Railways to hike passenger fares from July 1. Know in Detail | Ankit Agrawal Study IQ",
+      "tags": [
+        "railway fare hike",
+        "railway budget",
+        "railways fare hike",
+        "train fare hike",
+        "indian railways fare hike"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "O3SxoeE8OyE",
+      "title": "Why No Indian Deloitte? | Truth About Indian CAs & Big 4 Firms | StudyIQ |  UPSC",
+      "tags": [
+        "Big 4 firms India",
+        "Why no Indian Deloitte",
+        "Indian CA vs Big 4",
+        "Deloitte PwC KPMG EY",
+        "Indian audit industry"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "PJ12qhD2g8o",
+      "title": "What other posts does UPSC CSE Exam cover other than IAS & IPS? | Ankit Agrawal StudyIQ",
+      "tags": [
+        "studyiq",
+        "studyiq ias",
+        "ankit agrawal",
+        "ankit sir current affairs study iq",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "PVY5vuTl-WQ",
+      "title": "\u20b933,000 per device: Starlink's Entry plan | Will Indian's Use It? Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "SpwlDDFK5Is",
+      "title": "China Blocks Specialty Fertiliser Exports To India | Food Security in Danger? Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "China fertilizer export ban",
+        "Specialty fertilizers India",
+        "China India trade tensions"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "VR9jJVEIDNM",
+      "title": "National Emergency India 1975 | 50 Years Passed for Emergency | Indian Polity for UPSC GS1 | StudyIQ",
+      "tags": [
+        "emergency in india date",
+        "national emergency 1975",
+        "Emergency in India",
+        "Emergency 1975",
+        "history of Emergency"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "W3Yjzuzw90k",
+      "title": "US-China Trade Deal | Trump Ends Trade Talks with Canada | What about India? Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc",
+        "US China trade deal explained"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "aHNP6Ww2ZcQ",
+      "title": "Indian Roads For Sale? | India\u2019s Infrastructure Being Privatized? | UPSC GS 3 | StudyIQ IAS",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc",
+        "Indian roads privatization"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "aNert6NtZAE",
+      "title": "Bihar's First Nuclear Power Plant | Know in detail | Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc",
+        "new nuclear power plant in india"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "bhdmfF4zMjc",
+      "title": "Axiom-4 Mission, Shubhanshu Shukla: How ISRO Helped Avert Space Disaster? Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "d8UTs7pBDFI",
+      "title": "Why is North East India Burning with Insurgency? | Complete History | UPSC",
+      "tags": [
+        "North East India Burning with Insurgency",
+        "Complete History",
+        "north east india insurgency",
+        "insurgency in north east",
+        "insurgency in northeast india rstv"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "hdYYnjcUgEs",
+      "title": "US failed to destroy Iran\u2019s nuclear facilities, Trump says Fake News | Ankit Agrawal Study IQ",
+      "tags": [
+        "indian youtuber",
+        "Donald trump",
+        "trump ceasefire",
+        "iran ceasefire",
+        "iran israel ceasefire"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "lE5xo3JREAE",
+      "title": "How Did Continents Start Moving? | Continental Drift Theory Explained | StudyIQ IAS",
+      "tags": [
+        "continent moving animation",
+        "tectonic plates",
+        "continental drift",
+        "continental movement",
+        "how continents were formed"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "lEmo6V7Z8qU",
+      "title": "Entire History of the American Civil War | UPSC | StudyIQ IAS",
+      "tags": [
+        "aadesh singh",
+        "American Civil war",
+        "How did the American Civil war start",
+        "American Civil War",
+        "Confederates State vs United States"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "ss_QjRXhRSo",
+      "title": "Best Video for Economy Strategy For UPSC CSE | Must Watch | StudyIQ IAS",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "wZvqg78SNLo",
+      "title": "Kolkata Law College Student Gang-raped | Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc",
+        "Kolkata law college student rape case"
+      ],
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "zidROrAh8QQ",
+      "title": "Why is US worried of Pakistan's ICBM Program? Ankit Agrawal Study IQ",
+      "tags": [
+        "studyiq",
+        "study iq ias",
+        "studyiq ias",
+        "upsc"
+      ],
+      "categories": [
+        "Education"
+      ]
+    }
+  ],
+  "filter_preferences": [
+    "Reject content focused on UPSC exam prep\u2014strategy, coaching, syllabus, toppers, tips. Allow news or case studies where UPSC is only mentioned, not the main focus."
+  ]
+}
+
+--- RAW RESPONSE ---
+{
+  "rejected_items": [
+    {
+      "id": "51ksU9nTf2s",
+      "reason": "UPSC-focused tags"
+    },
+    {
+      "id": "BIW9S7cC7Zc",
+      "reason": "UPSC study plan"
+    },
+    {
+      "id": "E-RKCGGeDrU",
+      "reason": "UPSC syllabus focus"
+    },
+    {
+      "id": "O3SxoeE8OyE",
+      "reason": "UPSC in title"
+    },
+    {
+      "id": "PJ12qhD2g8o",
+      "reason": "UPSC exam focus"
+    },
+    {
+      "id": "VR9jJVEIDNM",
+      "reason": "UPSC in title"
+    },
+    {
+      "id": "aHNP6Ww2ZcQ",
+      "reason": "UPSC in title"
+    },
+    {
+      "id": "d8UTs7pBDFI",
+      "reason": "UPSC in title"
+    },
+    {
+      "id": "lEmo6V7Z8qU",
+      "reason": "UPSC in title"
+    },
+    {
+      "id": "ss_QjRXhRSo",
+      "reason": "UPSC strategy focus"
+    }
+  ]
+}

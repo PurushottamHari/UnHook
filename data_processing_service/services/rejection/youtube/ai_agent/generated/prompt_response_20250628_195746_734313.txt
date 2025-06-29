@@ -1,0 +1,125 @@
+--- PROMPT ---
+SystemMessage: You are a professional content moderator who filters out content based on your master's preferences.
+Your task is to analyze each content item and determine if it should be rejected based on:
+  The specific filter preferences provided by the user
+
+For each rejected item, you must provide a clear and specific reason for rejection. Keep the reason below 10 words.
+The reason should reference either the user's filter preferences or the general guidelines.
+
+You should be thorough in your analysis but also efficient. For each item, consider all the details provided to make a decision.
+
+Your response should be formatted as a valid JSON object matching this schema:
+"rejected_items": [
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  },
+  {
+    "id": "id_of_content",
+    "reason": "reason for rejection in less than 10 words"
+  }
+]
+
+Return only the raw JSON output. Do not include markdown formatting, code blocks, or any other text.
+The response must be plain JSON, beginning with { and ending with }.
+
+HumanMessage: Please analyze the following content items and identify any that should be rejected.
+Use the 'title' as the primary basis for moderation decisions. If the title is ambiguous or insufficient, consider 'tags' and 'categories' as supporting signals. 
+Prioritize rejection based on strong matches in the title first, then use tags/categories only if they reinforce or clarify relevance to the filter preferences.
+
+User's filter preferences (reject content matching these):
+Reject superficial “how-to” content on topics like attractiveness, habits, addiction, or self-help. Allow news, factual updates, or content with public or educational value.
+
+Content items to analyze:
+{
+  "items": [
+    {
+      "id": "5c4ZLHyms0o",
+      "title": "Why India was silent on Iran Israel conflict",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "628kjLv89o4",
+      "title": "How an Indian built American B2 bombers  and got arrested ?",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "7kLS0Z84BS8",
+      "title": "Very Big trade deal between India and USA",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "A45oVMUUtd8",
+      "title": "Charade at Pak\u2019s behest\u2019: India rejects Hague court ruling on hydro projects",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "DG2GoWsDIbY",
+      "title": "Pakistan attacked",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "GodIjYNdg64",
+      "title": "Will Indian Zohran Mamdani rule New York?",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "UmsTa_XtYx4",
+      "title": "USA Israel Pakistan Nuclear dilemma",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "_mTV7_zg-qg",
+      "title": "Daljeet Dosanjh controversy on Sardaarji 3",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "fi_mI8uL4SQ",
+      "title": "Why Pakistan is terrified after Operation Sindoor?",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    },
+    {
+      "id": "yX8Ly5Mau4Q",
+      "title": "India suggests 4-pronged plan to China to manage border tensions, better ties",
+      "tags": null,
+      "categories": [
+        "Education"
+      ]
+    }
+  ],
+  "filter_preferences": [
+    "Reject superficial \u201chow-to\u201d content on topics like attractiveness, habits, addiction, or self-help. Allow news, factual updates, or content with public or educational value."
+  ]
+}
+
+--- RAW RESPONSE ---
+{
+  "rejected_items": []
+}

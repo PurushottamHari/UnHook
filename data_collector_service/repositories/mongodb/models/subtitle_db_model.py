@@ -1,5 +1,7 @@
 from typing import Dict, Optional
+
 from pydantic import BaseModel, RootModel
+
 
 class SubtitleInfoDB(RootModel[Dict[str, str]]):
     def to_dict(self):
@@ -12,4 +14,4 @@ class SubtitleInfoDB(RootModel[Dict[str, str]]):
 
 class SubtitleDB(BaseModel):
     automatic: Optional[Dict[str, SubtitleInfoDB]] = None
-    manual: Optional[Dict[str, SubtitleInfoDB]] = None 
+    manual: Optional[Dict[str, SubtitleInfoDB]] = None

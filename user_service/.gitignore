@@ -67,3 +67,7 @@ Pipfile.lock
 
 # macOS
 .DS_Store 
+
+**/generated/ 
+**/__pycache__/
+**/.vscode/
