@@ -1,7 +1,14 @@
 from datetime import datetime
-from data_collector_service.collectors.youtube.models.youtube_video_details import YouTubeVideoDetails
-from data_collector_service.repositories.mongodb.adapters.subtitle_adapter import SubtitleDBAdapter
-from data_collector_service.repositories.mongodb.models.youtube_video_details import YouTubeVideoDetailsDB
+
+from data_collector_service.collectors.youtube.models.youtube_video_details import (
+    YouTubeVideoDetails,
+)
+from data_collector_service.repositories.mongodb.adapters.subtitle_adapter import (
+    SubtitleDBAdapter,
+)
+from data_collector_service.repositories.mongodb.models.youtube_video_details import (
+    YouTubeVideoDetailsDB,
+)
 
 
 class YouTubeVideoDetailsAdapter:
@@ -18,7 +25,9 @@ class YouTubeVideoDetailsAdapter:
             views=entity.views,
             description=entity.description,
             thumbnail=entity.thumbnail,
-            release_date=entity.release_date.timestamp() if entity.release_date else None,
+            release_date=(
+                entity.release_date.timestamp() if entity.release_date else None
+            ),
             created_at=entity.created_at.timestamp(),
             tags=entity.tags,
             categories=entity.categories,
@@ -26,7 +35,7 @@ class YouTubeVideoDetailsAdapter:
             duration_in_seconds=entity.duration_in_seconds,
             comments_count=entity.comments_count,
             likes_count=entity.likes_count,
-            subtitles=SubtitleDBAdapter.to_db_model(entity.subtitles)
+            subtitles=SubtitleDBAdapter.to_db_model(entity.subtitles),
         )
 
     @staticmethod
@@ -40,7 +49,11 @@ class YouTubeVideoDetailsAdapter:
             views=db_model.views,
             description=db_model.description,
             thumbnail=db_model.thumbnail,
-            release_date=datetime.fromtimestamp(db_model.release_date) if db_model.release_date else None,
+            release_date=(
+                datetime.fromtimestamp(db_model.release_date)
+                if db_model.release_date
+                else None
+            ),
             created_at=datetime.fromtimestamp(db_model.created_at),
             tags=db_model.tags,
             categories=db_model.categories,
@@ -48,5 +61,5 @@ class YouTubeVideoDetailsAdapter:
             duration_in_seconds=db_model.duration_in_seconds,
             comments_count=db_model.comments_count,
             likes_count=db_model.likes_count,
-            subtitles=SubtitleDBAdapter.from_db_model(db_model.subtitles)
-        ) 
+            subtitles=SubtitleDBAdapter.from_db_model(db_model.subtitles),
+        )

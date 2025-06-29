@@ -1,17 +1,24 @@
 """
 MongoDB database models for user interests.
 """
+
 from typing import List, Optional
+
 from pydantic import BaseModel, Field
-from user_service.models.enums import CategoryName, Weekday, OutputType
+
+from user_service.models.enums import CategoryName, OutputType, Weekday
+
 
 class InterestDBModel(BaseModel):
     """Database model for user interests."""
+
     category_name: str  # Stored as string representation of CategoryName
     category_definition: str = Field(..., max_length=200)
     weekdays: List[str]  # Stored as list of string representations of Weekday
     output_type: str  # Stored as string representation of OutputType
 
+
 class NotInterestedDBModel(BaseModel):
     """Database model for topics user is not interested in."""
-    category_definition: str = Field(..., max_length=200) 
+
+    category_definition: str = Field(..., max_length=200)

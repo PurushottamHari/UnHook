@@ -1,17 +1,22 @@
 """
 Configuration settings for AI services.
 """
-from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any
+
 from enum import Enum
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, Field
+
 
 class ModelProvider(str, Enum):
     DEEPSEEK = "deepseek"
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
 
+
 class ModelConfig(BaseModel):
     """Configuration for AI model settings."""
+
     provider: ModelProvider = Field(default=ModelProvider.DEEPSEEK)
     model_name: str = Field(default="deepseek-chat")
     temperature: float = Field(default=0.7)
@@ -38,7 +43,7 @@ class ModelConfig(BaseModel):
             max_tokens=max_tokens,
             api_key=api_key,
             api_base=api_base,
-            additional_params=additional_params
+            additional_params=additional_params,
         )
 
     @classmethod
@@ -57,8 +62,9 @@ class ModelConfig(BaseModel):
             temperature=temperature,
             max_tokens=max_tokens,
             api_key=api_key,
-            additional_params=additional_params
+            additional_params=additional_params,
         )
 
+
 # Create a singleton instance
-model_config = ModelConfig() 
+model_config = ModelConfig()

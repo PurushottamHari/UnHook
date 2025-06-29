@@ -5,6 +5,7 @@ Enum classes for user-related data models.
 from enum import Enum
 from typing import List
 
+
 class CategoryName(str, Enum):
     TECHNOLOGY = "TECHNOLOGY"
     SCIENCE = "SCIENCE"
@@ -22,6 +23,7 @@ class CategoryName(str, Enum):
     GAMING = "GAMING"
     MUSIC = "MUSIC"
 
+
 class Weekday(str, Enum):
     MONDAY = "MONDAY"
     TUESDAY = "TUESDAY"
@@ -30,6 +32,7 @@ class Weekday(str, Enum):
     FRIDAY = "FRIDAY"
     SATURDAY = "SATURDAY"
     SUNDAY = "SUNDAY"
+
 
 class OutputType(str, Enum):
     VERY_SHORT = "VERY_SHORT"  # One Line update
