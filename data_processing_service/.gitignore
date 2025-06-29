@@ -66,4 +66,6 @@ Pipfile.lock
 .DS_Store
 
 # Ignore temp data
-repositories/ephemeral/local/temp/ 
+repositories/ephemeral/local/temp/
+
+**/generated/ 

@@ -1,0 +1,18 @@
+from data_processing_service.services.processing.youtube.ai_agent.models.output import ContentDataOutput
+from data_processing_service.models.generated_content import GeneratedData
+from typing import Dict
+from user_service.models import OutputType
+
+class ContentOutputAdaptor:
+    @staticmethod
+    def to_generated_data_dict(content_output: ContentDataOutput) -> Dict[str, GeneratedData]:
+        result = {}
+        for key, value in content_output.generated.items():
+            if key == 'TITLE':
+                mapped_key = OutputType.VERY_SHORT
+            elif key == 'SUMMARY':
+                mapped_key = OutputType.SHORT
+            else:
+                raise ValueError(f"Unexpected key in generated content: {key}")
+            result[mapped_key] = GeneratedData(string=value)
+        return result 

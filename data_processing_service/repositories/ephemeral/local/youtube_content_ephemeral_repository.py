@@ -1,5 +1,6 @@
 import os
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import YoutubeContentEphemeralRepository
+from data_processing_service.models.youtube.subtitle_data import SubtitleData, SubtitleMap
 
 class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
     """
@@ -104,3 +105,40 @@ class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         """
         file_path = self._generate_subtitle_file_path(video_id, subtitle_type, extension, "clean_subtitles", language)
         return os.path.isfile(file_path) and os.path.getsize(file_path) > 0
+
+
+    def get_all_clean_subtitle_file_data(self, video_id: str) -> SubtitleData:
+        """
+        Gets all clean subtitle file data for a video, returning a SubtitleData object
+        with both automatic and manual subtitle mappings for all available languages.
+        """
+        automatic_subtitle_maps = []
+        manual_subtitle_maps = []
+        
+        # Check for automatic subtitles
+        for language in ['en', 'hi']:
+            video_automatic_path = os.path.join(self.subtitles_dir, video_id, 'automatic', language)
+            if os.path.isdir(video_automatic_path):
+                for extension in os.listdir(video_automatic_path):
+                    extension_path = os.path.join(video_automatic_path, extension)
+                    if os.path.isdir(extension_path):
+                        file_path = self._generate_subtitle_file_path(video_id, 'automatic', extension, 'clean_subtitles', language)
+                        if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+                            with open(file_path, "r", encoding="utf-8") as f:
+                                subtitle_content = f.read()
+                            automatic_subtitle_maps.append(SubtitleMap(language=language, subtitle=subtitle_content))
+        
+        # Check for manual subtitles
+        for language in ['en', 'hi']:
+            video_manual_path = os.path.join(self.subtitles_dir, video_id, 'manual', language)
+            if os.path.isdir(video_manual_path):
+                for extension in os.listdir(video_manual_path):
+                    extension_path = os.path.join(video_manual_path, extension)
+                    if os.path.isdir(extension_path):
+                        file_path = self._generate_subtitle_file_path(video_id, 'manual', extension, 'clean_subtitles', language)
+                        if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+                            with open(file_path, "r", encoding="utf-8") as f:
+                                subtitle_content = f.read()
+                            manual_subtitle_maps.append(SubtitleMap(language=language, subtitle=subtitle_content))
+        
+        return SubtitleData(automatic=automatic_subtitle_maps, manual=manual_subtitle_maps)

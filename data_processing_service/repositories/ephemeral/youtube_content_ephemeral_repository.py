@@ -5,6 +5,7 @@ Abstract base class for youtube content ephemeral storage.
 from abc import ABC, abstractmethod
 from typing import List
 from data_collector_service.models.user_collected_content import UserCollectedContent, ContentStatus, ContentSubStatus, ContentType
+from data_processing_service.models.youtube.subtitle_data import SubtitleData 
 
 class YoutubeContentEphemeralRepository(ABC):
     @abstractmethod
@@ -33,4 +34,7 @@ class YoutubeContentEphemeralRepository(ABC):
         pass
     @abstractmethod
     def get_clean_subtitle_file_data(self, video_id: str, extension: str, subtitle_type: str, language: str) -> str:
+        pass
+    @abstractmethod
+    def get_all_clean_subtitle_file_data(self, video_id: str) -> SubtitleData:
         pass

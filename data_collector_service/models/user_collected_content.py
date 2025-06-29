@@ -36,7 +36,7 @@ class UserCollectedContent:
     output_type: str
     status: ContentStatus
     status_details: List[StatusDetail]
-    data: Dict[str, any]
+    data: Dict[str, any] # Content_Type: {Object}
     sub_status: Optional[ContentSubStatus] = None
     sub_status_details: List[SubStatusDetail] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.utcnow)
