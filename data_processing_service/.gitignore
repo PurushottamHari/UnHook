@@ -67,5 +67,3 @@ Pipfile.lock
 
 # Ignore temp data
 repositories/ephemeral/local/temp/
-
-**/generated/ 
