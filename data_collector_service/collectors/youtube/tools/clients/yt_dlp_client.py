@@ -1,5 +1,8 @@
 import logging
+import os
+import re
 from datetime import datetime, timezone
+from pathlib import Path
 from pprint import pprint
 from typing import Dict, List, Optional
 
@@ -101,4 +104,76 @@ class YtDlpClient:
             return None
         except Exception as e:
             logger.error(f"Unexpected error fetching video {video_id}: {str(e)}")
+            return None
+
+    def download_subtitles(
+        self, video_id: str, language: str, fmt: str, subtitle_type: str
+    ):
+        """
+        Download subtitles for a given YouTube video using yt-dlp client, return as string and delete the file.
+        Args:
+            video_url (str): The URL of the YouTube video.
+            output_dir (Path or str): Directory to save the subtitles.
+            languages (list or None): List of language codes (e.g., ['en', 'hi']). Defaults to ['en', 'hi'].
+            fmt (str): Subtitle file format (e.g., 'json3', 'vtt'). Defaults to 'srt'.
+            output_filename (str or None): Ignored in this version.
+        Returns:
+            str or None: Subtitle content as string, or None if failed.
+        """
+        video_url = f"https://www.youtube.com/watch?v={video_id}"
+        output_dir = Path(f"subtitles/{language}/{fmt}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        # Set subtitle options based on subtitle_type
+        if subtitle_type == "automatic":
+            writesubtitles = False
+            writeautomaticsub = True
+        elif subtitle_type == "manual":
+            writesubtitles = True
+            writeautomaticsub = False
+        else:
+            writesubtitles = True
+            writeautomaticsub = True
+        subtitle_opts = {
+            "writesubtitles": writesubtitles,
+            "writeautomaticsub": writeautomaticsub,
+            "subtitleslangs": [language],
+            "subtitlesformat": fmt,
+            "quiet": True,
+            "no_warnings": True,
+            "skip_download": True,
+            "paths": {"subtitle": str(output_dir)},
+        }
+        try:
+            with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
+                ydl.download([video_url])
+                import random
+                import time
+
+                time.sleep(random.uniform(8, 12))
+
+            video_id = None
+            m = re.search(r"v=([\w-]+)", video_url)
+            if m:
+                video_id = m.group(1)
+
+            pattern = re.compile(rf".*\[{video_id}\]\.{language}\.{fmt}$")
+            for file in os.listdir(output_dir):
+                if pattern.match(file):
+                    src = output_dir / file
+                    try:
+                        with open(src, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        src.unlink()  # Delete the file after reading
+                        return content
+                    except Exception as e:
+                        logger.error(
+                            f"Error reading/deleting subtitle file {src}: {str(e)}"
+                        )
+                        return None
+            logger.error(
+                f"No matching subtitle file found for {video_url} in {output_dir}"
+            )
+            return None
+        except Exception as e:
+            logger.error(f"✗ Error downloading subtitles for {video_url}: {str(e)}")
             return None

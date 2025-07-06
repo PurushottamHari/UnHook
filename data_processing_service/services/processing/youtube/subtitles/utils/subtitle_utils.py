@@ -3,10 +3,7 @@ Utility for cleaning subtitles.
 """
 
 import json
-import os
 import re
-
-import requests
 
 
 class SubtitleUtils:
@@ -101,20 +98,3 @@ class SubtitleUtils:
             return "".join(text_segments).replace("\n", " ").strip()
         except json.JSONDecodeError:
             return ""
-
-    def download_subtitle_file(self, url: str) -> str:
-        """
-        Downloads the subtitle file from the given URL.
-
-        Args:
-            url: The URL of the subtitle file.
-
-        Returns:
-            The content of the subtitle file as a string.
-        """
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for bad status codes
-        content = response.text
-        if not content or not content.strip():
-            raise ValueError("Downloaded subtitle content is empty.")
-        return content

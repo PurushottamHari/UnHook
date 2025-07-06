@@ -54,3 +54,10 @@ class YouTubeExternalTool:
                     enriched_video_list.append(data)
 
         return enriched_video_list
+
+    def download_subtitles(
+        self, video_id: str, language: str, fmt: str, subtitle_type: str
+    ) -> str:
+        return self.yt_dlp_client.download_subtitles(
+            video_id, language, fmt, subtitle_type
+        )

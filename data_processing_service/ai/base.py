@@ -3,6 +3,7 @@ Base AI client implementation supporting multiple model providers.
 """
 
 import os
+import re
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
@@ -11,7 +12,7 @@ from langchain.schema import HumanMessage, SystemMessage
 from langchain_deepseek import ChatDeepSeek
 from pydantic import BaseModel
 
-from .config import ModelConfig, ModelProvider
+from data_processing_service.ai.config import ModelConfig, ModelProvider
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -95,6 +96,18 @@ class BaseAIClient(Generic[T], ABC):
             # Parse the response into the output model
             return self.output_model.parse_raw(response_text)
         except Exception as e:
+            # Try to strip markdown code block if present and parse again
+            print("Trying to strip markdown from LLM response.....")
+            code_block_pattern = r"```(?:json)?\s*([\s\S]*?)\s*```"
+            match = re.search(code_block_pattern, response_text, re.IGNORECASE)
+            if match:
+                stripped_response = match.group(1)
+                try:
+                    return self.output_model.parse_raw(stripped_response)
+                except Exception as e2:
+                    raise ValueError(
+                        f"Failed to parse AI response into {self.output_model.__name__} after stripping markdown code block: {str(e2)}"
+                    ) from e2
             raise ValueError(
                 f"Failed to parse AI response into {self.output_model.__name__}: {str(e)}"
             )

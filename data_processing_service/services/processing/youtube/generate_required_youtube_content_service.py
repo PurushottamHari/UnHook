@@ -127,6 +127,9 @@ class GenerateRequiredYoutubeContentService:
                 self.user_content_repository.add_generated_content(
                     generated_content=generated_content
                 )
+                print(
+                    f"Operation completed successfully for external_id: {content_to_generate.external_id}"
+                )
 
             except Exception as e:
                 self.logger.error(

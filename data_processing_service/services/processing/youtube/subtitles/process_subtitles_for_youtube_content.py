@@ -55,6 +55,7 @@ class ProcessSubtitlesForYoutubeContent:
                 )
             else:
                 # Download the subtitles
+                print(f"Downloading subtitles for content ID: {content.id}")
                 if not self._download_and_store_subtitles(video_details):
                     self.logger.warning(
                         f"Failed to download subtitles for content ID: {content.id}"
@@ -68,6 +69,7 @@ class ProcessSubtitlesForYoutubeContent:
                 )
             else:
                 # Clean the subtitles and store them in the ephemeral storage
+                print(f"Cleaning subtitles for content ID: {content.id}")
                 if not self._clean_and_store_subtitles(video_details):
                     self.logger.warning(
                         f"Failed to clean and store subtitles for content ID: {content.id}"
@@ -114,27 +116,25 @@ class ProcessSubtitlesForYoutubeContent:
         # Todo: Puru Use AI to determine if automatic is better or manual?
 
         # get latest subtitle data for the video
-        enriched_video_data_list = (
-            self.youtube_external_tool.enrich_video_data_with_details(
-                youtube_video_details=[content]
-            )
-        )
-        enriched_video_data = enriched_video_data_list[0]
         found_automatic_subtitle = False
-        if enriched_video_data.subtitles.automatic:
-            subtitle_data = enriched_video_data.subtitles.automatic
+        if content.subtitles.automatic:
+            subtitle_data = content.subtitles.automatic
             for lang in ["en", "hi"]:
                 if subtitle_data.get(lang):
                     subtitle_lang_data = subtitle_data.get(lang)
                     for ext in self.SUBTITLE_PRIORITY_LIST:
                         if subtitle_lang_data.get(ext):
+                            print(
+                                f"Downloading automatic subtitle for {content.video_id} in {lang} with extension {ext}"
+                            )
                             try:
-                                url = subtitle_lang_data.get(ext)
                                 subtitle_content = (
-                                    self.subtitle_utils.download_subtitle_file(url)
+                                    self.youtube_external_tool.download_subtitles(
+                                        content.video_id, lang, ext, "automatic"
+                                    )
                                 )
                                 self.youtube_content_ephemeral_repository.store_subtitles(
-                                    video_id=enriched_video_data.video_id,
+                                    video_id=content.video_id,
                                     subtitles=subtitle_content,
                                     extension=ext,
                                     subtitle_type="automatic",
@@ -143,23 +143,28 @@ class ProcessSubtitlesForYoutubeContent:
                                 found_automatic_subtitle = True
                                 break
                             except Exception as e:
+                                self.logger.error(f"Downloading subtitles failed: {e}")
                                 continue
 
         found_manual_subtitle = False
-        if enriched_video_data.subtitles.manual:
-            subtitle_data = enriched_video_data.subtitles.automatic
+        if content.subtitles.manual:
+            subtitle_data = content.subtitles.manual
             for lang in ["en", "hi"]:
                 if subtitle_data.get(lang):
                     subtitle_lang_data = subtitle_data.get(lang)
                     for ext in self.SUBTITLE_PRIORITY_LIST:
                         if subtitle_lang_data.get(ext):
+                            print(
+                                f"Downloading manual subtitle for {content.video_id} in {lang} with extension {ext}"
+                            )
                             try:
-                                url = subtitle_lang_data.get(ext)
                                 subtitle_content = (
-                                    self.subtitle_utils.download_subtitle_file(url)
+                                    self.youtube_external_tool.download_subtitles(
+                                        content.video_id, lang, ext, "manual"
+                                    )
                                 )
                                 self.youtube_content_ephemeral_repository.store_subtitles(
-                                    video_id=enriched_video_data.video_id,
+                                    video_id=content.video_id,
                                     subtitles=subtitle_content,
                                     extension=ext,
                                     subtitle_type="manual",
@@ -168,6 +173,7 @@ class ProcessSubtitlesForYoutubeContent:
                                 found_manual_subtitle = True
                                 break
                             except Exception as e:
+                                self.logger.error(f"Downloading subtitles failed: {e}")
                                 continue
 
         return found_automatic_subtitle or found_manual_subtitle
