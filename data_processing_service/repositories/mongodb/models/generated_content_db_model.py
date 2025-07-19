@@ -18,6 +18,12 @@ class GeneratedDataDBModel(BaseModel):
     string: str = ""
 
 
+class CategoryInfoDBModel(BaseModel):
+    category: str
+    category_description: str = ""
+    category_tags: list[str] = []
+
+
 class GeneratedContentDBModel(BaseModel):
     """Database model for generated content."""
 
@@ -30,7 +36,7 @@ class GeneratedContentDBModel(BaseModel):
     content_generated_at: float
     status: str
     status_details: StatusDetailDBModel
-    category: Optional[str] = None
+    category: Optional[CategoryInfoDBModel] = None
 
     class Config:
         populate_by_name = True

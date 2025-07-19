@@ -12,9 +12,12 @@ from data_collector_service.repositories.mongodb.adapters.collected_content_adap
     CollectedContentAdapter
 from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
     CollectedContentDBModel
-from data_processing_service.models.generated_content import GeneratedContent
+from data_processing_service.models.generated_content import (
+    GeneratedContent, GeneratedContentStatus)
 from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
     GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
+    GeneratedContentDBModel
 
 from ..user_content_repository import UserContentRepository
 
@@ -151,3 +154,46 @@ class MongoDBUserContentRepository(UserContentRepository):
         self.generated_content_collection.insert_one(
             generated_content_db_model.model_dump(by_alias=True)
         )
+
+    def get_generated_content(
+        self,
+        status: GeneratedContentStatus,
+        content_type: ContentType,
+    ) -> List[GeneratedContent]:
+        """
+        Get list of generated content with the given status and content_type.
+        Args:
+            status: The status of the generated content to filter by
+            content_type: The content type to filter by
+        Returns:
+            List[GeneratedContent]: List of generated content items
+        """
+        cursor = self.generated_content_collection.find(
+            {
+                "status": status,
+                "content_type": content_type,
+            }
+        )
+        return [
+            GeneratedContentAdapter.from_generated_content_db_model(
+                GeneratedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
+    def update_generated_content_batch(
+        self, updated_generated_content_list: List[GeneratedContent]
+    ):
+        """
+        Update a batch of GeneratedContent items in MongoDB.
+        Args:
+            updated_generated_content_list: List of GeneratedContent objects to update
+        """
+        operations = []
+        for content in updated_generated_content_list:
+            db_model = GeneratedContentAdapter.to_generated_content_db_model(content)
+            update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
+            _id = update_dict.pop("_id")
+            operations.append(UpdateOne({"_id": _id}, {"$set": update_dict}))
+        if operations:
+            self.generated_content_collection.bulk_write(operations)

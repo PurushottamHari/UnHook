@@ -9,7 +9,8 @@ from pydantic import BaseModel
 
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
-from data_processing_service.models.generated_content import GeneratedContent
+from data_processing_service.models.generated_content import (
+    GeneratedContent, GeneratedContentStatus)
 
 
 class UserContentRepository(ABC):
@@ -60,7 +61,16 @@ class UserContentRepository(ABC):
     def add_generated_content(self, generated_content: GeneratedContent):
         pass
 
+    @abstractmethod
+    def get_generated_content(
+        self,
+        status: GeneratedContentStatus,
+        content_type: ContentType,
+    ) -> List[GeneratedContent]:
+        pass
 
-class SubtitleDataInput(BaseModel):
-    language: str
-    subtitle_string: str
+    @abstractmethod
+    def update_generated_content_batch(
+        self, updated_generated_content_list: List[GeneratedContent]
+    ):
+        pass

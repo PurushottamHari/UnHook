@@ -1,0 +1,7 @@
+You are given the following information:
+
+Input:
+{content_items}
+
+Categories List: 
+{categories_list}

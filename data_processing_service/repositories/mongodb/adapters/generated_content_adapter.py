@@ -7,9 +7,11 @@ from typing import Any, Dict, Optional
 
 from data_collector_service.models import ContentType
 from data_processing_service.models.generated_content import (
-    GeneratedContent, GeneratedContentStatus, GeneratedData, StatusDetail)
+    CategoryInfo, GeneratedContent, GeneratedContentStatus, GeneratedData,
+    StatusDetail)
 from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
-    GeneratedContentDBModel, GeneratedDataDBModel, StatusDetailDBModel)
+    CategoryInfoDBModel, GeneratedContentDBModel, GeneratedDataDBModel,
+    StatusDetailDBModel)
 from user_service.models import CategoryName
 
 
@@ -31,6 +33,13 @@ class GeneratedContentAdapter:
             k: GeneratedDataDBModel(markdown_string=v.markdown_string, string=v.string)
             for k, v in content.generated.items()
         }
+        category_db = None
+        if content.category is not None:
+            category_db = CategoryInfoDBModel(
+                category=content.category.category.value,
+                category_description=content.category.category_description,
+                category_tags=content.category.category_tags,
+            )
         return GeneratedContentDBModel(
             id=content.id,
             external_id=content.external_id,
@@ -43,7 +52,7 @@ class GeneratedContentAdapter:
             ),
             status=content.status,
             status_details=status_details_db,
-            category=content.category.value if content.category is not None else None,
+            category=category_db,
         )
 
     @staticmethod
@@ -61,6 +70,13 @@ class GeneratedContentAdapter:
             k: GeneratedData(markdown_string=v.markdown_string, string=v.string)
             for k, v in db_model.generated.items()
         }
+        category = None
+        if db_model.category is not None:
+            category = CategoryInfo(
+                category=CategoryName(db_model.category.category),
+                category_description=db_model.category.category_description,
+                category_tags=db_model.category.category_tags,
+            )
         return GeneratedContent(
             id=db_model.id,
             external_id=db_model.external_id,
@@ -73,11 +89,7 @@ class GeneratedContentAdapter:
             ),
             status=GeneratedContentStatus(db_model.status),
             status_details=status_details,
-            category=(
-                CategoryName(db_model.category)
-                if db_model.category is not None
-                else None
-            ),
+            category=category,
         )
 
     @staticmethod
