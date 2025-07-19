@@ -54,3 +54,28 @@ isort .
 
 This will ensure your code is consistently formatted and imports are properly organized.
 
+## Running the Data Collector Service
+
+To start the data collector service, run the following command from the root of your project:
+
+```bash
+python3 -m data_collector_service.service
+```
+
+# Moderation (Content Rejection) Step
+
+To run the content moderation (rejection) step, use the following command from the project root:
+
+```sh
+python3 -m data_processing_service.services.rejection.reject_content_service
+```
+
+# Processing Moderated Content Step
+
+To process the moderated content, use the following command from the project root:
+
+```sh
+python3 -m data_processing_service.services.processing.process_moderated_content_service
+```
+
+

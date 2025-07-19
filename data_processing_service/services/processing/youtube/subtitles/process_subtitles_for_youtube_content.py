@@ -4,23 +4,18 @@ Service for processing subtitles for YouTube content.
 
 import logging
 
-from data_collector_service.collectors.youtube.models import YouTubeVideoDetails
-from data_collector_service.collectors.youtube.tools.youtube_external_tool import (
-    YouTubeExternalTool,
-)
+from data_collector_service.collectors.youtube.models import \
+    YouTubeVideoDetails
+from data_collector_service.collectors.youtube.tools.youtube_external_tool import \
+    YouTubeExternalTool
 from data_collector_service.models.user_collected_content import (
-    ContentType,
-    UserCollectedContent,
-)
-from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import (
-    LocalYoutubeContentEphemeralRepository,
-)
-from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import (
-    YoutubeContentEphemeralRepository,
-)
-from data_processing_service.services.processing.youtube.subtitles.utils.subtitle_utils import (
-    SubtitleUtils,
-)
+    ContentType, UserCollectedContent)
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
+from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
+from data_processing_service.services.processing.youtube.subtitles.utils.subtitle_utils import \
+    SubtitleUtils
 
 
 class ProcessSubtitlesForYoutubeContent:

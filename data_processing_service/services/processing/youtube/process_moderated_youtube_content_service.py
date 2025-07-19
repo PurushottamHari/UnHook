@@ -7,16 +7,11 @@ from copy import deepcopy
 from datetime import datetime
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-)
-from data_processing_service.repositories.user_content_repository import (
-    UserContentRepository,
-)
-from data_processing_service.services.processing.youtube.subtitles.process_subtitles_for_youtube_content import (
-    ProcessSubtitlesForYoutubeContent,
-)
+    ContentStatus, ContentSubStatus, ContentType)
+from data_processing_service.repositories.user_content_repository import \
+    UserContentRepository
+from data_processing_service.services.processing.youtube.subtitles.process_subtitles_for_youtube_content import \
+    ProcessSubtitlesForYoutubeContent
 from user_service.models.user import User
 
 

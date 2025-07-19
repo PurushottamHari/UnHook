@@ -3,14 +3,14 @@ Service for processing moderated content for users.
 """
 
 from data_collector_service.models.user_collected_content import ContentType
-from data_processing_service.external.user_service.client import UserServiceClient
-from data_processing_service.repositories.mongodb.config.database import MongoDB
-from data_processing_service.repositories.mongodb.user_content_repository import (
-    MongoDBUserContentRepository,
-)
-from data_processing_service.services.processing.youtube.process_moderated_youtube_content_service import (
-    ProcessModeratedYoutubeContentService,
-)
+from data_processing_service.external.user_service.client import \
+    UserServiceClient
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.user_content_repository import \
+    MongoDBUserContentRepository
+from data_processing_service.services.processing.youtube.process_moderated_youtube_content_service import \
+    ProcessModeratedYoutubeContentService
 from user_service.models.user import User
 
 

@@ -34,7 +34,7 @@ class YtDlpClient:
         Get the latest videos from a YouTube channel.
 
         Args:
-            channel_id: The YouTube channel ID
+            channel_name: The YouTube channel name
             max_videos: Maximum number of videos to retrieve
 
         Returns:
@@ -53,7 +53,7 @@ class YtDlpClient:
 
                 if not channel_info:
                     logger.error(
-                        f"No channel information returned for channel {channel_id}"
+                        f"No channel information returned for channel {channel_name} (URL: {url}). The channel may not exist, may have been renamed, or is unavailable."
                     )
                     return []
 
@@ -67,11 +67,13 @@ class YtDlpClient:
 
         except yt_dlp.utils.DownloadError as e:
             logger.error(
-                f"YouTube-DL download error for channel {channel_id}: {str(e)}"
+                f"YouTube-DL download error for channel {channel_name} (URL: {url}): {str(e)}. The channel may have been renamed, deleted, or is unavailable."
             )
             return []
         except Exception as e:
-            logger.error(f"Unexpected error scanning channel {channel_id}: {str(e)}")
+            logger.error(
+                f"Unexpected error scanning channel {channel_name} (URL: {url}): {str(e)}"
+            )
             return []
 
     def get_video_data(self, video_id: str) -> Optional[Dict]:
