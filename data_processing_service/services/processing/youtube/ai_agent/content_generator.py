@@ -18,9 +18,7 @@ class ContentGenerator(BaseAIClient[ContentDataOutput]):
 
     def __init__(self):
         model_config = ModelConfig.create_deepseek_config(
-            model_name="deepseek-chat",
-            temperature=0.5,
-            api_key="sk-359ed2eb7c13455e827b557cece76038",  # Replace with actual key or config
+            model_name="deepseek-chat", temperature=0.5
         )
         log_dir = os.path.join(os.path.dirname(__file__), "generated")
         super().__init__(ContentDataOutput, model_config, log_dir=log_dir)

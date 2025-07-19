@@ -1,6 +1,8 @@
 import logging
 import os
+import random
 import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from pprint import pprint
@@ -145,37 +147,47 @@ class YtDlpClient:
             "skip_download": True,
             "paths": {"subtitle": str(output_dir)},
         }
-        try:
-            with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
-                ydl.download([video_url])
-                import random
-                import time
+        max_retries = 3
+        last_exception = None
+        for attempt in range(1, max_retries + 1):
+            try:
+                with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
+                    wait_time = random.uniform(5, 10)
+                    print(f"Waiting {wait_time:.2f} seconds before download...")
+                    time.sleep(wait_time)
+                    ydl.download([video_url])
 
-                time.sleep(random.uniform(8, 12))
-
-            video_id = None
-            m = re.search(r"v=([\w-]+)", video_url)
-            if m:
-                video_id = m.group(1)
-
-            pattern = re.compile(rf".*\[{video_id}\]\.{language}\.{fmt}$")
-            for file in os.listdir(output_dir):
-                if pattern.match(file):
-                    src = output_dir / file
-                    try:
-                        with open(src, "r", encoding="utf-8") as f:
-                            content = f.read()
-                        src.unlink()  # Delete the file after reading
-                        return content
-                    except Exception as e:
-                        logger.error(
-                            f"Error reading/deleting subtitle file {src}: {str(e)}"
-                        )
-                        return None
-            logger.error(
-                f"No matching subtitle file found for {video_url} in {output_dir}"
-            )
-            return None
-        except Exception as e:
-            logger.error(f"✗ Error downloading subtitles for {video_url}: {str(e)}")
-            return None
+                video_id = None
+                m = re.search(r"v=([\w-]+)", video_url)
+                if m:
+                    video_id = m.group(1)
+                pattern = re.compile(rf".*\[{video_id}\]\.{language}\.{fmt}$")
+                for file in os.listdir(output_dir):
+                    if pattern.match(file):
+                        src = output_dir / file
+                        try:
+                            with open(src, "r", encoding="utf-8") as f:
+                                content = f.read()
+                            src.unlink()  # Delete the file after reading
+                            return content
+                        except Exception as e:
+                            logger.error(
+                                f"Error reading/deleting subtitle file {src}: {str(e)}"
+                            )
+                            return None
+                logger.error(
+                    f"No matching subtitle file found for {video_url} in {output_dir}"
+                )
+                return None
+            except Exception as e:
+                print(
+                    f"[Attempt {attempt}] Error downloading subtitles for {video_url}: {str(e)}"
+                )
+                last_exception = e
+        # If all retries failed
+        print(
+            f"All {max_retries} attempts failed for downloading subtitles for {video_url}."
+        )
+        raise Exception(
+            f"Failed to download subtitles for {video_url} after {max_retries} attempts. Last error: {last_exception}"
+        )

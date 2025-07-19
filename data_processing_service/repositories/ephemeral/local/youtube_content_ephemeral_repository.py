@@ -1,12 +1,9 @@
 import os
 
-from data_processing_service.models.youtube.subtitle_data import (
-    SubtitleData,
-    SubtitleMap,
-)
-from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import (
-    YoutubeContentEphemeralRepository,
-)
+from data_processing_service.models.youtube.subtitle_data import (SubtitleData,
+                                                                  SubtitleMap)
+from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
 
 
 class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):

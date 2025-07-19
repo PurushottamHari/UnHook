@@ -6,11 +6,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-    UserCollectedContent,
-)
+    ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
 from data_processing_service.models.youtube.subtitle_data import SubtitleData
 
 

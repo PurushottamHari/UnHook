@@ -7,21 +7,14 @@ from typing import List
 from pymongo import UpdateOne
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-    UserCollectedContent,
-)
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
-    CollectedContentAdapter,
-)
-from data_collector_service.repositories.mongodb.models.collected_content_db_model import (
-    CollectedContentDBModel,
-)
+    ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
+    CollectedContentAdapter
+from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
+    CollectedContentDBModel
 from data_processing_service.models.generated_content import GeneratedContent
-from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
-    GeneratedContentAdapter,
-)
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
+    GeneratedContentAdapter
 
 from ..user_content_repository import UserContentRepository
 

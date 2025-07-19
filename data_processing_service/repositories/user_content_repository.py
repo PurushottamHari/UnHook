@@ -8,11 +8,7 @@ from typing import List
 from pydantic import BaseModel
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-    UserCollectedContent,
-)
+    ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
 from data_processing_service.models.generated_content import GeneratedContent
 
 
