@@ -9,6 +9,7 @@ from pprint import pprint
 from typing import Dict, List, Optional
 
 import yt_dlp
+from yt_dlp.networking.impersonate import ImpersonateTarget
 
 logger = logging.getLogger(__name__)
 
@@ -146,13 +147,16 @@ class YtDlpClient:
             "no_warnings": True,
             "skip_download": True,
             "paths": {"subtitle": str(output_dir)},
+            "retries": 3,
+            "impersonate": ImpersonateTarget("chrome"),
+            "limit_rate": "150K",
         }
         max_retries = 3
         last_exception = None
         for attempt in range(1, max_retries + 1):
             try:
                 with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
-                    wait_time = random.uniform(5, 10)
+                    wait_time = random.uniform(8, 12)
                     print(f"Waiting {wait_time:.2f} seconds before download...")
                     time.sleep(wait_time)
                     ydl.download([video_url])
