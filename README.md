@@ -77,4 +77,15 @@ To process the moderated content, use the following command from the project roo
 python3 -m data_processing_service.services.processing.process_moderated_content_service
 ```
 
+# Generating the required data for Youtube Video
+```sh
+python3 -m data_processing_service.services.processing.youtube.generate_required_content.generate_required_youtube_content_service
+```
+
+# Categorizing the generated content
+```sh
+python3 -m data_processing_service.services.processing.youtube.categorize_content.categorize_youtube_content_service
+```
+
+
 

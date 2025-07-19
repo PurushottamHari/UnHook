@@ -9,25 +9,10 @@ Output Schema:
 
 OUTPUT RULES (DO NOT VIOLATE):
 	•	Your response must only contain a raw JSON object.
-	•	NO markdown formatting.
-	•	NO code blocks.
 	•	NO extra text.
 	•	Output should begin directly with { and end with }.
 
-Expected Output:
-{
-    "generated":{
-       "TITLE": "Gaganyaan: India’s First Crewed Space Mission in 2025",
-       "SUMMARY": "India plans to launch its first human space mission, Gaganyaan, in 2025. Astronaut training is underway, and ISRO is collaborating with international space agencies."   
-    }
-}
-
-===========================
-❌ THIS IS TO BE AVOIDED:
-===========================
-
-❌ Markdown or code blocks:
-```json
+Expected Output Example:
 {
     "generated":{
        "TITLE": "Gaganyaan: India’s First Crewed Space Mission in 2025",

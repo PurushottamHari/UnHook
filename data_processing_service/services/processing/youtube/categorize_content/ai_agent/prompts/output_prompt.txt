@@ -1,0 +1,30 @@
+Your response should be formatted as a valid JSON object matching this schema:
+Output Schema:
+{
+    "output": [
+        {
+        "id": "12345": original id,
+        "category": string: one of the predefined categories,
+        "category_description": string: 1 sentence,
+        "category_tags": list[strings]: 3-5 tags
+        }..
+    ]
+}
+
+OUTPUT RULES (DO NOT VIOLATE):
+	•	Your response must only contain a raw JSON object.
+	•	NO extra text.
+	•	Output should begin directly with { and end with }.
+
+Expected Output Example:
+{
+  "output": [
+    {
+      "id": "12345",
+      "category": "TECHNOLOGY",
+      "category_description": "Covers the latest advancements in technology, gadgets, and software.",
+      "category_tags": ["AI", "gadgets", "innovation"]
+    },
+    ...
+  ]
+}    
