@@ -48,8 +48,7 @@ This project uses **Black** and **isort** for automatic code formatting and impo
 To format your code, run the following commands from the root of each service:
 
 ```bash
-black .
-isort .
+black . && isort .
 ```
 
 This will ensure your code is consistently formatted and imports are properly organized.
