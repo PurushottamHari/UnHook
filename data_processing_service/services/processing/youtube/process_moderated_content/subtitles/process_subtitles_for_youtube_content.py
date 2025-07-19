@@ -14,7 +14,7 @@ from data_processing_service.repositories.ephemeral.local.youtube_content_epheme
     LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
     YoutubeContentEphemeralRepository
-from data_processing_service.services.processing.youtube.subtitles.utils.subtitle_utils import \
+from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
     SubtitleUtils
 
 

@@ -13,7 +13,7 @@ from .models.input import ContentDataInput
 from .models.output import ContentDataOutput
 
 
-class ContentGenerator(BaseAIClient[ContentDataOutput]):
+class RequiredContentGenerator(BaseAIClient[ContentDataOutput]):
     """AI agent for content generation."""
 
     def __init__(self):

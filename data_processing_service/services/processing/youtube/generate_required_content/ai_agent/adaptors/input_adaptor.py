@@ -3,7 +3,7 @@ from typing import List, Optional
 from data_collector_service.collectors.youtube.models.youtube_video_details import \
     YouTubeVideoDetails
 from data_processing_service.models.youtube.subtitle_data import SubtitleMap
-from data_processing_service.services.processing.youtube.ai_agent.models.input import (
+from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.models.input import (
     ContentDataInput, SubtitleDataInput)
 
 

@@ -28,8 +28,8 @@ from data_processing_service.repositories.mongodb.user_content_repository import
     MongoDBUserContentRepository
 from data_processing_service.repositories.user_content_repository import \
     UserContentRepository
-from data_processing_service.services.processing.youtube.ai_agent.content_generator import \
-    ContentGenerator
+from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import \
+    RequiredContentGenerator
 from user_service.models import OutputType
 from user_service.models.user import User
 
@@ -50,7 +50,7 @@ class GenerateRequiredYoutubeContentService:
         self.user_content_repository = user_content_repository
         self.user_service_client = UserServiceClient()
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
-        self.content_generator_agent = ContentGenerator()
+        self.required_content_generator_agent = RequiredContentGenerator()
         self.logger = logging.getLogger(__name__)
 
     async def generate(self, user_id: str) -> None:
@@ -85,11 +85,9 @@ class GenerateRequiredYoutubeContentService:
                 selected_subtitle = self._select_best_subtitle(
                     subtitle_data, youtube_video_details
                 )
-                generated_data = (
-                    await self.content_generator_agent.generate_required_content(
-                        youtube_video_details=youtube_video_details,
-                        subtitle_map=selected_subtitle,
-                    )
+                generated_data = await self.required_content_generator_agent.generate_required_content(
+                    youtube_video_details=youtube_video_details,
+                    subtitle_map=selected_subtitle,
                 )
 
                 # Create a generated content model using the required content, status: required_content_generated

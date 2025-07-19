@@ -1,3 +1,0 @@
-"""
-YouTube processing services package.
-"""

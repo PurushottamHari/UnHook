@@ -9,7 +9,7 @@ from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
 from data_processing_service.repositories.mongodb.user_content_repository import \
     MongoDBUserContentRepository
-from data_processing_service.services.processing.youtube.process_moderated_youtube_content_service import \
+from data_processing_service.services.processing.youtube.process_moderated_content.process_moderated_youtube_content_service import \
     ProcessModeratedYoutubeContentService
 from user_service.models.user import User
 
