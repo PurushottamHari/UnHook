@@ -16,8 +16,21 @@ dependencies = [
     "pymongo>=4.0.0",  # Required for MongoDB operations
     "httpx>=0.24.0",  # Required for HTTP client operations
     "langcodes>=3.3.0", # Required for language code validation
-    "user-service @ file:///Users/purushottamhari/youtube_newspaper_scrape/user_service"  # Local dependency
+    "user-service @ file:///Users/puru/Workspace/Unhook/user_service"  # Local dependency
 ]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
