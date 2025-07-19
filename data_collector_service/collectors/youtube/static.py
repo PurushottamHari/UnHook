@@ -2,11 +2,11 @@ import logging
 
 from user_service.models.user import User
 
-from ...repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
+from ...repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
 from ..base_static import BaseStaticCollector
-from .adapters.youtube_to_user_content_adapter import YouTubeToUserContentAdapter
+from .adapters.youtube_to_user_content_adapter import \
+    YouTubeToUserContentAdapter
 from .tools.youtube_external_tool import YouTubeExternalTool
 
 logger = logging.getLogger(__name__)

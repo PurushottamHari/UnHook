@@ -4,30 +4,21 @@ MongoDB implementation of the UserCollectedContentRepository interface.
 
 from typing import List
 
-from data_collector_service.collectors.youtube.adapters.youtube_to_user_content_adapter import (
-    YouTubeToUserContentAdapter,
-)
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
+from data_collector_service.collectors.youtube.adapters.youtube_to_user_content_adapter import \
+    YouTubeToUserContentAdapter
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    UserCollectedContent,
-)
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
-    CollectedContentAdapter,
-)
+    ContentStatus, ContentSubStatus, UserCollectedContent)
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
+    CollectedContentAdapter
 from data_collector_service.repositories.mongodb.config.database import MongoDB
-from data_collector_service.repositories.mongodb.config.settings import (
-    get_mongodb_settings,
-)
-from data_collector_service.repositories.mongodb.models.collected_content_db_model import (
-    CollectedContentDBModel,
-)
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
+from data_collector_service.repositories.mongodb.config.settings import \
+    get_mongodb_settings
+from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
+    CollectedContentDBModel
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
 
 
 class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):

@@ -1,14 +1,11 @@
 from datetime import datetime
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
-from data_collector_service.collectors.youtube.tools.adapters.youtube_video_adapter import (
-    YouTubeVideoAdapter,
-)
-from data_collector_service.collectors.youtube.tools.clients.yt_dlp_client import (
-    YtDlpClient,
-)
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
+from data_collector_service.collectors.youtube.tools.adapters.youtube_video_adapter import \
+    YouTubeVideoAdapter
+from data_collector_service.collectors.youtube.tools.clients.yt_dlp_client import \
+    YtDlpClient
 
 
 class YouTubeExternalTool:

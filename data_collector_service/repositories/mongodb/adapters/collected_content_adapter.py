@@ -5,28 +5,19 @@ Adapter for converting between internal models and MongoDB models for collected 
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentType,
-    StatusDetail,
-    SubStatusDetail,
-    UserCollectedContent,
-)
-from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import (
-    YouTubeVideoDetailsAdapter,
-)
-from data_collector_service.repositories.mongodb.models.youtube_video_details import (
-    YouTubeVideoDetailsDB,
-)
+    ContentStatus, ContentType, StatusDetail, SubStatusDetail,
+    UserCollectedContent)
+from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import \
+    YouTubeVideoDetailsAdapter
+from data_collector_service.repositories.mongodb.models.youtube_video_details import \
+    YouTubeVideoDetailsDB
 
-from ..models.collected_content_db_model import (
-    CollectedContentDBModel,
-    StatusDetails,
-    SubStatusDetails,
-)
+from ..models.collected_content_db_model import (CollectedContentDBModel,
+                                                 StatusDetails,
+                                                 SubStatusDetails)
 
 
 class CollectedContentAdapter:
