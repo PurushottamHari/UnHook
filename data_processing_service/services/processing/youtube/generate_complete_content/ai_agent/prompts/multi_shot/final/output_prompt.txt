@@ -1,0 +1,1 @@
+Return only the final section of the article in markdown format. Do not include any snippets, explanations, comments, or formatting beyond the article content itself.

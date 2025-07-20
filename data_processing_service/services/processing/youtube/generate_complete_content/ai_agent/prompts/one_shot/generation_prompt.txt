@@ -1,0 +1,5 @@
+Here is the required data for your article:
+Title: {title}
+Content: {content}
+Tags: {tags}
+Category: {category} 

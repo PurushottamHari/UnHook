@@ -1,0 +1,86 @@
+import asyncio
+import logging
+from copy import deepcopy
+
+from services.processing.youtube.generate_complete_content.ai_agent.complete_content_generator import \
+    CompleteContentGenerator
+
+from data_collector_service.models.enums import ContentType
+from data_processing_service.models.generated_content import \
+    GeneratedContentStatus
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.user_content_repository import \
+    MongoDBUserContentRepository
+from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
+    SubtitleUtils
+
+
+class GenerateCompleteYoutubeContentService:
+    """Service for generating complete YouTube content for users."""
+
+    def __init__(self):
+        # Initialize MongoDB connection if not already connected
+        if MongoDB.db is None:
+            MongoDB.connect_to_database()
+        # Create MongoDB user content repository
+        self.user_content_repository = MongoDBUserContentRepository(
+            MongoDB.get_database()
+        )
+        self.youtube_content_ephemeral_repository = (
+            LocalYoutubeContentEphemeralRepository()
+        )
+        self.subtitle_utils = SubtitleUtils()
+        self.complete_content_generator = CompleteContentGenerator()
+        self.logger = logging.getLogger(__name__)
+
+    async def generate_complete_content(self) -> None:
+        """
+        Fetch all generated content with status CATEGORIZATION_COMPLETED and process them.
+        The processing logic for each entry is to be implemented.
+        """
+        generated_content_list = self.user_content_repository.get_generated_content(
+            status=GeneratedContentStatus.CATEGORIZATION_COMPLETED,
+            content_type=ContentType.YOUTUBE_VIDEO,
+        )
+        print(
+            f"Found {len(generated_content_list)} generated content items with status CATEGORIZATION_COMPLETED"
+        )
+
+        for content in generated_content_list:
+            external_id = content.external_id
+            youtube_video_details = content.data.get(ContentType.YOUTUBE_VIDEO)
+            subtitle_data = self.youtube_content_ephemeral_repository.get_all_clean_subtitle_file_data(
+                video_id=external_id
+            )
+            # Skip if no clean subtitles are found
+            if not subtitle_data.manual and not subtitle_data.automatic:
+                print(f"No clean subtitles found for video_id {external_id}, skipping.")
+                continue
+
+            selected_subtitle = self.subtitle_utils.select_best_subtitle(
+                subtitle_data, youtube_video_details
+            )
+            updated_content = (
+                self.complete_content_generator.generate_for_generated_content(
+                    content=content, content_data=selected_subtitle
+                )
+            )
+            cloned = deepcopy(updated_content)
+            # Update timestamp and status
+            cloned.set_status(
+                GeneratedContentStatus.ARTICLE_GENERATED,
+                "Article Generation Complete.",
+            )
+            self.user_content_repository.update_generated_content(
+                updated_generated_content=cloned
+            )
+            print(f"Article generated for id {cloned.id}")
+            pass
+
+
+if __name__ == "__main__":
+    service = GenerateCompleteYoutubeContentService()
+    asyncio.run(service.generate_complete_content())

@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
 
+import tiktoken
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_deepseek import ChatDeepSeek
 from pydantic import BaseModel
@@ -51,6 +52,20 @@ class BaseAIClient(Generic[T], ABC):
             )
         # Add other providers as needed
         raise ValueError(f"Unsupported model provider: {self.model_config.provider}")
+
+    def get_estimated_tokens(self, text: str) -> int:
+        """Estimate the number of tokens for the given text based on the model provider."""
+        if self.model_config.provider == ModelProvider.OPENAI:
+            # Use tiktoken for OpenAI models
+            encoding = tiktoken.encoding_for_model(self.model_config.model_name)
+            return len(encoding.encode(text))
+        elif self.model_config.provider == ModelProvider.DEEPSEEK:
+            # DeepSeek: fallback to simple estimation (unless a tokenizer is available)
+            return len(text) // 4
+        else:
+            raise NotImplementedError(
+                f"Token estimation not implemented for provider: {self.model_config.provider}"
+            )
 
     @abstractmethod
     def get_system_prompt(self) -> str:

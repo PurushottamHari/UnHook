@@ -181,6 +181,21 @@ class MongoDBUserContentRepository(UserContentRepository):
             for doc in cursor
         ]
 
+    def update_generated_content(self, updated_generated_content: GeneratedContent):
+        """
+        Update a single GeneratedContent item in MongoDB.
+        Args:
+            updated_generated_content: The GeneratedContent object to update
+        """
+        db_model = GeneratedContentAdapter.to_generated_content_db_model(
+            updated_generated_content
+        )
+        update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
+        _id = update_dict.pop("_id")
+        self.generated_content_collection.update_one(
+            {"_id": _id}, {"$set": update_dict}
+        )
+
     def update_generated_content_batch(
         self, updated_generated_content_list: List[GeneratedContent]
     ):

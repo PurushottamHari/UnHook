@@ -1,0 +1,1 @@
+Return only the next article part in markdown format, followed by a concise snippet for context passing, separated by '\n---SNIPPET---\n'. Do not include any extra text, explanations, or formatting outside of the specified format. 

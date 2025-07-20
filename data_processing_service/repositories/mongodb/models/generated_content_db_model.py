@@ -35,7 +35,7 @@ class GeneratedContentDBModel(BaseModel):
     updated_at: float
     content_generated_at: float
     status: str
-    status_details: StatusDetailDBModel
+    status_details: list[StatusDetailDBModel]
     category: Optional[CategoryInfoDBModel] = None
 
     class Config:

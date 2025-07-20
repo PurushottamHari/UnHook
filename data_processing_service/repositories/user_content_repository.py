@@ -70,6 +70,10 @@ class UserContentRepository(ABC):
         pass
 
     @abstractmethod
+    def update_generated_content(self, updated_generated_content: GeneratedContent):
+        pass
+
+    @abstractmethod
     def update_generated_content_batch(
         self, updated_generated_content_list: List[GeneratedContent]
     ):

@@ -14,6 +14,7 @@ from user_service.models import CategoryName, OutputType
 class GeneratedContentStatus(str, Enum):
     REQUIRED_CONTENT_GENERATED = "REQUIRED_CONTENT_GENERATED"
     CATEGORIZATION_COMPLETED = "CATEGORIZATION_COMPLETED"
+    ARTICLE_GENERATED = "ARTICLE_GENERATED"
 
 
 @dataclass
@@ -44,8 +45,8 @@ class GeneratedContent:
     external_id: str
     content_type: ContentType
     status: GeneratedContentStatus
-    status_details: StatusDetail
     content_generated_at: datetime
+    status_details: List[StatusDetail] = field(default_factory=list)
     category: Optional[CategoryInfo] = None
     generated: Dict[str, GeneratedData] = field(default_factory=dict)  # OutputType: {}
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -57,9 +58,10 @@ class GeneratedContent:
         self.updated_at = datetime.utcnow()
 
     def set_status(self, status: GeneratedContentStatus, reason: str = ""):
-        """Set the status, update status_details, and update the updated_at timestamp."""
+        """Set the status, append to status_details, and update the updated_at timestamp."""
         self.status = status
-        self.status_details = StatusDetail(
+        detail = StatusDetail(
             status=status, created_at=datetime.utcnow(), reason=reason
         )
+        self.status_details.append(detail)
         self.updated_at = datetime.utcnow()

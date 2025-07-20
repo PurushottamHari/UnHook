@@ -1,0 +1,6 @@
+Here is the required data for the middle part of your article:
+Title: {title}
+Content Chunk: {content}
+Chunk Number: {chunk_number}
+Tags: {tags}
+Category: {category} 

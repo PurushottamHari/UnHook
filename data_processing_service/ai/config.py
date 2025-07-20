@@ -50,7 +50,7 @@ class ModelConfig(BaseModel):
         cls,
         model_name: str = "deepseek-chat",
         temperature: float = 0.7,
-        max_tokens: int = 1000,
+        max_tokens: int = 62000,  # 64k but tbs
         api_base: Optional[str] = None,
         **additional_params
     ) -> "ModelConfig":
