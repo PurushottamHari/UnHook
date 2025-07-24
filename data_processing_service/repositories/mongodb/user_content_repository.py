@@ -212,3 +212,22 @@ class MongoDBUserContentRepository(UserContentRepository):
             operations.append(UpdateOne({"_id": _id}, {"$set": update_dict}))
         if operations:
             self.generated_content_collection.bulk_write(operations)
+
+    def get_user_collected_content_by_external_ids(
+        self, external_ids: List[str]
+    ) -> List[UserCollectedContent]:
+        """
+        Fetch UserCollectedContent objects for a list of external_ids.
+        Returns a list of UserCollectedContent.
+        """
+        cursor = self.collected_content_collection.find(
+            {
+                "external_id": {"$in": external_ids},
+            }
+        )
+        return [
+            CollectedContentAdapter.to_user_collected_content(
+                CollectedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]

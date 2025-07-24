@@ -1,5 +1,7 @@
 Here is the required data for the beginning of your article:
 Title: {title}
 Content Chunk: {content}
+Content Language: {language}
 Tags: {tags}
 Category: {category} 
+MAKE SURE YOU WRITE THE ARTICLE WITHIN {character_count} characters

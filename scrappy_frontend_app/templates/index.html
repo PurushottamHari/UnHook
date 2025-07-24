@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}UnHook Articles - Home{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="color: #2c3e50; font-size: 1.75rem;">Generated Articles</h2>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <label for="user-id" style="font-weight: 600; color: #495057;">User ID:</label>
+            <input type="text" id="user-id" value="{{ user_id }}" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem;">
+            <button onclick="changeUser()" class="btn">Change User</button>
+        </div>
+    </div>
+    
+    {% if articles %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+            {% for article in articles %}
+            <div class="card" onclick="window.location.href='/article/{{ article.id }}'">
+                <h3>{{ article.title }}</h3>
+                <p>{{ article.summary }}</p>
+                <div class="card-meta">
+                    <div>
+                        {% if article.category %}
+                            <span class="category-badge">{{ article.category }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if article.created_at %}
+                            <span title="Content published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
+                                {{ article.created_at.strftime('%b %d, %Y') }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No articles found</h3>
+            <p>No articles with status "ARTICLE_GENERATED" were found for this user.</p>
+            <p>Make sure your content processing pipeline has generated some articles.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function changeUser() {
+    const userId = document.getElementById('user-id').value;
+    if (userId.trim()) {
+        window.location.href = '/?user_id=' + encodeURIComponent(userId);
+    }
+}
+
+// Allow Enter key to change user
+document.getElementById('user-id').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        changeUser();
+    }
+});
+</script>
+{% endblock %} 

@@ -4,26 +4,22 @@ from data_processing_service.models.generated_content import (
     GeneratedContent, GeneratedContentStatus, GeneratedData, StatusDetail)
 from user_service.models.enums import OutputType
 
-from ..models.output import CompleteContentOutput
-
 
 class CompleteContentOutputAdaptor:
     @staticmethod
-    def to_dict(output: CompleteContentOutput) -> dict:
+    def to_dict(output: str) -> dict:
         return {
-            "article_markdown": output.article_markdown,
+            "article_markdown": output,
         }
 
     @staticmethod
-    def to_generated_data(output: CompleteContentOutput) -> GeneratedData:
-        return GeneratedData(
-            string=output.article_markdown, markdown_string=output.article_markdown
-        )
+    def to_generated_data(output: str) -> GeneratedData:
+        return GeneratedData(string=output, markdown_string=output)
 
     @staticmethod
     def update_generated_content(
         content: GeneratedContent,
-        output: CompleteContentOutput,
+        output: str,
         output_type: OutputType,
     ) -> GeneratedContent:
         # Only update the generated, status, status_details, and updated_at fields

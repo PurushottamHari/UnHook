@@ -1,1 +1,2 @@
-Return only the content of the final article in markdown format. Do not include any extra text, explanations, or formatting outside of the markdown article itself. 
+Return only the content of the final article in markdown format in ENGLISH.
+Do not include any extra text, explanations, or formatting outside of the markdown article itself. 

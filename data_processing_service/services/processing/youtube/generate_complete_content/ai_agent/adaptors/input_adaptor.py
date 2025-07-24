@@ -15,7 +15,7 @@ class CompleteContentInputAdaptor:
 
     @staticmethod
     def from_generated_content(
-        content: GeneratedContent, content_data: str
+        content: GeneratedContent, content_data: str, content_language: str
     ) -> CompleteContentInput:
         # Extract title, content, tags, and category from GeneratedContent
         title = ""
@@ -35,6 +35,7 @@ class CompleteContentInputAdaptor:
         return CompleteContentInput(
             title=title,
             content=content_data,
+            language=content_language,
             tags=tags,
             category=category,
         )

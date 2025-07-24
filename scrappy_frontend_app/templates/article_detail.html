@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - UnHook Articles{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="/" class="btn btn-secondary" style="margin-bottom: 1rem; display: inline-block;">
+        ← Back to Articles
+    </a>
+    
+    <div class="article-content">
+        <h1>{{ article.title }}</h1>
+        
+        <div style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e9ecef;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {% if article.category %}
+                        <span class="category-badge">{{ article.category }}</span>
+                    {% endif %}
+                    <span style="color: #6c757d; font-size: 0.9rem;">
+                        Article ID: {{ article.id }}
+                    </span>
+                </div>
+                <div style="color: #6c757d; font-size: 0.9rem;">
+                    {% if article.created_at %}
+                        Published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% if article.content %}
+            <div id="article-content">
+                {{ article.content | safe }}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No content available</h3>
+                <p>This article doesn't have any content to display.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Add any additional JavaScript functionality here if needed
+document.addEventListener('DOMContentLoaded', function() {
+    // The markdown is now properly converted to HTML by the backend
+    // and styled with CSS, so no additional JavaScript styling is needed
+    console.log('Article content loaded successfully!');
+});
+</script>
+{% endblock %} 

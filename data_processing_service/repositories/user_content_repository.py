@@ -78,3 +78,13 @@ class UserContentRepository(ABC):
         self, updated_generated_content_list: List[GeneratedContent]
     ):
         pass
+
+    @abstractmethod
+    def get_user_collected_content_by_external_ids(
+        self, external_ids: List[str]
+    ) -> List[UserCollectedContent]:
+        """
+        Fetch UserCollectedContent objects for a list of external_ids.
+        Returns a list of UserCollectedContent.
+        """
+        pass

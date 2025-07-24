@@ -11,6 +11,7 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
 import tiktoken
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_deepseek import ChatDeepSeek
+from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
 from data_processing_service.ai.config import ModelConfig, ModelProvider
@@ -38,7 +39,7 @@ class BaseAIClient(Generic[T], ABC):
             return ChatDeepSeek(
                 model_name=self.model_config.model_name,
                 temperature=self.model_config.temperature,
-                max_tokens=self.model_config.max_tokens,
+                max_tokens=8192,
                 api_key=self.model_config.api_key,
                 **self.model_config.additional_params,
             )
@@ -55,13 +56,19 @@ class BaseAIClient(Generic[T], ABC):
 
     def get_estimated_tokens(self, text: str) -> int:
         """Estimate the number of tokens for the given text based on the model provider."""
+        # Handle None or non-string inputs
+        if text is None:
+            raise ValueError("Text cannot be None for token estimation")
+
         if self.model_config.provider == ModelProvider.OPENAI:
             # Use tiktoken for OpenAI models
             encoding = tiktoken.encoding_for_model(self.model_config.model_name)
             return len(encoding.encode(text))
         elif self.model_config.provider == ModelProvider.DEEPSEEK:
-            # DeepSeek: fallback to simple estimation (unless a tokenizer is available)
-            return len(text) // 4
+            # DeepSeek models use GPT-style tokenization (cl100k_base encoding)
+            # Use cl100k_base encoding directly since tiktoken doesn't have DeepSeek model support
+            encoding = tiktoken.get_encoding("cl100k_base")
+            return len(encoding.encode(text))
         else:
             raise NotImplementedError(
                 f"Token estimation not implemented for provider: {self.model_config.provider}"
@@ -107,6 +114,17 @@ class BaseAIClient(Generic[T], ABC):
             with open(log_file_path, "a", encoding="utf-8") as f:
                 f.write("--- RAW RESPONSE ---\n")
                 f.write(response_text + "\n")
+
+        # Handle string output types differently
+        if self.output_model == str:
+            # For string output, strip markdown code blocks if present and return the content
+            code_block_pattern = r"```(?:markdown)?\s*([\s\S]*?)\s*```"
+            match = re.search(code_block_pattern, response_text, re.IGNORECASE)
+            if match:
+                return match.group(1).strip()
+            return response_text.strip()
+
+        # For Pydantic models, parse as JSON
         try:
             # Parse the response into the output model
             return self.output_model.parse_raw(response_text)

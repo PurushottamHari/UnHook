@@ -49,9 +49,25 @@ class GenerateCompleteYoutubeContentService:
             f"Found {len(generated_content_list)} generated content items with status CATEGORIZATION_COMPLETED"
         )
 
+        # Collect all external_ids
+        external_ids = [content.external_id for content in generated_content_list]
+        # Fetch all UserCollectedContent objects in one DB call
+        user_collected_content_list = (
+            self.user_content_repository.get_user_collected_content_by_external_ids(
+                external_ids
+            )
+        )
+        # Map for quick lookup
+        user_collected_content_map = {
+            content.external_id: content for content in user_collected_content_list
+        }
+
         for content in generated_content_list:
             external_id = content.external_id
-            youtube_video_details = content.data.get(ContentType.YOUTUBE_VIDEO)
+            user_collected_content = user_collected_content_map.get(external_id)
+            youtube_video_details = user_collected_content.data.get(
+                ContentType.YOUTUBE_VIDEO
+            )
             subtitle_data = self.youtube_content_ephemeral_repository.get_all_clean_subtitle_file_data(
                 video_id=external_id
             )
@@ -64,8 +80,10 @@ class GenerateCompleteYoutubeContentService:
                 subtitle_data, youtube_video_details
             )
             updated_content = (
-                self.complete_content_generator.generate_for_generated_content(
-                    content=content, content_data=selected_subtitle
+                await self.complete_content_generator.generate_for_generated_content(
+                    content=content,
+                    content_data=selected_subtitle.subtitle,
+                    content_language=selected_subtitle.language,
                 )
             )
             cloned = deepcopy(updated_content)
