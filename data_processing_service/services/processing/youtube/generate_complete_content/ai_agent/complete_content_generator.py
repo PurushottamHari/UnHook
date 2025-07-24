@@ -1,6 +1,9 @@
 import os
+import re
 from datetime import datetime
-from typing import List
+from typing import Any, Dict, List, Optional
+
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from data_processing_service.ai import BaseAIClient, ModelConfig, ModelProvider
 from data_processing_service.models.generated_content import (
@@ -17,6 +20,9 @@ class CompleteContentGenerator(BaseAIClient[str]):
 
     # Configurable factor for output token estimation
     OUTPUT_TOKEN_FACTOR = 1.3
+
+    # Static variable to track current stage for multi-shot generation
+    _current_stage = None
 
     def __init__(self):
         model_config = ModelConfig.create_deepseek_config(
@@ -63,28 +69,34 @@ class CompleteContentGenerator(BaseAIClient[str]):
         with open(os.path.join(final_dir, "output_prompt.txt"), "r") as f:
             self._final_output_format_guide = f.read().strip()
 
-    def get_system_prompt(self, multi_shot: bool = False, stage: str = None) -> str:
-        if not multi_shot:
-            return self._one_shot_system_prompt
-        if stage == "beginning":
-            return self._beginning_system_prompt
-        elif stage == "transient":
-            return self._transient_system_prompt
-        elif stage == "final":
-            return self._final_system_prompt
+    def get_system_prompt(self) -> str:
+        # Automatically detect multi-shot mode by checking the static stage variable
+        if self._current_stage is not None:
+            # We're in multi-shot mode, use the appropriate stage
+            if self._current_stage == "beginning":
+                return self._beginning_system_prompt
+            elif self._current_stage == "transient":
+                return self._transient_system_prompt
+            elif self._current_stage == "final":
+                return self._final_system_prompt
+            else:
+                raise ValueError(f"Invalid stage: {self._current_stage}")
+        # Default to one-shot mode
         return self._one_shot_system_prompt
 
-    def _create_output_format_guide(
-        self, multi_shot: bool = False, stage: str = None
-    ) -> str:
-        if not multi_shot:
-            return self._one_shot_output_format_guide
-        if stage == "beginning":
-            return self._beginning_output_format_guide
-        elif stage == "transient":
-            return self._transient_output_format_guide
-        elif stage == "final":
-            return self._final_output_format_guide
+    def _create_output_format_guide(self) -> str:
+        # Automatically detect multi-shot mode by checking the static stage variable
+        if self._current_stage is not None:
+            # We're in multi-shot mode, use the appropriate stage
+            if self._current_stage == "beginning":
+                return self._beginning_output_format_guide
+            elif self._current_stage == "transient":
+                return self._transient_output_format_guide
+            elif self._current_stage == "final":
+                return self._final_output_format_guide
+            else:
+                raise ValueError(f"Invalid stage: {self._current_stage}")
+        # Default to one-shot mode
         return self._one_shot_output_format_guide
 
     def _calculate_character_count(self, content: str) -> int:
@@ -123,12 +135,17 @@ class CompleteContentGenerator(BaseAIClient[str]):
 
     async def _generate_multi_shot(self, input_data: CompleteContentInput) -> str:
         # Use the beginning prompt for chunking
+        # Calculate character count for the full content for chunking purposes
+        full_character_count = self._calculate_character_count(input_data.content)
         chunks = self.chunk_content(
             input_data.content,
             self._beginning_prompt,
             title=input_data.title,
+            language=input_data.language,
             tags=", ".join(input_data.tags),
             category=input_data.category,
+            character_count=full_character_count,
+            chunk_number=1,
         )
         article_parts = []
         snippet = None
@@ -137,32 +154,37 @@ class CompleteContentGenerator(BaseAIClient[str]):
             chunk_character_count = self._calculate_character_count(chunk)
 
             if idx == 0:
+                CompleteContentGenerator._current_stage = "beginning"
                 prompt = self._beginning_prompt.format(
                     title=input_data.title,
                     content=chunk,
+                    chunk_number=idx + 1,
                     language=input_data.language,
                     tags=", ".join(input_data.tags),
                     category=input_data.category,
                     character_count=chunk_character_count,
                 )
             elif idx == len(chunks) - 1:
+                CompleteContentGenerator._current_stage = "final"
                 prompt = self._final_prompt.format(
                     title=input_data.title,
                     content=chunk,
+                    chunk_number=idx + 1,
                     language=input_data.language,
                     tags=", ".join(input_data.tags),
                     category=input_data.category,
-                    previous_snippet=snippet or "",
+                    previous_snippet=snippet,
                     character_count=chunk_character_count,
                 )
             else:
+                CompleteContentGenerator._current_stage = "transient"
                 prompt = self._transient_prompt.format(
                     title=input_data.title,
                     content=chunk,
                     language=input_data.language,
                     tags=", ".join(input_data.tags),
                     category=input_data.category,
-                    previous_snippet=snippet or "",
+                    previous_snippet=snippet,
                     chunk_number=idx + 1,
                     character_count=chunk_character_count,
                 )
@@ -175,6 +197,9 @@ class CompleteContentGenerator(BaseAIClient[str]):
             else:
                 article_parts.append(article_markdown)
                 snippet = None
+
+        # Reset the static stage variable after multi-shot generation is complete
+        CompleteContentGenerator._current_stage = None
         return "\n".join(article_parts)
 
     def should_chunk(self, content: str, prompt: str) -> bool:

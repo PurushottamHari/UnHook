@@ -1,8 +1,9 @@
 Here is the required data for the middle part of your article:
 Title: {title}
+Previous Chunk Snippet Context: {previous_snippet}
 Content Chunk: {content}
 Content Language: {language}
 Chunk Number: {chunk_number}
 Tags: {tags}
 Category: {category} 
-MAKE SURE YOU WRITE THE ARTICLE WITHIN {character_count} characters
+MAKE SURE YOU WRITE THE ARTICLE CHUNK WITHIN {character_count} characters

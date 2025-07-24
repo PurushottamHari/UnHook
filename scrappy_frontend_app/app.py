@@ -43,6 +43,36 @@ class ArticleCard:
         self.category = category
         self.created_at = created_at
 
+    def get_time_ago(self) -> str:
+        """Get a human-readable time ago string."""
+        if not self.created_at:
+            return ""
+
+        now = datetime.now()
+        diff = now - self.created_at
+
+        if diff.days > 0:
+            if diff.days == 1:
+                return "1 day ago"
+            elif diff.days < 7:
+                return f"{diff.days} days ago"
+            else:
+                return self.created_at.strftime("%b %d, %Y")
+        elif diff.seconds >= 3600:
+            hours = diff.seconds // 3600
+            if hours == 1:
+                return "1 hour ago"
+            else:
+                return f"{hours} hours ago"
+        elif diff.seconds >= 60:
+            minutes = diff.seconds // 60
+            if minutes == 1:
+                return "1 minute ago"
+            else:
+                return f"{minutes} minutes ago"
+        else:
+            return "Just now"
+
 
 class ArticleDetail:
     """Model for full article details."""
@@ -62,7 +92,7 @@ class ArticleDetail:
         self.created_at = created_at
 
 
-def fetch_articles(user_id: str) -> List[ArticleCard]:
+def fetch_articles(user_id: str, sort_by: str = "newest") -> List[ArticleCard]:
     """Fetch articles with status ARTICLE_GENERATED for a user."""
     db = get_database()
     collection = db.generated_content
@@ -116,6 +146,14 @@ def fetch_articles(user_id: str) -> List[ArticleCard]:
                 created_at=content_generated_at,
             )
         )
+
+    # Sort articles based on the sort_by parameter
+    if sort_by == "newest":
+        articles.sort(key=lambda x: x.created_at or datetime.min, reverse=True)
+    elif sort_by == "oldest":
+        articles.sort(key=lambda x: x.created_at or datetime.max)
+    elif sort_by == "title":
+        articles.sort(key=lambda x: x.title.lower())
 
     return articles
 
@@ -195,8 +233,23 @@ def index():
     """Main page showing article cards."""
     # For now, we'll use a default user_id. In a real app, this would come from authentication
     user_id = request.args.get("user_id", "default_user")
-    articles = fetch_articles(user_id)
-    return render_template("index.html", articles=articles, user_id=user_id)
+    sort_by = request.args.get("sort", "newest")
+    articles = fetch_articles(user_id, sort_by)
+
+    # Calculate date range for articles with dates
+    articles_with_dates = [a for a in articles if a.created_at]
+    date_range = None
+    if articles_with_dates:
+        dates = [a.created_at for a in articles_with_dates]
+        date_range = {"earliest": min(dates), "latest": max(dates)}
+
+    return render_template(
+        "index.html",
+        articles=articles,
+        user_id=user_id,
+        sort_by=sort_by,
+        date_range=date_range,
+    )
 
 
 @app.route("/article/<article_id>")
@@ -212,7 +265,8 @@ def article_detail(article_id):
 def api_articles():
     """API endpoint to get articles as JSON."""
     user_id = request.args.get("user_id", "default_user")
-    articles = fetch_articles(user_id)
+    sort_by = request.args.get("sort", "newest")
+    articles = fetch_articles(user_id, sort_by)
 
     # Convert to dict for JSON serialization
     articles_data = []
