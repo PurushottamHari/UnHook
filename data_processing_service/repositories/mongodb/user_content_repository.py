@@ -231,3 +231,50 @@ class MongoDBUserContentRepository(UserContentRepository):
             )
             for doc in cursor
         ]
+
+    def update_user_collected_content_and_generated_content(
+        self,
+        user_collected_content: UserCollectedContent,
+        generated_content: GeneratedContent,
+    ):
+        """
+        Update user collected content and generated content in one shot.
+        """
+        # Convert to DB models
+        user_collected_content_db_model = (
+            CollectedContentAdapter.to_collected_content_db_model(
+                user_collected_content
+            )
+        )
+        generated_content_db_model = (
+            GeneratedContentAdapter.to_generated_content_db_model(generated_content)
+        )
+
+        # Prepare update dictionaries
+        user_content_update_dict = user_collected_content_db_model.dict(
+            by_alias=True, exclude_unset=True
+        )
+        generated_content_update_dict = generated_content_db_model.model_dump(
+            by_alias=True, exclude_unset=True
+        )
+
+        # Remove _id fields as MongoDB doesn't allow them in updates
+        user_content_id = user_content_update_dict.pop("_id")
+        generated_content_id = generated_content_update_dict.pop("_id")
+
+        # Execute both updates in a single transaction
+        with self.database.client.start_session() as session:
+            with session.start_transaction():
+                # Update user collected content
+                self.collected_content_collection.update_one(
+                    {"_id": user_content_id},
+                    {"$set": user_content_update_dict},
+                    session=session,
+                )
+
+                # Update generated content
+                self.generated_content_collection.update_one(
+                    {"_id": generated_content_id},
+                    {"$set": generated_content_update_dict},
+                    session=session,
+                )

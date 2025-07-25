@@ -6,6 +6,7 @@ from services.processing.youtube.generate_complete_content.ai_agent.complete_con
     CompleteContentGenerator
 
 from data_collector_service.models.enums import ContentType
+from data_collector_service.models.user_collected_content import ContentStatus
 from data_processing_service.models.generated_content import \
     GeneratedContentStatus
 from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
@@ -86,17 +87,22 @@ class GenerateCompleteYoutubeContentService:
                     content_language=selected_subtitle.language,
                 )
             )
-            cloned = deepcopy(updated_content)
+            generated_content_clone = deepcopy(updated_content)
             # Update timestamp and status
-            cloned.set_status(
+            generated_content_clone.set_status(
                 GeneratedContentStatus.ARTICLE_GENERATED,
                 "Article Generation Complete.",
             )
-            self.user_content_repository.update_generated_content(
-                updated_generated_content=cloned
+            user_collected_content_clone = deepcopy(user_collected_content)
+            user_collected_content_clone.set_status(
+                ContentStatus.PROCESSED,
+                "User Collected Content Processed.",
             )
-            print(f"Article generated for id {cloned.id}")
-            pass
+            self.user_content_repository.update_user_collected_content_and_generated_content(
+                user_collected_content=user_collected_content_clone,
+                generated_content=generated_content_clone,
+            )
+            print(f"Article generated for id {generated_content_clone.id}")
 
 
 if __name__ == "__main__":

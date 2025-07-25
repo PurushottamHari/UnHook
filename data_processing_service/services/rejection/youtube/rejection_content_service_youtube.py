@@ -97,9 +97,7 @@ class RejectionContentServiceYoutube:
                     updated_rejected_content = copy.deepcopy(rejected_content)
                     updated_rejected_content.updated_at = datetime.utcnow()
                     updated_rejected_content.status = ContentStatus.REJECTED
-                    updated_rejected_content.add_status_detail(
-                        ContentStatus.REJECTED, reason
-                    )
+                    updated_rejected_content.set_status(ContentStatus.REJECTED, reason)
                     final_moderated_content_list.append(updated_rejected_content)
         # After all channel processing, update non-rejected content as PROCESSED
         # We should also make the sub_status as MODERATION_PASSED
@@ -108,13 +106,13 @@ class RejectionContentServiceYoutube:
                 updated_processed_content = copy.deepcopy(content)
                 updated_processed_content.updated_at = datetime.utcnow()
                 updated_processed_content.status = ContentStatus.PROCESSING
-                updated_processed_content.add_status_detail(
+                updated_processed_content.set_status(
                     ContentStatus.PROCESSING, "Moderation passed."
                 )
                 updated_processed_content.sub_status = (
                     ContentSubStatus.MODERATION_PASSED
                 )
-                updated_processed_content.add_sub_status_detail(
+                updated_processed_content.set_sub_status(
                     ContentSubStatus.MODERATION_PASSED, "first moderation passed"
                 )
                 final_moderated_content_list.append(updated_processed_content)

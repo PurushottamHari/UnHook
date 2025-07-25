@@ -88,3 +88,14 @@ class UserContentRepository(ABC):
         Returns a list of UserCollectedContent.
         """
         pass
+
+    @abstractmethod
+    def update_user_collected_content_and_generated_content(
+        self,
+        user_collected_content: UserCollectedContent,
+        generated_content: GeneratedContent,
+    ):
+        """
+        Update user collected content and generated content in one shot.
+        """
+        pass
