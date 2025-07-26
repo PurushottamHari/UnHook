@@ -87,5 +87,9 @@ python3 -m data_processing_service.services.processing.youtube.generate_required
 python3 -m data_processing_service.services.processing.youtube.categorize_content.categorize_youtube_content_service
 ```
 
+# Generating the Final Article
+```sh
+python3 -m data_processing_service.services.processing.youtube.generate_complete_content.generate_complete_youtube_content_service
+```
 
 

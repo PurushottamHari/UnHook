@@ -48,6 +48,7 @@ class GeneratedContentAdapter:
             external_id=content.external_id,
             content_type=content.content_type,
             generated=generated_db,
+            reading_time_seconds=content.reading_time_seconds,
             created_at=GeneratedContentAdapter._datetime_to_float(content.created_at),
             updated_at=GeneratedContentAdapter._datetime_to_float(content.updated_at),
             content_generated_at=GeneratedContentAdapter._datetime_to_float(
@@ -90,6 +91,7 @@ class GeneratedContentAdapter:
             external_id=db_model.external_id,
             content_type=ContentType(db_model.content_type),
             generated=generated,
+            reading_time_seconds=db_model.reading_time_seconds,
             created_at=GeneratedContentAdapter._float_to_datetime(db_model.created_at),
             updated_at=GeneratedContentAdapter._float_to_datetime(db_model.updated_at),
             content_generated_at=GeneratedContentAdapter._float_to_datetime(

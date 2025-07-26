@@ -49,6 +49,7 @@ class GeneratedContent:
     status_details: List[StatusDetail] = field(default_factory=list)
     category: Optional[CategoryInfo] = None
     generated: Dict[str, GeneratedData] = field(default_factory=dict)  # OutputType: {}
+    reading_time_seconds: int = 0
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 

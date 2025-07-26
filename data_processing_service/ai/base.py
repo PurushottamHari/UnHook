@@ -101,10 +101,14 @@ class BaseAIClient(Generic[T], ABC):
 
         log_file_path = None
         if self.log_dir:
-            os.makedirs(self.log_dir, exist_ok=True)
+            # Create date-based subdirectory
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            date_log_dir = os.path.join(self.log_dir, current_date)
+            os.makedirs(date_log_dir, exist_ok=True)
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
             log_file_path = os.path.join(
-                self.log_dir, f"prompt_response_{timestamp}.txt"
+                date_log_dir, f"prompt_response_{timestamp}.txt"
             )
             with open(log_file_path, "w", encoding="utf-8") as f:
                 f.write("--- PROMPT ---\n")

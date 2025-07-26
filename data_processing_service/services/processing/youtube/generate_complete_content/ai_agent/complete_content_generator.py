@@ -32,7 +32,7 @@ class CompleteContentGenerator(BaseAIClient[str]):
         model_config = ModelConfig.create_deepseek_config(
             model_name="deepseek-chat", temperature=0.5
         )
-        log_dir = os.path.join(os.path.dirname(__file__), "generated", "test3")
+        log_dir = os.path.join(os.path.dirname(__file__), "generated")
         super().__init__(str, model_config, log_dir=log_dir)
         self._load_prompts()
         self.chunk_summarizer = ChunkSummarizer()
@@ -434,9 +434,7 @@ async def test_generation():
             print("=" * 50)
 
             # Write the final article to a test file
-            test_output_dir = os.path.join(
-                os.path.dirname(__file__), "generated", "test3"
-            )
+            test_output_dir = os.path.join(os.path.dirname(__file__), "generated")
             os.makedirs(test_output_dir, exist_ok=True)
             output_file_path = os.path.join(
                 test_output_dir, f"article_{content.external_id}.txt"
@@ -457,7 +455,8 @@ async def test_generation():
 
             # Write the final article to a test file
             test_output_dir = os.path.join(
-                os.path.dirname(__file__), "generated", "test3"
+                os.path.dirname(__file__),
+                "generated",
             )
             os.makedirs(test_output_dir, exist_ok=True)
             output_file_path = os.path.join(

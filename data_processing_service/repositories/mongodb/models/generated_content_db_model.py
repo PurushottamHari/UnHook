@@ -31,6 +31,7 @@ class GeneratedContentDBModel(BaseModel):
     external_id: str
     content_type: str
     generated: Dict[str, GeneratedDataDBModel] = {}
+    reading_time_seconds: int = 0
     created_at: float
     updated_at: float
     content_generated_at: float

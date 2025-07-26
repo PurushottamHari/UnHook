@@ -7,8 +7,8 @@ from services.processing.youtube.generate_complete_content.ai_agent.complete_con
 
 from data_collector_service.models.enums import ContentType
 from data_collector_service.models.user_collected_content import ContentStatus
-from data_processing_service.models.generated_content import \
-    GeneratedContentStatus
+from data_processing_service.models.generated_content import (
+    GeneratedContent, GeneratedContentStatus)
 from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
     LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.mongodb.config.database import \
@@ -17,6 +17,8 @@ from data_processing_service.repositories.mongodb.user_content_repository import
     MongoDBUserContentRepository
 from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
     SubtitleUtils
+from data_processing_service.utils.content_utils import calculate_reading_time
+from user_service.models import OutputType
 
 
 class GenerateCompleteYoutubeContentService:
@@ -93,6 +95,9 @@ class GenerateCompleteYoutubeContentService:
                 GeneratedContentStatus.ARTICLE_GENERATED,
                 "Article Generation Complete.",
             )
+            generated_content_clone.reading_time_seconds = self._calculate_reading_time(
+                generated_content_clone
+            )
             user_collected_content_clone = deepcopy(user_collected_content)
             user_collected_content_clone.set_status(
                 ContentStatus.PROCESSED,
@@ -104,6 +109,36 @@ class GenerateCompleteYoutubeContentService:
             )
             print(f"Article generated for id {generated_content_clone.id}")
         print("Service Complete....")
+
+    def _calculate_reading_time(self, generated_content: GeneratedContent) -> int:
+        """
+        Calculate the reading time for the generated content.
+
+        Args:
+            generated_content: The generated content object containing MEDIUM or LONG articles
+
+        Returns:
+            int: Reading time in seconds
+
+        Raises:
+            ValueError: If neither MEDIUM nor LONG article content is found
+        """
+        generated = generated_content.generated
+
+        # Try to get article content from MEDIUM or LONG output types
+        article_content = ""
+        if OutputType.MEDIUM in generated:
+            article_content = generated[OutputType.MEDIUM].string
+        elif OutputType.LONG in generated:
+            article_content = generated[OutputType.LONG].string
+
+        if not article_content:
+            raise ValueError(
+                f"No article content found in generated content (id: {generated_content.id}). "
+                f"Expected either MEDIUM or LONG output type, but found: {list(generated.keys())}"
+            )
+
+        return calculate_reading_time(article_content)
 
 
 if __name__ == "__main__":

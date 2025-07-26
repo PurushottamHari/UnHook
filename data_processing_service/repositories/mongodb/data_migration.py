@@ -22,6 +22,8 @@ from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
 from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
     GeneratedContentDBModel
+from data_processing_service.utils.content_utils import calculate_reading_time
+from user_service.models import OutputType
 
 
 def migrate_generated_content_status_details():
@@ -393,5 +395,84 @@ def migrate_fix_wrongfully_rejected_content():
     print("Database connection closed.")
 
 
+def migrate_calculate_reading_time_for_generated_content():
+    """
+    Migration script to calculate and set reading_time_seconds for all generated_content
+    with ARTICLE_GENERATED status. Fetches the article content (MEDIUM or LONG) and
+    calculates reading time using the calculate_reading_time utility.
+    """
+    print("Starting migration to calculate reading time for generated content...")
+
+    # Connect to MongoDB
+    MongoDB.connect_to_database()
+    db = MongoDB.get_database()
+    generated_content_collection = db.generated_content
+
+    print(f"Connected to generated_content collection.")
+
+    # Find all generated_content documents with ARTICLE_GENERATED status
+    generated_docs = list(
+        generated_content_collection.find(
+            {"status": GeneratedContentStatus.ARTICLE_GENERATED}
+        )
+    )
+    print(
+        f"Found {len(generated_docs)} generated_content documents with ARTICLE_GENERATED status."
+    )
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in generated_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+        generated = doc.get("generated", {})
+
+        # Try to get article content from MEDIUM or LONG output types
+        article_content = ""
+        if OutputType.MEDIUM in generated:
+            article_content = generated[OutputType.MEDIUM].get("string", "")
+        elif OutputType.LONG in generated:
+            article_content = generated[OutputType.LONG].get("string", "")
+
+        if not article_content:
+            print(
+                f"No article content found for document {doc_id} (external_id: {external_id}), skipping."
+            )
+            continue
+
+        # Calculate reading time using the utility function
+        reading_time_seconds = calculate_reading_time(article_content)
+
+        print(
+            f"Document {doc_id} (external_id: {external_id}): {reading_time_seconds} seconds reading time"
+        )
+
+        # Update the document with reading time and updated timestamp
+        update_result = generated_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$set": {
+                    "reading_time_seconds": reading_time_seconds,
+                    "updated_at": current_timestamp,
+                }
+            },
+        )
+
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated document {doc_id} with reading time: {reading_time_seconds} seconds"
+            )
+        else:
+            print(f"No changes made to document {doc_id}")
+
+    print(f"Migration complete. {updated_count} documents updated with reading time.")
+
+    # Close the connection
+    MongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
-    migrate_fix_wrongfully_rejected_content()
+    migrate_calculate_reading_time_for_generated_content()
