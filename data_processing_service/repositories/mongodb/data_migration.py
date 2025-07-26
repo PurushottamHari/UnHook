@@ -474,5 +474,75 @@ def migrate_calculate_reading_time_for_generated_content():
     print("Database connection closed.")
 
 
+def migrate_set_generated_content_to_failed():
+    """
+    Migration script to set generated_content records with specific external IDs to FAILED status.
+    These are records that have no clean subtitles available.
+    """
+    print("Starting migration to set generated_content to FAILED status...")
+
+    # External IDs that have no clean subtitles and should be marked as failed
+    failed_external_ids = [
+        "7NCC61U7AH0",
+        "t8kAs0K3t4Y",
+        "u6XQFqQahgU",
+        "xIC9sCRSwww",
+    ]
+
+    # Connect to MongoDB
+    MongoDB.connect_to_database()
+    db = MongoDB.get_database()
+    generated_content_collection = db.generated_content
+
+    print(f"Connected to generated_content collection.")
+
+    # Find all generated_content documents with the specified external_ids
+    generated_docs = list(
+        generated_content_collection.find({"external_id": {"$in": failed_external_ids}})
+    )
+    print(
+        f"Found {len(generated_docs)} generated_content documents to update to FAILED status."
+    )
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in generated_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+
+        # Create new status detail for FAILED status
+        new_status_detail = {
+            "status": GeneratedContentStatus.FAILED,
+            "created_at": current_timestamp,
+            "reason": "Migration: No clean subtitles available for content generation since mac got formatted",
+        }
+
+        # Update the document
+        update_result = generated_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$set": {
+                    "status": GeneratedContentStatus.FAILED,
+                    "updated_at": current_timestamp,
+                },
+                "$push": {"status_details": new_status_detail},
+            },
+        )
+
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated generated_content document {doc_id} for external_id {external_id}"
+            )
+    print(
+        f"Migration complete. {updated_count} generated_content documents updated to FAILED status."
+    )
+
+    # Close the connection
+    MongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
-    migrate_calculate_reading_time_for_generated_content()
+    migrate_set_generated_content_to_failed()
