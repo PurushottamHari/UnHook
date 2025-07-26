@@ -84,12 +84,20 @@ class ArticleDetail:
         content: str,
         category: Optional[str] = None,
         created_at: datetime = None,
+        external_id: Optional[str] = None,
     ):
         self.id = id
         self.title = title
         self.content = content
         self.category = category
         self.created_at = created_at
+        self.external_id = external_id
+    
+    def get_youtube_url(self) -> Optional[str]:
+        """Get YouTube URL if external_id is available."""
+        if self.external_id:
+            return f"https://www.youtube.com/watch?v={self.external_id}"
+        return None
 
 
 def fetch_articles(user_id: str, sort_by: str = "newest") -> List[ArticleCard]:
@@ -219,12 +227,18 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
         # Fallback to created_at if content_generated_at is not available
         content_generated_at = datetime.fromtimestamp(doc["created_at"])
 
+    # Get external_id for YouTube video link
+    external_id = None
+    if "external_id" in doc:
+        external_id = doc["external_id"]
+
     return ArticleDetail(
         id=doc["_id"],
         title=title,
         content=content,
         category=category,
         created_at=content_generated_at,
+        external_id=external_id,
     )
 
 
@@ -302,6 +316,8 @@ def api_article_detail(article_id):
             "created_at": (
                 article.created_at.isoformat() if article.created_at else None
             ),
+            "external_id": article.external_id,
+            "youtube_url": article.get_youtube_url(),
         }
     )
 
