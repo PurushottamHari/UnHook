@@ -1,0 +1,9 @@
+You are given the following information from a YouTube video (CHUNKED CONTENT):
+
+Video Content:
+{youtube_video_data}
+
+Subtitles Chunk (Language: {language}):
+{subtitles}
+
+Note: The actual subtitles are longer by {excess_character_count} characters. This is just a snippet  

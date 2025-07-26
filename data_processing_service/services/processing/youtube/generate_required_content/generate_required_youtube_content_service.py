@@ -124,7 +124,7 @@ class GenerateRequiredYoutubeContentService:
 
             except Exception as e:
                 self.logger.error(
-                    f"Content generation failed for {content_to_generate.external_id}: {e}"
+                    f"Content generation failed for {content_to_generate.external_id}: {str(e)}"
                 )
                 continue
 

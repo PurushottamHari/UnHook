@@ -310,5 +310,88 @@ def migrate_fix_missing_subtitles_stored_sub_status_details():
     print("Database connection closed.")
 
 
+def migrate_fix_wrongfully_rejected_content():
+    """
+    Migration script to fix wrongfully rejected user_collected_content records.
+    Updates status to PROCESSING and sub_status to MODERATION_PASSED for specific external_ids.
+    """
+    print("Starting migration to fix wrongfully rejected user_collected_content...")
+
+    # External IDs that were wrongfully rejected
+    wrongfully_rejected_external_ids = [
+        "7NCC61U7AH0",
+        "t8kAs0K3t4Y",
+        "u6XQFqQahgU",
+        "xIC9sCRSwww",
+    ]
+
+    # Connect to data collector service MongoDB
+    CollectorMongoDB.connect_to_database()
+    collector_db = CollectorMongoDB.get_database()
+    collector_settings = get_mongodb_settings()
+    user_collected_content_collection = collector_db[collector_settings.COLLECTION_NAME]
+
+    print(f"Connected to {collector_settings.COLLECTION_NAME} collection.")
+
+    # Find all user_collected_content documents with the specified external_ids
+    user_collected_docs = list(
+        user_collected_content_collection.find(
+            {"external_id": {"$in": wrongfully_rejected_external_ids}}
+        )
+    )
+    print(f"Found {len(user_collected_docs)} user_collected_content documents to fix.")
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in user_collected_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+
+        # Create new status detail for PROCESSING status
+        new_status_detail = {
+            "status": ContentStatus.PROCESSING,
+            "created_at": current_timestamp,
+            "reason": "Migration: Fixing wrongfully rejected content",
+        }
+
+        # Create new sub_status detail for MODERATION_PASSED status
+        new_sub_status_detail = {
+            "sub_status": "MODERATION_PASSED",
+            "created_at": current_timestamp,
+            "reason": "Migration: Content was wrongfully rejected, now approved",
+        }
+
+        # Update the document
+        update_result = user_collected_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$set": {
+                    "status": ContentStatus.PROCESSING,
+                    "sub_status": "MODERATION_PASSED",
+                    "updated_at": current_timestamp,
+                },
+                "$push": {
+                    "status_details": new_status_detail,
+                    "sub_status_details": new_sub_status_detail,
+                },
+            },
+        )
+
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated user_collected_content document {doc_id} for external_id {external_id}"
+            )
+
+    print(
+        f"Migration complete. {updated_count} user_collected_content documents updated."
+    )
+
+    # Close the connection
+    CollectorMongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
-    migrate_fix_missing_subtitles_stored_sub_status_details()
+    migrate_fix_wrongfully_rejected_content()

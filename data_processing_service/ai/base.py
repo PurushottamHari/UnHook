@@ -74,6 +74,12 @@ class BaseAIClient(Generic[T], ABC):
                 f"Token estimation not implemented for provider: {self.model_config.provider}"
             )
 
+    def get_chars_for_tokens(self, target_tokens: int) -> int:
+        """Get the number of characters that correspond to the given number of tokens."""
+        # For GPT-style tokenizers (OpenAI and DeepSeek), average is roughly 4 characters per token
+        # This is a reasonable approximation for most text
+        return target_tokens * 4
+
     @abstractmethod
     def get_system_prompt(self) -> str:
         """Return the system prompt for the specific use case."""

@@ -16,7 +16,7 @@ OUTPUT RULES (DO NOT VIOLATE):
 Expected Output Example:
 {
     "generated":{
-       "TITLE": "Gaganyaan: India’s First Crewed Space Mission in 2025",
+       "TITLE": "Gaganyaan: India's First Crewed Space Mission in 2025",
        "SUMMARY": "India plans to launch its first human..upto 200 words"   
     }
-}
+} 
