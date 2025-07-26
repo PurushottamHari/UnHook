@@ -89,6 +89,11 @@
                         {% for content_type in article.content_types %}
                             <span class="content-type-badge">{{ content_type }}</span>
                         {% endfor %}
+                        {% if article.get_reading_time() %}
+                            <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                {{ article.get_reading_time() }}
+                            </span>
+                        {% endif %}
                     </div>
                     <div>
                         {% if article.created_at %}

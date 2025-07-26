@@ -36,6 +36,11 @@
                     {% if article.category %}
                         <span class="category-badge">{{ article.category }}</span>
                     {% endif %}
+                    {% if article.get_reading_time() %}
+                        <span style="color: #6c757d; font-size: 0.9rem; background-color: #f8f9fa; padding: 0.3rem 0.6rem; border-radius: 4px;">
+                            {{ article.get_reading_time() }}
+                        </span>
+                    {% endif %}
                     <span style="color: #6c757d; font-size: 0.9rem;">
                         Article ID: {{ article.id }}
                     </span>

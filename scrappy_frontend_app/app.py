@@ -37,6 +37,7 @@ class ArticleCard:
         category: Optional[str] = None,
         created_at: datetime = None,
         content_types: List[str] = None,
+        reading_time_seconds: int = 0,
     ):
         self.id = id
         self.title = title
@@ -44,6 +45,7 @@ class ArticleCard:
         self.category = category
         self.created_at = created_at
         self.content_types = content_types or []
+        self.reading_time_seconds = reading_time_seconds
 
     def get_time_ago(self) -> str:
         """Get a human-readable time ago string."""
@@ -75,6 +77,19 @@ class ArticleCard:
         else:
             return "Just now"
 
+    def get_reading_time(self) -> str:
+        """Get reading time in a human-readable format."""
+        if not self.reading_time_seconds:
+            return ""
+
+        minutes = self.reading_time_seconds // 60
+        if minutes < 1:
+            return "Less than 1 min read"
+        elif minutes == 1:
+            return "1 min read"
+        else:
+            return f"{minutes} min read"
+
 
 class ArticleDetail:
     """Model for full article details."""
@@ -87,6 +102,7 @@ class ArticleDetail:
         category: Optional[str] = None,
         created_at: datetime = None,
         external_id: Optional[str] = None,
+        reading_time_seconds: int = 0,
     ):
         self.id = id
         self.title = title
@@ -94,12 +110,26 @@ class ArticleDetail:
         self.category = category
         self.created_at = created_at
         self.external_id = external_id
+        self.reading_time_seconds = reading_time_seconds
 
     def get_youtube_url(self) -> Optional[str]:
         """Get YouTube URL if external_id is available."""
         if self.external_id:
             return f"https://www.youtube.com/watch?v={self.external_id}"
         return None
+
+    def get_reading_time(self) -> str:
+        """Get reading time in a human-readable format."""
+        if not self.reading_time_seconds:
+            return ""
+
+        minutes = self.reading_time_seconds // 60
+        if minutes < 1:
+            return "Less than 1 min read"
+        elif minutes == 1:
+            return "1 min read"
+        else:
+            return f"{minutes} min read"
 
 
 def get_unique_categories() -> List[str]:
@@ -177,6 +207,11 @@ def fetch_articles(
             # Fallback to created_at if content_generated_at is not available
             content_generated_at = datetime.fromtimestamp(doc["created_at"])
 
+        # Get reading time in seconds
+        reading_time_seconds = 0
+        if "reading_time_seconds" in doc:
+            reading_time_seconds = doc["reading_time_seconds"]
+
         # Apply filters
         if category_filter and category != category_filter:
             continue
@@ -192,6 +227,7 @@ def fetch_articles(
                 category=category,
                 created_at=content_generated_at,
                 content_types=content_types,
+                reading_time_seconds=reading_time_seconds,
             )
         )
 
@@ -272,6 +308,11 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
     if "external_id" in doc:
         external_id = doc["external_id"]
 
+    # Get reading time in seconds
+    reading_time_seconds = 0
+    if "reading_time_seconds" in doc:
+        reading_time_seconds = doc["reading_time_seconds"]
+
     return ArticleDetail(
         id=doc["_id"],
         title=title,
@@ -279,6 +320,7 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
         category=category,
         created_at=content_generated_at,
         external_id=external_id,
+        reading_time_seconds=reading_time_seconds,
     )
 
 
@@ -345,6 +387,7 @@ def api_articles():
                 "created_at": (
                     article.created_at.isoformat() if article.created_at else None
                 ),
+                "reading_time_seconds": article.reading_time_seconds,
             }
         )
 
@@ -369,6 +412,7 @@ def api_article_detail(article_id):
             ),
             "external_id": article.external_id,
             "youtube_url": article.get_youtube_url(),
+            "reading_time_seconds": article.reading_time_seconds,
         }
     )
 

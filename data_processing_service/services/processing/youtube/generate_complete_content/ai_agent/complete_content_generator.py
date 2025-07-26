@@ -150,6 +150,7 @@ class CompleteContentGenerator(BaseAIClient[str]):
             output = await self._generate_multi_shot(input_data)
             output_type = OutputType.LONG
         else:
+            print("Generating one-shot content...")
             output = await self.generate_structured_response(user_input=one_shot_prompt)
             output_type = OutputType.MEDIUM
         return CompleteContentOutputAdaptor.update_generated_content(
@@ -171,10 +172,12 @@ class CompleteContentGenerator(BaseAIClient[str]):
             chunk_number=1,
         )
         total_chunks = len(chunks)
+        print(f"Generating multi-shot content in {total_chunks} chunks...")
         article_parts = []
         summary_of_previous_chunks = None
         for idx, chunk in enumerate(chunks):
             # Calculate character count based on this specific chunk
+            print(f"Generating chunk {idx + 1} of {total_chunks}...")
             chunk_character_count = self._calculate_character_count(chunk)
 
             if idx == 0:
