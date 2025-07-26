@@ -1,0 +1,152 @@
+import os
+import sys
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from datetime import datetime, timezone
+
+from data_collector_service.models.user_collected_content import ContentStatus
+from data_collector_service.repositories.mongodb.config.database import \
+    MongoDB as CollectorMongoDB
+from data_collector_service.repositories.mongodb.config.settings import \
+    get_mongodb_settings
+from data_processing_service.models.generated_content import \
+    GeneratedContentStatus
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
+    GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
+    GeneratedContentDBModel
+
+
+def migrate_generated_content_status_details():
+    """
+    Migration script to fix generated_content.status_details from object to list.
+    """
+    print("Starting data migration for generated_content.status_details...")
+
+    # Connect to MongoDB
+    MongoDB.connect_to_database()
+    db = MongoDB.get_database()
+    generated_content_collection = db.generated_content
+
+    print(f"Connected to generated_content collection.")
+
+    # Find all documents where status_details is a dict (should be a list)
+    documents = list(
+        generated_content_collection.find({"status_details": {"$type": "object"}})
+    )
+    print(f"Found {len(documents)} documents to process.")
+
+    updated_count = 0
+    for doc in documents:
+        doc_id = doc["_id"]
+        status_details = doc.get("status_details")
+        if isinstance(status_details, dict):
+            # Convert to single-element list
+            new_status_details = [status_details]
+            generated_content_collection.update_one(
+                {"_id": doc_id}, {"$set": {"status_details": new_status_details}}
+            )
+            updated_count += 1
+            print(f"Updated document {doc_id}")
+
+    print(f"Migration complete. {updated_count} documents updated.")
+
+    # Close the connection
+    MongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
+def migrate_user_collected_content_to_processed():
+    """
+    Migration script to update user_collected_content status to PROCESSED for records
+    that have corresponding generated_content with ARTICLE_GENERATED status.
+    """
+    print("Starting migration to update user_collected_content to PROCESSED status...")
+
+    # Connect to data processing service MongoDB
+    MongoDB.connect_to_database()
+    processing_db = MongoDB.get_database()
+    generated_content_collection = processing_db.generated_content
+
+    # Connect to data collector service MongoDB
+    CollectorMongoDB.connect_to_database()
+    collector_db = CollectorMongoDB.get_database()
+    collector_settings = get_mongodb_settings()
+    user_collected_content_collection = collector_db[collector_settings.COLLECTION_NAME]
+
+    print(
+        f"Connected to generated_content and {collector_settings.COLLECTION_NAME} collections."
+    )
+
+    # Find all generated_content documents with ARTICLE_GENERATED status
+    generated_docs = list(
+        generated_content_collection.find(
+            {"status": GeneratedContentStatus.ARTICLE_GENERATED}
+        )
+    )
+    print(
+        f"Found {len(generated_docs)} generated_content documents with ARTICLE_GENERATED status."
+    )
+
+    # Extract external_ids from generated content
+    external_ids = [doc["external_id"] for doc in generated_docs]
+    print(f"External IDs to process: {external_ids}")
+
+    # Find corresponding user_collected_content records
+    user_collected_docs = list(
+        user_collected_content_collection.find({"external_id": {"$in": external_ids}})
+    )
+    print(
+        f"Found {len(user_collected_docs)} corresponding user_collected_content records."
+    )
+
+    # Update user_collected_content records to PROCESSED status
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in user_collected_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+
+        # Create new status detail for PROCESSED status
+        new_status_detail = {
+            "status": ContentStatus.PROCESSED,
+            "created_at": current_timestamp,
+            "reason": "Migration: Article generation completed",
+        }
+
+        # Update the document
+        update_result = user_collected_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$set": {
+                    "status": ContentStatus.PROCESSED,
+                    "updated_at": current_timestamp,
+                },
+                "$push": {"status_details": new_status_detail},
+            },
+        )
+
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated user_collected_content document {doc_id} for external_id {external_id}"
+            )
+
+    print(
+        f"Migration complete. {updated_count} user_collected_content documents updated to PROCESSED status."
+    )
+
+    # Close the connections
+    MongoDB.close_database_connection()
+    CollectorMongoDB.close_database_connection()
+    print("Database connections closed.")
+
+
+if __name__ == "__main__":
+    migrate_user_collected_content_to_processed()

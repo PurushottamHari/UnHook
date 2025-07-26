@@ -181,6 +181,21 @@ class MongoDBUserContentRepository(UserContentRepository):
             for doc in cursor
         ]
 
+    def update_generated_content(self, updated_generated_content: GeneratedContent):
+        """
+        Update a single GeneratedContent item in MongoDB.
+        Args:
+            updated_generated_content: The GeneratedContent object to update
+        """
+        db_model = GeneratedContentAdapter.to_generated_content_db_model(
+            updated_generated_content
+        )
+        update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
+        _id = update_dict.pop("_id")
+        self.generated_content_collection.update_one(
+            {"_id": _id}, {"$set": update_dict}
+        )
+
     def update_generated_content_batch(
         self, updated_generated_content_list: List[GeneratedContent]
     ):
@@ -197,3 +212,69 @@ class MongoDBUserContentRepository(UserContentRepository):
             operations.append(UpdateOne({"_id": _id}, {"$set": update_dict}))
         if operations:
             self.generated_content_collection.bulk_write(operations)
+
+    def get_user_collected_content_by_external_ids(
+        self, external_ids: List[str]
+    ) -> List[UserCollectedContent]:
+        """
+        Fetch UserCollectedContent objects for a list of external_ids.
+        Returns a list of UserCollectedContent.
+        """
+        cursor = self.collected_content_collection.find(
+            {
+                "external_id": {"$in": external_ids},
+            }
+        )
+        return [
+            CollectedContentAdapter.to_user_collected_content(
+                CollectedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
+    def update_user_collected_content_and_generated_content(
+        self,
+        user_collected_content: UserCollectedContent,
+        generated_content: GeneratedContent,
+    ):
+        """
+        Update user collected content and generated content in one shot.
+        """
+        # Convert to DB models
+        user_collected_content_db_model = (
+            CollectedContentAdapter.to_collected_content_db_model(
+                user_collected_content
+            )
+        )
+        generated_content_db_model = (
+            GeneratedContentAdapter.to_generated_content_db_model(generated_content)
+        )
+
+        # Prepare update dictionaries
+        user_content_update_dict = user_collected_content_db_model.dict(
+            by_alias=True, exclude_unset=True
+        )
+        generated_content_update_dict = generated_content_db_model.model_dump(
+            by_alias=True, exclude_unset=True
+        )
+
+        # Remove _id fields as MongoDB doesn't allow them in updates
+        user_content_id = user_content_update_dict.pop("_id")
+        generated_content_id = generated_content_update_dict.pop("_id")
+
+        # Execute both updates in a single transaction
+        with self.database.client.start_session() as session:
+            with session.start_transaction():
+                # Update user collected content
+                self.collected_content_collection.update_one(
+                    {"_id": user_content_id},
+                    {"$set": user_content_update_dict},
+                    session=session,
+                )
+
+                # Update generated content
+                self.generated_content_collection.update_one(
+                    {"_id": generated_content_id},
+                    {"$set": generated_content_update_dict},
+                    session=session,
+                )

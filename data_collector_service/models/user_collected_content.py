@@ -9,6 +9,7 @@ from .enums import ContentType
 class ContentStatus(str, Enum):
     COLLECTED = "COLLECTED"
     PROCESSING = "PROCESSING"
+    PROCESSED = "PROCESSED"
     USED = "USED"
     REJECTED = "REJECTED"
 
@@ -47,7 +48,7 @@ class UserCollectedContent:
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
 
-    def add_status_detail(self, status: ContentStatus, reason: str = ""):
+    def set_status(self, status: ContentStatus, reason: str = ""):
         status_detail = StatusDetail(
             status=status, created_at=datetime.utcnow(), reason=reason
         )
@@ -55,7 +56,7 @@ class UserCollectedContent:
         self.status = status
         self.updated_at = datetime.utcnow()
 
-    def add_sub_status_detail(self, sub_status: ContentSubStatus, reason: str = ""):
+    def set_sub_status(self, sub_status: ContentSubStatus, reason: str = ""):
         status_detail = SubStatusDetail(
             sub_status=sub_status, created_at=datetime.utcnow(), reason=reason
         )

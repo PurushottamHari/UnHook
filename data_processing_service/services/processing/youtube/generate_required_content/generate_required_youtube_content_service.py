@@ -30,6 +30,8 @@ from data_processing_service.repositories.user_content_repository import \
     UserContentRepository
 from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import \
     RequiredContentGenerator
+from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
+    SubtitleUtils
 from user_service.models import OutputType
 from user_service.models.user import User
 
@@ -51,6 +53,7 @@ class GenerateRequiredYoutubeContentService:
         self.user_service_client = UserServiceClient()
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
         self.required_content_generator_agent = RequiredContentGenerator()
+        self.subtitle_utils = SubtitleUtils()
         self.logger = logging.getLogger(__name__)
 
     async def generate(self, user_id: str) -> None:
@@ -82,7 +85,7 @@ class GenerateRequiredYoutubeContentService:
                 subtitle_data = self.youtube_content_ephemeral_repository.get_all_clean_subtitle_file_data(
                     video_id=content_to_generate.external_id
                 )
-                selected_subtitle = self._select_best_subtitle(
+                selected_subtitle = self.subtitle_utils.select_best_subtitle(
                     subtitle_data, youtube_video_details
                 )
                 generated_data = await self.required_content_generator_agent.generate_required_content(
@@ -101,11 +104,13 @@ class GenerateRequiredYoutubeContentService:
                         OutputType.SHORT: generated_data[OutputType.SHORT],
                     },
                     status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
-                    status_details=StatusDetail(
-                        status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
-                        created_at=datetime.utcnow(),
-                        reason="Initial generation.",
-                    ),
+                    status_details=[
+                        StatusDetail(
+                            status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
+                            created_at=datetime.utcnow(),
+                            reason="Initial generation.",
+                        )
+                    ],
                     content_generated_at=youtube_video_details.release_date,
                 )
 
@@ -122,44 +127,6 @@ class GenerateRequiredYoutubeContentService:
                     f"Content generation failed for {content_to_generate.external_id}: {e}"
                 )
                 continue
-
-    def _select_best_subtitle(
-        self, subtitle_data: SubtitleData, youtube_video_details: YouTubeVideoDetails
-    ) -> SubtitleMap:
-        """
-        Select the best subtitle based on language and manual/automatic preference.
-        Args:
-            subtitle_data: SubtitleData object containing manual and automatic subtitles
-            youtube_video_details: YouTubeVideoDetails object (should have a 'language' attribute)
-        Returns:
-            SubtitleMap: The selected subtitle map
-        """
-        preferred_language = youtube_video_details.language or "en"
-
-        # 1. Prefer manual subtitle in preferred language
-        for sub in subtitle_data.manual:
-            if (
-                sub.language.lower() == preferred_language.lower()
-                and sub.subtitle.strip()
-            ):
-                return sub
-        # 2. Prefer automatic subtitle in preferred language
-        for sub in subtitle_data.automatic:
-            if (
-                sub.language.lower() == preferred_language.lower()
-                and sub.subtitle.strip()
-            ):
-                return sub
-        # 3. Any manual subtitle
-        for sub in subtitle_data.manual:
-            if sub.subtitle.strip():
-                return sub
-        # 4. Any automatic subtitle
-        for sub in subtitle_data.automatic:
-            if sub.subtitle.strip():
-                return sub
-        # 5. If nothing is available, raise an error or return a dummy SubtitleMap
-        raise ValueError("No subtitles available to select.")
 
 
 if __name__ == "__main__":

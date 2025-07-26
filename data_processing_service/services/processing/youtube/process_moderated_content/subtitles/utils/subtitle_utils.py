@@ -5,6 +5,11 @@ Utility for cleaning subtitles.
 import json
 import re
 
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
+from data_processing_service.models.youtube.subtitle_data import (SubtitleData,
+                                                                  SubtitleMap)
+
 
 class SubtitleUtils:
     """A class for cleaning subtitle files."""
@@ -29,6 +34,44 @@ class SubtitleUtils:
         else:
             # Default fallback for unknown formats
             raise RuntimeError("Subtitle file format unsupported: " + extension)
+
+    def select_best_subtitle(
+        self, subtitle_data: SubtitleData, youtube_video_details: YouTubeVideoDetails
+    ) -> SubtitleMap:
+        """
+        Select the best subtitle based on language and manual/automatic preference.
+        Args:
+            subtitle_data: SubtitleData object containing manual and automatic subtitles
+            youtube_video_details: YouTubeVideoDetails object (should have a 'language' attribute)
+        Returns:
+            SubtitleMap: The selected subtitle map
+        """
+        preferred_language = youtube_video_details.language or "en"
+
+        # 1. Prefer manual subtitle in preferred language
+        for sub in subtitle_data.manual:
+            if (
+                sub.language.lower() == preferred_language.lower()
+                and sub.subtitle.strip()
+            ):
+                return sub
+        # 2. Prefer automatic subtitle in preferred language
+        for sub in subtitle_data.automatic:
+            if (
+                sub.language.lower() == preferred_language.lower()
+                and sub.subtitle.strip()
+            ):
+                return sub
+        # 3. Any manual subtitle
+        for sub in subtitle_data.manual:
+            if sub.subtitle.strip():
+                return sub
+        # 4. Any automatic subtitle
+        for sub in subtitle_data.automatic:
+            if sub.subtitle.strip():
+                return sub
+        # 5. If nothing is available, raise an error or return a dummy SubtitleMap
+        raise ValueError("No subtitles available to select.")
 
     def _clean_srt(self, content: str) -> str:
         """Cleans SRT subtitle content."""

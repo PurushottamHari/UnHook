@@ -3,7 +3,7 @@ Output Schema:
 {
     "generated": {
       "TITLE": "title under 12 words",
-      "SUMMARY": "summary under 50 words"
+      "SUMMARY": "summary under 150 words"
     }
 }
 
@@ -16,6 +16,6 @@ Expected Output Example:
 {
     "generated":{
        "TITLE": "Gaganyaan: India’s First Crewed Space Mission in 2025",
-       "SUMMARY": "India plans to launch its first human space mission, Gaganyaan, in 2025. Astronaut training is underway, and ISRO is collaborating with international space agencies."   
+       "SUMMARY": "India plans to launch its first human..upto 150 words"   
     }
 }

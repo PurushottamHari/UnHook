@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - UnHook Articles{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <a href="/" class="btn btn-secondary" style="margin-bottom: 1rem; display: inline-block;">
+        ← Back to Articles
+    </a>
+    
+    <div class="article-content">
+        <h1>{{ article.title }}</h1>
+        
+        {% if article.external_id %}
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%); border: 1px solid #ffcccc; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff0000">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        <span style="font-weight: 600; color: #333;">This article is based on a YouTube video</span>
+                    </div>
+                    <a href="{{ article.get_youtube_url() }}" target="_blank" class="btn btn-youtube">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                        Watch Original Video
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #e9ecef;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {% if article.category %}
+                        <span class="category-badge">{{ article.category }}</span>
+                    {% endif %}
+                    <span style="color: #6c757d; font-size: 0.9rem;">
+                        Article ID: {{ article.id }}
+                    </span>
+                    {% if article.external_id %}
+                        <span style="color: #6c757d; font-size: 0.9rem;">
+                            Video ID: {{ article.external_id }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div style="color: #6c757d; font-size: 0.9rem;">
+                    {% if article.created_at %}
+                        Published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% if article.content %}
+            <div id="article-content">
+                {{ article.content | safe }}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No content available</h3>
+                <p>This article doesn't have any content to display.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Add any additional JavaScript functionality here if needed
+document.addEventListener('DOMContentLoaded', function() {
+    // The markdown is now properly converted to HTML by the backend
+    // and styled with CSS, so no additional JavaScript styling is needed
+    console.log('Article content loaded successfully!');
+});
+</script>
+{% endblock %} 

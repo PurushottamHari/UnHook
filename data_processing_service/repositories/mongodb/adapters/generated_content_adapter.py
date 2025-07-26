@@ -22,13 +22,16 @@ class GeneratedContentAdapter:
     def to_generated_content_db_model(
         content: GeneratedContent,
     ) -> GeneratedContentDBModel:
-        status_details_db = StatusDetailDBModel(
-            status=content.status,
-            created_at=GeneratedContentAdapter._datetime_to_float(
-                content.status_details.created_at
-            ),
-            reason=content.status_details.reason,
-        )
+        status_details_db = [
+            StatusDetailDBModel(
+                status=detail.status,
+                created_at=GeneratedContentAdapter._datetime_to_float(
+                    detail.created_at
+                ),
+                reason=detail.reason,
+            )
+            for detail in content.status_details
+        ]
         generated_db = {
             k: GeneratedDataDBModel(markdown_string=v.markdown_string, string=v.string)
             for k, v in content.generated.items()
@@ -59,13 +62,18 @@ class GeneratedContentAdapter:
     def from_generated_content_db_model(
         db_model: GeneratedContentDBModel,
     ) -> GeneratedContent:
-        status_details = StatusDetail(
-            status=GeneratedContentStatus(db_model.status),
-            created_at=GeneratedContentAdapter._float_to_datetime(
-                db_model.status_details.created_at
-            ),
-            reason=db_model.status_details.reason,
-        )
+        status_details = []
+        if hasattr(db_model, "status_details") and db_model.status_details:
+            for detail in db_model.status_details:
+                status_details.append(
+                    StatusDetail(
+                        status=GeneratedContentStatus(detail.status),
+                        created_at=GeneratedContentAdapter._float_to_datetime(
+                            detail.created_at
+                        ),
+                        reason=detail.reason,
+                    )
+                )
         generated = {
             k: GeneratedData(markdown_string=v.markdown_string, string=v.string)
             for k, v in db_model.generated.items()

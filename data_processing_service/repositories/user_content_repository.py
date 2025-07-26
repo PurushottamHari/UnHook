@@ -70,7 +70,32 @@ class UserContentRepository(ABC):
         pass
 
     @abstractmethod
+    def update_generated_content(self, updated_generated_content: GeneratedContent):
+        pass
+
+    @abstractmethod
     def update_generated_content_batch(
         self, updated_generated_content_list: List[GeneratedContent]
     ):
+        pass
+
+    @abstractmethod
+    def get_user_collected_content_by_external_ids(
+        self, external_ids: List[str]
+    ) -> List[UserCollectedContent]:
+        """
+        Fetch UserCollectedContent objects for a list of external_ids.
+        Returns a list of UserCollectedContent.
+        """
+        pass
+
+    @abstractmethod
+    def update_user_collected_content_and_generated_content(
+        self,
+        user_collected_content: UserCollectedContent,
+        generated_content: GeneratedContent,
+    ):
+        """
+        Update user collected content and generated content in one shot.
+        """
         pass
