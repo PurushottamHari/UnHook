@@ -14,6 +14,8 @@ from data_collector_service.repositories.mongodb.config.settings import \
     get_mongodb_settings
 from data_processing_service.models.generated_content import \
     GeneratedContentStatus
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
     GeneratedContentAdapter
 from data_processing_service.repositories.mongodb.config.database import \
@@ -148,5 +150,165 @@ def migrate_user_collected_content_to_processed():
     print("Database connections closed.")
 
 
+def migrate_user_collected_content_to_subtitle_stored():
+    """
+    Migration script to update user_collected_content sub_status to SUBTITLES_STORED
+    for records that have valid subtitle files stored in the ephemeral repository and user_collected_content with MODERATION_PASSED sub_status.
+    """
+    print("Starting migration to update user_collected_content to SUBTITLES_STORED...")
+
+    # Connect to data collector service MongoDB
+    CollectorMongoDB.connect_to_database()
+    collector_db = CollectorMongoDB.get_database()
+    collector_settings = get_mongodb_settings()
+    user_collected_content_collection = collector_db[collector_settings.COLLECTION_NAME]
+
+    print(f"Connected to {collector_settings.COLLECTION_NAME} collection.")
+
+    # Find all user_collected_content documents with sub_status MODERATION_PASSED
+    user_collected_docs = list(
+        user_collected_content_collection.find({"sub_status": "MODERATION_PASSED"})
+    )
+    print(
+        f"Found {len(user_collected_docs)} user_collected_content documents with sub_status MODERATION_PASSED."
+    )
+
+    # Initialize ephemeral repository
+    ephemeral_repository = LocalYoutubeContentEphemeralRepository()
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in user_collected_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+
+        # Check if clean subtitles exist for this external_id
+        try:
+            subtitle_data = ephemeral_repository.get_all_clean_subtitle_file_data(
+                video_id=external_id
+            )
+            # Check if we have valid clean subtitles (not empty)
+            has_valid_subtitles = False
+            if subtitle_data.automatic:
+                for subtitle_map in subtitle_data.automatic:
+                    if subtitle_map.subtitle and subtitle_map.subtitle.strip():
+                        has_valid_subtitles = True
+                        break
+            if not has_valid_subtitles and subtitle_data.manual:
+                for subtitle_map in subtitle_data.manual:
+                    if subtitle_map.subtitle and subtitle_map.subtitle.strip():
+                        has_valid_subtitles = True
+                        break
+            if has_valid_subtitles:
+                # Update user_collected_content
+                new_sub_status_detail = {
+                    "sub_status": "SUBTITLES_STORED",
+                    "created_at": current_timestamp,
+                    "reason": "Migration: Valid subtitle files found",
+                }
+                # user_collected_content_collection.update_one(
+                #     {"_id": doc_id},
+                #     {
+                #         "$set": {
+                #             "sub_status": "SUBTITLES_STORED",
+                #             "updated_at": current_timestamp,
+                #         },
+                #         "$push": {"sub_status_details": new_sub_status_detail},
+                #     },
+                # )
+                updated_count += 1
+                print(f"Updated user_collected_content for external_id {external_id}")
+            else:
+                print(
+                    f"No valid clean subtitles found for external_id {external_id}, skipping."
+                )
+        except Exception as e:
+            print(f"Error checking subtitles for external_id {external_id}: {str(e)}")
+            continue
+
+    print(
+        f"Migration complete. {updated_count} user_collected_content records updated to SUBTITLES_STORED."
+    )
+
+    # Close the connection
+    CollectorMongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
+def migrate_fix_missing_subtitles_stored_sub_status_details():
+    """
+    Migration script to fix missing sub_status_details entries for records
+    that have sub_status as "SUBTITLES_STORED" but only have one entry in sub_status_details.
+    """
+    print("Starting migration to fix missing SUBTITLES_STORED sub_status_details...")
+
+    # Connect to data collector service MongoDB
+    CollectorMongoDB.connect_to_database()
+    collector_db = CollectorMongoDB.get_database()
+    collector_settings = get_mongodb_settings()
+    user_collected_content_collection = collector_db[collector_settings.COLLECTION_NAME]
+
+    print(f"Connected to {collector_settings.COLLECTION_NAME} collection.")
+
+    # Find all user_collected_content documents with sub_status SUBTITLES_STORED
+    # that have only one entry in sub_status_details
+    user_collected_docs = list(
+        user_collected_content_collection.find(
+            {"sub_status": "SUBTITLES_STORED", "sub_status_details": {"$size": 1}}
+        )
+    )
+    print(
+        f"Found {len(user_collected_docs)} user_collected_content documents with sub_status SUBTITLES_STORED and only one sub_status_details entry."
+    )
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in user_collected_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+        sub_status_details = doc.get("sub_status_details", [])
+
+        # Check if the existing entry is for SUBTITLES_STORED
+        if len(sub_status_details) == 1:
+            existing_detail = sub_status_details[0]
+            if existing_detail.get("sub_status") == "SUBTITLES_STORED":
+                print(
+                    f"Document {doc_id} already has SUBTITLES_STORED in sub_status_details, skipping."
+                )
+                continue
+
+        # Add the missing SUBTITLES_STORED entry
+        new_sub_status_detail = {
+            "sub_status": "SUBTITLES_STORED",
+            "created_at": current_timestamp,
+            "reason": "Migration: Subtitles stored status added",
+        }
+
+        # Update the document
+        update_result = user_collected_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$push": {"sub_status_details": new_sub_status_detail},
+                "$set": {"updated_at": current_timestamp},
+            },
+        )
+
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated user_collected_content document {doc_id} for external_id {external_id}"
+            )
+
+    print(
+        f"Migration complete. {updated_count} user_collected_content documents updated with missing SUBTITLES_STORED sub_status_details."
+    )
+
+    # Close the connection
+    CollectorMongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
-    migrate_user_collected_content_to_processed()
+    migrate_fix_missing_subtitles_stored_sub_status_details()

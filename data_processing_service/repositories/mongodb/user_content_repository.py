@@ -61,6 +61,24 @@ class MongoDBUserContentRepository(UserContentRepository):
             for doc in cursor
         ]
 
+    def update_user_collected_content(
+        self, updated_user_collected_content: UserCollectedContent
+    ):
+        """
+        Update a single UserCollectedContent item in MongoDB.
+        Args:
+            updated_user_collected_content: The UserCollectedContent object to update
+        """
+        db_model = CollectedContentAdapter.to_collected_content_db_model(
+            updated_user_collected_content
+        )
+        update_dict = db_model.dict(by_alias=True, exclude_unset=True)
+        # Mongodb does not allow _id to be passed even if same
+        _id = update_dict.pop("_id")
+        self.collected_content_collection.update_one(
+            {"_id": _id}, {"$set": update_dict}
+        )
+
     def update_user_collected_content_batch(
         self, updated_user_collected_content_list: List[UserCollectedContent]
     ):

@@ -38,6 +38,12 @@ class UserContentRepository(ABC):
         pass
 
     @abstractmethod
+    def update_user_collected_content(
+        self, updated_user_collected_content: UserCollectedContent
+    ):
+        pass
+
+    @abstractmethod
     def get_user_collected_content(
         self,
         user_id: str,

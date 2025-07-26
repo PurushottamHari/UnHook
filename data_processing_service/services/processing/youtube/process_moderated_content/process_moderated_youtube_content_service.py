@@ -56,11 +56,13 @@ class ProcessModeratedYoutubeContentService:
                 if subtitle_processed:
                     # Make a deepcopy of the content_to_process, update the updated_at, sub_status = SUBTITLES_STORED
                     updated_content = deepcopy(content_to_process)
-                    updated_content.updated_at = datetime.utcnow()
-                    updated_content.sub_status = ContentSubStatus.SUBTITLES_STORED
+                    updated_content.set_sub_status(ContentSubStatus.SUBTITLES_STORED)
 
                     # Add it to contents_with_subtitles_stored list
                     contents_with_subtitles_stored.append(updated_content)
+                    self.user_content_repository.update_user_collected_content(
+                        updated_content
+                    )
                 else:
                     # If subtitle processing failed, log it but continue with other content
                     self.logger.warning(
@@ -76,7 +78,8 @@ class ProcessModeratedYoutubeContentService:
 
         # Update all successfully processed content
         if contents_with_subtitles_stored:
-            print(f"Updating {len(contents_with_subtitles_stored)} items")
-            self.user_content_repository.update_user_collected_content_batch(
-                updated_user_collected_content_list=contents_with_subtitles_stored
+            print(
+                f"Successfully updated {len(contents_with_subtitles_stored)} items out of {len(content_to_process_list)}"
             )
+        else:
+            print(f"No items were successfully updated")
