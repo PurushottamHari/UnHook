@@ -1,1 +1,2 @@
+from .chunk_summarizer import ChunkSummarizer
 from .complete_content_generator import CompleteContentGenerator

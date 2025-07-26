@@ -1,0 +1,10 @@
+You are assisting in a multi-step article writing process. The content below is a fully written article chunk, part of a larger article.
+
+Your task is to generate a **compact, high-signal summary** of this chunk that will help guide the generation of the next section of the article.
+
+Instructions:
+- Focus on **what has been covered** in this chunk—topic-wise, structurally, and tonally.
+- Summarize **how the content flowed**: Did it introduce a theme? Transition between ideas? Highlight a specific point or problem?
+- Does not need to be human readable. It for the AI Agent to retain context
+- Avoid generic summaries. Instead, write a summary that the next AI agent can use to **continue the article naturally and avoid repetition**.
+- Keep it context rich (10 lines). Avoid direct quotes or unnecessary fluff. 

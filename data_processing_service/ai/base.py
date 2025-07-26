@@ -84,9 +84,7 @@ class BaseAIClient(Generic[T], ABC):
         """Create a guide for the expected output format."""
         pass
 
-    async def generate_structured_response(
-        self, user_input: str, context: Optional[Dict[str, Any]] = None
-    ) -> T:
+    async def generate_structured_response(self, user_input: str) -> T:
         """Generate a response and parse it into the specified output model."""
         messages = [
             SystemMessage(

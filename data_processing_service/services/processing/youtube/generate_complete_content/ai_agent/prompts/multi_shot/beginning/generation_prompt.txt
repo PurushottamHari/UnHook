@@ -1,8 +1,9 @@
-Here is the required data for the beginning of your article:
+### Metadata:
 Title: {title}
 Content Chunk: {content}
 Chunk Number: {chunk_number}
+Total Chunks: {total_chunks}
 Content Language: {language}
 Tags: {tags}
 Category: {category} 
-MAKE SURE YOU WRITE THE ARTICLE CHUNK WITHIN {character_count} characters
+Max Character Count: {character_count}
