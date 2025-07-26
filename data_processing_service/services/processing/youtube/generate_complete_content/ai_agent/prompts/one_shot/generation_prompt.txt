@@ -1,7 +1,7 @@
-Here is the required data for your article:
+### Metadata:
 Title: {title}
 Content: {content}
 Content Language: {language}
 Tags: {tags}
 Category: {category} 
-MAKE SURE YOU WRITE THE ARTICLE WITHIN {character_count} characters
+Max Character Count: {character_count}

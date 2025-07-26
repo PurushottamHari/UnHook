@@ -94,7 +94,7 @@ class ArticleDetail:
         self.category = category
         self.created_at = created_at
         self.external_id = external_id
-    
+
     def get_youtube_url(self) -> Optional[str]:
         """Get YouTube URL if external_id is available."""
         if self.external_id:
@@ -106,21 +106,26 @@ def get_unique_categories() -> List[str]:
     """Get all unique categories from the database."""
     db = get_database()
     collection = db.generated_content
-    
+
     # Find articles with status ARTICLE_GENERATED
     cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED})
-    
+
     categories = set()
     for doc in cursor:
         if "category" in doc and doc["category"]:
             category = doc["category"].get("category", "")
             if category:
                 categories.add(category)
-    
+
     return sorted(list(categories))
 
 
-def fetch_articles(user_id: str, sort_by: str = "newest", category_filter: str = None, content_type_filter: str = None) -> List[ArticleCard]:
+def fetch_articles(
+    user_id: str,
+    sort_by: str = "newest",
+    category_filter: str = None,
+    content_type_filter: str = None,
+) -> List[ArticleCard]:
     """Fetch articles with status ARTICLE_GENERATED for a user."""
     db = get_database()
     collection = db.generated_content
@@ -175,7 +180,7 @@ def fetch_articles(user_id: str, sort_by: str = "newest", category_filter: str =
         # Apply filters
         if category_filter and category != category_filter:
             continue
-        
+
         if content_type_filter and content_type_filter not in content_types:
             continue
 
