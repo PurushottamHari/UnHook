@@ -36,12 +36,14 @@ class ArticleCard:
         summary: str,
         category: Optional[str] = None,
         created_at: datetime = None,
+        content_types: List[str] = None,
     ):
         self.id = id
         self.title = title
         self.summary = summary
         self.category = category
         self.created_at = created_at
+        self.content_types = content_types or []
 
     def get_time_ago(self) -> str:
         """Get a human-readable time ago string."""
@@ -100,7 +102,25 @@ class ArticleDetail:
         return None
 
 
-def fetch_articles(user_id: str, sort_by: str = "newest") -> List[ArticleCard]:
+def get_unique_categories() -> List[str]:
+    """Get all unique categories from the database."""
+    db = get_database()
+    collection = db.generated_content
+    
+    # Find articles with status ARTICLE_GENERATED
+    cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED})
+    
+    categories = set()
+    for doc in cursor:
+        if "category" in doc and doc["category"]:
+            category = doc["category"].get("category", "")
+            if category:
+                categories.add(category)
+    
+    return sorted(list(categories))
+
+
+def fetch_articles(user_id: str, sort_by: str = "newest", category_filter: str = None, content_type_filter: str = None) -> List[ArticleCard]:
     """Fetch articles with status ARTICLE_GENERATED for a user."""
     db = get_database()
     collection = db.generated_content
@@ -137,6 +157,13 @@ def fetch_articles(user_id: str, sort_by: str = "newest") -> List[ArticleCard]:
         if "category" in doc and doc["category"]:
             category = doc["category"].get("category", "")
 
+        # Get content types available (MEDIUM, LONG)
+        content_types = []
+        if OutputType.MEDIUM in generated:
+            content_types.append("MEDIUM")
+        if OutputType.LONG in generated:
+            content_types.append("LONG")
+
         # Get content generated date (when the content was actually published/generated)
         content_generated_at = None
         if "content_generated_at" in doc:
@@ -145,6 +172,13 @@ def fetch_articles(user_id: str, sort_by: str = "newest") -> List[ArticleCard]:
             # Fallback to created_at if content_generated_at is not available
             content_generated_at = datetime.fromtimestamp(doc["created_at"])
 
+        # Apply filters
+        if category_filter and category != category_filter:
+            continue
+        
+        if content_type_filter and content_type_filter not in content_types:
+            continue
+
         articles.append(
             ArticleCard(
                 id=doc["_id"],
@@ -152,6 +186,7 @@ def fetch_articles(user_id: str, sort_by: str = "newest") -> List[ArticleCard]:
                 summary=summary,
                 category=category,
                 created_at=content_generated_at,
+                content_types=content_types,
             )
         )
 
@@ -248,7 +283,12 @@ def index():
     # For now, we'll use a default user_id. In a real app, this would come from authentication
     user_id = request.args.get("user_id", "default_user")
     sort_by = request.args.get("sort", "newest")
-    articles = fetch_articles(user_id, sort_by)
+    category_filter = request.args.get("category", "")
+    content_type_filter = request.args.get("content_type", "")
+    articles = fetch_articles(user_id, sort_by, category_filter, content_type_filter)
+
+    # Get available categories for filter dropdown
+    available_categories = get_unique_categories()
 
     # Calculate date range for articles with dates
     articles_with_dates = [a for a in articles if a.created_at]
@@ -262,6 +302,9 @@ def index():
         articles=articles,
         user_id=user_id,
         sort_by=sort_by,
+        category_filter=category_filter,
+        content_type_filter=content_type_filter,
+        available_categories=available_categories,
         date_range=date_range,
     )
 
@@ -280,7 +323,9 @@ def api_articles():
     """API endpoint to get articles as JSON."""
     user_id = request.args.get("user_id", "default_user")
     sort_by = request.args.get("sort", "newest")
-    articles = fetch_articles(user_id, sort_by)
+    category_filter = request.args.get("category", "")
+    content_type_filter = request.args.get("content_type", "")
+    articles = fetch_articles(user_id, sort_by, category_filter, content_type_filter)
 
     # Convert to dict for JSON serialization
     articles_data = []
@@ -291,6 +336,7 @@ def api_articles():
                 "title": article.title,
                 "summary": article.summary,
                 "category": article.category,
+                "content_types": article.content_types,
                 "created_at": (
                     article.created_at.isoformat() if article.created_at else None
                 ),

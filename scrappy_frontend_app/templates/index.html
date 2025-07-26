@@ -14,13 +14,35 @@
     </div>
     
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div style="display: flex; gap: 1rem; align-items: center;">
-            <label for="sort-select" style="font-weight: 600; color: #495057;">Sort by:</label>
-            <select id="sort-select" onchange="changeSort()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
-                <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest First</option>
-                <option value="oldest" {% if sort_by == "oldest" %}selected{% endif %}>Oldest First</option>
-                <option value="title" {% if sort_by == "title" %}selected{% endif %}>Title A-Z</option>
-            </select>
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="sort-select" style="font-weight: 600; color: #495057;">Sort by:</label>
+                <select id="sort-select" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
+                    <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if sort_by == "oldest" %}selected{% endif %}>Oldest First</option>
+                    <option value="title" {% if sort_by == "title" %}selected{% endif %}>Title A-Z</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="category-filter" style="font-weight: 600; color: #495057;">Category:</label>
+                <select id="category-filter" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
+                    <option value="">All Categories</option>
+                    {% for category in available_categories %}
+                        <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="content-type-filter" style="font-weight: 600; color: #495057;">Content Type:</label>
+                <select id="content-type-filter" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
+                    <option value="">All Types</option>
+                    <option value="MEDIUM" {% if content_type_filter == "MEDIUM" %}selected{% endif %}>Medium</option>
+                    <option value="LONG" {% if content_type_filter == "LONG" %}selected{% endif %}>Long</option>
+                </select>
+            </div>
+            
             {% if sort_by == "newest" %}
                 <span style="color: #28a745; font-size: 0.9rem;">↓ Newest first</span>
             {% elif sort_by == "oldest" %}
@@ -60,10 +82,13 @@
                 </div>
                 <p style="margin-bottom: 1rem;">{{ article.summary }}</p>
                 <div class="card-meta">
-                    <div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         {% if article.category %}
                             <span class="category-badge">{{ article.category }}</span>
                         {% endif %}
+                        {% for content_type in article.content_types %}
+                            <span class="content-type-badge">{{ content_type }}</span>
+                        {% endfor %}
                     </div>
                     <div>
                         {% if article.created_at %}
@@ -93,16 +118,28 @@
 <script>
 function changeUser() {
     const userId = document.getElementById('user-id').value;
-    const sortBy = document.getElementById('sort-select').value;
     if (userId.trim()) {
-        window.location.href = '/?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy);
+        applyFilters();
     }
 }
 
-function changeSort() {
+function applyFilters() {
     const userId = document.getElementById('user-id').value;
     const sortBy = document.getElementById('sort-select').value;
-    window.location.href = '/?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy);
+    const categoryFilter = document.getElementById('category-filter').value;
+    const contentTypeFilter = document.getElementById('content-type-filter').value;
+    
+    let url = '/?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy);
+    
+    if (categoryFilter) {
+        url += '&category=' + encodeURIComponent(categoryFilter);
+    }
+    
+    if (contentTypeFilter) {
+        url += '&content_type=' + encodeURIComponent(contentTypeFilter);
+    }
+    
+    window.location.href = url;
 }
 
 // Allow Enter key to change user

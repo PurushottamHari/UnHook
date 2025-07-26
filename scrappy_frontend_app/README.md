@@ -9,6 +9,9 @@ A simple Flask-based frontend application to view and read AI-generated articles
 - **Markdown Rendering**: Articles are displayed in proper markdown format
 - **Responsive Design**: Works on desktop and mobile devices
 - **User Switching**: Change user ID to view different user's articles
+- **Sorting**: Sort articles by newest, oldest, or title (A-Z)
+- **Category Filtering**: Filter articles by content category (Technology, Science, Business, etc.)
+- **Content Type Filtering**: Filter articles by content length (Medium or Long)
 - **Modern UI**: Clean, modern interface with smooth animations
 
 ## Setup
@@ -61,8 +64,11 @@ A simple Flask-based frontend application to view and read AI-generated articles
 
 1. **View Articles**: The main page shows all articles with status "ARTICLE_GENERATED"
 2. **Change User**: Use the user ID input field to switch between different users
-3. **Read Articles**: Click on any article card to view the full content
-4. **Navigate**: Use the "Back to Articles" button to return to the main page
+3. **Sort Articles**: Use the "Sort by" dropdown to sort by newest, oldest, or title
+4. **Filter by Category**: Use the "Category" dropdown to filter articles by content category
+5. **Filter by Content Type**: Use the "Content Type" dropdown to filter by Medium or Long articles
+6. **Read Articles**: Click on any article card to view the full content
+7. **Navigate**: Use the "Back to Articles" button to return to the main page
 
 ## API Endpoints
 
@@ -80,6 +86,7 @@ The app fetches articles from the `generated_content` collection in MongoDB with
 - **Summary**: From `generated.SHORT.string`
 - **Content**: From `generated.LONG.markdown_string` (preferred) or `generated.MEDIUM.markdown_string`
 - **Category**: From `category.category` if available
+- **Content Types**: Determined by checking presence of `generated.MEDIUM` and `generated.LONG` fields
 - **Created Date**: From `created_at` timestamp
 
 ## Troubleshooting
