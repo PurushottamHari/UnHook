@@ -103,6 +103,7 @@ class GenerateCompleteYoutubeContentService:
                 generated_content=generated_content_clone,
             )
             print(f"Article generated for id {generated_content_clone.id}")
+        print("Service Complete....")
 
 
 if __name__ == "__main__":

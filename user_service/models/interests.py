@@ -10,12 +10,12 @@ from .enums import CategoryName, OutputType, Weekday
 
 
 class NotInterested(BaseModel):
-    category_definition: str = Field(..., max_length=200)
+    category_definition: str = Field(..., max_length=500)
 
 
 class Interest(BaseModel):
     category_name: CategoryName
-    category_definition: str = Field(..., max_length=200)
+    category_definition: str = Field(..., max_length=500)
     weekdays: List[Weekday]
     output_type: OutputType
 

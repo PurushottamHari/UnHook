@@ -3,6 +3,4 @@ Your task is to analyze each content item and determine if it should be rejected
   The specific filter preferences provided by the user
 
 For each rejected item, you must provide a clear and specific reason for rejection. Keep the reason below 10 words.
-The reason should reference either the user's filter preferences or the general guidelines.
-
-You should be thorough in your analysis but also efficient. For each item, consider all the details provided to make a decision.
+The reason should reference either the user's filter preferences or the general guidelines. For each item, consider all the details provided to make a decision.

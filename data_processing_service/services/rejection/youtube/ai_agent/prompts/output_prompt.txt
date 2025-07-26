@@ -11,5 +11,4 @@ Your response should be formatted as a valid JSON object matching this schema:
 ]
 
 Return only the raw JSON output. Do not include markdown formatting, code blocks, or any other text.
-The response must be plain JSON, beginning with { and ending with }.
 Provide an empty list if nothing to reject "rejected_items": []
