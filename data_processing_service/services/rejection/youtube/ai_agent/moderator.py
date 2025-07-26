@@ -56,7 +56,9 @@ class ContentModerator(BaseAIClient[ModerationOutput]):
 
         return self._moderation_prompt_template.format(
             filter_preferences=", ".join(filter_preferences),
-            content_items=json.dumps({"items": input_data.items}, indent=2),
+            content_items=json.dumps(
+                {"items": [item.model_dump() for item in input_data.items]}, indent=2
+            ),
         )
 
     def _create_output_format_guide(self) -> str:
