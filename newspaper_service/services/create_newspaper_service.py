@@ -68,6 +68,11 @@ class CreateNewspaperService:
             )
 
             self.logger.info(f"Found {len(processed_content_list)} processed contents")
+            if len(processed_content_list) == 0:
+                self.logger.info(
+                    f"No processed contents found for user {user_id} on {for_date}"
+                )
+                return None
             processed_ids: List[str] = [c.id for c in processed_content_list]
 
             # Build considered_content_list
