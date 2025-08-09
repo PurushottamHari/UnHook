@@ -38,6 +38,8 @@ class ArticleCard:
         created_at: datetime = None,
         content_types: List[str] = None,
         reading_time_seconds: int = 0,
+        external_id: Optional[str] = None,
+        channel_name: Optional[str] = None,
     ):
         self.id = id
         self.title = title
@@ -46,6 +48,8 @@ class ArticleCard:
         self.created_at = created_at
         self.content_types = content_types or []
         self.reading_time_seconds = reading_time_seconds
+        self.external_id = external_id
+        self.channel_name = channel_name
 
     def get_time_ago(self) -> str:
         """Get a human-readable time ago string."""
@@ -90,6 +94,12 @@ class ArticleCard:
         else:
             return f"{minutes} min read"
 
+    def get_youtube_url(self) -> Optional[str]:
+        """Get YouTube URL if external_id is available."""
+        if self.external_id:
+            return f"https://www.youtube.com/watch?v={self.external_id}"
+        return None
+
 
 class ArticleDetail:
     """Model for full article details."""
@@ -103,6 +113,7 @@ class ArticleDetail:
         created_at: datetime = None,
         external_id: Optional[str] = None,
         reading_time_seconds: int = 0,
+        channel_name: Optional[str] = None,
     ):
         self.id = id
         self.title = title
@@ -111,6 +122,7 @@ class ArticleDetail:
         self.created_at = created_at
         self.external_id = external_id
         self.reading_time_seconds = reading_time_seconds
+        self.channel_name = channel_name
 
     def get_youtube_url(self) -> Optional[str]:
         """Get YouTube URL if external_id is available."""
@@ -212,6 +224,11 @@ def fetch_articles(
         if "reading_time_seconds" in doc:
             reading_time_seconds = doc["reading_time_seconds"]
 
+        # Get external_id for YouTube video link (but don't fetch channel name for performance)
+        external_id = None
+        if "external_id" in doc:
+            external_id = doc["external_id"]
+
         # Apply filters
         if category_filter and category != category_filter:
             continue
@@ -228,6 +245,8 @@ def fetch_articles(
                 created_at=content_generated_at,
                 content_types=content_types,
                 reading_time_seconds=reading_time_seconds,
+                external_id=external_id,
+                channel_name=None,  # Don't fetch channel name for homepage performance
             )
         )
 
@@ -313,6 +332,21 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
     if "reading_time_seconds" in doc:
         reading_time_seconds = doc["reading_time_seconds"]
 
+    # Fetch channel name from collected_content collection
+    channel_name = None
+    if external_id:
+        collected_content_collection = db.collected_content
+        collected_doc = collected_content_collection.find_one(
+            {"external_id": external_id}
+        )
+        if collected_doc and "data" in collected_doc:
+            # The data field contains the YouTube video details with YOUTUBE_VIDEO as key
+            data = collected_doc["data"]
+            if "YOUTUBE_VIDEO" in data:
+                video_details = data["YOUTUBE_VIDEO"]
+                if isinstance(video_details, dict) and "channel_name" in video_details:
+                    channel_name = video_details["channel_name"]
+
     return ArticleDetail(
         id=doc["_id"],
         title=title,
@@ -321,6 +355,7 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
         created_at=content_generated_at,
         external_id=external_id,
         reading_time_seconds=reading_time_seconds,
+        channel_name=channel_name,
     )
 
 
@@ -388,6 +423,9 @@ def api_articles():
                     article.created_at.isoformat() if article.created_at else None
                 ),
                 "reading_time_seconds": article.reading_time_seconds,
+                "external_id": article.external_id,
+                "youtube_url": article.get_youtube_url(),
+                # channel_name not included for performance (only fetched on detail pages)
             }
         )
 
@@ -413,6 +451,7 @@ def api_article_detail(article_id):
             "external_id": article.external_id,
             "youtube_url": article.get_youtube_url(),
             "reading_time_seconds": article.reading_time_seconds,
+            "channel_name": article.channel_name,
         }
     )
 

@@ -66,49 +66,51 @@
     {% if articles %}
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
             {% for article in articles %}
-            <div class="card" onclick="window.location.href='/article/{{ article.id }}'">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                    <h3 style="margin: 0; flex: 1;">{{ article.title }}</h3>
-                    {% if article.created_at %}
-                        <div style="text-align: right; min-width: 80px;">
-                            <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">
-                                {{ article.created_at.strftime('%b %d') }}
-                            </div>
-                            <div style="font-size: 0.7rem; color: #adb5bd;">
-                                {{ article.created_at.strftime('%Y') }}
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-                <p style="margin-bottom: 1rem;">{{ article.summary }}</p>
-                <div class="card-meta">
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        {% if article.category %}
-                            <span class="category-badge">{{ article.category }}</span>
-                        {% endif %}
-                        {% for content_type in article.content_types %}
-                            <span class="content-type-badge">{{ content_type }}</span>
-                        {% endfor %}
-                        {% if article.get_reading_time() %}
-                            <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">
-                                {{ article.get_reading_time() }}
-                            </span>
-                        {% endif %}
-                    </div>
-                    <div>
+            <a href="/article/{{ article.id }}" class="card-link">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h3 style="margin: 0; flex: 1;">{{ article.title }}</h3>
                         {% if article.created_at %}
-                            <span style="font-size: 0.8rem; color: #6c757d;" title="Content published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
-                                {% set time_ago = article.get_time_ago() %}
-                                {% if time_ago and time_ago != article.created_at.strftime('%b %d, %Y') %}
-                                    {{ time_ago }}
-                                {% else %}
-                                    {{ article.created_at.strftime('%I:%M %p') }}
-                                {% endif %}
-                            </span>
+                            <div style="text-align: right; min-width: 80px;">
+                                <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">
+                                    {{ article.created_at.strftime('%b %d') }}
+                                </div>
+                                <div style="font-size: 0.7rem; color: #adb5bd;">
+                                    {{ article.created_at.strftime('%Y') }}
+                                </div>
+                            </div>
                         {% endif %}
                     </div>
+                    <p style="margin-bottom: 1rem;">{{ article.summary }}</p>
+                    <div class="card-meta">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            {% if article.category %}
+                                <span class="category-badge">{{ article.category }}</span>
+                            {% endif %}
+                            {% for content_type in article.content_types %}
+                                <span class="content-type-badge">{{ content_type }}</span>
+                            {% endfor %}
+                            {% if article.get_reading_time() %}
+                                <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                    {{ article.get_reading_time() }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if article.created_at %}
+                                <span style="font-size: 0.8rem; color: #6c757d;" title="Content published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
+                                    {% set time_ago = article.get_time_ago() %}
+                                    {% if time_ago and time_ago != article.created_at.strftime('%b %d, %Y') %}
+                                        {{ time_ago }}
+                                    {% else %}
+                                        {{ article.created_at.strftime('%I:%M %p') }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     {% else %}
