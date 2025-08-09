@@ -151,7 +151,10 @@ async def main():
     for_date = datetime.fromtimestamp(epoch, pytz.timezone("Asia/Kolkata"))
 
     newspaper = await service.create_newspaper_for_user(user_id, for_date)
-    print(f"Created newspaper: {newspaper.id}")
+    if newspaper:
+        print(f"Created newspaper: {newspaper.id}")
+    else:
+        print("No newspaper was created due to lack of processed content")
 
 
 if __name__ == "__main__":
