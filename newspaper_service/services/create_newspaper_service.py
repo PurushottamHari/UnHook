@@ -62,7 +62,7 @@ class CreateNewspaperService:
             processed_content_list = (
                 self.user_collected_content_repository.get_content_with_status(
                     user_id=user_id,
-                    status=ContentStatus.PICKED_FOR_EVALUATION,
+                    status=ContentStatus.PROCESSED,
                     before_time=for_date,
                 )
             )
