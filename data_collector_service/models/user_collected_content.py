@@ -12,6 +12,7 @@ class ContentStatus(str, Enum):
     PROCESSED = "PROCESSED"
     USED = "USED"
     REJECTED = "REJECTED"
+    PICKED_FOR_EVALUATION = "PICKED_FOR_EVALUATION"
 
 
 class ContentSubStatus(str, Enum):

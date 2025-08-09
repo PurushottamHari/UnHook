@@ -148,7 +148,6 @@ class YtDlpClient:
             "skip_download": True,
             "paths": {"subtitle": str(output_dir)},
             "retries": 3,
-            "impersonate": ImpersonateTarget("chrome"),
             "limit_rate": "150K",
         }
         max_retries = 3
