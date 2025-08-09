@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "newspaper-service"
+version = "0.1.0"
+description = "Service for creating curated newspapers from processed articles"
+requires-python = ">=3.8"
+dependencies = [
+    "pydantic>=2.0.0",
+    "python-dateutil>=2.8.2",
+    "motor>=3.0.0",
+    "pymongo>=4.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=0.19.0",
+    "typing-extensions>=4.0.0",
+    "data-processing-service @ file:///Users/puru/Workspace/UnHook/data_processing_service",
+    "user-service @ file:///Users/puru/Workspace/UnHook/user_service",
+    "data-collector-service @ file:///Users/puru/Workspace/UnHook/data_collector_service",
+    "fastapi>=0.68.0",
+    "uvicorn>=0.15.0",
+    "apscheduler>=3.10.0",
+    "httpx>=0.24.0",
+    "pytz>=2023.3",
+    "curl-cffi"
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.hatch.metadata]
+allow-direct-references = true 
