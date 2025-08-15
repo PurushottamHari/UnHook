@@ -13,15 +13,16 @@ import pytz
 
 from data_collector_service.models.user_collected_content import (
     ContentStatus, UserCollectedContent)
-
-from ..external.user_service import UserServiceClient
-from ..models import (ConsideredContent, ConsideredContentStatus, Newspaper,
-                      NewspaperStatus)
-from ..repositories import NewspaperRepository, UserCollectedContentRepository
-from ..repositories.mongodb.config.database import MongoDB
-from ..repositories.mongodb.newspaper_repository import \
+from newspaper_service.external.user_service import UserServiceClient
+from newspaper_service.models import (ConsideredContent,
+                                      ConsideredContentStatus, Newspaper,
+                                      NewspaperStatus)
+from newspaper_service.repositories import (NewspaperRepository,
+                                            UserCollectedContentRepository)
+from newspaper_service.repositories.mongodb.config.database import MongoDB
+from newspaper_service.repositories.mongodb.newspaper_repository import \
     MongoDBNewspaperRepository
-from ..repositories.mongodb.user_collected_content_repository import \
+from newspaper_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
 
 

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -10,6 +10,10 @@ class CategoryOutputItem(BaseModel):
         ..., description="1 sentence description of the category."
     )
     category_tags: List[str] = Field(..., description="3-5 tags.")
+    shelf_life: str = Field(..., description="One of the predefined shelf lives.")
+    geography: Optional[str] = Field(
+        None, description="Valid country (2 letter ISO) or null."
+    )
 
 
 class CategorizationDataOutput(BaseModel):

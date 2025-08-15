@@ -24,6 +24,12 @@ class CategoryName(str, Enum):
     MUSIC = "MUSIC"
 
 
+class ShelfLife(str, Enum):
+    WEEK = "WEEK"
+    MONTH = "MONTH"
+    PERMANENT = "PERMANENT"
+
+
 class Weekday(str, Enum):
     MONDAY = "MONDAY"
     TUESDAY = "TUESDAY"
