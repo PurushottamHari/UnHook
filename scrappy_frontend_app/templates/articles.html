@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}UnHook Articles - All Articles{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+            <a href="/" style="color: #007bff; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; margin-bottom: 0.5rem;">
+                ← Back to Newspapers
+            </a>
+            <h2 style="color: #2c3e50; font-size: 1.75rem; margin: 0;">All Generated Articles</h2>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <label for="user-id" style="font-weight: 600; color: #495057;">User ID:</label>
+            <input type="text" id="user-id" value="{{ user_id }}" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem;">
+            <button onclick="changeUser()" class="btn">Change User</button>
+        </div>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="sort-select" style="font-weight: 600; color: #495057;">Sort by:</label>
+                <select id="sort-select" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
+                    <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if sort_by == "oldest" %}selected{% endif %}>Oldest First</option>
+                    <option value="title" {% if sort_by == "title" %}selected{% endif %}>Title A-Z</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="category-filter" style="font-weight: 600; color: #495057;">Category:</label>
+                <select id="category-filter" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
+                    <option value="">All Categories</option>
+                    {% for category in available_categories %}
+                        <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <label for="content-type-filter" style="font-weight: 600; color: #495057;">Content Type:</label>
+                <select id="content-type-filter" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
+                    <option value="">All Types</option>
+                    <option value="MEDIUM" {% if content_type_filter == "MEDIUM" %}selected{% endif %}>Medium</option>
+                    <option value="LONG" {% if content_type_filter == "LONG" %}selected{% endif %}>Long</option>
+                </select>
+            </div>
+            
+            {% if sort_by == "newest" %}
+                <span style="color: #28a745; font-size: 0.9rem;">↓ Newest first</span>
+            {% elif sort_by == "oldest" %}
+                <span style="color: #28a745; font-size: 0.9rem;">↑ Oldest first</span>
+            {% elif sort_by == "title" %}
+                <span style="color: #28a745; font-size: 0.9rem;">A-Z Alphabetical</span>
+            {% endif %}
+        </div>
+        <div style="color: #6c757d; font-size: 0.9rem;">
+            {% if articles %}
+                Showing {{ articles|length }} article{{ 's' if articles|length != 1 else '' }}
+                {% if date_range and (sort_by == "newest" or sort_by == "oldest") %}
+                    <br><span style="font-size: 0.8rem;">
+                        From {{ date_range.earliest.strftime('%b %d, %Y') }} to {{ date_range.latest.strftime('%b %d, %Y') }}
+                    </span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if articles %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+            {% for article in articles %}
+            <a href="/article/{{ article.id }}" class="card-link">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h3 style="margin: 0; flex: 1;">{{ article.title }}</h3>
+                        {% if article.created_at %}
+                            <div style="text-align: right; min-width: 80px;">
+                                <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">
+                                    {{ article.created_at.strftime('%b %d') }}
+                                </div>
+                                <div style="font-size: 0.7rem; color: #adb5bd;">
+                                    {{ article.created_at.strftime('%Y') }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <p style="margin-bottom: 1rem;">{{ article.summary }}</p>
+                    <div class="card-meta">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            {% if article.category %}
+                                <span class="category-badge">{{ article.category }}</span>
+                            {% endif %}
+                            {% for content_type in article.content_types %}
+                                <span class="content-type-badge">{{ content_type }}</span>
+                            {% endfor %}
+                            {% if article.get_reading_time() %}
+                                <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                    {{ article.get_reading_time() }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            {% if article.created_at %}
+                                <span style="font-size: 0.8rem; color: #6c757d;" title="Content published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
+                                    {% set time_ago = article.get_time_ago() %}
+                                    {% if time_ago and time_ago != article.created_at.strftime('%b %d, %Y') %}
+                                        {{ time_ago }}
+                                    {% else %}
+                                        {{ article.created_at.strftime('%I:%M %p') }}
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No articles found</h3>
+            <p>No articles with status "ARTICLE_GENERATED" were found for this user.</p>
+            <p>Make sure your content processing pipeline has generated some articles.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function changeUser() {
+    const userId = document.getElementById('user-id').value;
+    if (userId.trim()) {
+        applyFilters();
+    }
+}
+
+function applyFilters() {
+    const userId = document.getElementById('user-id').value;
+    const sortBy = document.getElementById('sort-select').value;
+    const categoryFilter = document.getElementById('category-filter').value;
+    const contentTypeFilter = document.getElementById('content-type-filter').value;
+    
+    let url = '/articles?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy);
+    
+    if (categoryFilter) {
+        url += '&category=' + encodeURIComponent(categoryFilter);
+    }
+    
+    if (contentTypeFilter) {
+        url += '&content_type=' + encodeURIComponent(contentTypeFilter);
+    }
+    
+    window.location.href = url;
+}
+
+// Allow Enter key to change user
+document.getElementById('user-id').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        changeUser();
+    }
+});
+</script>
+{% endblock %}

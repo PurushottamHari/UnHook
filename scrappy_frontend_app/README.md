@@ -4,14 +4,15 @@ A simple Flask-based frontend application to view and read AI-generated articles
 
 ## Features
 
-- **Article Cards**: Display all articles with status "ARTICLE_GENERATED" in a card format
-- **Article Details**: Click on any card to view the full article content
+- **Article Cards**: Display articles organized by date in a card format
+- **Sleek Date Carousel**: Browse articles by date using a modern gradient carousel
+- **Article Details**: Click on any article to view its full content
 - **Markdown Rendering**: Articles are displayed in proper markdown format
 - **Responsive Design**: Works on desktop and mobile devices
 - **User Switching**: Change user ID to view different user's articles
-- **Sorting**: Sort articles by newest, oldest, or title (A-Z)
-- **Category Filtering**: Filter articles by content category (Technology, Science, Business, etc.)
-- **Content Type Filtering**: Filter articles by content length (Medium or Long)
+- **Sorting**: Sort articles by newest, oldest, or category
+- **Date Filtering**: Filter articles by specific dates
+- **Keyboard Navigation**: Use arrow keys to navigate between dates
 - **Modern UI**: Clean, modern interface with smooth animations
 
 ## Setup
@@ -62,24 +63,37 @@ A simple Flask-based frontend application to view and read AI-generated articles
 
 ### Using the Interface
 
-1. **View Articles**: The main page shows all articles with status "ARTICLE_GENERATED"
-2. **Change User**: Use the user ID input field to switch between different users
-3. **Sort Articles**: Use the "Sort by" dropdown to sort by newest, oldest, or title
-4. **Filter by Category**: Use the "Category" dropdown to filter articles by content category
-5. **Filter by Content Type**: Use the "Content Type" dropdown to filter by Medium or Long articles
-6. **Read Articles**: Click on any article card to view the full content
-7. **Navigate**: Use the "Back to Articles" button to return to the main page
+1. **View Articles**: The main page shows articles organized by date
+2. **Navigate Dates**: Use the sleek date carousel at the top to browse articles by date
+   - Click the circular arrow buttons to move between dates
+   - Use the dropdown to jump to a specific date
+   - Use left/right arrow keys for keyboard navigation
+3. **Change User**: Use the user ID input field to switch between different users
+4. **Sort Articles**: Use the "Sort by" dropdown to sort by newest, oldest, or category
+5. **Read Articles**: Click on any article card to view its full content
+6. **Navigate**: Use the "Back to Articles" button to return to the main page
 
 ## API Endpoints
 
 The app also provides REST API endpoints:
 
-- `GET /api/articles?user_id=<user_id>` - Get all articles as JSON
+- `GET /api/newspapers?user_id=<user_id>&date=<YYYY-MM-DD>` - Get newspapers for a specific date as JSON
+- `GET /api/dates?user_id=<user_id>` - Get all available dates for newspapers as JSON
+- `GET /api/newspaper/<newspaper_id>` - Get specific newspaper details as JSON
+- `GET /api/articles?user_id=<user_id>` - Get all articles as JSON (legacy)
 - `GET /api/article/<article_id>` - Get specific article details as JSON
 
 ## Data Structure
 
-The app fetches articles from the `generated_content` collection in MongoDB with the following structure:
+The app fetches newspapers from the `newspapers` collection in MongoDB with the following structure:
+
+- **Status**: Newspaper status (e.g., "COMPLETED", "PROCESSING")
+- **Created Date**: From `created_at` timestamp (used for date filtering)
+- **Article Count**: Number of articles in the newspaper
+- **Reading Time**: Total reading time in seconds
+- **Articles**: Associated articles from the `generated_content` collection
+
+The app also fetches articles from the `generated_content` collection with the following structure:
 
 - **Status**: Must be "ARTICLE_GENERATED"
 - **Title**: Extracted from `generated.VERY_SHORT.string` or first sentence of summary

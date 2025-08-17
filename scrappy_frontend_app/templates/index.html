@@ -5,11 +5,37 @@
 {% block content %}
 <div style="margin-bottom: 2rem;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2 style="color: #2c3e50; font-size: 1.75rem;">Generated Articles</h2>
+        <h2 style="color: #2c3e50; font-size: 1.75rem;">Your Articles</h2>
         <div style="display: flex; gap: 1rem; align-items: center;">
             <label for="user-id" style="font-weight: 600; color: #495057;">User ID:</label>
             <input type="text" id="user-id" value="{{ user_id }}" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem;">
             <button onclick="changeUser()" class="btn">Change User</button>
+        </div>
+    </div>
+    
+    <!-- Sleek Date Carousel -->
+    <div style="margin-bottom: 1.5rem; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button onclick="previousDate()" id="prev-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">‹</button>
+                <div style="text-align: center; color: white;">
+                    <div style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.2rem;">
+                        {{ target_date.strftime('%B %d, %Y') }}
+                    </div>
+                    <div style="font-size: 0.85rem; opacity: 0.9;">
+                        {{ target_date.strftime('%A') }}
+                    </div>
+                </div>
+                <button onclick="nextDate()" id="next-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">›</button>
+            </div>
+            <select id="date-select" onchange="jumpToDate()" style="background: rgba(255,255,255,0.9); border: none; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.85rem; color: #333; min-width: 180px; cursor: pointer;">
+                {% for date in available_dates %}
+                    <option value="{{ date.strftime('%Y-%m-%d') }}" 
+                            {% if date.strftime('%Y-%m-%d') == target_date.strftime('%Y-%m-%d') %}selected{% endif %}>
+                        {{ date.strftime('%b %d, %Y') }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
     </div>
     
@@ -20,26 +46,7 @@
                 <select id="sort-select" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
                     <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest First</option>
                     <option value="oldest" {% if sort_by == "oldest" %}selected{% endif %}>Oldest First</option>
-                    <option value="title" {% if sort_by == "title" %}selected{% endif %}>Title A-Z</option>
-                </select>
-            </div>
-            
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
-                <label for="category-filter" style="font-weight: 600; color: #495057;">Category:</label>
-                <select id="category-filter" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
-                    <option value="">All Categories</option>
-                    {% for category in available_categories %}
-                        <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>{{ category }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div style="display: flex; gap: 0.5rem; align-items: center;">
-                <label for="content-type-filter" style="font-weight: 600; color: #495057;">Content Type:</label>
-                <select id="content-type-filter" onchange="applyFilters()" style="padding: 0.5rem; border: 1px solid #ced4da; border-radius: 6px; font-size: 0.9rem; background-color: white;">
-                    <option value="">All Types</option>
-                    <option value="MEDIUM" {% if content_type_filter == "MEDIUM" %}selected{% endif %}>Medium</option>
-                    <option value="LONG" {% if content_type_filter == "LONG" %}selected{% endif %}>Long</option>
+                    <option value="status" {% if sort_by == "status" %}selected{% endif %}>Category A-Z</option>
                 </select>
             </div>
             
@@ -47,58 +54,55 @@
                 <span style="color: #28a745; font-size: 0.9rem;">↓ Newest first</span>
             {% elif sort_by == "oldest" %}
                 <span style="color: #28a745; font-size: 0.9rem;">↑ Oldest first</span>
-            {% elif sort_by == "title" %}
-                <span style="color: #28a745; font-size: 0.9rem;">A-Z Alphabetical</span>
+            {% elif sort_by == "status" %}
+                <span style="color: #28a745; font-size: 0.9rem;">A-Z Category</span>
             {% endif %}
         </div>
         <div style="color: #6c757d; font-size: 0.9rem;">
             {% if articles %}
-                Showing {{ articles|length }} article{{ 's' if articles|length != 1 else '' }}
-                {% if date_range and (sort_by == "newest" or sort_by == "oldest") %}
-                    <br><span style="font-size: 0.8rem;">
-                        From {{ date_range.earliest.strftime('%b %d, %Y') }} to {{ date_range.latest.strftime('%b %d, %Y') }}
-                    </span>
-                {% endif %}
+                Showing {{ articles|length }} article{{ 's' if articles|length != 1 else '' }} for {{ target_date.strftime('%B %d, %Y') }}
+            {% else %}
+                No articles found for {{ target_date.strftime('%B %d, %Y') }}
             {% endif %}
         </div>
     </div>
     
     {% if articles %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem;">
             {% for article in articles %}
             <a href="/article/{{ article.id }}" class="card-link">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <h3 style="margin: 0; flex: 1;">{{ article.title }}</h3>
-                        {% if article.created_at %}
-                            <div style="text-align: right; min-width: 80px;">
-                                <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">
-                                    {{ article.created_at.strftime('%b %d') }}
-                                </div>
-                                <div style="font-size: 0.7rem; color: #adb5bd;">
-                                    {{ article.created_at.strftime('%Y') }}
-                                </div>
-                            </div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                        <h3 style="margin: 0; flex: 1; font-size: 1.1rem; line-height: 1.4;">{{ article.title }}</h3>
+                        {% if article.category %}
+                            <span class="category-badge" style="margin-left: 0.5rem;">{{ article.category }}</span>
                         {% endif %}
                     </div>
-                    <p style="margin-bottom: 1rem;">{{ article.summary }}</p>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <p style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ article.summary }}
+                        </p>
+                    </div>
+                    
                     <div class="card-meta">
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            {% if article.category %}
-                                <span class="category-badge">{{ article.category }}</span>
-                            {% endif %}
-                            {% for content_type in article.content_types %}
-                                <span class="content-type-badge">{{ content_type }}</span>
-                            {% endfor %}
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
                             {% if article.get_reading_time() %}
                                 <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">
                                     {{ article.get_reading_time() }}
                                 </span>
                             {% endif %}
+                            {% if article.content_types %}
+                                {% for content_type in article.content_types %}
+                                    <span style="font-size: 0.75rem; color: #495057; background-color: #e9ecef; padding: 0.2rem 0.4rem; border-radius: 3px;">
+                                        {{ content_type }}
+                                    </span>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                         <div>
                             {% if article.created_at %}
-                                <span style="font-size: 0.8rem; color: #6c757d;" title="Content published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
+                                <span style="font-size: 0.8rem; color: #6c757d;" title="Article created on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
                                     {% set time_ago = article.get_time_ago() %}
                                     {% if time_ago and time_ago != article.created_at.strftime('%b %d, %Y') %}
                                         {{ time_ago }}
@@ -115,14 +119,25 @@
         </div>
     {% else %}
         <div class="empty-state">
-            <h3>No articles found</h3>
-            <p>No articles with status "ARTICLE_GENERATED" were found for this user.</p>
-            <p>Make sure your content processing pipeline has generated some articles.</p>
+            <h3>No articles found for {{ target_date.strftime('%B %d, %Y') }}</h3>
+            <p>No articles were found for this user on the selected date.</p>
+            <p>Try selecting a different date from the dropdown above, or make sure your newspaper creation pipeline has generated some articles.</p>
         </div>
     {% endif %}
+    
+
 </div>
 
 <script>
+// Store available dates for navigation
+const availableDates = [
+    {% for date in available_dates %}
+        "{{ date.strftime('%Y-%m-%d') }}",
+    {% endfor %}
+];
+
+const currentDate = "{{ target_date.strftime('%Y-%m-%d') }}";
+
 function changeUser() {
     const userId = document.getElementById('user-id').value;
     if (userId.trim()) {
@@ -133,18 +148,39 @@ function changeUser() {
 function applyFilters() {
     const userId = document.getElementById('user-id').value;
     const sortBy = document.getElementById('sort-select').value;
-    const categoryFilter = document.getElementById('category-filter').value;
-    const contentTypeFilter = document.getElementById('content-type-filter').value;
+    const dateSelect = document.getElementById('date-select');
+    const selectedDate = dateSelect ? dateSelect.value : currentDate;
     
-    let url = '/?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy);
+    let url = '/?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy) + '&date=' + encodeURIComponent(selectedDate);
     
-    if (categoryFilter) {
-        url += '&category=' + encodeURIComponent(categoryFilter);
+    window.location.href = url;
+}
+
+function jumpToDate() {
+    applyFilters();
+}
+
+function previousDate() {
+    const currentIndex = availableDates.indexOf(currentDate);
+    if (currentIndex < availableDates.length - 1) {
+        const previousDate = availableDates[currentIndex + 1];
+        navigateToDate(previousDate);
     }
-    
-    if (contentTypeFilter) {
-        url += '&content_type=' + encodeURIComponent(contentTypeFilter);
+}
+
+function nextDate() {
+    const currentIndex = availableDates.indexOf(currentDate);
+    if (currentIndex > 0) {
+        const nextDate = availableDates[currentIndex - 1];
+        navigateToDate(nextDate);
     }
+}
+
+function navigateToDate(dateStr) {
+    const userId = document.getElementById('user-id').value;
+    const sortBy = document.getElementById('sort-select').value;
+    
+    let url = '/?user_id=' + encodeURIComponent(userId) + '&sort=' + encodeURIComponent(sortBy) + '&date=' + encodeURIComponent(dateStr);
     
     window.location.href = url;
 }
@@ -154,6 +190,46 @@ document.getElementById('user-id').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         changeUser();
     }
+});
+
+// Add keyboard navigation for date carousel
+document.addEventListener('keydown', function(e) {
+    // Left arrow key for previous date
+    if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        previousDate();
+    }
+    // Right arrow key for next date
+    else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextDate();
+    }
+});
+
+// Update button states based on available dates
+function updateButtonStates() {
+    const currentIndex = availableDates.indexOf(currentDate);
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    
+    if (prevBtn) {
+        const isDisabled = currentIndex >= availableDates.length - 1;
+        prevBtn.disabled = isDisabled;
+        prevBtn.style.opacity = isDisabled ? '0.3' : '1';
+        prevBtn.style.cursor = isDisabled ? 'not-allowed' : 'pointer';
+    }
+    
+    if (nextBtn) {
+        const isDisabled = currentIndex <= 0;
+        nextBtn.disabled = isDisabled;
+        nextBtn.style.opacity = isDisabled ? '0.3' : '1';
+        nextBtn.style.cursor = isDisabled ? 'not-allowed' : 'pointer';
+    }
+}
+
+// Initialize button states when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    updateButtonStates();
 });
 </script>
 {% endblock %} 

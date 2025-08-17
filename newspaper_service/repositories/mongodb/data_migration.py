@@ -428,6 +428,106 @@ def update_newspaper_reading_time(newspaper_id: str, reading_time_seconds: int):
         raise
 
 
+def fix_newspaper_created_at_dates():
+    """
+    Migration script to fix newspaper created_at dates by using the most recent
+    content_created_at date from the considered articles, set to midnight (0,0,0).
+    """
+    try:
+        # Initialize repositories
+        user_collected_content_repository = MongoDBUserCollectedContentRepository()
+        newspaper_repository = MongoDBNewspaperRepository(
+            user_collected_content_repository=user_collected_content_repository
+        )
+
+        # Get database connection
+        db = MongoDB.get_database()
+        settings = get_mongodb_settings()
+        newspaper_collection = db[settings.NEWSPAPER_COLLECTION_NAME]
+
+        # Get all newspapers
+        newspapers = list(newspaper_collection.find())
+        print(f"Found {len(newspapers)} newspapers to process")
+
+        updated_count = 0
+
+        for newspaper_doc in newspapers:
+            newspaper_id = newspaper_doc["_id"]
+            considered_items = newspaper_doc.get("considered_content_list", [])
+
+            if not considered_items:
+                print(f"Skipping newspaper {newspaper_id} - no considered content")
+                continue
+
+            print(
+                f"Processing newspaper {newspaper_id} with {len(considered_items)} considered items"
+            )
+
+            # Get user_collected_content_ids from considered items
+            content_ids = []
+            for item in considered_items:
+                if "user_collected_content_id" in item:
+                    content_ids.append(item["user_collected_content_id"])
+
+            if not content_ids:
+                print(f"Skipping newspaper {newspaper_id} - no valid content IDs")
+                continue
+
+            # Fetch the user collected content to get content_created_at dates
+            most_recent_date = None
+            for content_id in content_ids:
+                content = user_collected_content_repository.get_content_by_id(
+                    content_id
+                )
+                if content and content.content_created_at:
+                    content_date = content.content_created_at
+                    if most_recent_date is None or content_date > most_recent_date:
+                        most_recent_date = content_date
+
+            if most_recent_date is None:
+                print(
+                    f"Skipping newspaper {newspaper_id} - no content creation dates found"
+                )
+                continue
+
+            # Set the date to midnight (0,0,0) of that day
+            newspaper_date = most_recent_date.replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            newspaper_timestamp = newspaper_date.timestamp()
+
+            # Use current timestamp for updated_at
+            current_timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC).timestamp()
+
+            current_created_at = datetime.fromtimestamp(newspaper_doc["created_at"])
+            print(f"Updating newspaper {newspaper_id}:")
+            print(f"  From: {current_created_at}")
+            print(f"  To: {newspaper_date}")
+
+            # Update the newspaper document
+            update_result = newspaper_collection.update_one(
+                {"_id": newspaper_id},
+                {
+                    "$set": {
+                        "created_at": newspaper_timestamp,
+                        "updated_at": current_timestamp,
+                    }
+                },
+            )
+            if update_result.modified_count > 0:
+                updated_count += 1
+                print(f"  ✓ Updated successfully")
+            else:
+                print(f"  ✗ Update failed")
+
+        print(f"\nMigration completed!")
+        print(f"Updated {updated_count} out of {len(newspapers)} newspapers")
+
+    except Exception as e:
+        print(f"Error fixing newspaper created_at dates: {str(e)}")
+        raise
+
+
 def update_used_content_to_processed():
     """
     Migration script to update all user collected content with status USED to PROCESSED.
@@ -498,8 +598,11 @@ def update_used_content_to_processed():
 if __name__ == "__main__":
     # Example usage for the migration functions
 
+    # To fix newspaper created_at dates based on content dates:
+    # fix_newspaper_created_at_dates()
+
     # To run the USED to PROCESSED migration:
-    update_used_content_to_processed()
+    # update_used_content_to_processed()
 
     # To process newspaper acceptance:
     # newspaper_id = (
@@ -512,3 +615,4 @@ if __name__ == "__main__":
     # import pytz
     # for_date = datetime.now(pytz.timezone("Asia/Kolkata"))
     # filter_newspaper_considered_items_by_weekday(newspaper_id, for_date)
+    pass

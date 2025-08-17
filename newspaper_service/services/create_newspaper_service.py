@@ -154,6 +154,7 @@ class CreateNewspaperService:
         newspaper = Newspaper(
             id=str(uuid4()),
             user_id=user_id,
+            created_at=for_date,
             status=NewspaperStatus.COLLATING,
             reading_time_in_seconds=0,  # Will be calculated later
         )

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Newspaper - UnHook{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+            <a href="/" style="color: #007bff; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; margin-bottom: 0.5rem;">
+                ← Back to Newspapers
+            </a>
+            {% if newspaper.created_at %}
+                <h2 style="color: #2c3e50; font-size: 1.75rem; margin: 0;">{{ newspaper.created_at.strftime('%B %d, %Y') }}</h2>
+            {% else %}
+                <h2 style="color: #2c3e50; font-size: 1.75rem; margin: 0;">Newspaper (No Date)</h2>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Newspaper Info Card -->
+    <div class="card" style="margin-bottom: 2rem; background-color: #f8f9fa; border: 1px solid #e9ecef;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #495057;">Newspaper Information</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <strong style="color: #6c757d; font-size: 0.9rem;">Status:</strong>
+                        <div style="color: #495057; font-weight: 600;">{{ newspaper.status }}</div>
+                    </div>
+                    <div>
+                        <strong style="color: #6c757d; font-size: 0.9rem;">User ID:</strong>
+                        <div style="color: #495057;">{{ newspaper.user_id }}</div>
+                    </div>
+                    <div>
+                        <strong style="color: #6c757d; font-size: 0.9rem;">Articles:</strong>
+                        <div style="color: #495057;">{{ articles|length }} articles</div>
+                    </div>
+                    {% if newspaper.get_reading_time() %}
+                    <div>
+                        <strong style="color: #6c757d; font-size: 0.9rem;">Total Reading Time:</strong>
+                        <div style="color: #495057;">{{ newspaper.get_reading_time() }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    {% if newspaper.created_at %}
+                    <div>
+                        <strong style="color: #6c757d; font-size: 0.9rem;">Created:</strong>
+                        <div style="color: #495057;">{{ newspaper.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    {% endif %}
+                    {% if newspaper.updated_at %}
+                    <div>
+                        <strong style="color: #6c757d; font-size: 0.9rem;">Last Updated:</strong>
+                        <div style="color: #495057;">{{ newspaper.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Articles Section -->
+    <div style="margin-bottom: 1.5rem;">
+        <h3 style="color: #2c3e50; font-size: 1.5rem; margin-bottom: 1rem;">Articles in this Newspaper</h3>
+        
+        {% if articles %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+                {% for article in articles %}
+                <a href="/article/{{ article.id }}" class="card-link">
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <h4 style="margin: 0; flex: 1;">{{ article.title }}</h4>
+                            {% if article.created_at %}
+                                <div style="text-align: right; min-width: 80px;">
+                                    <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">
+                                        {{ article.created_at.strftime('%b %d') }}
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: #adb5bd;">
+                                        {{ article.created_at.strftime('%Y') }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p style="margin-bottom: 1rem;">{{ article.summary }}</p>
+                        <div class="card-meta">
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                {% if article.category %}
+                                    <span class="category-badge">{{ article.category }}</span>
+                                {% endif %}
+                                {% for content_type in article.content_types %}
+                                    <span class="content-type-badge">{{ content_type }}</span>
+                                {% endfor %}
+                                {% if article.get_reading_time() %}
+                                    <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                        {{ article.get_reading_time() }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if article.created_at %}
+                                    <span style="font-size: 0.8rem; color: #6c757d;" title="Content published on {{ article.created_at.strftime('%B %d, %Y at %I:%M %p') }}">
+                                        {% set time_ago = article.get_time_ago() %}
+                                        {% if time_ago and time_ago != article.created_at.strftime('%b %d, %Y') %}
+                                            {{ time_ago }}
+                                        {% else %}
+                                            {{ article.created_at.strftime('%I:%M %p') }}
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h4>No articles found</h4>
+                <p>This newspaper doesn't have any articles yet.</p>
+                <p>The articles may still be processing or the newspaper might be empty.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Newspaper Metadata -->
+    {% if newspaper.considered_content_list or newspaper.final_content_list %}
+    <div style="margin-top: 2rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+        <h4 style="margin: 0 0 0.5rem 0; color: #495057;">Newspaper Metadata</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+            {% if newspaper.considered_content_list %}
+            <div>
+                <strong style="color: #6c757d;">Considered Content:</strong>
+                <div style="color: #495057;">{{ newspaper.considered_content_list|length }} items</div>
+            </div>
+            {% endif %}
+            {% if newspaper.final_content_list %}
+            <div>
+                <strong style="color: #6c757d;">Final Content:</strong>
+                <div style="color: #495057;">{{ newspaper.final_content_list|length }} items</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
