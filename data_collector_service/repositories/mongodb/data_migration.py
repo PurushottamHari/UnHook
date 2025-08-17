@@ -4,9 +4,6 @@ from datetime import datetime
 
 from pymongo import MongoClient
 
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
-    CollectedContentAdapter
-
 # Add the project root to the Python path
 # This is a bit of a hack, a more robust solution would be to have a proper package structure
 # or use a script runner that sets the PYTHONPATH
@@ -16,6 +13,9 @@ if project_root not in sys.path:
 
 from data_collector_service.collectors.youtube.tools.youtube_external_tool import \
     YouTubeExternalTool
+# Now import the modules after setting up the path
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
+    CollectedContentAdapter
 from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import \
     YouTubeVideoDetailsAdapter
 from data_collector_service.repositories.mongodb.config.database import MongoDB
@@ -552,6 +552,66 @@ def migrate_add_missing_sub_status():
     print("Database connection closed.")
 
 
+def migrate_add_content_created_at():
+    """
+    Migration script to add content_created_at field for documents
+    that don't have it. Uses created_at as fallback.
+    """
+    print("Starting data migration for adding content_created_at field...")
+
+    # Connect to MongoDB
+    MongoDB.connect_to_database()
+    db = MongoDB.get_database()
+    settings = get_mongodb_settings()
+    collection = db[settings.COLLECTION_NAME]
+
+    print(
+        f"Connected to database '{settings.DATABASE_NAME}' and collection '{settings.COLLECTION_NAME}'."
+    )
+
+    # Find documents that need migration (missing content_created_at field)
+    query = {"content_created_at": {"$exists": False}}
+    documents = list(collection.find(query))
+    print(f"Found {len(documents)} documents to process.")
+
+    updated_count = 0
+    for doc in documents:
+        doc_id = doc["_id"]
+        updates = {}
+
+        # Try to get content_created_at from video data first
+        content_created_at = None
+        if "data" in doc and "YOUTUBE_VIDEO" in doc["data"]:
+            video_data = doc["data"]["YOUTUBE_VIDEO"]
+            if "release_date" in video_data and video_data["release_date"]:
+                content_created_at = video_data["release_date"]
+            elif "created_at" in video_data and video_data["created_at"]:
+                content_created_at = video_data["created_at"]
+
+        # If not found in video data, use document's created_at as fallback
+        if not content_created_at and "created_at" in doc:
+            content_created_at = doc["created_at"]
+
+        # If still not found, use current time
+        if not content_created_at:
+            content_created_at = datetime.now().timestamp()
+
+        updates["content_created_at"] = content_created_at
+
+        if updates:
+            collection.update_one({"_id": doc_id}, {"$set": updates})
+            updated_count += 1
+            print(
+                f"Updated document {doc_id} with content_created_at: {content_created_at}"
+            )
+
+    print(f"Migration complete. {updated_count} documents updated.")
+
+    # Close the connection
+    MongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
     # migrate_timestamps()
     # migrate_status_details_timestamps()
@@ -559,4 +619,5 @@ if __name__ == "__main__":
     # migrate_add_moderation_passed_sub_status()
     # migrate_enrich_subtitles()
     # migrate_delete_subtitles()
-    migrate_add_missing_sub_status()
+    # migrate_add_missing_sub_status()
+    migrate_add_content_created_at()

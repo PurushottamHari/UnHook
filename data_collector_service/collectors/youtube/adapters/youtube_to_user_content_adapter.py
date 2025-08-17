@@ -23,6 +23,9 @@ class YouTubeToUserContentAdapter:
             UserCollectedContent object
         """
         generated_id = str(uuid.uuid4())
+        content_created_at = (
+            video.release_date if video.release_date else video.created_at
+        )
         return UserCollectedContent(
             id=generated_id,
             content_type=ContentType.YOUTUBE_VIDEO,
@@ -30,6 +33,7 @@ class YouTubeToUserContentAdapter:
             external_id=video.video_id,
             output_type="youtube_video",
             created_at=video.created_at,
+            content_created_at=content_created_at,
             updated_at=video.created_at,
             status=ContentStatus.COLLECTED,
             status_details=[

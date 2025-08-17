@@ -26,4 +26,8 @@ python3 -m data_processing_service.services.processing.youtube.categorize_conten
 echo "Generating Final Article..."
 python3 -m data_processing_service.services.processing.youtube.generate_complete_content.generate_complete_youtube_content_service
 
+# Run creating newspaper
+echo "Creating Newspaper..."
+python3 -m newspaper_service.services.create_newspaper_service
+
 echo "✅ All done!" 

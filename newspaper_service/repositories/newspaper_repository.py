@@ -3,6 +3,7 @@ Newspaper repository interface.
 """
 
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import List, Optional
 
 from data_collector_service.models.user_collected_content import \
@@ -22,16 +23,18 @@ class NewspaperRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_newspaper(self, newspaper_id: str) -> Optional[Newspaper]:
+    def get_newspaper(self, newspaper_id: str) -> Optional[Newspaper]:
         """Get a newspaper by ID."""
         pass
 
     @abstractmethod
-    async def get_newspapers_by_user(self, user_id: str) -> List[Newspaper]:
-        """Get all newspapers for a user."""
+    def get_newspaper_by_user_and_date(
+        self, user_id: str, for_date: datetime
+    ) -> Optional[Newspaper]:
+        """Get a newspaper for a specific user and date."""
         pass
 
     @abstractmethod
-    async def update_newspaper(self, newspaper: Newspaper) -> Newspaper:
-        """Update a newspaper."""
+    def upsert_newspaper(self, newspaper: Newspaper) -> Newspaper:
+        """Create or update newspaper with all its associated content."""
         pass

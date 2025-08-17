@@ -38,7 +38,7 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
         # NOTE: status is an Enum; store and query by its string value
         query: dict = {"user_id": user_id, "status": status.value}
         if before_time is not None:
-            query["created_at"] = {"$lte": before_time.timestamp()}
+            query["content_created_at"] = {"$lte": before_time.timestamp()}
 
         cursor = self.collection.find(query)
         results: List[UserCollectedContent] = []
@@ -62,3 +62,11 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             return 0
         result = self.collection.bulk_write(operations, session=session)
         return result.modified_count or 0
+
+    def get_content_by_id(self, content_id: str) -> Optional[UserCollectedContent]:
+        """Get a single user collected content by ID."""
+        doc = self.collection.find_one({"_id": content_id})
+        if doc:
+            db_model = CollectedContentDBModel(**doc)
+            return CollectedContentAdapter.to_user_collected_content(db_model)
+        return None

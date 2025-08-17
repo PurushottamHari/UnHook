@@ -3,11 +3,11 @@ MongoDB implementation of newspaper repository.
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List, Optional
 
-from data_collector_service.models.user_collected_content import (
-    ContentStatus, UserCollectedContent)
+from data_collector_service.models.user_collected_content import \
+    UserCollectedContent
 
 from ...models import Newspaper
 from ..newspaper_repository import NewspaperRepository
@@ -15,6 +15,7 @@ from ..user_collected_content_repository import UserCollectedContentRepository
 from .adapters.newspaper_adapter import NewspaperAdapter
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
+from .models.newspaper_db_model import NewspaperDBModel
 
 
 class MongoDBNewspaperRepository(NewspaperRepository):
@@ -62,56 +63,86 @@ class MongoDBNewspaperRepository(NewspaperRepository):
             )
             raise
 
-    async def get_newspaper(self, newspaper_id: str) -> Optional[Newspaper]:
+    def get_newspaper(self, newspaper_id: str) -> Optional[Newspaper]:
         """Get a newspaper by ID."""
         try:
-            document = await self.collection.find_one({"_id": newspaper_id})
+            document = self.collection.find_one({"_id": newspaper_id})
             if document:
-                db_model = NewspaperDBModel(**document)  # type: ignore[name-defined]
+
+                db_model = NewspaperDBModel(**document)
                 return NewspaperAdapter.to_internal_model(db_model)
             return None
         except Exception as e:
             self.logger.error(f"Error getting newspaper {newspaper_id}: {str(e)}")
             raise
 
-    async def get_newspapers_by_user(self, user_id: str) -> List[Newspaper]:
-        """Get all newspapers for a user."""
+    def get_newspaper_by_user_and_date(
+        self, user_id: str, for_date: datetime
+    ) -> Optional[Newspaper]:
+        """Get a newspaper for a specific user and date."""
         try:
-            cursor = self.collection.find({"user_id": user_id})
-            newspapers = []
-            async for document in cursor:
-                db_model = NewspaperAdapter.to_internal_model(document)
-                newspapers.append(db_model)
-            return newspapers
+            # Convert date to start and end of day for comparison
+            start_of_day = for_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_of_day = for_date.replace(
+                hour=23, minute=59, second=59, microsecond=999999
+            )
+
+            document = self.collection.find_one(
+                {
+                    "user_id": user_id,
+                    "created_at": {"$gte": start_of_day, "$lte": end_of_day},
+                }
+            )
+
+            if document:
+                db_model = NewspaperDBModel(**document)
+                return NewspaperAdapter.to_internal_model(db_model)
+            return None
         except Exception as e:
-            self.logger.error(f"Error getting newspapers for user {user_id}: {str(e)}")
+            self.logger.error(
+                f"Error getting newspaper for user {user_id} on {for_date}: {str(e)}"
+            )
             raise
 
-    async def get_newspapers_by_status(self, status: str) -> List[Newspaper]:
-        """Get newspapers by status."""
-        try:
-            cursor = self.collection.find({"status": status})
-            newspapers = []
-            async for document in cursor:
-                db_model = NewspaperAdapter.to_internal_model(document)
-                newspapers.append(db_model)
-            return newspapers
-        except Exception as e:
-            self.logger.error(f"Error getting newspapers by status {status}: {str(e)}")
-            raise
-
-    async def update_newspaper(self, newspaper: Newspaper) -> Newspaper:
-        """Update a newspaper."""
+    def upsert_newspaper(self, newspaper: Newspaper) -> Newspaper:
+        """Create or update newspaper with all its associated content."""
         try:
             db_model = NewspaperAdapter.to_db_model(newspaper)
-            result = await self.collection.replace_one(
-                {"_id": str(newspaper.id)}, db_model.model_dump(by_alias=True)
-            )
-            if result.modified_count > 0:
-                self.logger.info(f"Updated newspaper with ID: {newspaper.id}")
-                return newspaper
-            else:
-                raise ValueError(f"Newspaper with ID {newspaper.id} not found")
+            newspaper_doc = db_model.model_dump(by_alias=True)
+
+            # Use a MongoDB transaction to atomically upsert the newspaper
+            client = self.database.client
+            with client.start_session() as session:
+                with session.start_transaction():
+                    # Check if newspaper exists
+                    existing_doc = self.collection.find_one(
+                        {"_id": newspaper.id}, session=session
+                    )
+
+                    if existing_doc:
+                        # Update existing newspaper
+                        newspaper_update = newspaper_doc.copy()
+                        if "_id" in newspaper_update:
+                            del newspaper_update["_id"]
+
+                        update_result = self.collection.update_one(
+                            {"_id": newspaper.id},
+                            {"$set": newspaper_update},
+                            session=session,
+                        )
+                        self.logger.info(
+                            f"Updated existing newspaper with ID: {newspaper.id}"
+                        )
+                    else:
+                        # Create new newspaper
+                        insert_result = self.collection.insert_one(
+                            newspaper_doc, session=session
+                        )
+                        self.logger.info(
+                            f"Created new newspaper with ID: {newspaper.id}"
+                        )
+
+            return newspaper
         except Exception as e:
-            self.logger.error(f"Error updating newspaper {newspaper.id}: {str(e)}")
+            self.logger.error(f"Error upserting newspaper: {str(e)}")
             raise

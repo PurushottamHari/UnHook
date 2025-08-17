@@ -48,6 +48,7 @@ class UserCollectedContent:
     sub_status_details: List[SubStatusDetail] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
+    content_created_at: datetime = field(default_factory=datetime.utcnow)
 
     def set_status(self, status: ContentStatus, reason: str = ""):
         status_detail = StatusDetail(

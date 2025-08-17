@@ -83,6 +83,9 @@ class CollectedContentAdapter:
             output_type=content.output_type,
             created_at=CollectedContentAdapter._datetime_to_float(content.created_at),
             updated_at=CollectedContentAdapter._datetime_to_float(content.updated_at),
+            content_created_at=CollectedContentAdapter._datetime_to_float(
+                content.content_created_at
+            ),
             status=status,
             status_details=status_details,
             sub_status=sub_status,
@@ -147,6 +150,9 @@ class CollectedContentAdapter:
             sub_status_details=sub_status_details,
             created_at=CollectedContentAdapter._float_to_datetime(db_model.created_at),
             updated_at=CollectedContentAdapter._float_to_datetime(db_model.updated_at),
+            content_created_at=CollectedContentAdapter._float_to_datetime(
+                db_model.content_created_at
+            ),
         )
 
     @staticmethod
