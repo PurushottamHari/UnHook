@@ -29,6 +29,7 @@ class CollectedContentDBModel(BaseModel):
     output_type: str
     created_at: float
     updated_at: float
+    content_created_at: float
     status: str
     status_details: List[StatusDetails]
     sub_status: Optional[str] = None

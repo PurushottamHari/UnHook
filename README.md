@@ -92,4 +92,8 @@ python3 -m data_processing_service.services.processing.youtube.categorize_conten
 python3 -m data_processing_service.services.processing.youtube.generate_complete_content.generate_complete_youtube_content_service
 ```
 
+# Create the newspaper for the day
+```sh
+python -m newspaper_service.services.create_newspaper_service
+```
 

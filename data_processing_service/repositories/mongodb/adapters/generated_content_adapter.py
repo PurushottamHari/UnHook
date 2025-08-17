@@ -12,7 +12,7 @@ from data_processing_service.models.generated_content import (
 from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
     CategoryInfoDBModel, GeneratedContentDBModel, GeneratedDataDBModel,
     StatusDetailDBModel)
-from user_service.models import CategoryName
+from user_service.models import CategoryName, ShelfLife
 
 
 class GeneratedContentAdapter:
@@ -42,6 +42,12 @@ class GeneratedContentAdapter:
                 category=content.category.category.value,
                 category_description=content.category.category_description,
                 category_tags=content.category.category_tags,
+                shelf_life=(
+                    content.category.shelf_life.value
+                    if content.category.shelf_life
+                    else None
+                ),
+                geography=content.category.geography,
             )
         return GeneratedContentDBModel(
             id=content.id,
@@ -81,10 +87,16 @@ class GeneratedContentAdapter:
         }
         category = None
         if db_model.category is not None:
+            shelf_life = None
+            if db_model.category.shelf_life:
+                shelf_life = ShelfLife(db_model.category.shelf_life)
+
             category = CategoryInfo(
                 category=CategoryName(db_model.category.category),
                 category_description=db_model.category.category_description,
                 category_tags=db_model.category.category_tags,
+                shelf_life=shelf_life,
+                geography=db_model.category.geography,
             )
         return GeneratedContent(
             id=db_model.id,

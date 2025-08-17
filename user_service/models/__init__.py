@@ -2,7 +2,7 @@
 Models package containing all user-related data models.
 """
 
-from .enums import CategoryName, OutputType, Weekday
+from .enums import CategoryName, OutputType, ShelfLife, Weekday
 from .interests import Interest, NotInterested
 from .manual_config import ManualConfig
 from .user import User
@@ -13,6 +13,7 @@ __all__ = [
     "CategoryName",
     "Weekday",
     "OutputType",
+    "ShelfLife",
     "Interest",
     "NotInterested",
     "ManualConfig",

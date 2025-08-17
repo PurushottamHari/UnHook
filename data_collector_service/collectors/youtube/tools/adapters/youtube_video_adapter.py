@@ -104,10 +104,10 @@ class YouTubeVideoAdapter:
         if not release_epoch and enrich_details_dict.get("timestamp"):
             release_epoch = enrich_details_dict["timestamp"]
         if not release_epoch:
-            raise youtube_video_key_data_missing(
-                "'timestamp/release_timestamp' is a required field for enrichment: "
-                + old_youtube_video_details.video_id
+            logger.warn(
+                f"Missing timestamp/release_timestamp for video: {old_youtube_video_details.video_id}"
             )
+            return None
         subtitles = SubtitleAdapter.from_enrich_dict(enrich_details_dict)
         if not subtitles:
             logger.warn(

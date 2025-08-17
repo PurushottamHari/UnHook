@@ -4,7 +4,7 @@ from typing import List
 
 from data_processing_service.ai import BaseAIClient, ModelConfig, ModelProvider
 from data_processing_service.models.generated_content import GeneratedContent
-from user_service.models.enums import CategoryName
+from user_service.models.enums import CategoryName, ShelfLife
 
 from .adaptors.input_adaptor import CategorizationInputAdaptor
 from .adaptors.output_adaptor import CategorizationOutputAdaptor
@@ -39,6 +39,10 @@ class CategorizationAgent(BaseAIClient[CategorizationDataOutput]):
     def _get_categories_list() -> List[str]:
         return [c.value for c in CategoryName]
 
+    @staticmethod
+    def _get_shelf_lives_list() -> List[str]:
+        return [s.value for s in ShelfLife]
+
     async def categorize_content(
         self, generated_content_list: List[GeneratedContent]
     ) -> List[GeneratedContent]:
@@ -56,6 +60,7 @@ class CategorizationAgent(BaseAIClient[CategorizationDataOutput]):
         return self._generation_prompt_template.format(
             content_items=json.dumps([i.model_dump() for i in inputs], indent=2),
             categories_list=json.dumps(self._get_categories_list()),
+            shelf_lives=json.dumps(self._get_shelf_lives_list()),
         )
 
     def _create_output_format_guide(self) -> str:

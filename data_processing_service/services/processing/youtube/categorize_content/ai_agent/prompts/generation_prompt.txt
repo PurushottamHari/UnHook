@@ -3,5 +3,8 @@ You are given the following information:
 Input:
 {content_items}
 
-Categories List: 
+Categories Options: 
 {categories_list}
+
+Shelf Life Options:
+{shelf_lives}

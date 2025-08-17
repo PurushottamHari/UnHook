@@ -8,7 +8,7 @@ from enum import Enum
 from typing import Dict, List, Optional
 
 from data_collector_service.models import ContentType
-from user_service.models import CategoryName, OutputType
+from user_service.models import CategoryName, OutputType, ShelfLife
 
 
 class GeneratedContentStatus(str, Enum):
@@ -36,6 +36,8 @@ class CategoryInfo:
     category: CategoryName
     category_description: str = ""
     category_tags: List[str] = field(default_factory=list)
+    shelf_life: Optional[ShelfLife] = None
+    geography: Optional[str] = None
 
 
 @dataclass

@@ -7,6 +7,8 @@ Output Schema:
         "category": string: one of the predefined categories,
         "category_description": string: 1 sentence,
         "category_tags": list[strings]: 3-5 tags
+        "shelf_life": string: one of the predefined shelf lives
+        "geography": string: valid country(2 letter ISO) or null
         }..
     ]
 }
@@ -24,6 +26,8 @@ Expected Output Example:
       "category": "TECHNOLOGY",
       "category_description": "Covers the latest advancements in technology, gadgets, and software.",
       "category_tags": ["AI", "gadgets", "innovation"]
+      "shelf_life": MONTH,
+      "geography": IN
     },
     ...
   ]

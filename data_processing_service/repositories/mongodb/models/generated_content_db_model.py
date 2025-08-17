@@ -22,6 +22,8 @@ class CategoryInfoDBModel(BaseModel):
     category: str
     category_description: str = ""
     category_tags: list[str] = []
+    shelf_life: Optional[str] = None
+    geography: Optional[str] = None
 
 
 class GeneratedContentDBModel(BaseModel):
