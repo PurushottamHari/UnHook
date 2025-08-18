@@ -1,9 +1,10 @@
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 import markdown
+import pytz
 from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
 
@@ -12,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from data_processing_service.models.generated_content import \
     GeneratedContentStatus
-from user_service.models.enums import OutputType
+from user_service.models.enums import CategoryName, OutputType, Weekday
 
 app = Flask(__name__)
 
@@ -501,6 +502,145 @@ def get_unique_categories() -> List[str]:
     return sorted(list(categories))
 
 
+def get_weekday_from_date(date: datetime) -> Weekday:
+    """Get the weekday enum from a datetime object."""
+    weekday_map = {
+        0: Weekday.MONDAY,
+        1: Weekday.TUESDAY,
+        2: Weekday.WEDNESDAY,
+        3: Weekday.THURSDAY,
+        4: Weekday.FRIDAY,
+        5: Weekday.SATURDAY,
+        6: Weekday.SUNDAY,
+    }
+    # Convert to local timezone if needed and get weekday (0=Monday, 6=Sunday)
+    local_date = date.astimezone(pytz.timezone("Asia/Kolkata"))
+    weekday_num = local_date.weekday()
+    return weekday_map[weekday_num]
+
+
+def get_allowed_categories_for_date(user_id: str, for_date: datetime) -> List[dict]:
+    """Get categories that should be considered for the given date based on user interests and weekdays."""
+    user = fetch_user(user_id)
+    if not user:
+        return []
+
+    weekday = get_weekday_from_date(for_date)
+    allowed_categories = []
+
+    for interest in user.get("interested", []):
+        # Check if the interest is defined for the current weekday
+        if weekday.value in interest.get("weekdays", []):
+            allowed_categories.append(
+                {
+                    "category_name": interest.get("category_name"),
+                    "category_definition": interest.get("category_definition"),
+                    "output_type": interest.get("output_type"),
+                    "weekdays": interest.get("weekdays"),
+                }
+            )
+
+    return allowed_categories
+
+
+def get_newspaper_categories_for_date(user_id: str, for_date: datetime) -> List[dict]:
+    """Get actual categories present in the newspaper for a given date."""
+    db = get_database()
+
+    # Create start and end of day for the target date
+    start_of_day = datetime(for_date.year, for_date.month, for_date.day, 0, 0, 0)
+    end_of_day = datetime(for_date.year, for_date.month, for_date.day, 23, 59, 59)
+
+    # Find newspapers for the user on the given date
+    newspapers_collection = db.newspapers
+    newspapers = newspapers_collection.find(
+        {
+            "user_id": user_id,
+            "created_at": {
+                "$gte": start_of_day.timestamp(),
+                "$lte": end_of_day.timestamp(),
+            },
+        }
+    )
+
+    # Collect all external_ids from considered_content_list
+    all_external_ids = set()
+    newspaper_ids = []
+
+    for newspaper in newspapers:
+        newspaper_ids.append(newspaper["_id"])
+        considered_content = newspaper.get("considered_content_list", [])
+        for content in considered_content:
+            if "external_id" in content:
+                all_external_ids.add(content["external_id"])
+
+    if not all_external_ids:
+        return []
+
+    # Fetch the generated articles using external_ids
+    generated_content_collection = db.generated_content
+
+    # Find articles with status ARTICLE_GENERATED that match the external_ids
+    cursor = generated_content_collection.find(
+        {
+            "status": GeneratedContentStatus.ARTICLE_GENERATED,
+            "external_id": {"$in": list(all_external_ids)},
+        }
+    )
+
+    # Collect unique categories with their details
+    categories = {}
+
+    for doc in cursor:
+        if "category" in doc and doc["category"]:
+            category_name = doc["category"].get("category", "")
+            if category_name:
+                if category_name not in categories:
+                    categories[category_name] = {
+                        "category_name": category_name,
+                        "article_count": 0,
+                        "articles": [],
+                    }
+
+                # Get article details
+                title = ""
+                summary = ""
+                generated = doc.get("generated", {})
+
+                # Try to get title from VERY_SHORT
+                if OutputType.VERY_SHORT in generated:
+                    title = generated[OutputType.VERY_SHORT].get("string", "")
+
+                # Get summary from SHORT
+                if OutputType.SHORT in generated:
+                    summary = generated[OutputType.SHORT].get("string", "")
+
+                # If no title from VERY_SHORT, try to extract from SHORT
+                if not title and summary:
+                    title = (
+                        summary.split(".")[0][:50] + "..."
+                        if len(summary.split(".")[0]) > 50
+                        else summary.split(".")[0]
+                    )
+
+                categories[category_name]["article_count"] += 1
+                categories[category_name]["articles"].append(
+                    {
+                        "id": doc["_id"],
+                        "title": title,
+                        "summary": summary,
+                        "external_id": doc.get("external_id"),
+                        "reading_time_seconds": doc.get("reading_time_seconds", 0),
+                    }
+                )
+
+    # Convert to list and sort by article count
+    categories_list = list(categories.values())
+    categories_list.sort(key=lambda x: x["article_count"], reverse=True)
+
+    return categories_list
+
+
 def fetch_articles(
     user_id: str,
     sort_by: str = "newest",
@@ -698,6 +838,44 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
     )
 
 
+def fetch_user(user_id: str) -> Optional[dict]:
+    """Fetch user details by ID."""
+    db = get_database()
+    collection = db["users"]
+
+    user_dict = collection.find_one({"_id": user_id})
+    if not user_dict:
+        return None
+
+    return user_dict
+
+
+def update_user(user_id: str, user_data: dict) -> Optional[dict]:
+    """Update user details by ID."""
+    db = get_database()
+    collection = db["users"]
+
+    # Only allow updating specific fields
+    allowed_fields = {
+        "max_reading_time_per_day_mins",
+        "interested",
+        "not_interested",
+        "manual_configs",
+    }
+
+    # Filter out non-editable fields
+    filtered_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+
+    if not filtered_data:
+        raise Exception("No valid fields to update")
+
+    result = collection.update_one({"_id": user_id}, {"$set": filtered_data})
+
+    if result.modified_count > 0:
+        return fetch_user(user_id)
+    return None
+
+
 @app.route("/")
 def index():
     """Main page showing articles for a specific date."""
@@ -738,6 +916,9 @@ def index():
 
     available_dates = get_available_dates(user_id)
 
+    # Get allowed categories for the current date
+    allowed_categories = get_allowed_categories_for_date(user_id, target_date)
+
     return render_template(
         "index.html",
         articles=all_articles,
@@ -745,6 +926,7 @@ def index():
         sort_by=sort_by,
         target_date=target_date,
         available_dates=available_dates,
+        allowed_categories=allowed_categories,
     )
 
 
@@ -801,6 +983,12 @@ def article_detail(article_id):
     if not article:
         return "Article not found", 404
     return render_template("article_detail.html", article=article)
+
+
+@app.route("/settings")
+def user_settings():
+    """User settings page."""
+    return render_template("user_settings.html")
 
 
 @app.route("/api/newspapers")
@@ -933,6 +1121,134 @@ def api_article_detail(article_id):
             "reading_time_seconds": article.reading_time_seconds,
             "channel_name": article.channel_name,
         }
+    )
+
+
+@app.route("/api/user/<user_id>")
+def api_user_detail(user_id):
+    """API endpoint to get user details as JSON."""
+    user = fetch_user(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify(user)
+
+
+@app.route("/api/user/<user_id>", methods=["PUT"])
+def api_update_user(user_id):
+    """API endpoint to update user details."""
+    try:
+        user_data = request.get_json()
+        if not user_data:
+            return jsonify({"error": "No data provided"}), 400
+
+        updated_user = update_user(user_id, user_data)
+        if not updated_user:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify(updated_user)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/api/user/<user_id>/allowed-categories")
+def api_allowed_categories(user_id):
+    """API endpoint to get allowed categories for a specific date."""
+    try:
+        # Get date parameter, default to today
+        date_str = request.args.get("date")
+        if date_str:
+            try:
+                target_date = datetime.strptime(date_str, "%Y-%m-%d")
+            except ValueError:
+                return jsonify({"error": "Invalid date format. Use YYYY-MM-DD"}), 400
+        else:
+            target_date = datetime.now().replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+
+        allowed_categories = get_allowed_categories_for_date(user_id, target_date)
+        newspaper_categories = get_newspaper_categories_for_date(user_id, target_date)
+
+        return jsonify(
+            {
+                "user_id": user_id,
+                "date": target_date.strftime("%Y-%m-%d"),
+                "weekday": get_weekday_from_date(target_date).value,
+                "allowed_categories": allowed_categories,
+                "newspaper_categories": newspaper_categories,
+                "total_allowed_categories": len(allowed_categories),
+                "total_newspaper_categories": len(newspaper_categories),
+                "total_articles": sum(
+                    cat["article_count"] for cat in newspaper_categories
+                ),
+            }
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/api/categories")
+def api_all_categories():
+    """API endpoint to get all available categories."""
+    try:
+        all_categories = [category.value for category in CategoryName]
+        return jsonify(
+            {
+                "available_categories": all_categories,
+                "total_categories": len(all_categories),
+            }
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/allowed-categories")
+def allowed_categories_page():
+    """Page to display allowed categories for a specific date."""
+    user_id = request.args.get("user_id", "607d95f0-47ef-444c-89d2-d05f257d1265")
+
+    # Get date parameter, default to today
+    date_str = request.args.get("date")
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            target_date = datetime.now().replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+    else:
+        target_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Get allowed categories for the date
+    allowed_categories = get_allowed_categories_for_date(user_id, target_date)
+
+    # Get actual newspaper categories for the date
+    newspaper_categories = get_newspaper_categories_for_date(user_id, target_date)
+
+    # Get all available categories
+    all_categories = [category.value for category in CategoryName]
+
+    # Generate test dates for the next 7 days
+    test_dates = []
+    for i in range(7):
+        test_date = target_date + timedelta(days=i)
+        test_dates.append(
+            {
+                "date": test_date.strftime("%Y-%m-%d"),
+                "day_name": test_date.strftime("%A"),
+            }
+        )
+
+    return render_template(
+        "allowed_categories.html",
+        user_id=user_id,
+        date=target_date.strftime("%Y-%m-%d"),
+        weekday=get_weekday_from_date(target_date).value,
+        allowed_categories=allowed_categories,
+        newspaper_categories=newspaper_categories,
+        all_categories=all_categories,
+        test_dates=test_dates,
     )
 
 

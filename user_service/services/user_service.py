@@ -38,3 +38,16 @@ class UserService:
             User object if found, None otherwise
         """
         return await self._user_repository.get_user(user_id)
+
+    async def update_user(self, user_id: UUID, user_data: dict) -> Optional[User]:
+        """
+        Update a user by their ID.
+
+        Args:
+            user_id: UUID of the user to update
+            user_data: Dictionary containing updated user data
+
+        Returns:
+            Updated user object if found, None otherwise
+        """
+        return await self._user_repository.update_user(user_id, user_data)

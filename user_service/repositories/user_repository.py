@@ -21,3 +21,8 @@ class UserRepository(ABC):
     async def get_user(self, user_id: UUID) -> Optional[User]:
         """Retrieve a user by their ID."""
         pass
+
+    @abstractmethod
+    async def update_user(self, user_id: UUID, user_data: dict) -> Optional[User]:
+        """Update a user by their ID."""
+        pass

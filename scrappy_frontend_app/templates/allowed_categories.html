@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Newspaper Categories - {{ date }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>Newspaper Categories for {{ date }} ({{ weekday }})</h2>
+            <p class="text-muted">User: {{ user_id }}</p>
+            
+            <!-- Actual Newspaper Categories -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-newspaper"></i>
+                        {% if newspaper_categories %}
+                            {{ newspaper_categories|length }} Categories in Newspaper
+                            ({{ newspaper_categories|sum(attribute='article_count') }} articles)
+                        {% else %}
+                            No Categories in Newspaper
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if newspaper_categories %}
+                        <div class="row">
+                            {% for category in newspaper_categories %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 border-success">
+                                    <div class="card-header bg-light">
+                                        <h6 class="card-title text-success mb-0">
+                                            {{ category.category_name }}
+                                            <span class="badge bg-success float-end">{{ category.article_count }} articles</span>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-2">
+                                            <strong>Articles:</strong>
+                                        </div>
+                                        {% for article in category.articles[:3] %}
+                                        <div class="mb-2 p-2 bg-light rounded">
+                                            <small class="text-muted">{{ article.title }}</small>
+                                        </div>
+                                        {% endfor %}
+                                        {% if category.articles|length > 3 %}
+                                        <div class="text-muted">
+                                            <small>... and {{ category.articles|length - 3 }} more articles</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No categories found in newspaper for this day</h5>
+                            <p class="text-muted">
+                                This means no newspaper was generated or no articles were categorized for {{ date }}.
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Allowed Categories -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog"></i>
+                        {% if allowed_categories %}
+                            {{ allowed_categories|length }} Categories Allowed by User Preferences
+                        {% else %}
+                            No Categories Allowed by User Preferences
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if allowed_categories %}
+                        <div class="row">
+                            {% for category in allowed_categories %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 border-info">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-info">{{ category.category_name }}</h6>
+                                        <p class="card-text">{{ category.category_definition }}</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-info">{{ category.output_type }}</span>
+                                            <small class="text-muted">
+                                                {{ category.weekdays|join(', ') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No categories are allowed for this day</h5>
+                            <p class="text-muted">
+                                This means the user hasn't configured any interests for {{ weekday }}.
+                                <br>
+                                <a href="/user-settings?user_id={{ user_id }}" class="btn btn-outline-info mt-2">
+                                    Configure Interests
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Available Categories</h5>
+                <div class="row">
+                    {% for category in all_categories %}
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <span class="badge bg-light text-dark border">{{ category }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Test Other Dates</h5>
+                <div class="btn-group" role="group">
+                    {% for test_date in test_dates %}
+                    <a href="?user_id={{ user_id }}&date={{ test_date.date }}" 
+                       class="btn btn-outline-secondary {% if test_date.date == date %}active{% endif %}">
+                        {{ test_date.day_name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add some interactivity
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight current day
+    const currentDay = '{{ weekday }}';
+    const dayButtons = document.querySelectorAll('.btn-group .btn');
+    dayButtons.forEach(btn => {
+        if (btn.textContent.trim() === currentDay) {
+            btn.classList.add('btn-primary');
+            btn.classList.remove('btn-outline-secondary');
+        }
+    });
+});
+</script>
+{% endblock %}

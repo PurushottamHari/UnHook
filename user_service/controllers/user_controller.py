@@ -61,3 +61,32 @@ async def get_user(
         return user
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.put("/{user_id}", response_model=User)
+async def update_user(
+    user_id: str,
+    user_data: Dict[str, Any],
+    user_service: UserService = Depends(get_user_service),
+) -> User:
+    """
+    Update a user by their ID.
+
+    Args:
+        user_id: UUID of the user to update
+        user_data: Dictionary containing updated user data
+        user_service: Injected user service
+
+    Returns:
+        Updated user object if found
+
+    Raises:
+        HTTPException: If user not found or update fails
+    """
+    try:
+        user = await user_service.update_user(user_id, user_data)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

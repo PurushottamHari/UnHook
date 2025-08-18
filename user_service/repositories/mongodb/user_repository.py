@@ -42,3 +42,42 @@ class MongoDBUserRepository(UserRepository):
             db_model = UserDBModel(**user_dict)
             return UserAdapter.to_internal_model(db_model)
         return None
+
+    async def update_user(self, user_id: UUID, user_data: dict) -> Optional[User]:
+        """Update a user in MongoDB by their ID."""
+        # Only allow updating specific fields
+        allowed_fields = {
+            "max_reading_time_per_day_mins",
+            "interested",
+            "not_interested",
+            "manual_configs",
+        }
+
+        # Filter out non-editable fields
+        filtered_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+
+        if not filtered_data:
+            raise Exception("No valid fields to update")
+
+        # Convert to DB model format
+        db_data = {}
+        for key, value in filtered_data.items():
+            if key == "interested" or key == "not_interested":
+                db_data[key] = [
+                    item.model_dump() if hasattr(item, "model_dump") else item
+                    for item in value
+                ]
+            elif key == "manual_configs":
+                db_data[key] = (
+                    value.model_dump() if hasattr(value, "model_dump") else value
+                )
+            else:
+                db_data[key] = value
+
+        result = await self.collection.update_one(
+            {"_id": str(user_id)}, {"$set": db_data}
+        )
+
+        if result.modified_count > 0:
+            return await self.get_user(user_id)
+        return None

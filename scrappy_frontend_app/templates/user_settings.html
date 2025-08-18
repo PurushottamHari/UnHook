@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}UnHook Articles{% endblock %}</title>
+    <title>User Settings - UnHook</title>
     <style>
         * {
             margin: 0;
@@ -52,28 +52,7 @@
         .header-actions {
             display: flex;
             align-items: center;
-        }
-
-        .settings-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.75rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-        }
-
-        .settings-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            color: white;
-            text-decoration: none;
+            gap: 1rem;
         }
 
         .btn {
@@ -95,378 +74,13 @@
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn-secondary:hover {
-            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
-        }
-
-        .btn-youtube {
-            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%) !important;
-            color: white !important;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-youtube:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-            color: white !important;
-            text-decoration: none;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid #e9ecef;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .card-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .card-link:hover {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .card h3 {
-            color: #2c3e50;
-            margin-bottom: 0.75rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .card p {
-            color: #6c757d;
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .card-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.875rem;
-            color: #868e96;
-        }
-
-        .category-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .content-type-badge {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .article-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            line-height: 1.8;
-            font-size: 1.1rem;
-        }
-
-        .article-content h1 {
-            color: #2c3e50;
-            margin: 2rem 0 1.5rem 0;
-            font-size: 2.5rem;
-            font-weight: 700;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 0.5rem;
-        }
-
-        .article-content h2 {
-            color: #34495e;
-            margin: 2rem 0 1rem 0;
-            font-size: 1.8rem;
-            font-weight: 600;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 0.3rem;
-        }
-
-        .article-content h3 {
-            color: #34495e;
-            margin: 1.5rem 0 0.75rem 0;
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-
-        .article-content h4 {
-            color: #34495e;
-            margin: 1.25rem 0 0.5rem 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .article-content h5, .article-content h6 {
-            color: #34495e;
-            margin: 1rem 0 0.5rem 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .article-content p {
-            margin-bottom: 1.2rem;
-            color: #2c3e50;
-            line-height: 1.8;
-        }
-
-        .article-content ul, .article-content ol {
-            margin: 1.2rem 0;
-            padding-left: 2.5rem;
-        }
-
-        .article-content li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
-        }
-
-        .article-content ul li {
-            list-style-type: disc;
-        }
-
-        .article-content ol li {
-            list-style-type: decimal;
-        }
-
-        .article-content blockquote {
-            border-left: 4px solid #667eea;
-            padding: 1rem 1.5rem;
-            margin: 1.5rem 0;
-            font-style: italic;
-            color: #6c757d;
-            background: #f8f9fa;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .article-content blockquote p {
-            margin: 0;
-        }
-
-        .article-content code {
-            background: #f1f3f4;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
-            font-size: 0.875rem;
-            color: #e83e8c;
-        }
-
-        .article-content pre {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 1.5rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            border: 1px solid #4a5568;
-        }
-
-        .article-content pre code {
-            background: none;
-            padding: 0;
-            color: inherit;
-            font-size: 0.9rem;
-        }
-
-        .article-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .article-content th {
-            background: #667eea;
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .article-content td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .article-content tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-
-        .article-content tr:hover {
-            background: #e9ecef;
-        }
-
-        .article-content hr {
-            border: none;
-            border-top: 2px solid #e9ecef;
-            margin: 2rem 0;
-        }
-
-        .article-content strong {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .article-content em {
-            font-style: italic;
-            color: #495057;
-        }
-
-        .article-content a {
-            color: #667eea;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-bottom-color 0.3s ease;
-        }
-
-        .article-content a:hover {
-            border-bottom-color: #667eea;
-        }
-
-        .article-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 1rem 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #6c757d;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            border: 1px solid #f5c6cb;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
-        }
-
-        .empty-state h3 {
-            margin-bottom: 1rem;
-            color: #495057;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 0;
-            padding: 2rem;
-            border-radius: 0;
-            width: 100%;
-            height: 100vh;
-            overflow-y: auto;
-            box-shadow: none;
-            animation: modalSlideIn 0.3s ease-out;
-            padding-top: 4rem;
-            padding-bottom: 4rem;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 3px solid #e9ecef;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-            padding-top: 1rem;
-            margin-top: -2rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
-
-        .modal-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: #000;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .form-group {
@@ -621,8 +235,8 @@
             border-radius: 12px;
             padding: 1rem;
             min-height: 200px;
-            min-width: 120px;
-            max-width: 120px;
+            min-width: 140px;
+            max-width: 140px;
             flex-shrink: 0;
         }
 
@@ -732,20 +346,56 @@
             font-size: 0.9rem;
         }
 
-        .scroll-hint {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            color: #856404;
-            text-align: center;
-            font-size: 0.9rem;
+        /* Card Grid Layout */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
         }
 
-        .scroll-hint::before {
-            content: "↔️ ";
-            margin-right: 0.5rem;
+        .card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-content {
+            margin-bottom: 1rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
         }
 
         .array-item {
@@ -786,21 +436,13 @@
             font-weight: 600;
         }
 
-        .modal-actions {
+        .page-actions {
             display: flex;
             gap: 1.5rem;
             justify-content: flex-end;
             margin-top: 3rem;
             padding-top: 2rem;
             border-top: 2px solid #e9ecef;
-            position: sticky;
-            bottom: 0;
-            background: white;
-            z-index: 10;
-            padding-bottom: 1rem;
-            margin-bottom: -2rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
         }
 
         .btn-cancel {
@@ -813,7 +455,7 @@
 
         .loading {
             text-align: center;
-            padding: 1rem;
+            padding: 2rem;
             color: #6c757d;
         }
 
@@ -850,25 +492,6 @@
                 font-size: 2rem;
             }
             
-            .card {
-                padding: 1rem;
-            }
-            
-            .article-content {
-                padding: 1.5rem;
-            }
-            
-            .article-content h1 {
-                font-size: 1.5rem;
-            }
-
-            .modal-content {
-                margin: 0;
-                width: 100%;
-                height: 100vh;
-                padding: 1.5rem;
-            }
-
             .weekdays-grid {
                 gap: 1rem;
                 padding-bottom: 0.5rem;
@@ -877,8 +500,13 @@
             .weekday-column {
                 min-height: 150px;
                 padding: 0.75rem;
-                min-width: 100px;
-                max-width: 100px;
+                min-width: 120px;
+                max-width: 120px;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
             }
 
             .category-tag {
@@ -905,35 +533,19 @@
         <div class="container">
             <div class="header-content">
                 <div class="header-text">
-                    <h1>UnHook Newspapers</h1>
-                    <p>Your personalized AI-curated newspapers</p>
+                    <h1>User Settings</h1>
+                    <p>Manage your preferences and interests</p>
                 </div>
                 <div class="header-actions">
-                    <a href="/settings" class="settings-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.257 9.77251 19.9887C9.5799 19.7204 9.31074 19.5189 9 19.41C8.69838 19.2769 8.36381 19.2372 8.03941 19.296C7.71502 19.3548 7.41568 19.5095 7.18 19.74L7.12 19.8C6.93425 19.986 6.71368 20.1335 6.47088 20.2341C6.22808 20.3348 5.96783 20.3866 5.705 20.3866C5.44217 20.3866 5.18192 20.3348 4.93912 20.2341C4.69632 20.1335 4.47575 19.986 4.29 19.8C4.10405 19.6143 3.95653 19.3937 3.85588 19.1509C3.75523 18.9081 3.70343 18.6478 3.70343 18.385C3.70343 18.1222 3.75523 17.8619 3.85588 17.6191C3.95653 17.3763 4.10405 17.1557 4.29 16.97L4.35 16.91C4.58054 16.6743 4.73519 16.375 4.79399 16.0506C4.8528 15.7262 4.81312 15.3916 4.68 15.09C4.55324 14.7942 4.34276 14.542 4.07447 14.3643C3.80618 14.1866 3.49179 14.0913 3.17 14.09H3C2.46957 14.09 1.96086 13.8793 1.58579 13.5042C1.21071 13.1291 1 12.6204 1 12.09C1 11.5596 1.21071 11.0509 1.58579 10.6758C1.96086 10.3007 2.46957 10.09 3 10.09H3.09C3.42099 10.0823 3.743 9.97512 4.0113 9.78251C4.27959 9.5899 4.48109 9.32074 4.59 9.01C4.72312 8.70838 4.7628 8.37381 4.704 8.04941C4.64519 7.72502 4.49054 7.42568 4.26 7.19L4.2 7.13C4.01405 6.94425 3.86653 6.72368 3.76588 6.48088C3.66523 6.23808 3.61343 5.97783 3.61343 5.715C3.61343 5.45217 3.66523 5.19192 3.76588 4.94912C3.86653 4.70632 4.01405 4.48575 4.2 4.3C4.38575 4.11405 4.60632 3.96653 4.84912 3.86588C5.09192 3.76523 5.35217 3.71343 5.615 3.71343C5.87783 3.71343 6.13808 3.76523 6.38088 3.86588C6.62368 3.96653 6.84425 4.11405 7.03 4.3L7.09 4.36C7.32568 4.59054 7.62502 4.74519 7.94941 4.80399C8.27381 4.8628 8.60838 4.82312 8.91 4.69H9C9.29577 4.56324 9.54802 4.35276 9.72569 4.08447C9.90337 3.81618 9.99872 3.50179 10 3.18V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.7728 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </a>
+                    <a href="/" class="btn btn-secondary">← Back to Home</a>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="container">
-        {% block content %}{% endblock %}
-    </div>
-
-    <!-- User Settings Modal -->
-    <div id="userSettingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">User Settings</h2>
-                <span class="close" onclick="closeUserSettings()">&times;</span>
-            </div>
-            <div id="modalBody">
-                <div class="loading">Loading user details...</div>
-            </div>
+        <div id="pageContent">
+            <div class="loading">Loading user details...</div>
         </div>
     </div>
 
@@ -942,24 +554,10 @@
         let currentUser = null;
         const userId = '607d95f0-47ef-444c-89d2-d05f257d1265'; // Default user ID
 
-        // Modal functions
-        function openUserSettings() {
-            document.getElementById('userSettingsModal').style.display = 'block';
+        // Load user details on page load
+        document.addEventListener('DOMContentLoaded', function() {
             loadUserDetails();
-        }
-
-        function closeUserSettings() {
-            document.getElementById('userSettingsModal').style.display = 'none';
-            document.getElementById('modalBody').innerHTML = '<div class="loading">Loading user details...</div>';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('userSettingsModal');
-            if (event.target === modal) {
-                closeUserSettings();
-            }
-        }
+        });
 
         // Load user details
         async function loadUserDetails() {
@@ -971,7 +569,7 @@
                 currentUser = await response.json();
                 renderUserForm();
             } catch (error) {
-                document.getElementById('modalBody').innerHTML = `
+                document.getElementById('pageContent').innerHTML = `
                     <div class="error-message">Error loading user details: ${error.message}</div>
                 `;
             }
@@ -979,42 +577,40 @@
 
         // Render user form
         function renderUserForm() {
-            const modalBody = document.getElementById('modalBody');
+            const pageContent = document.getElementById('pageContent');
             
-            modalBody.innerHTML = `
+            pageContent.innerHTML = `
                 <form id="userForm">
-                    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
-                        <div class="form-group">
-                            <label class="form-label">Max Reading Time Per Day (minutes)</label>
-                            <input type="number" class="form-input" id="maxReadingTime" 
-                                   value="${currentUser.max_reading_time_per_day_mins || 30}" min="1" max="480">
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Reading Time Per Day (minutes)</label>
+                        <input type="number" class="form-input" id="maxReadingTime" 
+                               value="${currentUser.max_reading_time_per_day_mins || 30}" min="1" max="480">
+                    </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Interests</label>
-                            <div id="interestsContainer">
-                                ${renderInterests()}
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Not Interested</label>
-                            <div id="notInterestedContainer">
-                                ${renderNotInterested()}
-                            </div>
-                            <button type="button" class="add-item-btn" onclick="addNotInterested()">Add Not Interested</button>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Manual Configs</label>
-                            <div id="manualConfigsContainer">
-                                ${renderManualConfigs()}
-                            </div>
+                    <div class="form-group">
+                        <label class="form-label">Interests</label>
+                        <div id="interestsContainer">
+                            ${renderInterests()}
                         </div>
                     </div>
 
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-cancel" onclick="closeUserSettings()">Cancel</button>
+                    <div class="form-group">
+                        <label class="form-label">Not Interested</label>
+                        <div class="cards-grid" id="notInterestedContainer">
+                            ${renderNotInterested()}
+                        </div>
+                        <button type="button" class="add-item-btn" onclick="addNotInterested()">Add Not Interested</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Manual Configs</label>
+                        <div class="cards-grid" id="manualConfigsContainer">
+                            ${renderManualConfigs()}
+                        </div>
+                    </div>
+
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-cancel" onclick="goBack()">Cancel</button>
                         <button type="submit" class="btn btn-save">Save Changes</button>
                     </div>
                 </form>
@@ -1054,7 +650,7 @@
                     <button type="button" class="add-item-btn" onclick="addInterest()">Add New Interest</button>
                 </div>
                 
-                <div id="existingInterests" style="margin-top: 2rem;">
+                <div class="cards-grid" id="existingInterests" style="margin-top: 2rem;">
                     ${renderExistingInterests()}
                 </div>
             `;
@@ -1073,17 +669,14 @@
         // Render weekdays grid
         function renderWeekdaysGrid() {
             const weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-            return `
-                <div class="scroll-hint">Scroll horizontally to see all weekdays</div>
-                ${weekdays.map(weekday => `
-                    <div class="weekday-column" data-weekday="${weekday}">
-                        <div class="weekday-header">${weekday.charAt(0) + weekday.slice(1).toLowerCase()}</div>
-                        <div class="weekday-categories" id="weekday-${weekday}">
-                            ${renderWeekdayCategories(weekday)}
-                        </div>
+            return weekdays.map(weekday => `
+                <div class="weekday-column" data-weekday="${weekday}">
+                    <div class="weekday-header">${weekday.charAt(0) + weekday.slice(1).toLowerCase()}</div>
+                    <div class="weekday-categories" id="weekday-${weekday}">
+                        ${renderWeekdayCategories(weekday)}
                     </div>
-                `).join('')}
-            `;
+                </div>
+            `).join('');
         }
 
         // Render categories for a specific weekday
@@ -1117,32 +710,34 @@
             }
 
             return currentUser.interested.map((interest, index) => `
-                <div class="array-item">
-                    <div class="array-item-header">
-                        <strong>Existing Interest ${index + 1}</strong>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Interest ${index + 1}</div>
                         <button type="button" class="remove-item-btn" onclick="removeInterest(${index})">Remove</button>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Category</label>
-                        <select class="form-select" onchange="updateInterest(${index}, 'category_name', this.value)">
-                            ${getCategoryOptions(interest.category_name)}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Category Definition</label>
-                        <textarea class="form-textarea" onchange="updateInterest(${index}, 'category_definition', this.value)">${interest.category_definition || ''}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Weekdays</label>
-                        <div class="checkbox-group">
-                            ${getWeekdayCheckboxes(interest.weekdays || [], index, 'weekdays')}
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" onchange="updateInterest(${index}, 'category_name', this.value)">
+                                ${getCategoryOptions(interest.category_name)}
+                            </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Output Type</label>
-                        <select class="form-select" onchange="updateInterest(${index}, 'output_type', this.value)">
-                            ${getOutputTypeOptions(interest.output_type)}
-                        </select>
+                        <div class="form-group">
+                            <label class="form-label">Category Definition</label>
+                            <textarea class="form-textarea" onchange="updateInterest(${index}, 'category_definition', this.value)">${interest.category_definition || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Weekdays</label>
+                            <div class="checkbox-group">
+                                ${getWeekdayCheckboxes(interest.weekdays || [], index, 'weekdays')}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Output Type</label>
+                            <select class="form-select" onchange="updateInterest(${index}, 'output_type', this.value)">
+                                ${getOutputTypeOptions(interest.output_type)}
+                            </select>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1155,14 +750,16 @@
             }
 
             return currentUser.not_interested.map((item, index) => `
-                <div class="array-item">
-                    <div class="array-item-header">
-                        <strong>Not Interested ${index + 1}</strong>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Not Interested ${index + 1}</div>
                         <button type="button" class="remove-item-btn" onclick="removeNotInterested(${index})">Remove</button>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Category Definition</label>
-                        <textarea class="form-textarea" onchange="updateNotInterested(${index}, 'category_definition', this.value)">${item.category_definition || ''}</textarea>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">Category Definition</label>
+                            <textarea class="form-textarea" onchange="updateNotInterested(${index}, 'category_definition', this.value)">${item.category_definition || ''}</textarea>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1176,19 +773,24 @@
 
             const config = currentUser.manual_configs;
             return `
-                <div class="array-item">
-                    <div class="form-group">
-                        <label class="form-label">YouTube Discover On</label>
-                        <div class="checkbox-group">
-                            ${getWeekdayCheckboxes(config.youtube?.discover_on || [], null, 'youtube_discover_on')}
-                        </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">YouTube Configuration</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">YouTube Channels</label>
-                        <div id="youtubeChannelsContainer">
-                            ${renderYouTubeChannels()}
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">YouTube Discover On</label>
+                            <div class="checkbox-group">
+                                ${getWeekdayCheckboxes(config.youtube?.discover_on || [], null, 'youtube_discover_on')}
+                            </div>
                         </div>
-                        <button type="button" class="add-item-btn" onclick="addYouTubeChannel()">Add Channel</button>
+                        <div class="form-group">
+                            <label class="form-label">YouTube Channels</label>
+                            <div class="cards-grid" id="youtubeChannelsContainer">
+                                ${renderYouTubeChannels()}
+                            </div>
+                            <button type="button" class="add-item-btn btn-small" onclick="addYouTubeChannel()">Add Channel</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -1201,24 +803,26 @@
             }
 
             return currentUser.manual_configs.youtube.channels.map((channel, index) => `
-                <div class="array-item">
-                    <div class="array-item-header">
-                        <strong>Channel ${index + 1}</strong>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Channel ${index + 1}</div>
                         <button type="button" class="remove-item-btn" onclick="removeYouTubeChannel(${index})">Remove</button>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Channel ID</label>
-                        <input type="text" class="form-input" value="${channel.channel_id || ''}" onchange="updateYouTubeChannel(${index}, 'channel_id', this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Max Videos Daily</label>
-                        <input type="number" class="form-input" value="${channel.max_videos_daily || 1}" min="1" max="10" onchange="updateYouTubeChannel(${index}, 'max_videos_daily', this.value)">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Output Type</label>
-                        <select class="form-select" onchange="updateYouTubeChannel(${index}, 'output_type', this.value)">
-                            ${getOutputTypeOptions(channel.output_type)}
-                        </select>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">Channel ID</label>
+                            <input type="text" class="form-input" value="${channel.channel_id || ''}" onchange="updateYouTubeChannel(${index}, 'channel_id', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Videos Daily</label>
+                            <input type="number" class="form-input" value="${channel.max_videos_daily || 1}" min="1" max="10" onchange="updateYouTubeChannel(${index}, 'max_videos_daily', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Output Type</label>
+                            <select class="form-select" onchange="updateYouTubeChannel(${index}, 'output_type', this.value)">
+                                ${getOutputTypeOptions(channel.output_type)}
+                            </select>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1483,23 +1087,27 @@
                 currentUser = updatedUser;
                 
                 // Show success message
-                const modalBody = document.getElementById('modalBody');
-                modalBody.innerHTML = `
+                const pageContent = document.getElementById('pageContent');
+                pageContent.innerHTML = `
                     <div class="success-message">User settings saved successfully!</div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-save" onclick="closeUserSettings()">Close</button>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-save" onclick="goBack()">Back to Home</button>
                     </div>
                 `;
             } catch (error) {
-                const modalBody = document.getElementById('modalBody');
-                modalBody.innerHTML = `
+                const pageContent = document.getElementById('pageContent');
+                pageContent.innerHTML = `
                     <div class="error-message">Error saving user settings: ${error.message}</div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-cancel" onclick="closeUserSettings()">Close</button>
+                    <div class="page-actions">
+                        <button type="button" class="btn btn-cancel" onclick="goBack()">Back to Home</button>
                     </div>
                 `;
             }
         }
+
+        function goBack() {
+            window.location.href = '/';
+        }
     </script>
 </body>
-</html> 
+</html>

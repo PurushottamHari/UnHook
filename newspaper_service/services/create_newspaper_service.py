@@ -174,11 +174,22 @@ class CreateNewspaperService:
         allowed_categories = self._get_allowed_categories_for_date(user, for_date)
 
         # Fetch processed collected content
+        # Clone for_date and set time to 11:59:59.999999 PM
+        before_time = datetime(
+            for_date.year,
+            for_date.month,
+            for_date.day,
+            23,
+            59,
+            59,
+            999999,
+            tzinfo=for_date.tzinfo,
+        )
         processed_content_list = (
             self.user_collected_content_repository.get_content_with_status(
                 user_id=user_id,
                 status=ContentStatus.PROCESSED,
-                before_time=for_date,
+                before_time=before_time,
             )
         )
 

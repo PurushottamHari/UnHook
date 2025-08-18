@@ -39,6 +39,34 @@
         </div>
     </div>
     
+    <!-- Allowed Categories Display -->
+    {% if allowed_categories %}
+    <div style="margin-bottom: 1.5rem; padding: 0.75rem; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <span style="color: white; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">
+                <i class="fas fa-filter"></i> Allowed Categories:
+            </span>
+            {% for category in allowed_categories %}
+            <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); padding: 0.4rem 0.8rem; border-radius: 20px; color: white; font-size: 0.85rem; white-space: nowrap;">
+                <span style="font-weight: 500;">{{ category.category_name }}</span>
+                <span style="opacity: 0.8; font-size: 0.75rem;">{{ category.output_type }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div style="margin-bottom: 1.5rem; padding: 0.75rem; background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="color: white; font-weight: 600; font-size: 0.9rem;">
+                <i class="fas fa-exclamation-triangle"></i> No categories allowed for {{ target_date.strftime('%A') }}
+            </span>
+            <a href="/user-settings?user_id={{ user_id }}" style="color: white; text-decoration: underline; font-size: 0.85rem;">
+                Configure Interests
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
             <div style="display: flex; gap: 0.5rem; align-items: center;">
