@@ -133,6 +133,8 @@
             transition: all 0.3s ease;
             cursor: pointer;
             border: 1px solid #e9ecef;
+            height: auto;
+            min-height: fit-content;
         }
 
         .card:hover {
@@ -166,12 +168,31 @@
 
         .summary-container {
             position: relative;
+            height: auto;
+            min-height: fit-content;
         }
 
         .summary-text {
             color: #6c757d;
             line-height: 1.6;
             word-wrap: break-word;
+        }
+
+        .summary-text.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 6em;
+        }
+
+        .summary-text.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+            max-height: none;
+            overflow: visible;
+            text-overflow: clip;
         }
 
         .read-more-btn {
@@ -199,6 +220,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1.5rem;
+            align-items: start;
         }
 
         .card-meta {
@@ -897,8 +919,6 @@
             
             .summary-text {
                 font-size: 0.9rem;
-                -webkit-line-clamp: 3;
-                max-height: 4.5em;
             }
             
             .articles-grid {
@@ -1552,6 +1572,91 @@
                 `;
             }
         }
+
+        // Read More Functionality - Global for all pages
+        let buttonsInitialized = false;
+
+        function initializeSummaryButtons() {
+            if (buttonsInitialized) {
+                console.log('Buttons already initialized, skipping...');
+                return;
+            }
+            
+            const readMoreBtns = document.querySelectorAll('.read-more-btn');
+            console.log('Found', readMoreBtns.length, 'read more buttons');
+            
+            readMoreBtns.forEach((btn, index) => {
+                console.log('Setting up button', index, ':', btn.textContent);
+                
+                // Remove any existing event listeners
+                btn.removeEventListener('click', handleButtonClick);
+                
+                // Add new event listener
+                btn.addEventListener('click', handleButtonClick);
+                
+                // Add a data attribute to track if it's been initialized
+                btn.setAttribute('data-initialized', 'true');
+            });
+            
+            buttonsInitialized = true;
+            console.log('Buttons initialization completed');
+        }
+
+        function handleButtonClick(event) {
+            console.log('Button clicked:', this.textContent);
+            event.preventDefault();
+            event.stopPropagation();
+            toggleSummary(this, event);
+        }
+
+        function toggleSummary(button, event) {
+            console.log('toggleSummary called');
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const summaryContainer = button.closest('.summary-container');
+            const summaryText = summaryContainer.querySelector('.summary-text');
+            
+            console.log('Summary text element:', summaryText);
+            console.log('Current classes:', summaryText.className);
+            
+            // Check if currently expanded or collapsed
+            const hasExpandedClass = summaryText.classList.contains('expanded');
+            const hasCollapsedClass = summaryText.classList.contains('collapsed');
+            
+            console.log('Has expanded class:', hasExpandedClass);
+            console.log('Has collapsed class:', hasCollapsedClass);
+            
+            if (hasExpandedClass) {
+                // Collapse the summary
+                console.log('Collapsing summary');
+                summaryText.classList.remove('expanded');
+                summaryText.classList.add('collapsed');
+                button.innerHTML = '📖 Read More';
+            } else {
+                // Expand the summary
+                console.log('Expanding summary');
+                summaryText.classList.remove('collapsed');
+                summaryText.classList.add('expanded');
+                button.innerHTML = '📖 Read Less';
+            }
+            
+            console.log('After toggle - classes:', summaryText.className);
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing summary buttons...');
+            initializeSummaryButtons();
+        });
+
+        // Fallback initialization on window load (only if not already initialized)
+        window.addEventListener('load', function() {
+            console.log('Window loaded, checking if buttons need initialization...');
+            if (!buttonsInitialized) {
+                initializeSummaryButtons();
+            }
+        });
     </script>
 </body>
 </html> 

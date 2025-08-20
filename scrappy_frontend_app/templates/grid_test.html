@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Test - Read More Functionality</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .card-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .summary-container {
+            position: relative;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .summary-text {
+            color: #6c757d;
+            line-height: 1.6;
+            word-wrap: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.5;
+            max-height: 6em;
+            margin-bottom: 0.5rem;
+        }
+
+        .read-more-btn {
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.2) !important;
+            border: 2px solid #667eea !important;
+            color: #667eea !important;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .read-more-btn:hover {
+            background: rgba(102, 126, 234, 0.3) !important;
+            color: #5a6ac7 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #868e96;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        .test-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #1976d2;
+        }
+
+        .test-info h3 {
+            margin-bottom: 0.5rem;
+            color: #1976d2;
+        }
+
+        .test-info p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Grid Test - Read More Functionality</h1>
+        
+        <div class="test-info">
+            <h3>Test Information</h3>
+            <p>This page tests the Read More functionality in a grid layout that matches the newspaper detail page.</p>
+            <p>Open browser console (F12) to see debugging information when clicking Read More buttons.</p>
+        </div>
+
+        <div class="articles-grid">
+            <!-- Article 1 - Short summary -->
+            <a href="#" class="card-link">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0; flex: 1;">Short Article Title</h4>
+                        <div style="text-align: right; min-width: 80px;">
+                            <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">Dec 15</div>
+                            <div style="font-size: 0.7rem; color: #adb5bd;">2024</div>
+                        </div>
+                    </div>
+                    <div class="summary-container" style="margin-bottom: 1rem;">
+                        <p class="summary-text collapsed" style="line-height: 1.5; margin-bottom: 0.5rem;">This is a short summary that should not need a read more button because it's not long enough to be truncated.</p>
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <button class="read-more-btn">📖 Read More</button>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="category-badge">NEWS</span>
+                            <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">2 min read</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: #6c757d;">1 hour ago</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Article 2 - Long summary -->
+            <a href="#" class="card-link">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0; flex: 1;">Long Article Title That Should Definitely Need Read More</h4>
+                        <div style="text-align: right; min-width: 80px;">
+                            <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">Dec 15</div>
+                            <div style="font-size: 0.7rem; color: #adb5bd;">2024</div>
+                        </div>
+                    </div>
+                    <div class="summary-container" style="margin-bottom: 1rem;">
+                        <p class="summary-text collapsed" style="line-height: 1.5; margin-bottom: 0.5rem;">This is a much longer summary that should definitely need a read more button. It contains multiple sentences and should be truncated after four lines. The text should continue beyond what is visible in the initial view, requiring users to click the read more button to see the complete content. This tests whether the truncation and expansion functionality works correctly in a grid layout. The summary contains multiple paragraphs worth of content to ensure that the read more functionality is working properly.</p>
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <button class="read-more-btn">📖 Read More</button>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="category-badge">TECHNOLOGY</span>
+                            <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">5 min read</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: #6c757d;">2 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Article 3 - Very long summary -->
+            <a href="#" class="card-link">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0; flex: 1;">Extremely Long Article Title That Will Definitely Need Read More Functionality</h4>
+                        <div style="text-align: right; min-width: 80px;">
+                            <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">Dec 15</div>
+                            <div style="font-size: 0.7rem; color: #adb5bd;">2024</div>
+                        </div>
+                    </div>
+                    <div class="summary-container" style="margin-bottom: 1rem;">
+                        <p class="summary-text collapsed" style="line-height: 1.5; margin-bottom: 0.5rem;">This is an extremely long summary that will definitely need a read more button. It contains many sentences and should be truncated after four lines. The text should continue well beyond what is visible in the initial view, requiring users to click the read more button to see the complete content. This tests whether the truncation and expansion functionality works correctly in a grid layout. The summary contains multiple paragraphs worth of content to ensure that the read more functionality is working properly. Users should be able to expand and collapse the text as needed. This is a comprehensive test of the functionality.</p>
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <button class="read-more-btn">📖 Read More</button>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="category-badge">SCIENCE</span>
+                            <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">8 min read</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: #6c757d;">3 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Article 4 - Medium summary -->
+            <a href="#" class="card-link">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                        <h4 style="margin: 0; flex: 1;">Medium Length Article Title</h4>
+                        <div style="text-align: right; min-width: 80px;">
+                            <div style="font-size: 0.8rem; color: #6c757d; font-weight: 600;">Dec 15</div>
+                            <div style="font-size: 0.7rem; color: #adb5bd;">2024</div>
+                        </div>
+                    </div>
+                    <div class="summary-container" style="margin-bottom: 1rem;">
+                        <p class="summary-text collapsed" style="line-height: 1.5; margin-bottom: 0.5rem;">This is a medium length summary that might need a read more button depending on the screen size and font rendering. It contains several sentences and should test the boundary conditions of the truncation functionality. The text should be long enough to potentially trigger the read more button in some cases.</p>
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <button class="read-more-btn">📖 Read More</button>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="category-badge">BUSINESS</span>
+                            <span style="font-size: 0.8rem; color: #6c757d; background-color: #f8f9fa; padding: 0.2rem 0.5rem; border-radius: 4px;">3 min read</span>
+                        </div>
+                        <div>
+                            <span style="font-size: 0.8rem; color: #6c757d;">4 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Initialize summary functionality
+        let buttonsInitialized = false;
+
+        function initializeSummaryButtons() {
+            if (buttonsInitialized) {
+                console.log('Buttons already initialized, skipping...');
+                return;
+            }
+            
+            const readMoreBtns = document.querySelectorAll('.read-more-btn');
+            console.log('Found', readMoreBtns.length, 'read more buttons');
+            
+            readMoreBtns.forEach((btn, index) => {
+                console.log('Setting up button', index, ':', btn.textContent);
+                
+                // Remove any existing event listeners
+                btn.removeEventListener('click', handleButtonClick);
+                
+                // Add new event listener
+                btn.addEventListener('click', handleButtonClick);
+                
+                // Add a data attribute to track if it's been initialized
+                btn.setAttribute('data-initialized', 'true');
+            });
+            
+            buttonsInitialized = true;
+            console.log('Buttons initialization completed');
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing summary buttons...');
+            initializeSummaryButtons();
+        });
+
+        // Fallback initialization on window load (only if not already initialized)
+        window.addEventListener('load', function() {
+            console.log('Window loaded, initializing summary buttons...');
+            if (!buttonsInitialized) {
+                initializeSummaryButtons();
+            }
+        });
+
+        function handleButtonClick(event) {
+            console.log('Button clicked:', this.textContent);
+            event.preventDefault();
+            event.stopPropagation();
+            toggleSummary(this, event);
+        }
+
+        // Toggle summary text expansion
+        function toggleSummary(button, event) {
+            console.log('toggleSummary called');
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const summaryContainer = button.closest('.summary-container');
+            const summaryText = summaryContainer.querySelector('.summary-text');
+            
+            console.log('Summary text element:', summaryText);
+            console.log('Current classes:', summaryText.className);
+            
+            // Check if currently expanded or collapsed
+            const hasExpandedClass = summaryText.classList.contains('expanded');
+            const hasCollapsedClass = summaryText.classList.contains('collapsed');
+            
+            console.log('Has expanded class:', hasExpandedClass);
+            console.log('Has collapsed class:', hasCollapsedClass);
+            
+            if (hasExpandedClass) {
+                // Collapse the summary
+                console.log('Collapsing summary');
+                summaryText.classList.remove('expanded');
+                summaryText.classList.add('collapsed');
+                button.innerHTML = '📖 Read More';
+            } else {
+                // Expand the summary
+                console.log('Expanding summary');
+                summaryText.classList.remove('collapsed');
+                summaryText.classList.add('expanded');
+                button.innerHTML = '📖 Read Less';
+            }
+            
+            console.log('After toggle - classes:', summaryText.className);
+        }
+    </script>
+</body>
+</html>

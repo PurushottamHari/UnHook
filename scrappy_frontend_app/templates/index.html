@@ -96,10 +96,10 @@
     </div>
     
     {% if articles %}
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 1.5rem; align-items: start;">
             {% for article in articles %}
             <a href="/article/{{ article.id }}" class="card-link">
-                <div class="card">
+                <div class="card" style="height: auto; min-height: fit-content;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
                         <h3 style="margin: 0; flex: 1; font-size: 1.1rem; line-height: 1.4;">{{ article.title }}</h3>
                         {% if article.category %}
@@ -108,9 +108,9 @@
                     </div>
                     
                     <div class="summary-container" style="margin-bottom: 1rem;">
-                        <p class="summary-text" style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-height: 4.5em; margin-bottom: 0.5rem;">{{ article.summary }}</p>
+                        <p class="summary-text collapsed" style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5; margin-bottom: 0.5rem;">{{ article.summary }}</p>
                         <div style="text-align: center; margin-top: 0.5rem;">
-                            <button class="read-more-btn" onclick="toggleSummary(this, event)" style="background: rgba(102, 126, 234, 0.2); border: 2px solid #667eea; color: #667eea; cursor: pointer; font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.3s ease; font-weight: 600; display: block; margin: 0 auto; box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);">📖 Read More</button>
+                            <button class="read-more-btn" style="background: rgba(102, 126, 234, 0.2); border: 2px solid #667eea; color: #667eea; cursor: pointer; font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.3s ease; font-weight: 600; display: block; margin: 0 auto; box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);">📖 Read More</button>
                         </div>
                     </div>
                     
@@ -306,37 +306,32 @@ function toggleSummary(button, event) {
     const summaryText = summaryContainer.querySelector('.summary-text');
     
     console.log('Summary text element:', summaryText);
-    console.log('Current display:', summaryText.style.display);
-    console.log('Current webkitLineClamp:', summaryText.style.webkitLineClamp);
+    console.log('Current classes:', summaryText.className);
+    console.log('Has expanded class:', summaryText.classList.contains('expanded'));
+    console.log('Has collapsed class:', summaryText.classList.contains('collapsed'));
     
     // Check if currently expanded or collapsed
-    const isExpanded = summaryText.style.display === 'block' || 
-                      summaryText.style.webkitLineClamp === 'unset' ||
-                      summaryText.style.maxHeight === 'none' ||
-                      summaryText.style.webkitLineClamp === '';
+    const isExpanded = summaryText.classList.contains('expanded');
     
     console.log('Is expanded:', isExpanded);
     
     if (isExpanded) {
         // Collapse the summary
         console.log('Collapsing summary');
-        summaryText.style.display = '-webkit-box';
-        summaryText.style.webkitLineClamp = '3';
-        summaryText.style.maxHeight = '4.5em';
-        summaryText.style.overflow = 'hidden';
+        summaryText.classList.remove('expanded');
+        summaryText.classList.add('collapsed');
         button.innerHTML = '📖 Read More';
     } else {
         // Expand the summary
         console.log('Expanding summary');
-        summaryText.style.display = 'block';
-        summaryText.style.webkitLineClamp = 'unset';
-        summaryText.style.maxHeight = 'none';
-        summaryText.style.overflow = 'visible';
+        summaryText.classList.remove('collapsed');
+        summaryText.classList.add('expanded');
         button.innerHTML = '📖 Read Less';
     }
     
-    console.log('After toggle - display:', summaryText.style.display);
-    console.log('After toggle - webkitLineClamp:', summaryText.style.webkitLineClamp);
+    console.log('After toggle - classes:', summaryText.className);
+    console.log('After toggle - has expanded:', summaryText.classList.contains('expanded'));
+    console.log('After toggle - has collapsed:', summaryText.classList.contains('collapsed'));
 }
 </script>
 {% endblock %} 

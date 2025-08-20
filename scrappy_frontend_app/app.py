@@ -982,6 +982,18 @@ def test_summary():
     return render_template("test_summary.html")
 
 
+@app.route("/debug-summary")
+def debug_summary():
+    """Debug route for summary functionality."""
+    return render_template("debug_summary.html")
+
+
+@app.route("/grid-test")
+def grid_test():
+    """Grid test route for summary functionality."""
+    return render_template("grid_test.html")
+
+
 @app.route("/article/<article_id>")
 def article_detail(article_id):
     """Article detail page."""

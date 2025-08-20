@@ -65,10 +65,10 @@
         <h3 style="color: #2c3e50; font-size: 1.5rem; margin-bottom: 1rem;">Articles in this Newspaper</h3>
         
         {% if articles %}
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; align-items: start;">
                 {% for article in articles %}
                 <a href="/article/{{ article.id }}" class="card-link">
-                    <div class="card">
+                    <div class="card" style="height: auto; min-height: fit-content;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                             <h4 style="margin: 0; flex: 1;">{{ article.title }}</h4>
                             {% if article.created_at %}
@@ -83,9 +83,9 @@
                             {% endif %}
                         </div>
                         <div class="summary-container" style="margin-bottom: 1rem;">
-                            <p class="summary-text" style="display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; max-height: 6em; margin-bottom: 0.5rem; position: relative;">{{ article.summary }}</p>
+                            <p class="summary-text collapsed" style="line-height: 1.5; margin-bottom: 0.5rem;">{{ article.summary }}</p>
                             <div style="text-align: center; margin-top: 0.5rem;">
-                                <button class="read-more-btn" onclick="toggleSummary(this, event)" style="background: rgba(102, 126, 234, 0.2); border: 2px solid #667eea; color: #667eea; cursor: pointer; font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 6px; transition: all 0.3s ease; font-weight: 600; display: block; margin: 0 auto; box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);">📖 Read More</button>
+                                <button class="read-more-btn">📖 Read More</button>
                             </div>
                         </div>
                         <div class="card-meta">
@@ -150,87 +150,5 @@
     {% endif %}
 </div>
 
-<script>
-// Toggle summary text expansion
-function toggleSummary(button, event) {
-    console.log('toggleSummary called');
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const summaryContainer = button.closest('.summary-container');
-    const summaryText = summaryContainer.querySelector('.summary-text');
-    
-    console.log('Summary text element:', summaryText);
-    console.log('Current display:', summaryText.style.display);
-    console.log('Current webkitLineClamp:', summaryText.style.webkitLineClamp);
-    
-    // Check if currently expanded or collapsed
-    const isExpanded = summaryText.style.display === 'block' || 
-                      summaryText.style.webkitLineClamp === 'unset' ||
-                      summaryText.style.maxHeight === 'none' ||
-                      summaryText.style.webkitLineClamp === '';
-    
-    console.log('Is expanded:', isExpanded);
-    
-    if (isExpanded) {
-        // Collapse the summary
-        console.log('Collapsing summary');
-        summaryText.style.display = '-webkit-box';
-        summaryText.style.webkitLineClamp = '4';
-        summaryText.style.maxHeight = '6em';
-        summaryText.style.overflow = 'hidden';
-        button.innerHTML = '📖 Read More';
-    } else {
-        // Expand the summary
-        console.log('Expanding summary');
-        summaryText.style.display = 'block';
-        summaryText.style.webkitLineClamp = 'unset';
-        summaryText.style.maxHeight = 'none';
-        summaryText.style.overflow = 'visible';
-        button.innerHTML = '📖 Read Less';
-    }
-    
-    console.log('After toggle - display:', summaryText.style.display);
-    console.log('After toggle - webkitLineClamp:', summaryText.style.webkitLineClamp);
-}
 
-// Initialize summary functionality
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, looking for read more buttons...');
-    initializeSummaryButtons();
-});
-
-// Also try to initialize on window load in case DOMContentLoaded already fired
-window.addEventListener('load', function() {
-    console.log('Window loaded, looking for read more buttons...');
-    initializeSummaryButtons();
-});
-
-function initializeSummaryButtons() {
-    // Add click event listeners to all read more buttons
-    const readMoreBtns = document.querySelectorAll('.read-more-btn');
-    console.log('Found', readMoreBtns.length, 'read more buttons');
-    
-    readMoreBtns.forEach((btn, index) => {
-        console.log('Button', index, ':', btn.textContent);
-        
-        // Remove any existing event listeners
-        btn.removeEventListener('click', handleButtonClick);
-        
-        // Add new event listener
-        btn.addEventListener('click', handleButtonClick);
-        
-        // Also add onclick as backup
-        btn.onclick = function(event) {
-            console.log('onclick triggered for button', index);
-            handleButtonClick.call(this, event);
-        };
-    });
-}
-
-function handleButtonClick(event) {
-    console.log('Button clicked:', this.textContent);
-    toggleSummary(this, event);
-}
-</script>
 {% endblock %}

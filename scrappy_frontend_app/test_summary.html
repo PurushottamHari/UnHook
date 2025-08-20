@@ -28,6 +28,9 @@
             color: #6c757d;
             line-height: 1.6;
             word-wrap: break-word;
+        }
+        
+        .summary-text.collapsed {
             display: -webkit-box;
             -webkit-line-clamp: 4;
             -webkit-box-orient: vertical;
@@ -36,6 +39,14 @@
             line-height: 1.5;
             max-height: 6em;
             margin-bottom: 0.5rem;
+        }
+        
+        .summary-text.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+            max-height: none;
+            overflow: visible;
+            text-overflow: clip;
         }
         
         .read-more-btn {
@@ -64,7 +75,7 @@
     <div class="card">
         <h3>Short Summary</h3>
         <div class="summary-container">
-            <p class="summary-text">This is a short summary that should not need a read more button.</p>
+            <p class="summary-text collapsed">This is a short summary that should not need a read more button.</p>
             <div style="text-align: center; margin-top: 0.5rem;">
                 <button class="read-more-btn" onclick="toggleSummary(this, event)">📖 Read More</button>
             </div>
@@ -74,7 +85,7 @@
     <div class="card">
         <h3>Long Summary</h3>
         <div class="summary-container">
-            <p class="summary-text">This is a much longer summary that should definitely need a read more button. It contains multiple sentences and should be truncated after four lines. The text should continue beyond what is visible in the initial view, requiring users to click the read more button to see the complete content. This tests whether the truncation and expansion functionality works correctly.</p>
+            <p class="summary-text collapsed">This is a much longer summary that should definitely need a read more button. It contains multiple sentences and should be truncated after four lines. The text should continue beyond what is visible in the initial view, requiring users to click the read more button to see the complete content. This tests whether the truncation and expansion functionality works correctly.</p>
             <div style="text-align: center; margin-top: 0.5rem;">
                 <button class="read-more-btn" onclick="toggleSummary(this, event)">📖 Read More</button>
             </div>
@@ -84,7 +95,7 @@
     <div class="card">
         <h3>Very Long Summary</h3>
         <div class="summary-container">
-            <p class="summary-text">This is an extremely long summary that will definitely need a read more button. It contains many sentences and should be truncated after four lines. The text should continue well beyond what is visible in the initial view, requiring users to click the read more button to see the complete content. This tests whether the truncation and expansion functionality works correctly. The summary contains multiple paragraphs worth of content to ensure that the read more functionality is working properly. Users should be able to expand and collapse the text as needed.</p>
+            <p class="summary-text collapsed">This is an extremely long summary that will definitely need a read more button. It contains many sentences and should be truncated after four lines. The text should continue well beyond what is visible in the initial view, requiring users to click the read more button to see the complete content. This tests whether the truncation and expansion functionality works correctly. The summary contains multiple paragraphs worth of content to ensure that the read more functionality is working properly. Users should be able to expand and collapse the text as needed.</p>
             <div style="text-align: center; margin-top: 0.5rem;">
                 <button class="read-more-btn" onclick="toggleSummary(this, event)">📖 Read More</button>
             </div>
@@ -101,23 +112,18 @@
             const summaryText = summaryContainer.querySelector('.summary-text');
             
             // Check if currently expanded or collapsed
-            const isExpanded = summaryText.style.display === 'block' || 
-                              summaryText.style.webkitLineClamp === 'unset' ||
-                              summaryText.style.maxHeight === 'none';
+            const hasExpandedClass = summaryText.classList.contains('expanded');
+            const hasCollapsedClass = summaryText.classList.contains('collapsed');
             
-            if (isExpanded) {
+            if (hasExpandedClass) {
                 // Collapse the summary
-                summaryText.style.display = '-webkit-box';
-                summaryText.style.webkitLineClamp = '4';
-                summaryText.style.maxHeight = '6em';
-                summaryText.style.overflow = 'hidden';
+                summaryText.classList.remove('expanded');
+                summaryText.classList.add('collapsed');
                 button.innerHTML = '📖 Read More';
             } else {
                 // Expand the summary
-                summaryText.style.display = 'block';
-                summaryText.style.webkitLineClamp = 'unset';
-                summaryText.style.maxHeight = 'none';
-                summaryText.style.overflow = 'visible';
+                summaryText.classList.remove('collapsed');
+                summaryText.classList.add('expanded');
                 button.innerHTML = '📖 Read Less';
             }
         }
