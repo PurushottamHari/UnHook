@@ -107,10 +107,11 @@
                         {% endif %}
                     </div>
                     
-                    <div style="margin-bottom: 1rem;">
-                        <p style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                            {{ article.summary }}
-                        </p>
+                    <div class="summary-container" style="margin-bottom: 1rem;">
+                        <p class="summary-text" style="margin: 0; color: #6c757d; font-size: 0.9rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-height: 4.5em; margin-bottom: 0.5rem;">{{ article.summary }}</p>
+                        <div style="text-align: center; margin-top: 0.5rem;">
+                            <button class="read-more-btn" onclick="toggleSummary(this, event)" style="background: rgba(102, 126, 234, 0.2); border: 2px solid #667eea; color: #667eea; cursor: pointer; font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.3s ease; font-weight: 600; display: block; margin: 0 auto; box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);">📖 Read More</button>
+                        </div>
                     </div>
                     
                     <div class="card-meta">
@@ -258,6 +259,84 @@ function updateButtonStates() {
 // Initialize button states when page loads
 document.addEventListener('DOMContentLoaded', function() {
     updateButtonStates();
+    initializeSummaryButtons();
 });
+
+// Also try to initialize on window load in case DOMContentLoaded already fired
+window.addEventListener('load', function() {
+    console.log('Window loaded, looking for read more buttons...');
+    initializeSummaryButtons();
+});
+
+function initializeSummaryButtons() {
+    // Initialize summary functionality
+    console.log('DOM loaded, looking for read more buttons...');
+    const readMoreBtns = document.querySelectorAll('.read-more-btn');
+    console.log('Found', readMoreBtns.length, 'read more buttons');
+    
+    readMoreBtns.forEach((btn, index) => {
+        console.log('Button', index, ':', btn.textContent);
+        
+        // Remove any existing event listeners
+        btn.removeEventListener('click', handleButtonClick);
+        
+        // Add new event listener
+        btn.addEventListener('click', handleButtonClick);
+        
+        // Also add onclick as backup
+        btn.onclick = function(event) {
+            console.log('onclick triggered for button', index);
+            handleButtonClick.call(this, event);
+        };
+    });
+}
+
+function handleButtonClick(event) {
+    console.log('Button clicked:', this.textContent);
+    toggleSummary(this, event);
+}
+
+// Toggle summary text expansion
+function toggleSummary(button, event) {
+    console.log('toggleSummary called');
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const summaryContainer = button.closest('.summary-container');
+    const summaryText = summaryContainer.querySelector('.summary-text');
+    
+    console.log('Summary text element:', summaryText);
+    console.log('Current display:', summaryText.style.display);
+    console.log('Current webkitLineClamp:', summaryText.style.webkitLineClamp);
+    
+    // Check if currently expanded or collapsed
+    const isExpanded = summaryText.style.display === 'block' || 
+                      summaryText.style.webkitLineClamp === 'unset' ||
+                      summaryText.style.maxHeight === 'none' ||
+                      summaryText.style.webkitLineClamp === '';
+    
+    console.log('Is expanded:', isExpanded);
+    
+    if (isExpanded) {
+        // Collapse the summary
+        console.log('Collapsing summary');
+        summaryText.style.display = '-webkit-box';
+        summaryText.style.webkitLineClamp = '3';
+        summaryText.style.maxHeight = '4.5em';
+        summaryText.style.overflow = 'hidden';
+        button.innerHTML = '📖 Read More';
+    } else {
+        // Expand the summary
+        console.log('Expanding summary');
+        summaryText.style.display = 'block';
+        summaryText.style.webkitLineClamp = 'unset';
+        summaryText.style.maxHeight = 'none';
+        summaryText.style.overflow = 'visible';
+        button.innerHTML = '📖 Read Less';
+    }
+    
+    console.log('After toggle - display:', summaryText.style.display);
+    console.log('After toggle - webkitLineClamp:', summaryText.style.webkitLineClamp);
+}
 </script>
 {% endblock %} 

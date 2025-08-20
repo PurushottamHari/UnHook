@@ -976,6 +976,12 @@ def articles():
     )
 
 
+@app.route("/test-summary")
+def test_summary():
+    """Test route for summary functionality."""
+    return render_template("test_summary.html")
+
+
 @app.route("/article/<article_id>")
 def article_detail(article_id):
     """Article detail page."""
