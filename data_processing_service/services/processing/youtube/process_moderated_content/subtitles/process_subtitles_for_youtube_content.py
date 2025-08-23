@@ -3,6 +3,7 @@ Service for processing subtitles for YouTube content.
 """
 
 import logging
+from typing import Optional
 
 from data_collector_service.collectors.youtube.models import \
     YouTubeVideoDetails
@@ -14,6 +15,8 @@ from data_processing_service.repositories.ephemeral.local.youtube_content_epheme
     LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
     YoutubeContentEphemeralRepository
+from data_processing_service.service_context import \
+    DataProcessingServiceContext
 from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
     SubtitleUtils
 
@@ -21,8 +24,13 @@ from data_processing_service.services.processing.youtube.process_moderated_conte
 class ProcessSubtitlesForYoutubeContent:
     """Service for processing subtitles for YouTube content."""
 
-    def __init__(self):
-        """Initialize the subtitle processor."""
+    def __init__(self, service_context: Optional[DataProcessingServiceContext] = None):
+        """
+        Initialize the subtitle processor.
+
+        Args:
+            service_context: Optional service context containing metrics processor
+        """
         self.logger = logging.getLogger(__name__)
         self.youtube_content_ephemeral_repository: YoutubeContentEphemeralRepository = (
             LocalYoutubeContentEphemeralRepository()
@@ -30,6 +38,10 @@ class ProcessSubtitlesForYoutubeContent:
         self.SUBTITLE_PRIORITY_LIST = ["srt", "vtt", "json3"]
         self.subtitle_utils = SubtitleUtils()
         self.youtube_external_tool = YouTubeExternalTool()
+        self.service_context = service_context
+        self.metrics_processor = (
+            service_context.get_metrics_processor() if service_context else None
+        )
 
     def process_subtitles(self, content: UserCollectedContent) -> bool:
         """
@@ -44,6 +56,13 @@ class ProcessSubtitlesForYoutubeContent:
         try:
             # Check if the download is present in the ephemeral storage, else continue
             video_details = content.data.get(ContentType.YOUTUBE_VIDEO)
+
+            # Record video language if available
+            if self.metrics_processor and video_details.language:
+                self.metrics_processor.record_video_language(
+                    content.id, video_details.language
+                )
+
             if self._is_subtitle_stored(video_details):
                 self.logger.info(
                     f"Subtitles already downloaded for content ID: {content.id}"
@@ -51,7 +70,7 @@ class ProcessSubtitlesForYoutubeContent:
             else:
                 # Download the subtitles
                 print(f"Downloading subtitles for content ID: {content.id}")
-                if not self._download_and_store_subtitles(video_details):
+                if not self._download_and_store_subtitles(content.id, video_details):
                     self.logger.warning(
                         f"Failed to download subtitles for content ID: {content.id}"
                     )
@@ -70,6 +89,10 @@ class ProcessSubtitlesForYoutubeContent:
                         f"Failed to clean and store subtitles for content ID: {content.id}"
                     )
                     return False
+
+            # Record language match result if we have both video language and downloaded languages
+            if self.metrics_processor and video_details.language:
+                self._record_language_match_result(content.id, video_details.language)
 
             return True
 
@@ -95,11 +118,14 @@ class ProcessSubtitlesForYoutubeContent:
             )
         )
 
-    def _download_and_store_subtitles(self, content: YouTubeVideoDetails) -> bool:
+    def _download_and_store_subtitles(
+        self, content_id: str, content: YouTubeVideoDetails
+    ) -> bool:
         """
         Download subtitles for the given content.
 
         Args:
+            content_id: ID of the content being processed
             content: The YouTube content to download subtitles for
 
         Returns:
@@ -136,9 +162,30 @@ class ProcessSubtitlesForYoutubeContent:
                                     language=lang,
                                 )
                                 found_automatic_subtitle = True
+
+                                # Record successful download attempt
+                                if self.metrics_processor:
+                                    self.metrics_processor.record_subtitle_download_attempt(
+                                        content_id, lang, "automatic", ext, success=True
+                                    )
+                                    self.metrics_processor.record_subtitle_language_downloaded(
+                                        content_id, lang, "automatic"
+                                    )
                                 break
                             except Exception as e:
                                 self.logger.error(f"Downloading subtitles failed: {e}")
+                                # Record failed download attempt
+                                if self.metrics_processor:
+                                    self.metrics_processor.record_subtitle_download_attempt(
+                                        content_id,
+                                        lang,
+                                        "automatic",
+                                        ext,
+                                        success=False,
+                                    )
+                                    self.metrics_processor.record_subtitle_language_failed(
+                                        content_id, lang
+                                    )
                                 continue
 
         found_manual_subtitle = False
@@ -166,9 +213,26 @@ class ProcessSubtitlesForYoutubeContent:
                                     language=lang,
                                 )
                                 found_manual_subtitle = True
+
+                                # Record successful download attempt
+                                if self.metrics_processor:
+                                    self.metrics_processor.record_subtitle_download_attempt(
+                                        content_id, lang, "manual", ext, success=True
+                                    )
+                                    self.metrics_processor.record_subtitle_language_downloaded(
+                                        content_id, lang, "manual"
+                                    )
                                 break
                             except Exception as e:
                                 self.logger.error(f"Downloading subtitles failed: {e}")
+                                # Record failed download attempt
+                                if self.metrics_processor:
+                                    self.metrics_processor.record_subtitle_download_attempt(
+                                        content_id, lang, "manual", ext, success=False
+                                    )
+                                    self.metrics_processor.record_subtitle_language_failed(
+                                        content_id, lang
+                                    )
                                 continue
 
         return found_automatic_subtitle or found_manual_subtitle
@@ -235,3 +299,38 @@ class ProcessSubtitlesForYoutubeContent:
                 f"Could not find any subtitles to clean for video {content.video_id}"
             )
         return generated_clean_subtitles
+
+    def _record_language_match_result(
+        self, content_id: str, video_language: str
+    ) -> None:
+        """
+        Record whether the downloaded subtitle language matches the video language.
+
+        Args:
+            content_id: ID of the content
+            video_language: Language of the video
+        """
+        if not self.metrics_processor:
+            return
+
+        # Get downloaded languages for this content
+        downloaded_languages = self.metrics_processor.get_languages_downloaded().get(
+            content_id, []
+        )
+
+        if not downloaded_languages:
+            # No languages downloaded, can't determine match
+            return
+
+        # Check if any of the downloaded languages match the video language
+        # Normalize language codes for comparison (e.g., 'en-US' should match 'en')
+        video_lang_normalized = (
+            video_language.split("-")[0].lower() if video_language else ""
+        )
+        downloaded_langs_normalized = [
+            lang.split("-")[0].lower() for lang in downloaded_languages
+        ]
+
+        matches = video_lang_normalized in downloaded_langs_normalized
+
+        self.metrics_processor.record_language_match_result(content_id, matches)

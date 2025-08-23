@@ -30,14 +30,18 @@ class ProcessModeratedYoutubeContentService:
             user_content_repository: Repository for managing user content data
         """
         self.user_content_repository = user_content_repository
-        self.subtitle_processor = ProcessSubtitlesForYoutubeContent()
-        self.logger = logging.getLogger(__name__)
 
         # Initialize service context and metrics processor
         self.service_context = DataProcessingServiceContext(
             ProcessModeratedContentMetricsProcessor
         )
         self.metrics_processor = self.service_context.get_metrics_processor()
+
+        # Initialize subtitle processor with service context
+        self.subtitle_processor = ProcessSubtitlesForYoutubeContent(
+            self.service_context
+        )
+        self.logger = logging.getLogger(__name__)
 
     def process(self, user: User) -> None:
         """
@@ -115,11 +119,7 @@ class ProcessModeratedYoutubeContentService:
             # Complete metrics collection
             if self.metrics_processor:
                 self.metrics_processor.complete(success=True)
-                print(
-                    f"✅ Process moderated content completed. Considered: {self.metrics_processor.get_total_considered()}, "
-                    f"Successfully processed: {self.metrics_processor.get_successfully_processed_count()}, "
-                    f"Failures: {self.metrics_processor.get_processing_failures_count()}"
-                )
+                self.metrics_processor.print_enhanced_metrics_summary()
 
         except Exception as e:
             # Complete metrics collection with error
