@@ -12,6 +12,7 @@ from .external.user_service.client import UserServiceClient
 from .repositories.mongodb.config.database import MongoDB
 from .repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
+from .service_context import DataCollectorServiceContext
 
 
 class DataCollectorService:
@@ -29,9 +30,14 @@ class DataCollectorService:
         MongoDB.connect_to_database()
         # Create MongoDB repository instance
         user_repository = MongoDBUserCollectedContentRepository()
-        # Pass the repository to the collectors
-        self.youtube_discover_collector = YouTubeDiscoverCollector(user_repository)
-        self.youtube_static_collector = YouTubeStaticCollector(user_repository)
+
+        self.service_context = DataCollectorServiceContext()
+        self.youtube_discover_collector = YouTubeDiscoverCollector(
+            user_repository, self.service_context
+        )
+        self.youtube_static_collector = YouTubeStaticCollector(
+            user_repository, self.service_context
+        )
 
     def _should_collect_discover(self, user: User) -> bool:
         """
@@ -53,21 +59,39 @@ class DataCollectorService:
         Args:
             user_id: The unique identifier of the user
         """
-        user = self.user_service_client.get_user(user_id)
-        if not user:
-            raise user_exception(user_id)
+        try:
+            user = self.user_service_client.get_user(user_id)
+            if not user:
+                raise user_exception(user_id)
 
-        # Only proceed if user.manual_configs.youtube exists
-        if getattr(user.manual_configs, "youtube", None):
-            # Check and perform discover collection if needed
-            if self._should_collect_discover(user):
-                self.youtube_discover_collector.collect(user)
+            # Only proceed if user.manual_configs.youtube exists
+            if getattr(user.manual_configs, "youtube", None):
+                # Check and perform discover collection if needed
+                if self._should_collect_discover(user):
+                    self.youtube_discover_collector.collect(user)
 
-            # Perform static collection if needed
-            self.youtube_static_collector.collect(user)
+                # Perform static collection if needed
+                self.youtube_static_collector.collect(user)
+
+            # Complete metrics collection
+            if self.service_context.get_metrics_processor():
+                self.service_context.get_metrics_processor().complete(success=True)
+                print(
+                    f"✅ Data collection completed. Total videos: {self.service_context.get_metrics_processor().get_total_videos()}"
+                )
+
+        except Exception as e:
+            # Complete metrics collection with error
+            if self.service_context.get_metrics_processor():
+                self.service_context.get_metrics_processor().complete(
+                    success=False, error_message=str(e)
+                )
+            raise
 
 
 if __name__ == "__main__":
+    print("🚀 Starting Data Collector Service...")
+
     user_service_client = UserServiceClient()
     data_collector_service = DataCollectorService(user_service_client)
     data_collector_service.collect_for_user(

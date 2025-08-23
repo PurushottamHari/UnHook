@@ -26,6 +26,9 @@ from newspaper_service.repositories.mongodb.newspaper_repository import \
     MongoDBNewspaperRepository
 from newspaper_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
+from newspaper_service.service_context import NewspaperServiceContext
+from newspaper_service.services.metrics_processor.newspaper_metrics_processor import \
+    NewspaperMetricsProcessor
 from user_service.models.enums import CategoryName, Weekday
 
 
@@ -43,6 +46,10 @@ class CreateNewspaperService:
         self.generated_content_repository = generated_content_repository
         self.logger = logging.getLogger(__name__)
         self.user_service_client = UserServiceClient()
+
+        # Initialize service context and metrics processor
+        self.service_context = NewspaperServiceContext(NewspaperMetricsProcessor)
+        self.metrics_processor = self.service_context.get_metrics_processor()
 
     async def create_newspaper_for_user(
         self, user_id: str, for_date: datetime
@@ -65,6 +72,10 @@ class CreateNewspaperService:
             # Step 2: Get candidates that need to be considered
             new_candidates = self._get_new_candidates(user_id, for_date, newspaper)
 
+            # Record total content considered
+            if self.metrics_processor:
+                self.metrics_processor.record_content_considered(len(new_candidates))
+
             if not new_candidates:
                 self.logger.info(
                     f"No new candidates to add to newspaper {newspaper.id}"
@@ -79,6 +90,11 @@ class CreateNewspaperService:
             # Step 4: Update newspaper with new candidates
             for item in considered_items:
                 newspaper.add_considered_content(item)
+                # Record content added to newspaper
+                if self.metrics_processor:
+                    self.metrics_processor.record_content_added_to_newspaper(
+                        item.user_collected_content_id
+                    )
 
             # Step 5: Upsert newspaper
             # Update user content statuses
@@ -94,12 +110,24 @@ class CreateNewspaperService:
                 newspaper, considered_items, updated_user_contents
             )
 
+            # Complete metrics collection
+            if self.metrics_processor:
+                self.metrics_processor.complete(success=True)
+                print(
+                    f"✅ Newspaper creation completed. Considered: {self.metrics_processor.get_total_considered()}, "
+                    f"Content added: {self.metrics_processor.get_content_added_to_newspaper_count()}, "
+                    f"Failures: {self.metrics_processor.get_newspaper_creation_failures_count()}"
+                )
+
             self.logger.info(
                 f"Successfully updated newspaper {newspaper.id} with {len(considered_items)} new items"
             )
             return newspaper
 
         except Exception as e:
+            # Complete metrics collection with error
+            if self.metrics_processor:
+                self.metrics_processor.complete(success=False, error_message=str(e))
             self.logger.error(
                 f"Error processing newspaper for user {user_id}: {str(e)}"
             )

@@ -1,6 +1,10 @@
 #!/bin/bash
 
-echo "🚀 Running UnHook Pipeline..."
+# Generate pipeline ID for metrics tracking
+PIPELINE_ID=$(uuidgen)
+export PIPELINE_ID
+
+echo "🚀 Running UnHook Pipeline (ID: $PIPELINE_ID)..."
 
 # Run data collector service
 echo "Starting Data Collector Service..."

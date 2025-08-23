@@ -21,15 +21,16 @@ from .ai_agent.models import ModerationOutput
 class RejectionContentServiceYoutube:
     """Service for handling YouTube content rejection."""
 
-    def __init__(self, moderator_agent: ContentModerator):
+    def __init__(self, moderator_agent: ContentModerator, service_context=None):
         """
         Initialize the service.
 
         Args:
-            user_service_client: Client for user service
-            user_content_repository: Repository for user content
+            moderator_agent: Content moderator agent
+            service_context: Service context for dependency injection
         """
         self.moderator_agent = moderator_agent
+        self.service_context = service_context
 
     async def reject(
         self, user: User, contents: List[UserCollectedContent]
@@ -92,6 +93,12 @@ class RejectionContentServiceYoutube:
                     moderation_output, contents
                 )
                 print(f"Rejected {len(moderation_output.rejected_items)} items")
+
+                # Record rejection metrics
+                self._record_rejection_metrics(
+                    channel_name, len(moderation_output.rejected_items)
+                )
+
                 for rejected_content, reason in rejected_content_with_reasons:
                     all_rejected_ids.add(rejected_content.id)
                     updated_rejected_content = copy.deepcopy(rejected_content)
@@ -117,6 +124,19 @@ class RejectionContentServiceYoutube:
                 )
                 final_moderated_content_list.append(updated_processed_content)
         return final_moderated_content_list
+
+    def _record_rejection_metrics(self, channel_name: str, rejected_count: int) -> None:
+        """
+        Record rejection metrics for a channel.
+
+        Args:
+            channel_name: Name of the channel
+            rejected_count: Number of items rejected
+        """
+        if self.service_context:
+            metrics_processor = self.service_context.get_rejection_metrics_processor()
+            if metrics_processor:
+                metrics_processor.record_content_rejected(channel_name, rejected_count)
 
 
 def get_content_by_video_id(

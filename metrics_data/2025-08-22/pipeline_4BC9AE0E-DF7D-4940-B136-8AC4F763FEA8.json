@@ -1,0 +1,65 @@
+{
+  "services": {
+    "data_collector_service": {
+      "service_name": "data_collector_service",
+      "pipeline_id": "4BC9AE0E-DF7D-4940-B136-8AC4F763FEA8",
+      "start_time": "2025-08-22T12:51:45.807479",
+      "end_time": "2025-08-22T12:52:16.719203",
+      "duration_seconds": 30.911724,
+      "success": true,
+      "error_message": null,
+      "data": {
+        "videos_by_channel": {
+          "StudyGlows": [
+            "YrmPyu4zx70"
+          ],
+          "JustinSung": [
+            "xumUjW99b_0"
+          ]
+        },
+        "total_videos": 2,
+        "channels_processed": [
+          "StudyIQEducationLtd",
+          "ThinkSchool",
+          "ranveerallahbadia",
+          "BBCHARDTALK",
+          "ThePrakharGuptaXperience",
+          "Career247Official",
+          "beerbiceps",
+          "mkbhd",
+          "mohak_mangal",
+          "NitishRajput",
+          "StudyGlows",
+          "kk.create.original",
+          "TiagoForte",
+          "TheDiaryOfACEO",
+          "JustinSung"
+        ],
+        "channels_with_videos": 2
+      }
+    },
+    "rejection_service": {
+      "service_name": "rejection_service",
+      "pipeline_id": "4BC9AE0E-DF7D-4940-B136-8AC4F763FEA8",
+      "start_time": "2025-08-22T12:52:18.677433",
+      "end_time": "2025-08-22T12:52:33.854505",
+      "duration_seconds": 15.177072,
+      "success": true,
+      "error_message": null,
+      "data": {
+        "total_considered": 13,
+        "total_rejected": 5,
+        "rejected_by_channel": {
+          "StudyGlows": 0,
+          "StudyIQEducationLtd": 5
+        },
+        "channels_processed": [
+          "unknown"
+        ],
+        "success_rate": 61.53846153846154
+      }
+    }
+  },
+  "pipeline_id": "4BC9AE0E-DF7D-4940-B136-8AC4F763FEA8",
+  "created_at": "2025-08-22T12:52:16.719697"
+}
