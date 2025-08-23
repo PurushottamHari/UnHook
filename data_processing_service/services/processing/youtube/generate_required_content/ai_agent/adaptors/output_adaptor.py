@@ -1,8 +1,9 @@
 from typing import Dict
 
 from data_processing_service.models.generated_content import GeneratedData
-from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.models.output import \
-    ContentDataOutput
+from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.models.output import (
+    ContentDataOutput,
+)
 from user_service.models import OutputType
 
 

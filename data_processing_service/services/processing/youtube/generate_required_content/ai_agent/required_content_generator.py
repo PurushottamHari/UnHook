@@ -1,8 +1,9 @@
 import json
 import os
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import \
-    YouTubeVideoDetails
+from data_collector_service.collectors.youtube.models.youtube_video_details import (
+    YouTubeVideoDetails,
+)
 from data_processing_service.ai import BaseAIClient, ModelConfig, ModelProvider
 from data_processing_service.models.generated_content import GeneratedData
 from data_processing_service.models.youtube.subtitle_data import SubtitleMap
