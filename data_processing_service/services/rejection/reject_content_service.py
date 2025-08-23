@@ -14,6 +14,7 @@ from ...repositories.mongodb.config.database import MongoDB
 from ...repositories.mongodb.user_content_repository import \
     MongoDBUserContentRepository
 from ...repositories.user_content_repository import UserContentRepository
+from .service_context import RejectionServiceContext
 from .youtube.rejection_content_service_youtube import \
     RejectionContentServiceYoutube
 
@@ -24,14 +25,12 @@ class RejectContentService:
     def __init__(
         self,
         user_service_client: UserServiceClient,
-        rejection_content_service_youtube: RejectionContentServiceYoutube,
     ):
         """
         Initialize the service.
 
         Args:
             user_service_client: Client for user service
-            user_content_repository: Repository for user content
         """
         self.user_service_client = user_service_client
         # Initialize MongoDB connection
@@ -40,7 +39,17 @@ class RejectContentService:
         self.user_content_repository = MongoDBUserContentRepository(
             MongoDB.get_database()
         )
-        self.rejection_content_service_youtube = rejection_content_service_youtube
+
+        # Initialize service-specific context (auto-initializes metrics processor)
+        self.service_context = RejectionServiceContext()
+
+        # Get the auto-initialized metrics processor
+        self.metrics_processor = self.service_context.get_rejection_metrics_processor()
+
+        # Initialize YouTube rejection service with service context
+        self.rejection_content_service_youtube = RejectionContentServiceYoutube(
+            moderator_agent=ContentModerator(), service_context=self.service_context
+        )
 
     async def reject(self, user_id: str) -> None:
         """
@@ -49,60 +58,91 @@ class RejectContentService:
         Args:
             user_id: The ID of the user
         """
-        # Get user object from user service
-        user = self.user_service_client.get_user(user_id)
+        try:
+            # Get user object from user service
+            user = self.user_service_client.get_user(user_id)
 
-        # Get unprocessed content for the user
-        unprocessed_content_list = (
-            self.user_content_repository.get_unprocessed_content_for_user(user_id)
-        )
-
-        # Collect unprocessed content in a map by content_type
-        content_map = {}
-        for unprocessed_content in unprocessed_content_list:
-            content_type = unprocessed_content.content_type
-            if content_type not in content_map:
-                content_map[content_type] = []
-            content_map[content_type].append(unprocessed_content)
-
-        # Process each content type
-        rejected_content = []
-        for content_type, contents in content_map.items():
-            if content_type == ContentType.YOUTUBE_VIDEO:
-                print(f"Found {len(contents)} elements to process for Youtube")
-                moderated_youtube_content = (
-                    await self.rejection_content_service_youtube.reject(
-                        user=user, contents=contents
-                    )
-                )
-                if len(moderated_youtube_content) != len(contents):
-                    raise ValueError(
-                        f"Mismatch in moderated content count: expected {len(contents)}, got {len(moderated_youtube_content)}"
-                    )
-                rejected_content.extend(moderated_youtube_content)
-            else:
-                for content in contents:
-                    print(
-                        "Unsupported Content type!: "
-                        + content.id
-                        + " - "
-                        + content_type
-                    )
-
-        if len(rejected_content) != 0:
-            self.user_content_repository.update_user_collected_content_batch(
-                rejected_content
+            # Get unprocessed content for the user
+            unprocessed_content_list = (
+                self.user_content_repository.get_unprocessed_content_for_user(user_id)
             )
+
+            # Record total content considered
+            if self.metrics_processor:
+                self.metrics_processor.record_content_considered(
+                    len(unprocessed_content_list)
+                )
+
+            # Collect unprocessed content in a map by content_type
+            content_map = {}
+            for unprocessed_content in unprocessed_content_list:
+                content_type = unprocessed_content.content_type
+                if content_type not in content_map:
+                    content_map[content_type] = []
+                content_map[content_type].append(unprocessed_content)
+
+            # Process each content type
+            rejected_content = []
+            for content_type, contents in content_map.items():
+                if content_type == ContentType.YOUTUBE_VIDEO:
+                    print(f"Found {len(contents)} elements to process for Youtube")
+
+                    # Record channel processing
+                    if self.metrics_processor:
+                        # Extract channel from first content item (assuming same channel for batch)
+                        if contents:
+                            channel_name = getattr(
+                                contents[0], "channel_name", "unknown"
+                            )
+                            self.metrics_processor.record_channel_processed(
+                                channel_name
+                            )
+
+                    moderated_youtube_content = (
+                        await self.rejection_content_service_youtube.reject(
+                            user=user, contents=contents
+                        )
+                    )
+                    if len(moderated_youtube_content) != len(contents):
+                        raise ValueError(
+                            f"Mismatch in moderated content count: expected {len(contents)}, got {len(moderated_youtube_content)}"
+                        )
+                    rejected_content.extend(moderated_youtube_content)
+                else:
+                    for content in contents:
+                        print(
+                            "Unsupported Content type!: "
+                            + content.id
+                            + " - "
+                            + content_type
+                        )
+
+            if len(rejected_content) != 0:
+                self.user_content_repository.update_user_collected_content_batch(
+                    rejected_content
+                )
+
+            # Complete metrics collection
+            if self.metrics_processor:
+                self.metrics_processor.calculate_success_rate()
+                self.metrics_processor.complete(success=True)
+                print(
+                    f"✅ Rejection completed. Considered: {self.metrics_processor.get_total_considered()}, Rejected: {self.metrics_processor.get_total_rejected()}"
+                )
+
+        except Exception as e:
+            # Complete metrics collection with error
+            if self.metrics_processor:
+                self.metrics_processor.complete(success=False, error_message=str(e))
+            raise
 
 
 if __name__ == "__main__":
+    print("🚀 Starting Rejection Service...")
+
     user_service_client = UserServiceClient()
-    moderator_agent = ContentModerator()
-    rejection_content_service_youtube = RejectionContentServiceYoutube(moderator_agent)
-    reject_content_service = RejectContentService(
-        user_service_client=user_service_client,
-        rejection_content_service_youtube=rejection_content_service_youtube,
-    )
+    reject_content_service = RejectContentService(user_service_client)
+
     # Call reject with a custom user_id
     custom_user_id = (
         "607d95f0-47ef-444c-89d2-d05f257d1265"  # Replace with your desired user_id

@@ -4,6 +4,7 @@ from user_service.models.user import User
 
 from ...repositories.user_collected_content_repository import \
     UserCollectedContentRepository
+from ...service_context import DataCollectorServiceContext
 from ..base_static import BaseStaticCollector
 from .adapters.youtube_to_user_content_adapter import \
     YouTubeToUserContentAdapter
@@ -15,16 +16,22 @@ logger = logging.getLogger(__name__)
 class YouTubeStaticCollector(BaseStaticCollector):
     """YouTube-specific implementation of static data collection."""
 
-    def __init__(self, user_repository: UserCollectedContentRepository):
+    def __init__(
+        self,
+        user_repository: UserCollectedContentRepository,
+        service_context: DataCollectorServiceContext,
+    ):
         """
         Initialize the YouTube static collector.
 
         Args:
             user_repository: Repository for managing user collected content
+            service_context: Data collector service context for dependency injection
         """
         self.youtube_tool = YouTubeExternalTool()
         self.user_repository = user_repository
         self.adapter = YouTubeToUserContentAdapter()
+        self.service_context = service_context
 
     def collect(self, user: User) -> None:
         """
@@ -66,6 +73,8 @@ class YouTubeStaticCollector(BaseStaticCollector):
             ]
             if not uncollected_videos:
                 logger.info(f"No uncollected videos found for channel {channel_name}")
+                # Record that channel was processed even if no videos found
+                self._record_channel_processed(channel_name)
                 continue
             # Enrich this data with more input such as release_date,tags etc
             enriched_uncollected_videos = (
@@ -79,3 +88,36 @@ class YouTubeStaticCollector(BaseStaticCollector):
                 enriched_uncollected_videos, user_id
             )
             self.user_repository.add_collected_videos(user_collected_content, user_id)
+
+            # Record metrics for collected videos
+            self._record_collection_metrics(channel_name, user_collected_content)
+
+            # Record that channel was processed
+            self._record_channel_processed(channel_name)
+
+    def _record_collection_metrics(
+        self, channel_name: str, user_collected_content: list
+    ) -> None:
+        """Record metrics for collected videos."""
+        metrics_processor = self.service_context.get_data_collector_metrics_processor()
+        if metrics_processor:
+            try:
+                for content in user_collected_content:
+                    # Extract video ID from the content
+                    video_id = (
+                        content.external_id
+                        if hasattr(content, "external_id")
+                        else str(content.id)
+                    )
+                    metrics_processor.record_video_collected(channel_name, video_id)
+            except Exception as e:
+                logger.warning(f"Failed to record collection metrics: {e}")
+
+    def _record_channel_processed(self, channel_name: str) -> None:
+        """Record that a channel was processed."""
+        metrics_processor = self.service_context.get_data_collector_metrics_processor()
+        if metrics_processor:
+            try:
+                metrics_processor.record_channel_processed(channel_name)
+            except Exception as e:
+                logger.warning(f"Failed to record channel processed metrics: {e}")
