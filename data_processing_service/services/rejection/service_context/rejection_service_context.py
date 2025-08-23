@@ -7,7 +7,8 @@ from typing import Optional
 
 from commons.service_context import BaseServiceContext
 
-from ..metrics_processor.rejection_metrics_processor import RejectionMetricsProcessor
+from ..metrics_processor.rejection_metrics_processor import \
+    RejectionMetricsProcessor
 
 
 class RejectionServiceContext(BaseServiceContext):

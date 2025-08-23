@@ -8,48 +8,35 @@ import os
 import uuid
 from datetime import datetime
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
 from data_collector_service.models import ContentType
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-)
-from data_processing_service.external.user_service.client import UserServiceClient
+    ContentStatus, ContentSubStatus, ContentType)
+from data_processing_service.external.user_service.client import \
+    UserServiceClient
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-    StatusDetail,
-)
-from data_processing_service.models.youtube.subtitle_data import (
-    SubtitleData,
-    SubtitleMap,
-)
-from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import (
-    LocalYoutubeContentEphemeralRepository,
-)
-from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import (
-    YoutubeContentEphemeralRepository,
-)
-from data_processing_service.repositories.mongodb.config.database import MongoDB
-from data_processing_service.repositories.mongodb.user_content_repository import (
-    MongoDBUserContentRepository,
-)
-from data_processing_service.repositories.user_content_repository import (
-    UserContentRepository,
-)
-from data_processing_service.service_context import DataProcessingServiceContext
-from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import (
-    RequiredContentGenerator,
-)
-from data_processing_service.services.processing.youtube.generate_required_content.metrics_processor.generate_required_content_metrics_processor import (
-    GenerateRequiredContentMetricsProcessor,
-)
-from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import (
-    SubtitleUtils,
-)
+    GeneratedContent, GeneratedContentStatus, StatusDetail)
+from data_processing_service.models.youtube.subtitle_data import (SubtitleData,
+                                                                  SubtitleMap)
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
+from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.user_content_repository import \
+    MongoDBUserContentRepository
+from data_processing_service.repositories.user_content_repository import \
+    UserContentRepository
+from data_processing_service.service_context import \
+    DataProcessingServiceContext
+from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import \
+    RequiredContentGenerator
+from data_processing_service.services.processing.youtube.generate_required_content.metrics_processor.generate_required_content_metrics_processor import \
+    GenerateRequiredContentMetricsProcessor
+from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
+    SubtitleUtils
 from user_service.models import OutputType
 from user_service.models.user import User
 

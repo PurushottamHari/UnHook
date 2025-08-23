@@ -1,11 +1,7 @@
 from datetime import datetime
 
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-    GeneratedData,
-    StatusDetail,
-)
+    GeneratedContent, GeneratedContentStatus, GeneratedData, StatusDetail)
 from user_service.models.enums import OutputType
 
 

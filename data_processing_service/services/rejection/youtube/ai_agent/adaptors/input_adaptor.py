@@ -1,7 +1,8 @@
 import ast
 from typing import List
 
-from data_collector_service.collectors.youtube.models import YouTubeVideoDetails
+from data_collector_service.collectors.youtube.models import \
+    YouTubeVideoDetails
 from user_service.models.interests import NotInterested
 
 from ..models.content import ContentItem

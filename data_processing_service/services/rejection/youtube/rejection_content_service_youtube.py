@@ -6,15 +6,11 @@ import copy
 from datetime import datetime
 from typing import List, Tuple
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
 from data_collector_service.models.enums import ContentType
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    UserCollectedContent,
-)
+    ContentStatus, ContentSubStatus, UserCollectedContent)
 from user_service.models.user import User
 
 from .ai_agent import ContentModerator
