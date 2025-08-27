@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 from data_collector_service.collectors.youtube.models.youtube_video_details import \
@@ -154,6 +155,8 @@ class RequiredContentGenerator(BaseAIClient[ContentDataOutput]):
         self, subtitles: str, prompt_template: str, **prompt_kwargs
     ) -> tuple[str, int]:
         """Chunk subtitles by truncating from the end to fit within token limits."""
+        logger = logging.getLogger(__name__)
+
         # Create the complete prompt with full subtitles
         # Provide a default excess_character_count for initial formatting
         prompt_kwargs_with_default = prompt_kwargs.copy()
@@ -170,21 +173,97 @@ class RequiredContentGenerator(BaseAIClient[ContentDataOutput]):
             subtitles, complete_prompt
         )
 
+        logger.info(
+            f"Subtitle chunking: Original length={len(subtitles)}, Total tokens={total_tokens}, Max tokens={self.model_config.max_tokens}"
+        )
+
         # If already within limits, return full subtitles
         if total_tokens <= self.model_config.max_tokens:
+            logger.info(
+                "Subtitle chunking: No chunking needed, returning full subtitles"
+            )
             return subtitles, 0
 
         # Calculate how many tokens we need to reduce
         excess_tokens = total_tokens - self.model_config.max_tokens
 
-        # Calculate how many characters correspond to the tokens we need to remove
-        chars_to_remove = self.get_chars_for_tokens(excess_tokens)
+        # For Hindi text, use a more conservative character-to-token ratio
+        # Hindi text typically uses more tokens per character than English
+        language = prompt_kwargs.get("language", "en")
+        chars_per_token = self._get_chars_per_token_for_language(language)
+        chars_to_remove = excess_tokens * chars_per_token
 
-        # Truncate subtitles from the end
-        target_length = max(1, len(subtitles) - chars_to_remove)
+        logger.info(
+            f"Subtitle chunking: Language={language}, Chars per token={chars_per_token}, Excess tokens={excess_tokens}, Chars to remove={chars_to_remove}"
+        )
+
+        # Ensure we don't truncate too much - keep at least 1000 characters
+        min_chars = 1000
+        target_length = max(min_chars, len(subtitles) - chars_to_remove)
+
+        # If we still need to truncate more, use binary search to find the right length
+        if target_length < min_chars:
+            logger.warning(
+                f"Subtitle chunking: Initial target length {target_length} is below minimum {min_chars}, using binary search"
+            )
+            target_length = self._find_optimal_chunk_length(
+                subtitles, complete_prompt, min_chars
+            )
+
         chunked_subtitles = subtitles[:target_length]
 
         # Calculate excess character count
         excess_character_count = len(subtitles) - len(chunked_subtitles)
 
+        logger.info(
+            f"Subtitle chunking: Final chunk length={len(chunked_subtitles)}, Excess characters={excess_character_count}"
+        )
+
+        # Validate that we have meaningful content
+        if len(chunked_subtitles.strip()) < 100:
+            logger.error(
+                f"Subtitle chunking: Resulting chunk is too short ({len(chunked_subtitles)} chars). This indicates a chunking error."
+            )
+            # Fallback: return a reasonable portion of the beginning
+            fallback_length = min(5000, len(subtitles))
+            chunked_subtitles = subtitles[:fallback_length]
+            excess_character_count = len(subtitles) - len(chunked_subtitles)
+            logger.info(
+                f"Subtitle chunking: Using fallback chunk of {len(chunked_subtitles)} characters"
+            )
+
         return chunked_subtitles, excess_character_count
+
+    def _get_chars_per_token_for_language(self, language: str) -> float:
+        """Get the character-to-token ratio for different languages."""
+        # Hindi and other Indic scripts typically use more tokens per character
+        if language in ["hi", "bn", "te", "ta", "ml", "kn", "gu", "pa", "or"]:
+            return 2.0  # More conservative ratio for Indic scripts
+        else:
+            return 4.0  # Default ratio for other languages
+
+    def _find_optimal_chunk_length(
+        self, subtitles: str, complete_prompt: str, min_chars: int
+    ) -> int:
+        """Use binary search to find the optimal chunk length that fits within token limits."""
+        left, right = min_chars, len(subtitles)
+        optimal_length = min_chars
+
+        while left <= right:
+            mid = (left + right) // 2
+            test_chunk = subtitles[:mid]
+
+            # Calculate tokens for this chunk
+            total_tokens = self._calculate_total_tokens_for_content(
+                test_chunk, complete_prompt
+            )
+
+            if total_tokens <= self.model_config.max_tokens:
+                # This length works, try to find a longer one
+                optimal_length = mid
+                left = mid + 1
+            else:
+                # Too long, try shorter
+                right = mid - 1
+
+        return optimal_length
