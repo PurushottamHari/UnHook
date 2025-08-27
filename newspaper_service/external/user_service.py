@@ -6,8 +6,8 @@ import logging
 from typing import Dict, List, Optional
 
 import httpx
-from config import Config
 
+from newspaper_service.config.config import Config
 from user_service.models.user import User
 
 

@@ -29,6 +29,7 @@ RUN apt-get update \
         g++ \
         curl \
         uuid-runtime \
+        sed \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy all service directories
@@ -38,21 +39,20 @@ COPY newspaper_service/ ./newspaper_service/
 COPY user_service/ ./user_service/
 COPY commons/ ./commons/
 
+# Fix path references in pyproject.toml files for Docker container
+RUN sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' data_processing_service/pyproject.toml && \
+    sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' data_collector_service/pyproject.toml && \
+    sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' newspaper_service/pyproject.toml
+
 # Install Python dependencies for all services
 RUN pip install --upgrade pip \
     && pip install hatchling
 
-# Install user-service first (base dependency)
-RUN cd user_service && pip install -e .
-
-# Install data-collector-service
-RUN cd data_collector_service && pip install -e .
-
-# Install data-processing-service
-RUN cd data_processing_service && pip install -e .
-
-# Install newspaper-service
-RUN cd newspaper_service && pip install -e .
+# Install all services from project root to handle relative dependencies
+RUN pip install -e ./user_service
+RUN pip install -e ./data_collector_service
+RUN pip install -e ./data_processing_service
+RUN pip install -e ./newspaper_service
 
 # Copy the pipeline script
 COPY run_unhook_pipeline.sh ./run_unhook_pipeline.sh

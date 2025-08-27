@@ -5,8 +5,8 @@ Client for interacting with the user service.
 from typing import Optional
 
 import httpx
-from config import Config
 
+from data_processing_service.config.config import Config
 from user_service.models.user import User
 
 
