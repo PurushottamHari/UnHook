@@ -1,0 +1,50 @@
+name: UnHook Pipeline Daily Run
+
+on:
+  schedule:
+    # Run at 11:00 AM IST (5:30 AM UTC) and 4:30 PM IST (11:00 AM UTC)
+    - cron: '30 5,11 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      run: |
+        docker build -t unhook-pipeline .
+        
+    - name: Create .env file from secrets
+      run: |
+        cat > .env << EOF
+        MONGODB_URI=${{ secrets.MONGODB_URI }}
+        DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
+        LOG_LEVEL=${{ secrets.LOG_LEVEL }}
+        EOF
+        
+    - name: Run UnHook Pipeline
+      run: |
+        # Run the Docker container
+        docker run --env-file .env --name unhook-pipeline-run unhook-pipeline
+        
+    - name: Upload pipeline logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pipeline-logs-${{ github.run_id }}
+        path: |
+          pipeline-logs/
+        retention-days: 7
+        
+    - name: Cleanup Docker container
+      if: always()
+      run: |
+        docker rm -f unhook-pipeline-run || true
+        docker rmi unhook-pipeline || true

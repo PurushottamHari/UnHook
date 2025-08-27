@@ -25,7 +25,8 @@ dependencies = [
     "pytz>=2023.3",
     "curl-cffi",
     "black>=23.0.0",
-    "isort>=5.12.0"
+    "isort>=5.12.0",
+    "PyYAML>=6.0.0"  # Required for YAML configuration files
 ]
 
 [tool.black]

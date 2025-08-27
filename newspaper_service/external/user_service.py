@@ -7,14 +7,17 @@ from typing import Dict, List, Optional
 
 import httpx
 
+from newspaper_service.config.config import Config
 from user_service.models.user import User
 
 
 class UserServiceClient:
     """Client for communicating with the user service."""
 
-    def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+    def __init__(self, config: Optional[Config] = None):
+        if config is None:
+            config = Config()
+        self.base_url = config.user_service_url
         self.logger = logging.getLogger(__name__)
 
     def get_user(self, user_id: str) -> Optional[User]:

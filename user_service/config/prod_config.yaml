@@ -1,0 +1,5 @@
+service:
+  service_name: "user-service"
+  service_port: 443
+
+external:

@@ -2,14 +2,17 @@ from typing import Optional
 
 import httpx
 
+from data_collector_service.config.config import Config
 from user_service.models.user import User
 
 
 class UserServiceClient:
     """Client for interacting with the user service."""
 
-    def __init__(self):
-        self.base_url = "http://localhost:8000"
+    def __init__(self, config: Optional[Config] = None):
+        if config is None:
+            config = Config()
+        self.base_url = config.user_service_url
 
     def get_user(self, user_id: str) -> Optional[User]:
         """

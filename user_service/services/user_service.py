@@ -5,8 +5,8 @@ User service implementing business logic for user operations.
 from typing import Optional
 from uuid import UUID
 
-from ..models.user import User
-from ..repositories.user_repository import UserRepository
+from models.user import User
+from repositories.user_repository import UserRepository
 
 
 class UserService:
