@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Service for collecting data from various sources"
 requires-python = ">=3.10"
 dependencies = [
-    "yt-dlp>=2025.8.20",
+    "yt-dlp>=2025.8.22",
     "python-dateutil>=2.8.2",
     "pydantic>=2.0.0",
     "python-dotenv>=0.19.0",
