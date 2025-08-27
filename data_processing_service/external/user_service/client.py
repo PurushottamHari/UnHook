@@ -5,9 +5,9 @@ Client for interacting with the user service.
 from typing import Optional
 
 import httpx
+from config import Config
 
 from user_service.models.user import User
-from config import Config
 
 
 class UserServiceClient:

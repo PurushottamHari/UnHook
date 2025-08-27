@@ -2,9 +2,8 @@
 FastAPI application setup.
 """
 
-from fastapi import FastAPI
-
 from controllers.user_controller import router as user_router
+from fastapi import FastAPI
 from repositories.mongodb import MongoDB
 
 app = FastAPI(

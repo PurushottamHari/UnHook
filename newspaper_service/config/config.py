@@ -30,37 +30,41 @@ class Config:
     def _get_config_path(self, config_dir: Path) -> Path:
         """
         Get the appropriate config file path based on environment variable.
-        
+
         Args:
             config_dir: Directory containing config files
-            
+
         Returns:
             Path to the appropriate config file
-            
+
         Raises:
             ValueError: If environment is not 'local' or 'production'
         """
         environment = os.getenv("environment", "local").lower()
-        
+
         if environment == "local":
             return config_dir / "local_config.yaml"
         elif environment == "production":
             return config_dir / "prod_config.yaml"
         else:
-            raise ValueError(f"Invalid environment '{environment}'. Must be 'local' or 'production'")
+            raise ValueError(
+                f"Invalid environment '{environment}'. Must be 'local' or 'production'"
+            )
 
     def _load_config(self) -> dict:
         """Load configuration from YAML file."""
         if not self.config_path.exists():
             raise FileNotFoundError(f"Config file not found: {self.config_path}")
 
-        with open(self.config_path, 'r', encoding='utf-8') as file:
+        with open(self.config_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
 
     @property
     def service_name(self) -> str:
         """Get service name."""
-        return self._config_data.get("service", {}).get("service_name", "newspaper-service")
+        return self._config_data.get("service", {}).get(
+            "service_name", "newspaper-service"
+        )
 
     @property
     def service_port(self) -> int:
@@ -70,27 +74,44 @@ class Config:
     @property
     def user_service_base_url(self) -> str:
         """Get user service base URL."""
-        return self._config_data.get("external", {}).get("user_service", {}).get("base_url", "http://localhost")
+        return (
+            self._config_data.get("external", {})
+            .get("user_service", {})
+            .get("base_url", "http://localhost")
+        )
 
     @property
     def user_service_port(self) -> int:
         """Get user service port."""
-        return self._config_data.get("external", {}).get("user_service", {}).get("port", 8000)
+        return (
+            self._config_data.get("external", {})
+            .get("user_service", {})
+            .get("port", 8000)
+        )
 
     @property
     def user_service_url(self) -> str:
         """Get complete user service URL."""
+        # Don't append port for default HTTPS (443) or HTTP (80) ports
+        if (
+            self.user_service_base_url.startswith("https://")
+            and self.user_service_port == 443
+        ) or (
+            self.user_service_base_url.startswith("http://")
+            and self.user_service_port == 80
+        ):
+            return self.user_service_base_url
         return f"{self.user_service_base_url}:{self.user_service_port}"
 
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""
-        keys = key.split('.')
+        keys = key.split(".")
         value = self._config_data
-        
+
         for k in keys:
             if isinstance(value, dict) and k in value:
                 value = value[k]
             else:
                 return default
-        
+
         return value

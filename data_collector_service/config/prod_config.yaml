@@ -4,5 +4,5 @@ service:
 
 external:
   user_service:
-    base_url: "https://user-service.production.com"
+    base_url: "https://unhook-1aci.onrender.com"
     port: 443

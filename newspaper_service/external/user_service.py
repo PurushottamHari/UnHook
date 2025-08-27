@@ -6,9 +6,9 @@ import logging
 from typing import Dict, List, Optional
 
 import httpx
+from config import Config
 
 from user_service.models.user import User
-from config import Config
 
 
 class UserServiceClient:
