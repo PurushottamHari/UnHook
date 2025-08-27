@@ -6,9 +6,9 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from ..api.dependencies import get_user_service
-from ..models.user import User
-from ..services.user_service import UserService
+from api.dependencies import get_user_service
+from models.user import User
+from services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
 

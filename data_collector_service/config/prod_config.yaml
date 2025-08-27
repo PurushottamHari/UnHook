@@ -1,0 +1,8 @@
+service:
+  service_name: "data-collector-service"
+  service_port: 443
+
+external:
+  user_service:
+    base_url: "https://user-service.production.com"
+    port: 443

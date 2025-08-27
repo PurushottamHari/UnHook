@@ -1,0 +1,8 @@
+service:
+  service_name: "data-collector-service"
+  service_port: 8001
+
+external:
+  user_service:
+    base_url: "http://localhost"
+    port: 8000

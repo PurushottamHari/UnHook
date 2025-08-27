@@ -4,8 +4,8 @@ FastAPI application setup.
 
 from fastapi import FastAPI
 
-from ..controllers.user_controller import router as user_router
-from ..repositories.mongodb import MongoDB
+from controllers.user_controller import router as user_router
+from repositories.mongodb import MongoDB
 
 app = FastAPI(
     title="User Service API", description="API for managing user data", version="1.0.0"
@@ -13,6 +13,12 @@ app = FastAPI(
 
 # Include routers
 app.include_router(user_router)
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Docker."""
+    return {"status": "healthy", "service": "user-service"}
 
 
 @app.on_event("startup")

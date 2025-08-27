@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
 
-from ..models.user import User
+from models.user import User
 
 
 class UserRepository(ABC):

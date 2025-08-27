@@ -6,20 +6,19 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from user_service.models.enums import CategoryName, OutputType, Weekday
-from user_service.models.interests import Interest, NotInterested
-from user_service.models.manual_config import ManualConfig
-from user_service.models.user import User
-from user_service.models.youtube_config import (YoutubeChannelConfig,
-                                                YoutubeConfig)
+from models.enums import CategoryName, OutputType, Weekday
+from models.interests import Interest, NotInterested
+from models.manual_config import ManualConfig
+from models.user import User
+from models.youtube_config import YoutubeChannelConfig, YoutubeConfig
 
 from ..models.interests_db_model import InterestDBModel, NotInterestedDBModel
 from ..models.manual_config_db_model import ManualConfigDBModel
 from ..models.user_db_model import UserDBModel
-from ..models.youtube_config_db_model import \
-    YoutubeChannelConfig as YoutubeChannelConfigDBModel
-from ..models.youtube_config_db_model import \
-    YoutubeConfig as YoutubeConfigDBModel
+from ..models.youtube_config_db_model import (
+    YoutubeChannelConfig as YoutubeChannelConfigDBModel,
+)
+from ..models.youtube_config_db_model import YoutubeConfig as YoutubeConfigDBModel
 
 
 class UserAdapter:

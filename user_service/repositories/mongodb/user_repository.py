@@ -7,8 +7,9 @@ from uuid import UUID
 
 from pymongo.errors import DuplicateKeyError
 
-from ...models.user import User
-from ..user_repository import UserRepository
+from models.user import User
+from repositories.user_repository import UserRepository
+
 from .adapters.user_adapter import UserAdapter
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings

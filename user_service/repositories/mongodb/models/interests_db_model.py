@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from user_service.models.enums import CategoryName, OutputType, Weekday
+from models.enums import CategoryName, OutputType, Weekday
 
 
 class InterestDBModel(BaseModel):
