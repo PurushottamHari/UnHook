@@ -44,11 +44,12 @@ jobs:
       with:
         context: .
         push: false
-        tags: unhook-pipeline
+        tags: unhook-pipeline:latest
         cache-from: |
           type=gha,scope=unhook-docker-cache
         cache-to: |
           type=gha,mode=max,scope=unhook-docker-cache
+        load: true
         
     - name: Run UnHook Pipeline
       run: |
