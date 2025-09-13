@@ -1,19 +1,7 @@
 name: Test Subtitle Vendors
 
 on:
-  push:
-    branches: [ main, master, develop ]
-    paths:
-      - 'subtitle_vendor_test/**'
-      - '.github/workflows/test-subtitle-vendors.yml'
-  pull_request:
-    branches: [ main, master, develop ]
-    paths:
-      - 'subtitle_vendor_test/**'
-      - '.github/workflows/test-subtitle-vendors.yml'
-  workflow_dispatch:  # Allow manual triggering
-  schedule:
-    - cron: '0 6 * * 1'  # Run every Monday at 6 AM UTC
+  workflow_dispatch:  # Only manual triggering
 
 jobs:
   test-subtitle-vendors:
@@ -34,7 +22,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         
     - name: Cache pip dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('subtitle_vendor_test/requirements-subtitle-test.txt') }}
@@ -65,7 +53,7 @@ jobs:
         
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: subtitle-test-results-python-${{ matrix.python-version }}
         path: |
@@ -74,40 +62,6 @@ jobs:
           *.json
         retention-days: 7
         
-    - name: Comment on PR with results
-      if: github.event_name == 'pull_request' && always()
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const path = require('path');
-          
-          // Try to read any log files that might contain results
-          let results = 'Subtitle vendor tests completed. Check the workflow logs for detailed results.';
-          
-          try {
-            // Look for any output files
-            const files = fs.readdirSync('.');
-            const logFiles = files.filter(f => f.endsWith('.log') || f.endsWith('.txt'));
-            
-            if (logFiles.length > 0) {
-              results += '\n\nLog files generated: ' + logFiles.join(', ');
-            }
-          } catch (e) {
-            console.log('No log files found');
-          }
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `## 🧪 Subtitle Vendor Test Results (Python ${{ matrix.python-version }})
-            
-            ${results}
-            
-            **Workflow:** [View Details](${context.payload.repository.html_url}/actions/runs/${context.runId})
-            `
-          });
 
   test-subtitle-vendors-summary:
     runs-on: ubuntu-latest
@@ -119,13 +73,14 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       
     - name: Generate summary report
       run: |
         echo "# 🧪 Subtitle Vendor Test Summary" > test_summary.md
         echo "" >> test_summary.md
         echo "**Date:** $(date)" >> test_summary.md
+        echo "**Trigger:** Manual (workflow_dispatch)" >> test_summary.md
         echo "**Python Versions Tested:** 3.9, 3.10, 3.11, 3.12" >> test_summary.md
         echo "**Vendors Tested:**" >> test_summary.md
         echo "- yt-dlp" >> test_summary.md
@@ -157,7 +112,7 @@ jobs:
         cat test_summary.md
         
     - name: Upload summary report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: subtitle-test-summary
         path: test_summary.md

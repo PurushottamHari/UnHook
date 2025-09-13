@@ -37,11 +37,8 @@ python test_subtitle_vendors.py
 
 ### GitHub Actions
 
-The workflow automatically runs on:
-- Push to main/master/develop branches
-- Pull requests
-- Manual trigger (workflow_dispatch)
-- Weekly schedule (Mondays at 6 AM UTC)
+The workflow runs only when manually triggered via:
+- **Manual trigger (workflow_dispatch)** - Go to Actions tab and click "Run workflow"
 
 ## Test Results
 
