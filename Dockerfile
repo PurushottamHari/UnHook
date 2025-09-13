@@ -58,9 +58,23 @@ RUN pip install -e ./newspaper_service
 COPY run_unhook_pipeline.sh ./run_unhook_pipeline.sh
 RUN chmod +x ./run_unhook_pipeline.sh
 
+# Copy the cookies setup script
+COPY setup_cookies.sh ./setup_cookies.sh
+RUN chmod +x ./setup_cookies.sh
+
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+# Setup cookies first\n\
+./setup_cookies.sh\n\
+# Execute the original command\n\
+exec "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
+
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
+
+# Set entrypoint to handle cookies decompression
+ENTRYPOINT ["/entrypoint.sh"]
 USER app
 
 # Health check

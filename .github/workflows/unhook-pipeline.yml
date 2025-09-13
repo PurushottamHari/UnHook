@@ -25,14 +25,11 @@ jobs:
         LOG_LEVEL=${{ secrets.LOG_LEVEL }}
         EOF
 
-    - name: Create YouTube cookies file
+    - name: Verify YouTube cookies file exists
       run: |
         if [ -f "cookies/youtube_cookies_compressed.txt" ]; then
-          base64 -d cookies/youtube_cookies_compressed.txt | gunzip > youtube_cookies.txt
-          # Set proper permissions for the cookies file (readable by all users)
-          chmod 644 youtube_cookies.txt
+          echo "✅ YouTube cookies file found"
           echo "YOUTUBE_COOKIES=/app/youtube_cookies.txt" >> .env
-          echo "YouTube cookies file created and decompressed from cookies folder"
         else
           echo "❌ ERROR: No YouTube cookies file found!"
           echo "Please ensure cookies/youtube_cookies_compressed.txt exists in the repository."
@@ -53,8 +50,8 @@ jobs:
         
     - name: Run UnHook Pipeline
       run: |
-        # Run the Docker container with cookies file
-        docker run --env-file .env -v $(pwd)/youtube_cookies.txt:/app/youtube_cookies.txt --name unhook-pipeline-run unhook-pipeline
+        # Run the Docker container with compressed cookies file
+        docker run --env-file .env -v $(pwd)/cookies/youtube_cookies_compressed.txt:/app/youtube_cookies_compressed.txt --name unhook-pipeline-run unhook-pipeline
         
     - name: Upload pipeline logs
       if: always()
