@@ -285,21 +285,40 @@ class ProcessSubtitlesForYoutubeContent:
                             language=lan,
                         )
                         if subtitle_content:
-                            cleaned_subtitles = self.subtitle_utils.clean_subtitles(
-                                subtitle_content, ext
-                            )
-                            if cleaned_subtitles:
-                                self.youtube_content_ephemeral_repository.store_clean_subtitles(
-                                    video_id=content.video_id,
-                                    subtitles=cleaned_subtitles,
-                                    language=lan,
-                                    subtitle_type=subtitle_type,
-                                    extension=ext,
+                            try:
+                                cleaned_subtitles = self.subtitle_utils.clean_subtitles(
+                                    subtitle_content, ext
                                 )
-                                generated_clean_subtitles = True
-                                self.logger.info(
-                                    f"Successfully cleaned and stored {subtitle_type} subtitles with extension {ext} for video {content.video_id}"
+                                if cleaned_subtitles and cleaned_subtitles.strip():
+                                    # Validate that cleaned subtitles have proper structure
+                                    if (
+                                        len(cleaned_subtitles.splitlines()) > 0
+                                        or len(cleaned_subtitles.strip()) > 100
+                                    ):
+                                        self.youtube_content_ephemeral_repository.store_clean_subtitles(
+                                            video_id=content.video_id,
+                                            subtitles=cleaned_subtitles,
+                                            language=lan,
+                                            subtitle_type=subtitle_type,
+                                            extension=ext,
+                                        )
+                                        generated_clean_subtitles = True
+                                        self.logger.info(
+                                            f"Successfully cleaned and stored {subtitle_type} subtitles with extension {ext} for video {content.video_id}"
+                                        )
+                                    else:
+                                        self.logger.warning(
+                                            f"Cleaned subtitles too short or malformed for video {content.video_id}, language {lan}, type {subtitle_type}"
+                                        )
+                                else:
+                                    self.logger.warning(
+                                        f"Empty or whitespace-only cleaned subtitles for video {content.video_id}, language {lan}, type {subtitle_type}"
+                                    )
+                            except Exception as e:
+                                self.logger.error(
+                                    f"Error cleaning subtitles for video {content.video_id}, language {lan}, type {subtitle_type}: {str(e)}"
                                 )
+                                continue
 
         if not generated_clean_subtitles:
             self.logger.warning(

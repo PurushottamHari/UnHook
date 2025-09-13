@@ -32,6 +32,34 @@ class YtDlpClient:
             "noprint": True,
         }
 
+        # Add cookie configuration if available
+        self._add_cookie_config(self.metadata_opts)
+
+    def _add_cookie_config(self, opts: Dict):
+        """Add cookie configuration to yt-dlp options if cookies are available."""
+        # Check for cookie file path in environment variable
+        cookie_file = os.getenv("YOUTUBE_COOKIES")
+        if cookie_file and os.path.exists(cookie_file):
+            opts["cookiefile"] = cookie_file
+            logger.info(f"Using YouTube cookies from: {cookie_file}")
+        else:
+            logger.info(
+                "No YouTube cookies configured. Proceeding without authentication."
+            )
+            # Add additional options to help with bot detection
+            opts.update(
+                {
+                    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                    "http_headers": {
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-us,en;q=0.5",
+                        "Accept-Encoding": "gzip,deflate",
+                        "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+                        "DNT": "1",
+                    },
+                }
+            )
+
     def get_channel_videos(self, channel_name: str, max_videos: int) -> List:
         """
         Get the latest videos from a YouTube channel.
@@ -150,6 +178,9 @@ class YtDlpClient:
             "retries": 3,
             "limit_rate": "150K",
         }
+
+        # Add cookie configuration to subtitle options
+        self._add_cookie_config(subtitle_opts)
         max_retries = 3
         last_exception = None
         for attempt in range(1, max_retries + 1):

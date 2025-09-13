@@ -90,8 +90,16 @@ class SubtitleUtils:
             if line.strip() == "":
                 continue
             cleaned_lines.append(line.strip())
-        # Join with a space, or '\n' if you want to preserve some structure
-        return " ".join(cleaned_lines)
+
+        # Join with newlines to preserve structure and prevent single-line issues
+        # This maintains readability and prevents the "no line terminators" issue
+        result = "\n".join(cleaned_lines)
+
+        # Ensure we have at least some line breaks for proper formatting
+        if not result.strip():
+            return ""
+
+        return result
 
     def _clean_vtt(self, content: str) -> str:
         """Cleans VTT subtitle content."""

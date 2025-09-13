@@ -6,3 +6,4 @@ external:
   user_service:
     base_url: "https://unhook-1aci.onrender.com"
     port: 443
+    timeout: 120.0  # 2 minutes timeout

@@ -25,14 +25,28 @@ jobs:
         LOG_LEVEL=${{ secrets.LOG_LEVEL }}
         EOF
 
+    - name: Create YouTube cookies file
+      run: |
+        if [ -n "${{ secrets.YOUTUBE_COOKIES }}" ]; then
+          echo "${{ secrets.YOUTUBE_COOKIES }}" > youtube_cookies.txt
+          echo "YOUTUBE_COOKIES=/app/youtube_cookies.txt" >> .env
+          echo "YouTube cookies file created"
+        else
+          echo "❌ ERROR: No YouTube cookies provided!"
+          echo "YouTube's bot detection will likely block requests without authentication."
+          echo "Please add the YOUTUBE_COOKIES secret to your repository settings."
+          echo "See README.md for instructions on how to export and configure cookies."
+          exit 1
+        fi
+
     - name: Build Docker image
       run: |
         docker build -t unhook-pipeline .
         
     - name: Run UnHook Pipeline
       run: |
-        # Run the Docker container
-        docker run --env-file .env --name unhook-pipeline-run unhook-pipeline
+        # Run the Docker container with cookies file
+        docker run --env-file .env -v $(pwd)/youtube_cookies.txt:/app/youtube_cookies.txt --name unhook-pipeline-run unhook-pipeline
         
     - name: Upload pipeline logs
       if: always()

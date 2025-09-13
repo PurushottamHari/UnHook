@@ -41,6 +41,97 @@ Follow these steps to set up the development environment for this project:
 
 This will ensure all dependencies are installed and local packages are linked in editable mode for development.
 
+## YouTube Cookie Configuration for GitHub Actions
+
+YouTube has implemented strict bot detection that blocks GitHub Actions IP addresses. To avoid this issue, you need to configure YouTube cookies for authentication.
+
+### Option 1: Using the Cookie Export Script (Recommended)
+
+1. **Activate your virtual environment:**
+   ```bash
+   source venv/bin/activate
+   ```
+
+2. **Run the cookie export script:**
+   ```bash
+   python scripts/export_youtube_cookies.py chrome
+   ```
+
+3. **Follow the instructions** provided by the script to add cookies to GitHub Secrets
+
+### Option 2: Manual yt-dlp Export
+
+1. **Install yt-dlp locally:**
+   ```bash
+   pip install yt-dlp
+   ```
+
+2. **Export cookies from your browser:**
+   ```bash
+   # For Chrome/Chromium
+   yt-dlp --cookies-from-browser chrome --cookies youtube_cookies.txt
+   
+   # For Firefox
+   yt-dlp --cookies-from-browser firefox --cookies youtube_cookies.txt
+   
+   # For Safari (macOS)
+   yt-dlp --cookies-from-browser safari --cookies youtube_cookies.txt
+   ```
+
+3. **Add the cookies to GitHub Secrets:**
+   - Go to your GitHub repository
+   - Navigate to Settings → Secrets and variables → Actions
+   - Create a new repository secret named `YOUTUBE_COOKIES`
+   - Copy the contents of the `youtube_cookies.txt` file and paste it as the secret value
+
+4. **The workflow will automatically use the cookies** if the `YOUTUBE_COOKIES` secret is provided.
+
+### Testing Cookie Configuration
+
+To test if your cookies work:
+
+1. **Test the cookie export script:**
+   ```bash
+   source venv/bin/activate
+   python scripts/export_youtube_cookies.py chrome
+   ```
+
+2. **Test locally with cookies:**
+   ```bash
+   source venv/bin/activate
+   export YOUTUBE_COOKIES=./youtube_cookies.txt
+   python -c "from data_collector_service.collectors.youtube.tools.clients.yt_dlp_client import YtDlpClient; client = YtDlpClient(); print('Cookies loaded successfully')"
+   ```
+
+3. **Test with a YouTube video:**
+   ```bash
+   yt-dlp --cookies youtube_cookies.txt "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --skip-download --write-sub
+   ```
+
+4. **Test subtitle download:**
+   ```bash
+   python -c "
+   from data_collector_service.collectors.youtube.tools.clients.yt_dlp_client import YtDlpClient
+   client = YtDlpClient()
+   result = client.download_subtitles('dQw4w9WgXcQ', 'en', 'vtt', 'automatic')
+   print('Subtitle download successful' if result else 'Subtitle download failed')
+   "
+   ```
+
+5. **Run comprehensive test:**
+   ```bash
+   source venv/bin/activate
+   export YOUTUBE_COOKIES=./youtube_cookies.txt
+   python scripts/test_youtube_cookies.py dQw4w9WgXcQ
+   ```
+
+### Important Notes
+
+- **Cookie Expiration:** YouTube cookies typically expire after a few weeks. You'll need to refresh them periodically.
+- **Security:** Never commit cookie files to your repository. Always use GitHub Secrets.
+- **Multiple Accounts:** If you have multiple YouTube accounts, make sure to export cookies from the correct account.
+- **Legal Compliance:** Ensure you comply with YouTube's Terms of Service when using automated tools.
+
 ## Code Formatting
 
 This project uses **Black** and **isort** for automatic code formatting and import sorting. Configuration for both tools is included in each service's `pyproject.toml` file.

@@ -17,6 +17,7 @@ class UserServiceClient:
         if config is None:
             config = Config()
         self.base_url = config.user_service_url
+        self.timeout = config.user_service_timeout
 
     def get_user(self, user_id: str) -> Optional[User]:
         """
@@ -29,7 +30,7 @@ class UserServiceClient:
             Optional[User]: User object if found, None otherwise
         """
         try:
-            with httpx.Client() as client:
+            with httpx.Client(timeout=self.timeout) as client:
                 response = client.get(
                     f"{self.base_url}/users/{user_id}",
                     headers={"accept": "application/json"},
