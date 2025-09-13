@@ -5,3 +5,7 @@ venv/
 **/.vscode/
 **/.env
 metrics_data/
+/debug_subtitles*
+@debug_subtitles_**/
+/scripts/
+/youtube_cookies.txt

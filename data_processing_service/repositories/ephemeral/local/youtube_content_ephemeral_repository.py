@@ -87,9 +87,30 @@ class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         )
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                return f.read()
+                content = f.read()
+
+            # Validate file content
+            if not content or not content.strip():
+                raise RuntimeError(
+                    f"Empty or whitespace-only subtitle file at {file_path}"
+                )
+
+            # Check for malformed content (single line with no breaks)
+            if len(content.splitlines()) == 0 and len(content) > 1000:
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.warning(
+                    f"Potentially malformed subtitle file at {file_path}: single line with {len(content)} characters"
+                )
+
+            return content
         except FileNotFoundError:
             raise RuntimeError(f"File not found at {file_path}")
+        except UnicodeDecodeError as e:
+            raise RuntimeError(
+                f"Unicode decode error reading file at {file_path}: {str(e)}"
+            )
 
     def get_downloaded_subtitle_file_data(
         self, video_id: str, extension: str, subtitle_type: str, language: str

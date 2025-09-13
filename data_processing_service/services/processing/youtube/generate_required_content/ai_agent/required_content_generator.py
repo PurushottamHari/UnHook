@@ -157,6 +157,32 @@ class RequiredContentGenerator(BaseAIClient[ContentDataOutput]):
         """Chunk subtitles by truncating from the end to fit within token limits."""
         logger = logging.getLogger(__name__)
 
+        # Input validation to prevent slice errors
+        if not isinstance(subtitles, str):
+            logger.error(f"Invalid subtitle type: {type(subtitles)}, expected str")
+            raise TypeError(f"subtitle_string must be a string, got {type(subtitles)}")
+
+        if not subtitles or not subtitles.strip():
+            logger.error("Empty or whitespace-only subtitle string")
+            raise ValueError("subtitle_string cannot be empty or whitespace-only")
+
+        # Ensure target_length is an integer if provided
+        if "target_length" in prompt_kwargs:
+            target_length = prompt_kwargs["target_length"]
+            if not isinstance(target_length, int):
+                logger.error(
+                    f"Invalid target_length type: {type(target_length)}, expected int"
+                )
+                raise TypeError(
+                    f"target_length must be an integer, got {type(target_length)}"
+                )
+
+        # Log subtitle characteristics for debugging
+        logger.info(
+            f"Subtitle input validation: length={len(subtitles)}, type={type(subtitles)}, "
+            f"has_newlines={chr(10) in subtitles}, has_carriage_returns={chr(13) in subtitles}"
+        )
+
         # Create the complete prompt with full subtitles
         # Provide a default excess_character_count for initial formatting
         prompt_kwargs_with_default = prompt_kwargs.copy()

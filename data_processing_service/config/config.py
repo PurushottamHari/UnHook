@@ -103,6 +103,15 @@ class Config:
             return self.user_service_base_url
         return f"{self.user_service_base_url}:{self.user_service_port}"
 
+    @property
+    def user_service_timeout(self) -> float:
+        """Get user service timeout in seconds."""
+        return (
+            self._config_data.get("external", {})
+            .get("user_service", {})
+            .get("timeout", 120.0)  # Default 2 minutes
+        )
+
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""
         keys = key.split(".")

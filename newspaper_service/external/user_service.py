@@ -18,11 +18,12 @@ class UserServiceClient:
         if config is None:
             config = Config()
         self.base_url = config.user_service_url
+        self.timeout = config.user_service_timeout
         self.logger = logging.getLogger(__name__)
 
     def get_user(self, user_id: str) -> Optional[User]:
         try:
-            with httpx.Client() as client:
+            with httpx.Client(timeout=self.timeout) as client:
                 response = client.get(
                     f"{self.base_url}/users/{user_id}",
                     headers={"accept": "application/json"},
