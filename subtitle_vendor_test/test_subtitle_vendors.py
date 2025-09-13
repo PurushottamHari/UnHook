@@ -48,6 +48,7 @@ class SubtitleVendorTester:
     def test_yt_dlp(self, video_id: str) -> Dict[str, Any]:
         """Test yt-dlp subtitle downloading"""
         print(f"\n🔧 Testing yt-dlp for video: {video_id}")
+        print("  ⚠️  Note: yt-dlp may require cookies for authentication")
 
         if not YT_DLP_AVAILABLE:
             return {"success": False, "error": "yt-dlp not available", "attempts": 0}
@@ -88,32 +89,84 @@ class SubtitleVendorTester:
                             "attempts": attempt,
                         }
 
-                    print(f"  ✅ Success! Title: {result['video_title']}")
-                    print(
-                        f"  📊 Subtitles: {subtitle_count}, Auto-captions: {auto_caption_count}"
-                    )
+                        print(f"  ✅ Success! Title: {result['video_title']}")
+                        print(
+                            f"  📊 Subtitles: {subtitle_count}, Auto-captions: {auto_caption_count}"
+                        )
 
-                    # Print sample subtitle data for validation
-                    if subtitle_count > 0:
-                        print("  📝 Sample subtitle data:")
-                        for lang, subs in list(subtitles.items())[
-                            :1
-                        ]:  # First language only
-                            if subs:
-                                print(f"    Language: {lang}")
-                                print(
-                                    f"    Sample: {subs[0].get('ext', 'unknown')} format"
-                                )
-                    elif auto_caption_count > 0:
-                        print("  📝 Sample auto-caption data:")
-                        for lang, captions in list(automatic_captions.items())[
-                            :1
-                        ]:  # First language only
-                            if captions:
-                                print(f"    Language: {lang}")
-                                print(
-                                    f"    Sample: {captions[0].get('ext', 'unknown')} format"
-                                )
+                        # Print sample subtitle data for validation
+                        if subtitle_count > 0:
+                            print("  📝 Sample subtitle data:")
+                            for lang, subs in list(subtitles.items())[
+                                :1
+                            ]:  # First language only
+                                if subs:
+                                    print(f"    Language: {lang}")
+                                    print(
+                                        f"    Format: {subs[0].get('ext', 'unknown')}"
+                                    )
+                                    # Try to get actual subtitle content
+                                    if "url" in subs[0]:
+                                        print(
+                                            f"    URL available: {subs[0]['url'][:50]}..."
+                                        )
+                                        # Try to fetch and show sample content
+                                        try:
+                                            import requests
+
+                                            response = requests.get(
+                                                subs[0]["url"], timeout=10
+                                            )
+                                            if response.status_code == 200:
+                                                content = response.text
+                                                # Show first few lines of subtitle content
+                                                lines = content.split("\n")[:3]
+                                                print("    Sample content:")
+                                                for line in lines:
+                                                    if line.strip():
+                                                        print(f"      {line[:80]}...")
+                                                        break
+                                        except Exception as e:
+                                            print(
+                                                f"    Could not fetch content: {str(e)[:50]}..."
+                                            )
+                        elif auto_caption_count > 0:
+                            print("  📝 Sample auto-caption data:")
+                            for lang, captions in list(automatic_captions.items())[
+                                :1
+                            ]:  # First language only
+                                if captions:
+                                    print(f"    Language: {lang}")
+                                    print(
+                                        f"    Format: {captions[0].get('ext', 'unknown')}"
+                                    )
+                                    # Try to get actual caption content
+                                    if "url" in captions[0]:
+                                        print(
+                                            f"    URL available: {captions[0]['url'][:50]}..."
+                                        )
+                                        # Try to fetch and show sample content
+                                        try:
+                                            import requests
+
+                                            response = requests.get(
+                                                captions[0]["url"], timeout=10
+                                            )
+                                            if response.status_code == 200:
+                                                content = response.text
+                                                # Show first few lines of caption content
+                                                lines = content.split("\n")[:3]
+                                                print("    Sample content:")
+                                                for line in lines:
+                                                    if line.strip():
+                                                        print(f"      {line[:80]}...")
+                                                        break
+                                        except Exception as e:
+                                            print(
+                                                f"    Could not fetch content: {str(e)[:50]}..."
+                                            )
+                        else:
+                            print("  ⚠️  No subtitles or auto-captions found")
 
                         return result
                     else:
@@ -255,10 +308,49 @@ class SubtitleVendorTester:
                             # Show first few keys of the response
                             keys = list(data.keys())[:3]
                             print(f"    Response keys: {keys}")
+
+                            # Try to show actual subtitle content
+                            if "result" in data and data["result"]:
+                                result_data = data["result"]
+                                if (
+                                    isinstance(result_data, list)
+                                    and len(result_data) > 0
+                                ):
+                                    print("    Sample subtitle content:")
+                                    first_item = result_data[0]
+                                    if isinstance(first_item, dict):
+                                        # Check for EasySubAPI structure: result[0].data.frames[]
+                                        if (
+                                            "data" in first_item
+                                            and "frames" in first_item["data"]
+                                        ):
+                                            frames = first_item["data"]["frames"]
+                                            if frames and len(frames) > 0:
+                                                first_frame = frames[0]
+                                                if "message" in first_frame:
+                                                    print(
+                                                        f"      Text: {first_frame['message'][:100]}..."
+                                                    )
+                                                    print(
+                                                        f"      Time: {first_frame.get('from_time', 0)}s - {first_frame.get('to_time', 0)}s"
+                                                    )
+                                        elif "text" in first_item:
+                                            print(
+                                                f"      Text: {first_item['text'][:100]}..."
+                                            )
+                                    elif isinstance(first_item, str):
+                                        print(f"      Content: {first_item[:100]}...")
+                                elif (
+                                    isinstance(result_data, dict)
+                                    and "text" in result_data
+                                ):
+                                    print("    Sample subtitle content:")
+                                    print(f"      Text: {result_data['text'][:100]}...")
+
                             # Show a sample value if it's a string or simple type
                             for key in keys[:1]:
                                 value = data[key]
-                                if isinstance(value, str):
+                                if isinstance(value, str) and key != "result":
                                     print(f"    {key}: {value[:100]}...")
                                 elif isinstance(value, (int, float, bool)):
                                     print(f"    {key}: {value}")
