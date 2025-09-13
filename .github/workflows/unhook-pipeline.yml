@@ -27,15 +27,13 @@ jobs:
 
     - name: Create YouTube cookies file
       run: |
-        if [ -n "${{ secrets.YOUTUBE_COOKIES }}" ]; then
-          echo "${{ secrets.YOUTUBE_COOKIES }}" > youtube_cookies.txt
+        if [ -f "cookies/youtube_cookies_compressed.txt" ]; then
+          base64 -d cookies/youtube_cookies_compressed.txt | gunzip > youtube_cookies.txt
           echo "YOUTUBE_COOKIES=/app/youtube_cookies.txt" >> .env
-          echo "YouTube cookies file created"
+          echo "YouTube cookies file created and decompressed from cookies folder"
         else
-          echo "❌ ERROR: No YouTube cookies provided!"
-          echo "YouTube's bot detection will likely block requests without authentication."
-          echo "Please add the YOUTUBE_COOKIES secret to your repository settings."
-          echo "See README.md for instructions on how to export and configure cookies."
+          echo "❌ ERROR: No YouTube cookies file found!"
+          echo "Please ensure cookies/youtube_cookies_compressed.txt exists in the repository."
           exit 1
         fi
 

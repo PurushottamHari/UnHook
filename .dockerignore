@@ -78,3 +78,8 @@ docker-compose*
 # Temporary files
 *.tmp
 *.temp
+
+# Cookie files
+youtube_cookies.txt
+youtube_cookies_compressed.txt
+youtube_cookies_decompressed.txt
