@@ -29,6 +29,8 @@ jobs:
       run: |
         if [ -f "cookies/youtube_cookies_compressed.txt" ]; then
           base64 -d cookies/youtube_cookies_compressed.txt | gunzip > youtube_cookies.txt
+          # Set proper permissions for the cookies file (readable by all users)
+          chmod 644 youtube_cookies.txt
           echo "YOUTUBE_COOKIES=/app/youtube_cookies.txt" >> .env
           echo "YouTube cookies file created and decompressed from cookies folder"
         else
@@ -37,9 +39,16 @@ jobs:
           exit 1
         fi
 
-    - name: Build Docker image
-      run: |
-        docker build -t unhook-pipeline .
+    - name: Build Docker image with cache
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: unhook-pipeline
+        cache-from: |
+          type=gha,scope=unhook-docker-cache
+        cache-to: |
+          type=gha,mode=max,scope=unhook-docker-cache
         
     - name: Run UnHook Pipeline
       run: |
