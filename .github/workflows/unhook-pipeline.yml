@@ -36,6 +36,24 @@ jobs:
           exit 1
         fi
 
+    - name: Test YouTube cookies with yt-dlp
+      run: |
+        echo "🧪 Testing YouTube cookies in GitHub Actions environment..."
+        
+        # Decompress cookies for testing
+        base64 -d cookies/youtube_cookies_compressed.txt | gunzip > test_cookies.txt
+        chmod 644 test_cookies.txt
+        
+        # Install yt-dlp for testing
+        pip install yt-dlp
+        
+        # Run the comprehensive test script
+        python3 test_youtube_cookies_github.py
+        
+        # Clean up test files
+        rm -f test_cookies.txt
+        rm -rf subtitles/
+
     - name: Build Docker image with cache
       uses: docker/build-push-action@v5
       with:
