@@ -88,10 +88,33 @@ class SubtitleVendorTester:
                             "attempts": attempt,
                         }
 
-                        print(f"  ✅ Success! Title: {result['video_title']}")
-                        print(
-                            f"  📊 Subtitles: {subtitle_count}, Auto-captions: {auto_caption_count}"
-                        )
+                    print(f"  ✅ Success! Title: {result['video_title']}")
+                    print(
+                        f"  📊 Subtitles: {subtitle_count}, Auto-captions: {auto_caption_count}"
+                    )
+
+                    # Print sample subtitle data for validation
+                    if subtitle_count > 0:
+                        print("  📝 Sample subtitle data:")
+                        for lang, subs in list(subtitles.items())[
+                            :1
+                        ]:  # First language only
+                            if subs:
+                                print(f"    Language: {lang}")
+                                print(
+                                    f"    Sample: {subs[0].get('ext', 'unknown')} format"
+                                )
+                    elif auto_caption_count > 0:
+                        print("  📝 Sample auto-caption data:")
+                        for lang, captions in list(automatic_captions.items())[
+                            :1
+                        ]:  # First language only
+                            if captions:
+                                print(f"    Language: {lang}")
+                                print(
+                                    f"    Sample: {captions[0].get('ext', 'unknown')} format"
+                                )
+
                         return result
                     else:
                         print(f"  ❌ No video info returned")
@@ -166,6 +189,16 @@ class SubtitleVendorTester:
                         f"  ✅ Success! Language: {result['language']}, Generated: {result['is_generated']}"
                     )
                     print(f"  📊 Snippets: {result['snippet_count']}")
+
+                    # Print sample transcript data for validation
+                    if result.get("first_snippet"):
+                        snippet = result["first_snippet"]
+                        print("  📝 Sample transcript data:")
+                        print(f"    Text: {snippet['text'][:100]}...")
+                        print(
+                            f"    Start: {snippet['start']}s, Duration: {snippet['duration']}s"
+                        )
+
                     return result
                 else:
                     print(f"  ❌ No transcript data returned")
@@ -214,6 +247,24 @@ class SubtitleVendorTester:
                         "attempts": attempt,
                     }
                     print(f"  ✅ Success! Status: {response.status_code}")
+
+                    # Print sample API response for validation
+                    if data:
+                        print("  📝 Sample API response:")
+                        if isinstance(data, dict):
+                            # Show first few keys of the response
+                            keys = list(data.keys())[:3]
+                            print(f"    Response keys: {keys}")
+                            # Show a sample value if it's a string or simple type
+                            for key in keys[:1]:
+                                value = data[key]
+                                if isinstance(value, str):
+                                    print(f"    {key}: {value[:100]}...")
+                                elif isinstance(value, (int, float, bool)):
+                                    print(f"    {key}: {value}")
+                        else:
+                            print(f"    Response type: {type(data)}")
+
                     return result
                 else:
                     print(f"  ❌ HTTP {response.status_code}: {response.text[:200]}...")
