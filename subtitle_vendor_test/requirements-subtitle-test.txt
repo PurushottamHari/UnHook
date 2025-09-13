@@ -1,0 +1,4 @@
+# Requirements for subtitle vendor testing
+yt-dlp>=2023.12.30
+youtube-transcript-api>=1.2.0
+requests>=2.31.0
