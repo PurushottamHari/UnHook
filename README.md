@@ -78,13 +78,7 @@ YouTube has implemented strict bot detection that blocks GitHub Actions IP addre
    yt-dlp --cookies-from-browser safari --cookies youtube_cookies.txt
    ```
 
-3. **Add the cookies to GitHub Secrets:**
-   - Go to your GitHub repository
-   - Navigate to Settings → Secrets and variables → Actions
-   - Create a new repository secret named `YOUTUBE_COOKIES`
-   - Copy the contents of the `youtube_cookies.txt` file and paste it as the secret value
-
-4. **The workflow will automatically use the cookies** if the `YOUTUBE_COOKIES` secret is provided.
+3. **The workflow will automatically use the cookies** from the `cookies/` folder.
 
 ### Testing Cookie Configuration
 

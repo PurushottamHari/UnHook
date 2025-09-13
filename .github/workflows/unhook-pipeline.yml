@@ -25,28 +25,51 @@ jobs:
         LOG_LEVEL=${{ secrets.LOG_LEVEL }}
         EOF
 
-    - name: Create YouTube cookies file
+    - name: Verify YouTube cookies file exists
       run: |
-        if [ -n "${{ secrets.YOUTUBE_COOKIES }}" ]; then
-          echo "${{ secrets.YOUTUBE_COOKIES }}" > youtube_cookies.txt
+        if [ -f "cookies/youtube_cookies_compressed.txt" ]; then
+          echo "✅ YouTube cookies file found"
           echo "YOUTUBE_COOKIES=/app/youtube_cookies.txt" >> .env
-          echo "YouTube cookies file created"
         else
-          echo "❌ ERROR: No YouTube cookies provided!"
-          echo "YouTube's bot detection will likely block requests without authentication."
-          echo "Please add the YOUTUBE_COOKIES secret to your repository settings."
-          echo "See README.md for instructions on how to export and configure cookies."
+          echo "❌ ERROR: No YouTube cookies file found!"
+          echo "Please ensure cookies/youtube_cookies_compressed.txt exists in the repository."
           exit 1
         fi
 
-    - name: Build Docker image
+    - name: Test YouTube cookies with yt-dlp
       run: |
-        docker build -t unhook-pipeline .
+        echo "🧪 Testing YouTube cookies in GitHub Actions environment..."
+        
+        # Decompress cookies for testing
+        base64 -d cookies/youtube_cookies_compressed.txt | gunzip > test_cookies.txt
+        chmod 644 test_cookies.txt
+        
+        # Install yt-dlp for testing
+        pip install yt-dlp
+        
+        # Run the comprehensive test script
+        python3 test_youtube_cookies_github.py
+        
+        # Clean up test files
+        rm -f test_cookies.txt
+        rm -rf subtitles/
+
+    - name: Build Docker image with cache
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: unhook-pipeline:latest
+        cache-from: |
+          type=gha,scope=unhook-docker-cache
+        cache-to: |
+          type=gha,mode=max,scope=unhook-docker-cache
+        load: true
         
     - name: Run UnHook Pipeline
       run: |
-        # Run the Docker container with cookies file
-        docker run --env-file .env -v $(pwd)/youtube_cookies.txt:/app/youtube_cookies.txt --name unhook-pipeline-run unhook-pipeline
+        # Run the Docker container with compressed cookies file
+        docker run --env-file .env -v $(pwd)/cookies/youtube_cookies_compressed.txt:/app/youtube_cookies_compressed.txt --name unhook-pipeline-run unhook-pipeline
         
     - name: Upload pipeline logs
       if: always()

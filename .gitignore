@@ -9,3 +9,5 @@ metrics_data/
 @debug_subtitles_**/
 /scripts/
 /youtube_cookies.txt
+/youtube_cookies_compressed.txt
+/youtube_cookies_decompressed.txt
