@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Test script for yt-dlp with Zyte proxy support for YouTube subtitle downloading.
-Tests subtitle downloading for specific video IDs using proxy.
+Tests subtitle downloading for specific video IDs using yt-dlp configured with Zyte proxy.
+Uses yt-dlp's built-in proxy support with Zyte proxy configuration.
 """
 
 import json
@@ -77,17 +78,46 @@ class YtDlpProxyTester:
         self.test_videos = ["1GpGqwXExYE", "9uY6N2Bl0pU"]
         self.max_retries = 2
         self.results = {}
+        # Set up proxy environment variables
+        self._setup_proxy_environment()
+
+    def _setup_proxy_environment(self):
+        """Set up proxy environment variables like in command line"""
+        zyte_proxy_url = f"http://{self.zyte_api_key}:@api.zyte.com:8011"
+        os.environ["HTTP_PROXY"] = zyte_proxy_url
+        os.environ["HTTPS_PROXY"] = zyte_proxy_url
+        print(
+            f"🌐 Set proxy environment: {zyte_proxy_url.replace(self.zyte_api_key, 'API_KEY_HIDDEN')}"
+        )
 
     def test_proxy_connection(self) -> bool:
-        """Test if the Zyte proxy connection is working"""
-        print("🔍 Testing Zyte proxy connection...")
+        """Test if the Zyte proxy connection is working with yt-dlp"""
+        print("🔍 Testing Zyte proxy connection with yt-dlp...")
         try:
-            # Test with a simple URL
-            test_url = "https://httpbin.org/ip"
-            response_body = self.zyte_proxy.make_proxy_request(test_url)
-            print("✅ Proxy connection successful")
-            print(f"📄 Response length: {len(response_body)} bytes")
-            return True
+            test_opts = {
+                "quiet": True,
+                "no_warnings": True,
+                "nocheckcertificate": True,  # Correct yt-dlp option name for --no-check-certificate
+                "http_headers": {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                },
+            }
+
+            # Test with a simple YouTube video
+            test_url = (
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ"  # Rick Roll - short video
+            )
+
+            with yt_dlp.YoutubeDL(test_opts) as ydl:
+                info = ydl.extract_info(test_url, download=False)
+                if info and info.get("title"):
+                    print("✅ Proxy connection successful with yt-dlp")
+                    print(f"📄 Test video title: {info.get('title', 'Unknown')}")
+                    return True
+                else:
+                    print("❌ Proxy connection failed - no video info returned")
+                    return False
+
         except Exception as e:
             print(f"❌ Proxy connection failed: {str(e)}")
             return False
@@ -107,21 +137,14 @@ class YtDlpProxyTester:
             try:
                 video_url = f"https://www.youtube.com/watch?v={video_id}"
 
-                # First, try to get video info using the proxy
-                print("  🌐 Fetching video info through Zyte proxy...")
-                try:
-                    video_info_response = self.zyte_proxy.make_proxy_request(video_url)
-                    print(
-                        f"  ✅ Got video page response ({len(video_info_response)} bytes)"
-                    )
-                except Exception as e:
-                    print(f"  ⚠️  Proxy request for video page failed: {str(e)}")
-                    # Continue with direct yt-dlp anyway
+                print(
+                    f"  🌐 Using Zyte proxy: {os.environ.get('HTTP_PROXY', '').replace(self.zyte_api_key, 'API_KEY_HIDDEN')}"
+                )
 
-                # Configure yt-dlp with proxy-like settings
                 subtitle_opts = {
                     "quiet": True,
                     "no_warnings": True,
+                    "nocheckcertificate": True,  # Correct yt-dlp option name for --no-check-certificate
                     "writesubtitles": True,
                     "writeautomaticsub": True,
                     "subtitleslangs": ["en"],
@@ -169,8 +192,9 @@ class YtDlpProxyTester:
 
                         # Try to download actual subtitle content using proxy
                         if subtitle_count > 0 or auto_caption_count > 0:
-                            self._download_subtitle_content(
-                                video_id, subtitles, automatic_captions
+                            proxy_url = os.environ.get("HTTP_PROXY", "")
+                            self._download_subtitle_content_with_ytdlp(
+                                video_id, subtitles, automatic_captions, proxy_url
                             )
 
                         return result
@@ -188,11 +212,67 @@ class YtDlpProxyTester:
             "attempts": self.max_retries,
         }
 
+    def _download_subtitle_content_with_ytdlp(
+        self, video_id: str, subtitles: dict, automatic_captions: dict, proxy_url: str
+    ):
+        """Download actual subtitle content using yt-dlp with proxy"""
+        print("  📥 Downloading subtitle content through yt-dlp with proxy...")
+
+        # Configure yt-dlp for downloading subtitles with proxy
+        download_opts = {
+            "quiet": True,
+            "no_warnings": True,
+            "nocheckcertificate": True,  # Correct yt-dlp option name for --no-check-certificate
+            "writesubtitles": True,
+            "writeautomaticsub": True,
+            "subtitleslangs": ["en"],
+            "subtitlesformat": "srt",
+            "skip_download": True,
+            "http_headers": {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            },
+        }
+
+        try:
+            video_url = f"https://www.youtube.com/watch?v={video_id}"
+
+            with yt_dlp.YoutubeDL(download_opts) as ydl:
+                # This will download subtitles to files
+                ydl.download([video_url])
+
+                # Look for downloaded subtitle files
+                import glob
+
+                subtitle_files = glob.glob(f"*{video_id}*.srt")
+
+                if subtitle_files:
+                    print(f"    ✅ Downloaded {len(subtitle_files)} subtitle files:")
+                    for file in subtitle_files:
+                        print(f"      📄 {file}")
+
+                        # Show sample content
+                        try:
+                            with open(file, "r", encoding="utf-8") as f:
+                                content = f.read()
+                                lines = content.split("\n")[:5]
+                                print("    📝 Sample content:")
+                                for line in lines:
+                                    if line.strip():
+                                        print(f"      {line[:80]}...")
+                                        break
+                        except Exception as e:
+                            print(f"    ⚠️  Could not read sample content: {e}")
+                else:
+                    print("    ⚠️  No subtitle files found after download")
+
+        except Exception as e:
+            print(f"    ❌ Failed to download subtitles with yt-dlp: {str(e)}")
+
     def _download_subtitle_content(
         self, video_id: str, subtitles: dict, automatic_captions: dict
     ):
-        """Download actual subtitle content using proxy"""
-        print("  📥 Downloading subtitle content through proxy...")
+        """Download actual subtitle content using custom proxy handler (legacy method)"""
+        print("  📥 Downloading subtitle content through custom proxy...")
 
         # Try manual subtitles first
         for lang, subs in subtitles.items():
@@ -340,9 +420,10 @@ class YtDlpProxyTester:
 def main():
     """Main function"""
     print("🚀 yt-dlp with Zyte Proxy Test Suite")
-    print("Testing subtitle downloading with proxy support")
+    print("Testing subtitle downloading with yt-dlp configured to use Zyte proxy")
     print("Videos: 1GpGqwXExYE, 9uY6N2Bl0pU")
     print("Retries: 2 per video")
+    print("Proxy: Zyte (api.zyte.com:8011)")
 
     # Get Zyte API key from environment variable or command line
     zyte_api_key = os.getenv("ZYTE_API_KEY")
