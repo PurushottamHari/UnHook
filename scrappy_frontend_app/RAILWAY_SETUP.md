@@ -20,6 +20,11 @@ In the Railway dashboard, you need to configure the following:
 - Set **Root Directory** to: `scrappy_frontend_app`
 - This tells Railway to treat the `scrappy_frontend_app` folder as the project root
 
+#### **Build Method**
+- Make sure Railway uses **Nixpacks** (not Docker)
+- The `railway.json` file will automatically configure this
+- If Railway tries to use Docker, you can force Nixpacks in the settings
+
 **Note**: The `railway.json` file in the `scrappy_frontend_app` directory will automatically configure the build and start commands for you. You don't need to manually set them.
 
 ### Step 3: Set Environment Variables
@@ -99,6 +104,8 @@ UnHook/
 ### If Build Fails:
 - Check that the root directory is set to `scrappy_frontend_app`
 - Verify that `requirements.txt` exists in the scrappy_frontend_app folder
+- **Make sure Railway is using Nixpacks, not Docker** (check the build logs)
+- If Railway is using Docker, go to Settings → Build and change to Nixpacks
 - Check Railway logs for specific error messages
 
 ### If Import Errors Occur:
