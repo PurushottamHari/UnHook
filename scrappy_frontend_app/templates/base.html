@@ -158,6 +158,8 @@
             margin-bottom: 0.75rem;
             font-size: 1.25rem;
             font-weight: 600;
+            min-height: 1.5em; /* Ensure minimum height */
+            visibility: visible !important; /* Force visibility */
         }
 
         .card p {
@@ -176,6 +178,8 @@
             color: #6c757d;
             line-height: 1.6;
             word-wrap: break-word;
+            min-height: 1.5em; /* Ensure minimum height */
+            visibility: visible !important; /* Force visibility */
         }
 
         .summary-text.collapsed {
@@ -185,6 +189,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-height: 6em;
+            min-height: 1.5em; /* Ensure minimum height */
+            color: #6c757d !important; /* Force text color */
+            visibility: visible !important; /* Force visibility */
         }
 
         .summary-text.expanded {
