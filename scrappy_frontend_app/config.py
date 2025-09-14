@@ -11,7 +11,7 @@ DEFAULT_CONFIG = {
     "DATABASE_NAME": os.getenv("DATABASE_NAME", "youtube_newspaper"),
     "FLASK_DEBUG": os.getenv("FLASK_DEBUG", "True").lower() in ("true", "1", "yes"),
     "FLASK_HOST": os.getenv("FLASK_HOST", "0.0.0.0"),
-    "FLASK_PORT": int(os.getenv("FLASK_PORT", "5001")),
+    "FLASK_PORT": int(os.getenv("PORT", os.getenv("FLASK_PORT", "5001"))),
 }
 
 

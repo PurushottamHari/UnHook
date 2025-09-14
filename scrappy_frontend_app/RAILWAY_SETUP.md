@@ -36,8 +36,9 @@ MONGODB_URI=mongodb+srv://purushottam:test12345@cluster0.xv0gfbm.mongodb.net/?re
 DATABASE_NAME=youtube_newspaper
 FLASK_DEBUG=False
 FLASK_HOST=0.0.0.0
-FLASK_PORT=5001
 ```
+
+**Note**: Railway automatically sets the `PORT` environment variable, so you don't need to set `FLASK_PORT`.
 
 ### Step 4: Deploy
 

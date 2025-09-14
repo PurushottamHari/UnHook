@@ -876,6 +876,15 @@ def update_user(user_id: str, user_data: dict) -> Optional[dict]:
     return None
 
 
+@app.route("/health")
+def health_check():
+    """Health check endpoint for Railway."""
+    return (
+        jsonify({"status": "healthy", "message": "UnHook Scrappy Frontend is running"}),
+        200,
+    )
+
+
 @app.route("/")
 def index():
     """Main page showing articles for a specific date."""
