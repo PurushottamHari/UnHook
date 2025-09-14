@@ -446,7 +446,7 @@ def fetch_articles_for_newspaper(newspaper_id: str) -> List[ArticleCard]:
     # Find articles with status ARTICLE_GENERATED that match the external_ids
     cursor = generated_content_collection.find(
         {
-            "status": GeneratedContentStatus.ARTICLE_GENERATED,
+            "status": GeneratedContentStatus.ARTICLE_GENERATED.value,
             "external_id": {"$in": external_ids},
         }
     )
@@ -531,7 +531,7 @@ def get_unique_categories() -> List[str]:
     collection = db.generated_content
 
     # Find articles with status ARTICLE_GENERATED
-    cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED})
+    cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED.value})
 
     categories = set()
     for doc in cursor:
@@ -624,7 +624,7 @@ def get_newspaper_categories_for_date(user_id: str, for_date: datetime) -> List[
     # Find articles with status ARTICLE_GENERATED that match the external_ids
     cursor = generated_content_collection.find(
         {
-            "status": GeneratedContentStatus.ARTICLE_GENERATED,
+            "status": GeneratedContentStatus.ARTICLE_GENERATED.value,
             "external_id": {"$in": list(all_external_ids)},
         }
     )
@@ -693,7 +693,7 @@ def fetch_articles(
     collection = db.generated_content
 
     # Find articles with status ARTICLE_GENERATED
-    cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED})
+    cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED.value})
 
     articles = []
     for doc in cursor:
