@@ -1146,11 +1146,11 @@ def api_articles():
     
     try:
         articles = fetch_articles(user_id, sort_by, category_filter, content_type_filter)
-        logger.info(f"Fetched {len(articles)} articles for user {user_id}")
+        app.logger.info(f"Fetched {len(articles)} articles for user {user_id}")
         if articles:
-            logger.info(f"First article title: '{articles[0].title}', summary length: {len(articles[0].summary)}")
+            app.logger.info(f"First article title: '{articles[0].title}', summary length: {len(articles[0].summary)}")
     except Exception as e:
-        logger.error(f"Error in fetch_articles: {e}")
+        app.logger.error(f"Error in fetch_articles: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
     # Convert to dict for JSON serialization
