@@ -225,7 +225,7 @@ class RequiredContentGenerator(BaseAIClient[ContentDataOutput]):
 
         # Ensure we don't truncate too much - keep at least 1000 characters
         min_chars = 1000
-        target_length = max(min_chars, len(subtitles) - chars_to_remove)
+        target_length = int(max(min_chars, len(subtitles) - chars_to_remove))
 
         # If we still need to truncate more, use binary search to find the right length
         if target_length < min_chars:

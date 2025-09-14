@@ -544,5 +544,85 @@ def migrate_set_generated_content_to_failed():
     print("Database connection closed.")
 
 
+def migrate_update_sub_status_to_moderation_passed():
+    """
+    Migration script to update user_collected_content sub_status from SUBTITLES_STORED
+    to MODERATION_PASSED for specific document IDs.
+    """
+    print(
+        "Starting migration to update sub_status from SUBTITLES_STORED to MODERATION_PASSED..."
+    )
+
+    # Document IDs to update
+    doc_ids_to_update = [
+        "4a0f784a-e279-48e4-b5bd-40617d88e6fb",
+        "0fb67124-d614-4f23-9e5e-e06a0f5b8c22",
+        "9be415c5-3bca-4fd1-9d40-fa734cc55ad3",
+        "2152ebfb-444c-4996-b85a-2a6dd72fa80b",
+        "97849932-41ab-45b7-849a-9eae4578b898",
+        "8aa8d0e8-ab29-4730-8168-c509f75d0835",
+        "e22c8b93-1214-4d4c-a53b-fcdd93128359",
+    ]
+
+    # Connect to data collector service MongoDB
+    CollectorMongoDB.connect_to_database()
+    collector_db = CollectorMongoDB.get_database()
+    collector_settings = get_mongodb_settings()
+    user_collected_content_collection = collector_db[collector_settings.COLLECTION_NAME]
+
+    print(f"Connected to {collector_settings.COLLECTION_NAME} collection.")
+
+    # Find all user_collected_content documents with the specified document IDs and SUBTITLES_STORED sub_status
+    user_collected_docs = list(
+        user_collected_content_collection.find(
+            {"_id": {"$in": doc_ids_to_update}, "sub_status": "SUBTITLES_STORED"}
+        )
+    )
+    print(
+        f"Found {len(user_collected_docs)} user_collected_content documents to update."
+    )
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+
+    for doc in user_collected_docs:
+        doc_id = doc["_id"]
+        user_id = doc.get("user_id")
+        external_id = doc.get("external_id")
+
+        # Create new sub_status detail for MODERATION_PASSED status
+        new_sub_status_detail = {
+            "sub_status": "MODERATION_PASSED",
+            "created_at": current_timestamp,
+            "reason": "Migration: Updated from SUBTITLES_STORED to MODERATION_PASSED",
+        }
+
+        # Update the document
+        update_result = user_collected_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$set": {
+                    "sub_status": "MODERATION_PASSED",
+                    "updated_at": current_timestamp,
+                },
+                "$push": {"sub_status_details": new_sub_status_detail},
+            },
+        )
+
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated user_collected_content document {doc_id} for user_id {user_id} (external_id: {external_id})"
+            )
+
+    print(
+        f"Migration complete. {updated_count} user_collected_content documents updated from SUBTITLES_STORED to MODERATION_PASSED."
+    )
+
+    # Close the connection
+    CollectorMongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
-    migrate_set_generated_content_to_failed()
+    migrate_update_sub_status_to_moderation_passed()

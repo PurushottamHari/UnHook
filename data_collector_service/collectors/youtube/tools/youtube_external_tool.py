@@ -15,7 +15,7 @@ class YouTubeExternalTool:
         self.yt_dlp_client = YtDlpClient()
 
     def find_latest_videos(
-        self, channel_name: str, max: int
+        self, channel_name: str, max: int, use_proxy: bool = True
     ) -> list[YouTubeVideoDetails]:
         """
         Find the latest videos from YouTube.
@@ -23,12 +23,13 @@ class YouTubeExternalTool:
         Args:
             channel_name: Name of the YouTube channel
             max: Maximum number of videos to retrieve
+            use_proxy: Whether to use proxy for downloading. Defaults to True.
 
         Returns:
             list: List of YouTubeVideoDetails objects
         """
         videos_data = self.yt_dlp_client.get_channel_videos(
-            channel_name=channel_name, max_videos=max
+            channel_name=channel_name, max_videos=max, use_proxy=use_proxy
         )
         filtered_videos_data = [v for v in videos_data if not v.get("live_status")]
         return YouTubeVideoAdapter.to_video_details_list(
@@ -36,12 +37,12 @@ class YouTubeExternalTool:
         )
 
     def enrich_video_data_with_details(
-        self, youtube_video_details: list[YouTubeVideoDetails]
+        self, youtube_video_details: list[YouTubeVideoDetails], use_proxy: bool = True
     ):
         enriched_video_list = []
         for youtube_video_detail in youtube_video_details:
             video_details_dict = self.yt_dlp_client.get_video_data(
-                video_id=youtube_video_detail.video_id
+                video_id=youtube_video_detail.video_id, use_proxy=use_proxy
             )
             if video_details_dict:
                 data = YouTubeVideoAdapter.enrich_video_detail(
@@ -53,8 +54,13 @@ class YouTubeExternalTool:
         return enriched_video_list
 
     def download_subtitles(
-        self, video_id: str, language: str, fmt: str, subtitle_type: str
+        self,
+        video_id: str,
+        language: str,
+        fmt: str,
+        subtitle_type: str,
+        use_proxy: bool = True,
     ) -> str:
         return self.yt_dlp_client.download_subtitles(
-            video_id, language, fmt, subtitle_type
+            video_id, language, fmt, subtitle_type, use_proxy
         )

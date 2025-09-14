@@ -112,6 +112,11 @@ class Config:
             .get("timeout", 120.0)  # Default 2 minutes
         )
 
+    @property
+    def proxy_base_url(self) -> str:
+        """Get proxy base URL."""
+        return self._config_data.get("proxy", {}).get("base_url", "api.zyte.com:8011")
+
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""
         keys = key.split(".")
