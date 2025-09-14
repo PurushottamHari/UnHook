@@ -460,12 +460,12 @@ def fetch_articles_for_newspaper(newspaper_id: str) -> List[ArticleCard]:
         generated = doc.get("generated", {})
 
         # Try to get title from VERY_SHORT
-        if OutputType.VERY_SHORT in generated:
-            title = generated[OutputType.VERY_SHORT].get("string", "")
+        if OutputType.VERY_SHORT.value in generated:
+            title = generated[OutputType.VERY_SHORT.value].get("string", "")
 
         # Get summary from SHORT
-        if OutputType.SHORT in generated:
-            summary = generated[OutputType.SHORT].get("string", "")
+        if OutputType.SHORT.value in generated:
+            summary = generated[OutputType.SHORT.value].get("string", "")
 
         # If no title from VERY_SHORT, try to extract from SHORT
         if not title and summary:
@@ -482,9 +482,9 @@ def fetch_articles_for_newspaper(newspaper_id: str) -> List[ArticleCard]:
 
         # Get content types available (MEDIUM, LONG)
         content_types = []
-        if OutputType.MEDIUM in generated:
+        if OutputType.MEDIUM.value in generated:
             content_types.append("MEDIUM")
-        if OutputType.LONG in generated:
+        if OutputType.LONG.value in generated:
             content_types.append("LONG")
 
         # Get content generated date (when the content was actually published/generated)
@@ -704,12 +704,12 @@ def fetch_articles(
         generated = doc.get("generated", {})
 
         # Try to get title from VERY_SHORT
-        if OutputType.VERY_SHORT in generated:
-            title = generated[OutputType.VERY_SHORT].get("string", "")
+        if OutputType.VERY_SHORT.value in generated:
+            title = generated[OutputType.VERY_SHORT.value].get("string", "")
 
         # Get summary from SHORT
-        if OutputType.SHORT in generated:
-            summary = generated[OutputType.SHORT].get("string", "")
+        if OutputType.SHORT.value in generated:
+            summary = generated[OutputType.SHORT.value].get("string", "")
 
         # If no title from VERY_SHORT, try to extract from SHORT
         if not title and summary:
@@ -726,9 +726,9 @@ def fetch_articles(
 
         # Get content types available (MEDIUM, LONG)
         content_types = []
-        if OutputType.MEDIUM in generated:
+        if OutputType.MEDIUM.value in generated:
             content_types.append("MEDIUM")
-        if OutputType.LONG in generated:
+        if OutputType.LONG.value in generated:
             content_types.append("LONG")
 
         # Get content generated date (when the content was actually published/generated)
@@ -794,21 +794,21 @@ def fetch_article_detail(article_id: str) -> Optional[ArticleDetail]:
     title = ""
     generated = doc.get("generated", {})
 
-    if OutputType.VERY_SHORT in generated:
-        title = generated[OutputType.VERY_SHORT].get("string", "")
+    if OutputType.VERY_SHORT.value in generated:
+        title = generated[OutputType.VERY_SHORT.value].get("string", "")
 
     # Get content - prefer LONG, then MEDIUM, then SHORT
     content = ""
-    if OutputType.LONG in generated:
-        content = generated[OutputType.LONG].get(
-            "markdown_string", generated[OutputType.LONG].get("string", "")
+    if OutputType.LONG.value in generated:
+        content = generated[OutputType.LONG.value].get(
+            "markdown_string", generated[OutputType.LONG.value].get("string", "")
         )
-    elif OutputType.MEDIUM in generated:
-        content = generated[OutputType.MEDIUM].get(
-            "markdown_string", generated[OutputType.MEDIUM].get("string", "")
+    elif OutputType.MEDIUM.value in generated:
+        content = generated[OutputType.MEDIUM.value].get(
+            "markdown_string", generated[OutputType.MEDIUM.value].get("string", "")
         )
-    elif OutputType.SHORT in generated:
-        content = generated[OutputType.SHORT].get("string", "")
+    elif OutputType.SHORT.value in generated:
+        content = generated[OutputType.SHORT.value].get("string", "")
 
     # Convert markdown to HTML
     if content:
@@ -1219,12 +1219,12 @@ def api_debug_extraction():
         generated = doc.get("generated", {})
         
         # Try to get title from VERY_SHORT
-        if OutputType.VERY_SHORT in generated:
-            title = generated[OutputType.VERY_SHORT].get("string", "")
+        if OutputType.VERY_SHORT.value in generated:
+            title = generated[OutputType.VERY_SHORT.value].get("string", "")
         
         # Get summary from SHORT
-        if OutputType.SHORT in generated:
-            summary = generated[OutputType.SHORT].get("string", "")
+        if OutputType.SHORT.value in generated:
+            summary = generated[OutputType.SHORT.value].get("string", "")
         
         return jsonify({
             "generated_keys": list(generated.keys()),
