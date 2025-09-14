@@ -96,13 +96,16 @@ class YtDlpClient:
 
         logger.info(f"Proxy configured for subtitle downloading using {proxy_base_url}")
 
-    def get_channel_videos(self, channel_name: str, max_videos: int) -> List:
+    def get_channel_videos(
+        self, channel_name: str, max_videos: int, use_proxy: bool = True
+    ) -> List:
         """
         Get the latest videos from a YouTube channel.
 
         Args:
             channel_name: The YouTube channel name
             max_videos: Maximum number of videos to retrieve
+            use_proxy: Whether to use proxy for downloading. Defaults to True.
 
         Returns:
             List[Dict]: List of video information
@@ -113,6 +116,10 @@ class YtDlpClient:
         # Create a copy of metadata_opts and update playlistend
         metadata_opts = self.metadata_opts.copy()
         metadata_opts["playlistend"] = max_videos
+
+        # Add proxy configuration if requested
+        if use_proxy:
+            self._setup_proxy_config(metadata_opts)
 
         try:
             with yt_dlp.YoutubeDL(metadata_opts) as ydl:
@@ -143,12 +150,13 @@ class YtDlpClient:
             )
             return []
 
-    def get_video_data(self, video_id: str) -> Optional[Dict]:
+    def get_video_data(self, video_id: str, use_proxy: bool = True) -> Optional[Dict]:
         """
         Get detailed information for a specific YouTube video by its video ID.
 
         Args:
             video_id: The YouTube video ID
+            use_proxy: Whether to use proxy for downloading. Defaults to True.
         Returns:
             Dict: Video information dictionary, or None if not found/error
         """
@@ -158,6 +166,10 @@ class YtDlpClient:
         # Use a copy of metadata_opts but ensure extract_flat is False for full video info
         video_opts = self.metadata_opts.copy()
         video_opts["extract_flat"] = False
+
+        # Add proxy configuration if requested
+        if use_proxy:
+            self._setup_proxy_config(video_opts)
 
         try:
             with yt_dlp.YoutubeDL(video_opts) as ydl:
@@ -231,7 +243,7 @@ class YtDlpClient:
         for attempt in range(1, max_retries + 1):
             try:
                 with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
-                    wait_time = random.uniform(8, 12)
+                    wait_time = random.uniform(4, 8)
                     print(f"Waiting {wait_time:.2f} seconds before download...")
                     time.sleep(wait_time)
                     ydl.download([video_url])
