@@ -22,7 +22,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r subtitle_vendor_test/requirements-subtitle-test.txt
         
-    - name: Run subtitle vendor tests
+    - name: Run yt-dlp proxy tests
       run: |
-        echo "🚀 Starting subtitle vendor tests..."
-        python subtitle_vendor_test/test_subtitle_vendors.py
+        echo "🚀 Starting yt-dlp proxy tests..."
+        python subtitle_vendor_test/test_ytdlp_proxy.py
+      env:
+        ZYTE_API_KEY: ${{ secrets.ZYTE_API_KEY }}
