@@ -1,0 +1,20 @@
+# Ignore Docker files to force Nixpacks usage
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Ignore local development files
+.env
+*.log
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ignore test files
+test_*.py
+*_test.py
