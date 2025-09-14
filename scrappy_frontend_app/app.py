@@ -1197,7 +1197,47 @@ def api_debug_raw_articles():
         return jsonify(raw_docs)
 
     except Exception as e:
-        logger.error(f"Error in api_debug_raw_articles: {e}")
+        app.logger.error(f"Error in api_debug_raw_articles: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@app.route("/api/debug-extraction")
+def api_debug_extraction():
+    """Debug endpoint to test data extraction logic."""
+    try:
+        db = get_database()
+        collection = db.generated_content
+        
+        # Get one document
+        doc = collection.find_one({"status": GeneratedContentStatus.ARTICLE_GENERATED.value})
+        if not doc:
+            return jsonify({"error": "No documents found"}), 404
+        
+        # Test the same logic as in fetch_articles
+        title = ""
+        summary = ""
+        generated = doc.get("generated", {})
+        
+        # Try to get title from VERY_SHORT
+        if OutputType.VERY_SHORT in generated:
+            title = generated[OutputType.VERY_SHORT].get("string", "")
+        
+        # Get summary from SHORT
+        if OutputType.SHORT in generated:
+            summary = generated[OutputType.SHORT].get("string", "")
+        
+        return jsonify({
+            "generated_keys": list(generated.keys()),
+            "very_short_enum": str(OutputType.VERY_SHORT),
+            "very_short_value": OutputType.VERY_SHORT.value,
+            "very_short_in_generated": OutputType.VERY_SHORT in generated,
+            "title": title,
+            "summary": summary[:100] + "..." if len(summary) > 100 else summary,
+            "summary_length": len(summary)
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error in api_debug_extraction: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 
