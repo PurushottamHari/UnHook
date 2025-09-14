@@ -7,9 +7,22 @@ import os
 import sys
 from pathlib import Path
 
-# Add the parent directory to Python path for imports
-parent_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(parent_dir))
+# Handle both local development and Railway deployment
+current_dir = Path(__file__).parent
+if current_dir.name == "scrappy_frontend_app":
+    # Running from scrappy_frontend_app directory (local development)
+    parent_dir = current_dir.parent
+    sys.path.insert(0, str(parent_dir))
+    os.chdir(current_dir)  # Change to scrappy_frontend_app directory
+else:
+    # Running from repository root (Railway deployment)
+    scrappy_dir = current_dir / "scrappy_frontend_app"
+    if scrappy_dir.exists():
+        sys.path.insert(0, str(current_dir))
+        os.chdir(scrappy_dir)  # Change to scrappy_frontend_app directory
+    else:
+        # Fallback: assume we're already in the right directory
+        pass
 
 # Import and run the Flask app
 from app import app
