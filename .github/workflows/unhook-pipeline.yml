@@ -38,6 +38,8 @@ jobs:
         fi
 
     - name: Test subtitle download in this environment
+      env:
+        ZYTE_API_KEY: ${{ secrets.ZYTE_API_KEY }}
       run: |
         echo "🧪 Testing Zyte proxy setup in GitHub Actions environment..."
         
