@@ -1168,6 +1168,31 @@ def api_articles():
     return jsonify(articles_data)
 
 
+@app.route("/api/debug-raw-articles")
+def api_debug_raw_articles():
+    """Debug endpoint to see raw database documents."""
+    user_id = request.args.get("user_id", "607d95f0-47ef-444c-89d2-d05f257d1265")
+    
+    try:
+        db = get_database()
+        collection = db.generated_content
+        
+        # Get raw documents
+        cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED.value}).limit(3)
+        
+        raw_docs = []
+        for doc in cursor:
+            # Convert ObjectId to string for JSON serialization
+            doc["_id"] = str(doc["_id"])
+            raw_docs.append(doc)
+        
+        return jsonify(raw_docs)
+
+    except Exception as e:
+        logger.error(f"Error in api_debug_raw_articles: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
 @app.route("/api/article/<article_id>")
 def api_article_detail(article_id):
     """API endpoint to get article details as JSON."""
