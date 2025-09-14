@@ -11,9 +11,50 @@ from pymongo import MongoClient
 # Add the parent directory to the path to import from the main project
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from data_processing_service.models.generated_content import \
-    GeneratedContentStatus
-from user_service.models.enums import CategoryName, OutputType, Weekday
+# Try to import from main project, fallback to local definitions
+try:
+    from data_processing_service.models.generated_content import \
+        GeneratedContentStatus
+    from user_service.models.enums import CategoryName, OutputType, Weekday
+except ImportError:
+    # Fallback definitions for deployment
+    from enum import Enum
+
+    class GeneratedContentStatus(Enum):
+        ARTICLE_GENERATED = "ARTICLE_GENERATED"
+
+    class CategoryName(Enum):
+        TECHNOLOGY = "TECHNOLOGY"
+        SCIENCE = "SCIENCE"
+        BUSINESS = "BUSINESS"
+        HEALTH = "HEALTH"
+        COMEDY = "COMEDY"
+        SPORTS = "SPORTS"
+        NEWS = "NEWS"
+        EDUCATION = "EDUCATION"
+        ENVIRONMENT = "ENVIRONMENT"
+        CULTURE = "CULTURE"
+        SPIRITUALITY = "SPIRITUALITY"
+        MOVIES = "MOVIES"
+        PERSPECTIVES = "PERSPECTIVES"
+        GAMING = "GAMING"
+        MUSIC = "MUSIC"
+
+    class OutputType(Enum):
+        VERY_SHORT = "VERY_SHORT"
+        SHORT = "SHORT"
+        MEDIUM = "MEDIUM"
+        LONG = "LONG"
+
+    class Weekday(Enum):
+        MONDAY = "MONDAY"
+        TUESDAY = "TUESDAY"
+        WEDNESDAY = "WEDNESDAY"
+        THURSDAY = "THURSDAY"
+        FRIDAY = "FRIDAY"
+        SATURDAY = "SATURDAY"
+        SUNDAY = "SUNDAY"
+
 
 app = Flask(__name__)
 
