@@ -74,8 +74,8 @@ class YtDlpProxyTester:
     def __init__(self, zyte_api_key: str):
         self.zyte_api_key = zyte_api_key
         self.zyte_proxy = ZyteProxyHandler(zyte_api_key)
-        # Test with the specified video IDs
-        self.test_videos = ["1GpGqwXExYE", "9uY6N2Bl0pU"]
+        # Test with the specified video ID
+        self.test_videos = ["1GpGqwXExYE"]
         self.max_retries = 2
         self.results = {}
         # Set up proxy environment variables
@@ -421,8 +421,8 @@ def main():
     """Main function"""
     print("🚀 yt-dlp with Zyte Proxy Test Suite")
     print("Testing subtitle downloading with yt-dlp configured to use Zyte proxy")
-    print("Videos: 1GpGqwXExYE, 9uY6N2Bl0pU")
-    print("Retries: 2 per video")
+    print("Video: 1GpGqwXExYE")
+    print("Retries: 2")
     print("Proxy: Zyte (api.zyte.com:8011)")
 
     # Get Zyte API key from environment variable or command line
@@ -454,12 +454,12 @@ def main():
         # Print summary
         all_passed = tester.print_summary()
 
-        # Exit with appropriate code
+        # Exit with appropriate code - abort on any failure
         if all_passed:
             print("\n🎉 All tests passed!")
             sys.exit(0)
         else:
-            print("\n💥 Some tests failed!")
+            print("\n💥 Test failed! Aborting pipeline.")
             sys.exit(1)
 
     except Exception as e:

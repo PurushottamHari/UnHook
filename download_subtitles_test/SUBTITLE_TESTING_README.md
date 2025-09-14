@@ -26,7 +26,7 @@ This directory contains tools to test YouTube subtitle downloading capabilities 
 
 ```bash
 # Navigate to the subtitle vendor test directory
-cd subtitle_vendor_test
+cd download_subtitles_test
 
 # Install dependencies
 pip install -r requirements-subtitle-test.txt

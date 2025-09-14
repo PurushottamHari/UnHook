@@ -23,6 +23,7 @@ jobs:
         MONGODB_URI=${{ secrets.MONGODB_URI }}
         DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
         LOG_LEVEL=${{ secrets.LOG_LEVEL }}
+        ZYTE_API_KEY=${{ secrets.ZYTE_API_KEY }}
         EOF
 
     - name: Verify YouTube cookies file exists
@@ -36,22 +37,17 @@ jobs:
           exit 1
         fi
 
-    - name: Test YouTube cookies with yt-dlp
+    - name: Test subtitle download in this environment
       run: |
-        echo "🧪 Testing YouTube cookies in GitHub Actions environment..."
+        echo "🧪 Testing Zyte proxy setup in GitHub Actions environment..."
         
-        # Decompress cookies for testing
-        base64 -d cookies/youtube_cookies_compressed.txt | gunzip > test_cookies.txt
-        chmod 644 test_cookies.txt
+        # Install required packages for testing
+        pip install yt-dlp requests
         
-        # Install yt-dlp for testing
-        pip install yt-dlp
-        
-        # Run the comprehensive test script
-        python3 test_youtube_cookies_github.py
+        # Run the proxy test script
+        python3 download_subtitles_test/test_ytdlp_proxy.py
         
         # Clean up test files
-        rm -f test_cookies.txt
         rm -rf subtitles/
 
     - name: Build Docker image with cache

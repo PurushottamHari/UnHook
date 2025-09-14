@@ -11,6 +11,8 @@ from typing import Dict, List, Optional
 import yt_dlp
 from yt_dlp.networking.impersonate import ImpersonateTarget
 
+from data_collector_service.config.config import Config
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,6 +20,9 @@ class YtDlpClient:
     """Client for interacting with YouTube using yt-dlp."""
 
     def __init__(self):
+        # Initialize configuration
+        self.config = Config()
+
         # Base configuration for metadata extraction
         self.metadata_opts = {
             "quiet": True,
@@ -59,6 +64,37 @@ class YtDlpClient:
                     },
                 }
             )
+
+    def _setup_proxy_config(self, opts: Dict):
+        """Add proxy configuration to yt-dlp options for subtitle downloading."""
+        # Get Zyte API key from environment variable
+        zyte_api_key = os.getenv("ZYTE_API_KEY")
+        if not zyte_api_key:
+            raise RuntimeError(
+                "ZYTE_API_KEY not found in environment variables. Proxy cannot be configured."
+            )
+
+        # Get proxy base URL from config
+        proxy_base_url = self.config.proxy_base_url
+
+        # Set up proxy URL
+        zyte_proxy_url = f"http://{zyte_api_key}:@{proxy_base_url}"
+
+        # Set proxy environment variables
+        os.environ["HTTP_PROXY"] = zyte_proxy_url
+        os.environ["HTTPS_PROXY"] = zyte_proxy_url
+
+        # Add proxy-specific yt-dlp options
+        opts.update(
+            {
+                "nocheckcertificate": True,  # Correct yt-dlp option name for --no-check-certificate
+                "http_headers": {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                },
+            }
+        )
+
+        logger.info(f"Proxy configured for subtitle downloading using {proxy_base_url}")
 
     def get_channel_videos(self, channel_name: str, max_videos: int) -> List:
         """
@@ -140,16 +176,21 @@ class YtDlpClient:
             return None
 
     def download_subtitles(
-        self, video_id: str, language: str, fmt: str, subtitle_type: str
+        self,
+        video_id: str,
+        language: str,
+        fmt: str,
+        subtitle_type: str,
+        use_proxy: bool = True,
     ):
         """
         Download subtitles for a given YouTube video using yt-dlp client, return as string and delete the file.
         Args:
-            video_url (str): The URL of the YouTube video.
-            output_dir (Path or str): Directory to save the subtitles.
-            languages (list or None): List of language codes (e.g., ['en', 'hi']). Defaults to ['en', 'hi'].
-            fmt (str): Subtitle file format (e.g., 'json3', 'vtt'). Defaults to 'srt'.
-            output_filename (str or None): Ignored in this version.
+            video_id (str): The YouTube video ID.
+            language (str): Language code (e.g., 'en', 'hi').
+            fmt (str): Subtitle file format (e.g., 'json3', 'vtt', 'srt').
+            subtitle_type (str): Type of subtitles ('automatic', 'manual', or 'both').
+            use_proxy (bool): Whether to use proxy for downloading. Defaults to True.
         Returns:
             str or None: Subtitle content as string, or None if failed.
         """
@@ -181,6 +222,10 @@ class YtDlpClient:
 
         # Add cookie configuration to subtitle options
         self._add_cookie_config(subtitle_opts)
+
+        # Add proxy configuration if requested
+        if use_proxy:
+            self._setup_proxy_config(subtitle_opts)
         max_retries = 3
         last_exception = None
         for attempt in range(1, max_retries + 1):
