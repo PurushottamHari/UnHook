@@ -1,0 +1,48 @@
+{
+  "date": "2025-09-17",
+  "articles": [
+    {
+      "id": "37738f95-21da-4f09-afee-6222fbbbffc0",
+      "title": "Lazarus Group's $1 Billion Bangladesh Bank Cyber Heist",
+      "category": "NEWS",
+      "time_to_read": "13m read"
+    },
+    {
+      "id": "760af795-8844-4c21-962e-22469a54d7ff",
+      "title": "AirPods Pro 3 Review: Major Upgrades in Fit and ANC",
+      "category": "TECHNOLOGY",
+      "time_to_read": "6m read"
+    },
+    {
+      "id": "d0a4e24c-23a0-44ea-b302-b8ddbf5d6b24",
+      "title": "Pakistan Deputy PM Contradicts Trump's Ceasefire Claim",
+      "category": "NEWS",
+      "time_to_read": "4m read"
+    },
+    {
+      "id": "81488eb5-49f1-407d-a737-2dac91a1d5d0",
+      "title": "Pakistan Admits No US Mediation in India-Pakistan Ceasefire",
+      "category": "NEWS",
+      "time_to_read": "3m read"
+    },
+    {
+      "id": "a457957d-4a07-45a9-8358-a6de7f51f618",
+      "title": "US Pushes India to Open Market for American Corn",
+      "category": "BUSINESS",
+      "time_to_read": "3m read"
+    },
+    {
+      "id": "bcbf9d37-da90-42f5-ab86-0d6283c65345",
+      "title": "5 Context Levels for Better AI Prompting in 2025",
+      "category": "TECHNOLOGY",
+      "time_to_read": "6m read"
+    }
+  ],
+  "total_time_to_read": "35m read",
+  "topics": [
+    "NEWS",
+    "TECHNOLOGY",
+    "BUSINESS"
+  ],
+  "cached_at": "2025-09-17T15:39:47.856Z"
+}

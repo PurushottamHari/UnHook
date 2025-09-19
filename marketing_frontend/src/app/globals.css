@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* Default theme */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Vipassana theme */
+[data-theme="vipassana"] {
+  --background: #fef7e0;
+  --foreground: #8b4513;
+  --primary: #d4a574;
+  --secondary: #f4e4bc;
+  --accent: #b8860b;
+}
+
+[data-theme="vipassana"] body {
+  background: linear-gradient(135deg, #fef7e0 0%, #f4e4bc 100%);
+  color: #8b4513;
+}
+
+[data-theme="vipassana"] .bg-white {
+  background-color: #fef7e0;
+}
+
+[data-theme="vipassana"] .bg-gray-100 {
+  background-color: #f4e4bc;
+}
+
+[data-theme="vipassana"] .text-gray-900 {
+  color: #8b4513;
+}
+
+[data-theme="vipassana"] .text-gray-700 {
+  color: #a0522d;
+}
+
+[data-theme="vipassana"] .border-gray-200 {
+  border-color: #d4a574;
+}
+
+[data-theme="vipassana"] .bg-blue-600 {
+  background-color: #b8860b;
+}
+
+[data-theme="vipassana"] .hover\:bg-blue-700:hover {
+  background-color: #9a6f0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Utility classes for line clamping */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

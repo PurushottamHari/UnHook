@@ -1143,12 +1143,16 @@ def api_articles():
     sort_by = request.args.get("sort", "newest")
     category_filter = request.args.get("category", "")
     content_type_filter = request.args.get("content_type", "")
-    
+
     try:
-        articles = fetch_articles(user_id, sort_by, category_filter, content_type_filter)
+        articles = fetch_articles(
+            user_id, sort_by, category_filter, content_type_filter
+        )
         app.logger.info(f"Fetched {len(articles)} articles for user {user_id}")
         if articles:
-            app.logger.info(f"First article title: '{articles[0].title}', summary length: {len(articles[0].summary)}")
+            app.logger.info(
+                f"First article title: '{articles[0].title}', summary length: {len(articles[0].summary)}"
+            )
     except Exception as e:
         app.logger.error(f"Error in fetch_articles: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -1180,20 +1184,22 @@ def api_articles():
 def api_debug_raw_articles():
     """Debug endpoint to see raw database documents."""
     user_id = request.args.get("user_id", "607d95f0-47ef-444c-89d2-d05f257d1265")
-    
+
     try:
         db = get_database()
         collection = db.generated_content
-        
+
         # Get raw documents
-        cursor = collection.find({"status": GeneratedContentStatus.ARTICLE_GENERATED.value}).limit(3)
-        
+        cursor = collection.find(
+            {"status": GeneratedContentStatus.ARTICLE_GENERATED.value}
+        ).limit(3)
+
         raw_docs = []
         for doc in cursor:
             # Convert ObjectId to string for JSON serialization
             doc["_id"] = str(doc["_id"])
             raw_docs.append(doc)
-        
+
         return jsonify(raw_docs)
 
     except Exception as e:
@@ -1207,34 +1213,38 @@ def api_debug_extraction():
     try:
         db = get_database()
         collection = db.generated_content
-        
+
         # Get one document
-        doc = collection.find_one({"status": GeneratedContentStatus.ARTICLE_GENERATED.value})
+        doc = collection.find_one(
+            {"status": GeneratedContentStatus.ARTICLE_GENERATED.value}
+        )
         if not doc:
             return jsonify({"error": "No documents found"}), 404
-        
+
         # Test the same logic as in fetch_articles
         title = ""
         summary = ""
         generated = doc.get("generated", {})
-        
+
         # Try to get title from VERY_SHORT
         if OutputType.VERY_SHORT.value in generated:
             title = generated[OutputType.VERY_SHORT.value].get("string", "")
-        
+
         # Get summary from SHORT
         if OutputType.SHORT.value in generated:
             summary = generated[OutputType.SHORT.value].get("string", "")
-        
-        return jsonify({
-            "generated_keys": list(generated.keys()),
-            "very_short_enum": str(OutputType.VERY_SHORT),
-            "very_short_value": OutputType.VERY_SHORT.value,
-            "very_short_in_generated": OutputType.VERY_SHORT in generated,
-            "title": title,
-            "summary": summary[:100] + "..." if len(summary) > 100 else summary,
-            "summary_length": len(summary)
-        })
+
+        return jsonify(
+            {
+                "generated_keys": list(generated.keys()),
+                "very_short_enum": str(OutputType.VERY_SHORT),
+                "very_short_value": OutputType.VERY_SHORT.value,
+                "very_short_in_generated": OutputType.VERY_SHORT in generated,
+                "title": title,
+                "summary": summary[:100] + "..." if len(summary) > 100 else summary,
+                "summary_length": len(summary),
+            }
+        )
 
     except Exception as e:
         app.logger.error(f"Error in api_debug_extraction: {e}")
