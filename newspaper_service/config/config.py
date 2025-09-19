@@ -95,10 +95,10 @@ class Config:
         # Don't append port for default HTTPS (443) or HTTP (80) ports
         if (
             self.user_service_base_url.startswith("https://")
-            and self.user_service_port == 443
+            and int(self.user_service_port) == 443
         ) or (
             self.user_service_base_url.startswith("http://")
-            and self.user_service_port == 80
+            and int(self.user_service_port) == 80
         ):
             return self.user_service_base_url
         return f"{self.user_service_base_url}:{self.user_service_port}"
