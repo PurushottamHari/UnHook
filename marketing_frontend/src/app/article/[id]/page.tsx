@@ -71,7 +71,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <header className="mb-8 text-center">
           {/* Teerth Logo */}
           <div className="flex justify-center mb-8">
-            <TeerthLogo alt="Teerth Logo" width={200} height={50} />
+            <TeerthLogo alt="Teerth Logo" size={200} />
           </div>
           
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-amber-900 dark:text-amber-900 mb-6 leading-tight">
@@ -184,7 +184,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               
               {/* Teerth Logo Icon under features */}
               <div className="flex justify-center mt-6">
-                <TeerthLogoIcon alt="Teerth Logo Icon" width={75} height={50} />
+                <TeerthLogoIcon alt="Teerth Logo Icon" size={150} />
               </div>
             </div>
 

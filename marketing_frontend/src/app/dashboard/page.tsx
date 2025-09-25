@@ -20,7 +20,8 @@ async function getArticlesWithMetadata(articleIds: string[]): Promise<(CachedArt
 }
 
 export default async function Dashboard({ searchParams }: DashboardPageProps) {
-  const newspaper = await getNewspaperForDate(searchParams.date);
+  const resolvedSearchParams = await searchParams;
+  const newspaper = await getNewspaperForDate(resolvedSearchParams.date);
   
   // Only format date if newspaper exists
   const formattedDate = newspaper ? new Date(newspaper.date).toLocaleDateString('en-US', {
@@ -50,8 +51,8 @@ export default async function Dashboard({ searchParams }: DashboardPageProps) {
             
             <div className="text-center">
               {/* Teerth Logo */}
-              <div className="flex justify-center mb-8">
-                <TeerthLogo alt="Teerth Logo" width={200} height={50} />
+              <div className="flex justify-center mb-6">
+                <TeerthLogo alt="Teerth Logo" size={200} />
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-amber-900 dark:text-amber-900 mb-8 leading-tight tracking-tight">
@@ -199,7 +200,7 @@ export default async function Dashboard({ searchParams }: DashboardPageProps) {
               
               {/* Teerth Logo Icon under features */}
               <div className="flex justify-center mt-6">
-                <TeerthLogoIcon alt="Teerth Logo Icon" width={75} height={50} />
+                <TeerthLogoIcon alt="Teerth Logo Icon" size={150} />
               </div>
             </div>
 

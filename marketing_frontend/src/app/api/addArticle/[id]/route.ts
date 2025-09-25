@@ -3,9 +3,9 @@ import { cacheArticle, CachedArticle } from '@/lib/cache/article-cache';
 import { MongoClient } from 'mongodb';
 
 interface AddArticleParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function fetchArticleFromMongoDB(articleId: string): Promise<CachedArticle | null> {
@@ -176,5 +176,6 @@ export async function POST(request: Request, { params }: AddArticleParams) {
 }
 
 export async function GET(request: Request, { params }: AddArticleParams) {
-  return POST(request, { params });
+  const { id: articleId } = await params;
+  return POST(request, { params: Promise.resolve({ id: articleId }) });
 }

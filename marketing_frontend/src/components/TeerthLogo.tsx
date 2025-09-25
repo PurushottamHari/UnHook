@@ -4,43 +4,54 @@ interface TeerthLogoProps {
   className?: string;
   alt?: string;
   priority?: boolean;
-  width?: number;
-  height?: number;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | number;
 }
 
+// Aspect ratio of the full Teerth logo: 790px width / 135px height ≈ 5.85:1
+const TEERTH_LOGO_ASPECT_RATIO = 165 / 45;
+
+// Calculate dimensions from diagonal length
+function calculateDimensionsFromDiagonal(diagonal: number) {
+  // For a rectangle with aspect ratio a:b, if diagonal = d, then:
+  // width = d * a / sqrt(a² + b²)
+  // height = d * b / sqrt(a² + b²)
+  const a = TEERTH_LOGO_ASPECT_RATIO;
+  const b = 1;
+  const sqrt = Math.sqrt(a * a + b * b);
+  
+  return {
+    width: Math.round((diagonal * a) / sqrt),
+    height: Math.round((diagonal * b) / sqrt)
+  };
+}
+
 const sizeClasses = {
-  xs: { width: 32, height: 24 },      // 4:3 ratio
-  sm: { width: 48, height: 36 },      // 4:3 ratio
-  md: { width: 64, height: 48 },      // 4:3 ratio
-  lg: { width: 80, height: 60 },      // 4:3 ratio
-  xl: { width: 96, height: 72 },      // 4:3 ratio
-  '2xl': { width: 128, height: 96 },  // 4:3 ratio
-  '3xl': { width: 160, height: 120 }, // 4:3 ratio
-  '4xl': { width: 192, height: 144 }, // 4:3 ratio
-  '5xl': { width: 224, height: 168 }, // 4:3 ratio
+  xs: calculateDimensionsFromDiagonal(30),      // 30px diagonal
+  sm: calculateDimensionsFromDiagonal(50),      // 50px diagonal
+  md: calculateDimensionsFromDiagonal(70),      // 70px diagonal
+  lg: calculateDimensionsFromDiagonal(90),      // 90px diagonal
+  xl: calculateDimensionsFromDiagonal(110),     // 110px diagonal
+  '2xl': calculateDimensionsFromDiagonal(150),  // 150px diagonal
+  '3xl': calculateDimensionsFromDiagonal(200),  // 200px diagonal
+  '4xl': calculateDimensionsFromDiagonal(250),  // 250px diagonal
+  '5xl': calculateDimensionsFromDiagonal(300),  // 300px diagonal
 };
 
 export default function TeerthLogo({ 
   className = '', 
   alt = 'Teerth Logo',
   priority = false,
-  width,
-  height,
   size = 'lg'
 }: TeerthLogoProps) {
-  // Determine dimensions
+  // Determine dimensions from diagonal length
   let logoWidth: number;
   let logoHeight: number;
 
-  if (width && height) {
-    // Use explicit width and height
-    logoWidth = width;
-    logoHeight = height;
-  } else if (typeof size === 'number') {
-    // Use size as width, calculate height maintaining aspect ratio
-    logoWidth = size;
-    logoHeight = size * 0.75; // Assuming 4:3 aspect ratio
+  if (typeof size === 'number') {
+    // Use size as diagonal length
+    const dimensions = calculateDimensionsFromDiagonal(size);
+    logoWidth = dimensions.width;
+    logoHeight = dimensions.height;
   } else {
     // Use predefined size
     const dimensions = sizeClasses[size];
@@ -51,13 +62,18 @@ export default function TeerthLogo({
   return (
     <div 
       className={`relative ${className}`}
-      style={{ width: `${logoWidth}px`, height: `${logoHeight}px` }}
+      style={{ 
+        width: `${logoWidth}px`, 
+        height: `${logoHeight}px`,
+        display: 'inline-block',
+        overflow: 'hidden'
+      }}
     >
       <Image
         src="/assets/TeerthLogo.png"
         alt={alt}
         fill
-        className="object-none"
+        className="object-contain"
         priority={priority}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />
