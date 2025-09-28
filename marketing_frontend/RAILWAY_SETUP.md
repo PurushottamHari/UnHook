@@ -17,10 +17,12 @@ Since your repository is at the UnHook level and the marketing frontend app is i
 In the Railway dashboard, you need to configure the following:
 
 #### **Root Directory**
+
 - Set **Root Directory** to: `marketing_frontend`
 - This tells Railway to treat the `marketing_frontend` folder as the project root
 
 #### **Build Method**
+
 - Railway will automatically detect this as a Node.js project
 - The `railway.json` file will configure the build and start commands
 - Railway's current build system will handle the deployment
@@ -77,6 +79,7 @@ railway up
 ## 📁 Repository Structure
 
 Your repository structure should look like this:
+
 ```
 UnHook/
 ├── marketing_frontend/
@@ -88,7 +91,6 @@ UnHook/
 │   ├── package.json
 │   ├── next.config.ts
 │   ├── railway.json
-│   ├── .railwayignore
 │   └── env.example
 ├── scrappy_frontend_app/
 ├── data_collector_service/
@@ -107,26 +109,26 @@ UnHook/
 ## 🐛 Troubleshooting
 
 ### If Build Fails:
+
 - Check that the root directory is set to `marketing_frontend`
 - Verify that `package.json` exists in the marketing_frontend folder
-- **If you see Python/Dockerfile errors**: Railway is detecting the root-level Dockerfile instead of recognizing it as a Node.js project. Make sure:
-  - Root directory is set to `marketing_frontend`
-  - The `.railwayignore` file excludes Dockerfiles
-  - Railway detects it as a Node.js project (should show Node.js in build logs)
 - Check Railway logs for specific error messages
 
 ### If Import Errors Occur:
+
 - The app uses Next.js which handles its own module resolution
 - Make sure all dependencies are listed in `package.json`
 - Check that the build process completes successfully
 
 ### If MongoDB Connection Fails:
+
 - Verify your MongoDB URI is correct
 - Check that your MongoDB cluster allows connections from Railway's IP ranges
 - Ensure the database name is correct
 - Test the connection using the `/api/health` endpoint
 
 ### If Environment Variables Don't Work:
+
 - Make sure variables are set in Railway dashboard
 - Check that variable names match exactly (case-sensitive)
 - Restart the deployment after adding new environment variables
@@ -146,6 +148,7 @@ Your app will be available at a Railway-generated URL that you can access from a
 ## 🔍 Health Check
 
 Once deployed, you can check if your app is running properly by visiting:
+
 - `https://your-app-name.railway.app/api/health`
 
 This endpoint will return the health status of your application.

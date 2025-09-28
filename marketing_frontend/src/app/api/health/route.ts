@@ -8,7 +8,7 @@ export async function GET() {
       message: 'UnHook Marketing Frontend is running',
       timestamp: new Date().toISOString(),
       version: process.env.npm_package_version || '1.0.0',
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
     };
 
     return NextResponse.json(healthStatus, { status: 200 });
@@ -18,7 +18,7 @@ export async function GET() {
         status: 'unhealthy',
         message: 'Health check failed',
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       { status: 500 }
     );

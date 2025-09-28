@@ -39,10 +39,6 @@
     }
   ],
   "total_time_to_read": "35m read",
-  "topics": [
-    "NEWS",
-    "TECHNOLOGY",
-    "BUSINESS"
-  ],
+  "topics": ["NEWS", "TECHNOLOGY", "BUSINESS"],
   "cached_at": "2025-09-17T15:39:47.856Z"
 }

@@ -4,7 +4,17 @@ interface TeerthLogoIconProps {
   className?: string;
   alt?: string;
   priority?: boolean;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | number;
+  size?:
+    | 'xs'
+    | 'sm'
+    | 'md'
+    | 'lg'
+    | 'xl'
+    | '2xl'
+    | '3xl'
+    | '4xl'
+    | '5xl'
+    | number;
 }
 
 // Aspect ratio of the logo: 220px width / 135px height ≈ 1.63:1
@@ -18,30 +28,30 @@ function calculateDimensionsFromDiagonal(diagonal: number) {
   const a = LOGO_ASPECT_RATIO;
   const b = 1;
   const sqrt = Math.sqrt(a * a + b * b);
-  
+
   return {
     width: Math.round((diagonal * a) / sqrt),
-    height: Math.round((diagonal * b) / sqrt)
+    height: Math.round((diagonal * b) / sqrt),
   };
 }
 
 const sizeClasses = {
-  xs: calculateDimensionsFromDiagonal(20),      // 20px diagonal
-  sm: calculateDimensionsFromDiagonal(30),      // 30px diagonal
-  md: calculateDimensionsFromDiagonal(40),      // 40px diagonal
-  lg: calculateDimensionsFromDiagonal(50),      // 50px diagonal
-  xl: calculateDimensionsFromDiagonal(60),      // 60px diagonal
-  '2xl': calculateDimensionsFromDiagonal(80),   // 80px diagonal
-  '3xl': calculateDimensionsFromDiagonal(100),  // 100px diagonal
-  '4xl': calculateDimensionsFromDiagonal(120),  // 120px diagonal
-  '5xl': calculateDimensionsFromDiagonal(150),  // 150px diagonal
+  xs: calculateDimensionsFromDiagonal(20), // 20px diagonal
+  sm: calculateDimensionsFromDiagonal(30), // 30px diagonal
+  md: calculateDimensionsFromDiagonal(40), // 40px diagonal
+  lg: calculateDimensionsFromDiagonal(50), // 50px diagonal
+  xl: calculateDimensionsFromDiagonal(60), // 60px diagonal
+  '2xl': calculateDimensionsFromDiagonal(80), // 80px diagonal
+  '3xl': calculateDimensionsFromDiagonal(100), // 100px diagonal
+  '4xl': calculateDimensionsFromDiagonal(120), // 120px diagonal
+  '5xl': calculateDimensionsFromDiagonal(150), // 150px diagonal
 };
 
-export default function TeerthLogoIcon({ 
-  className = '', 
+export default function TeerthLogoIcon({
+  className = '',
   alt = 'Teerth Logo Icon',
   priority = false,
-  size = 'lg'
+  size = 'lg',
 }: TeerthLogoIconProps) {
   // Determine dimensions from diagonal length
   let logoWidth: number;
@@ -60,22 +70,22 @@ export default function TeerthLogoIcon({
   }
 
   return (
-    <div 
+    <div
       className={`relative ${className}`}
-      style={{ 
-        width: `${logoWidth}px`, 
+      style={{
+        width: `${logoWidth}px`,
         height: `${logoHeight}px`,
         display: 'inline-block',
-        overflow: 'hidden'
+        overflow: 'hidden',
       }}
     >
       <Image
-        src="/assets/logo_without_text.png"
+        src='/assets/logo_without_text.png'
         alt={alt}
         fill
-        className="object-contain"
+        className='object-contain'
         priority={priority}
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
       />
     </div>
   );

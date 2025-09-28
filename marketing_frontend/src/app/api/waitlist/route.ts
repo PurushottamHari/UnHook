@@ -42,8 +42,10 @@ export async function POST(request: NextRequest) {
       const collection = db.collection(COLLECTION_NAME);
 
       // Check if email already exists
-      const existingEntry = await collection.findOne({ email: email.toLowerCase() });
-      
+      const existingEntry = await collection.findOne({
+        email: email.toLowerCase(),
+      });
+
       if (existingEntry) {
         return NextResponse.json(
           { success: false, error: 'Email already exists in waitlist' },
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
         email: email.toLowerCase(),
         message: message || '',
         source: source || 'website',
-        timestamp
+        timestamp,
       };
 
       const result = await collection.insertOne(waitlistEntry);
@@ -64,20 +66,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'Successfully added to waitlist',
-        id: result.insertedId
+        id: result.insertedId,
       });
-
     } finally {
       await client.close();
     }
-
   } catch (error) {
     console.error('Error adding to waitlist:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error occurred' 
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : 'Unknown error occurred',
       },
       { status: 500 }
     );

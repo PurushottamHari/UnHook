@@ -11,17 +11,20 @@ This system allows you to fetch articles from the UnHook API and cache them loca
 ## API Endpoints
 
 ### Add Article to Cache
+
 ```
 GET /api/addArticle/{article_id}
 POST /api/addArticle/{article_id}
 ```
 
 **Example:**
+
 ```bash
 curl -X GET "http://localhost:3000/api/addArticle/02003d04-5555-4b43-89f9-01fbdcf010cc"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -37,11 +40,13 @@ curl -X GET "http://localhost:3000/api/addArticle/02003d04-5555-4b43-89f9-01fbdc
 ```
 
 ### View Cached Article
+
 ```
 GET /article/{article_id}
 ```
 
 **Example:**
+
 ```
 http://localhost:3000/article/02003d04-5555-4b43-89f9-01fbdcf010cc
 ```
@@ -49,6 +54,7 @@ http://localhost:3000/article/02003d04-5555-4b43-89f9-01fbdcf010cc
 ## Cached Article Structure
 
 Each cached article contains:
+
 - `id`: Article ID
 - `title`: Article title
 - `content`: Full article content (cleaned HTML)

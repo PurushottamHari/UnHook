@@ -27,11 +27,11 @@ if (!fs.existsSync(CACHE_DIR)) {
 export function getCachedNewspaper(date: string): CachedNewspaper | null {
   try {
     const filePath = path.join(CACHE_DIR, `${date}.json`);
-    
+
     if (!fs.existsSync(filePath)) {
       return null;
     }
-    
+
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(fileContent);
   } catch (error) {

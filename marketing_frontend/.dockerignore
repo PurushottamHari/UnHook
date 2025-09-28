@@ -1,5 +1,0 @@
-# This file prevents Railway from detecting this as a Docker project
-# and forces it to use the native Node.js build system
-
-# Ignore everything to prevent Docker build
-*

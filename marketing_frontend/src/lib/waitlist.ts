@@ -20,26 +20,23 @@ export interface WaitlistDocument {
   timestamp: number; // Epoch timestamp
 }
 
-// MongoDB configuration
-const MONGODB_CONFIG = {
-  // Note: MongoDB URI is only available on server side
-  // Client-side validation is not needed since API handles it
-  database: process.env.DATABASE_NAME || 'youtube_newspaper',
-  collection: 'waitlist'
-};
-
+// MongoDB configuration (for reference)
+// Note: MongoDB URI is only available on server side
+// Client-side validation is not needed since API handles it
 
 /**
  * Submit form data to MongoDB waitlist collection
  */
-export async function submitToWaitlist(formData: WaitlistFormData): Promise<WaitlistSubmissionResult> {
+export async function submitToWaitlist(
+  formData: WaitlistFormData
+): Promise<WaitlistSubmissionResult> {
   try {
     // Prepare the document for MongoDB
     const waitlistDocument: WaitlistDocument = {
       email: formData.email.toLowerCase().trim(),
       message: formData.message?.trim() || '',
       source: formData.source || 'website',
-      timestamp: Math.floor(Date.now() / 1000) // Epoch timestamp
+      timestamp: Math.floor(Date.now() / 1000), // Epoch timestamp
     };
 
     // Submit to MongoDB via API endpoint
@@ -49,34 +46,37 @@ export async function submitToWaitlist(formData: WaitlistFormData): Promise<Wait
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(waitlistDocument)
+      body: JSON.stringify(waitlistDocument),
     });
-    
+
     console.log('Response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
     }
 
     const result = await response.json();
-    
+
     if (result.success) {
       return {
         success: true,
-        message: 'Thank you for joining our waitlist! We\'ll notify you when Teerth is ready.'
+        message:
+          "Thank you for joining our waitlist! We'll notify you when Teerth is ready.",
       };
     } else {
       throw new Error(result.error || 'Unknown error from database');
     }
-
   } catch (error) {
     console.error('Error submitting to waitlist:', error);
-    
+
     return {
       success: false,
-      message: 'There was an error submitting your information. Please try again.',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message:
+        'There was an error submitting your information. Please try again.',
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -96,4 +96,3 @@ export function isValidEmail(email: string): boolean {
 export function isMongoDBConfigured(): boolean {
   return true;
 }
-

@@ -1,12 +1,11 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import TeerthLogoIcon from "@/components/TeerthLogoIcon";
-import CTAButton from "@/components/CTAButton";
-import WaitlistForm from "@/components/WaitlistForm";
+import { motion } from 'framer-motion';
+import TeerthLogoIcon from '@/components/TeerthLogoIcon';
+import WaitlistForm from '@/components/WaitlistForm';
 
 interface WaitlistSectionProps {
-  variant?: "detailed" | "concise";
+  variant?: 'detailed' | 'concise';
   title?: string;
   subtitle?: string;
   features?: Array<{
@@ -21,68 +20,74 @@ interface WaitlistSectionProps {
 
 const defaultFeatures = [
   {
-    icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-    text: "No clickbait, no noise"
+    icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+    text: 'No clickbait, no noise',
   },
   {
-    icon: "M13 10V3L4 14h7v7l9-11h-7z",
-    text: "Focused, meaningful articles"
+    icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+    text: 'Focused, meaningful articles',
   },
   {
-    icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-    text: "Hyper personalized"
+    icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    text: 'Hyper personalized',
   },
   {
-    icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-    text: "Enhance your time and attention"
-  }
+    icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+    text: 'Enhance your time and attention',
+  },
 ];
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: "easeOut" }
+  transition: { duration: 0.6, ease: 'easeOut' },
 };
 
 export default function WaitlistSection({
-  variant = "detailed",
+  variant = 'detailed',
   title,
-  subtitle,
   features = defaultFeatures,
   showFeatures = true,
   showLearnMoreButton = false,
-  learnMoreHref = "/about",
-  className = ""
+  learnMoreHref = '/about',
+  className = '',
 }: WaitlistSectionProps) {
   const getVariantStyles = () => {
     switch (variant) {
-      case "concise":
+      case 'concise':
         return {
-          container: "bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12",
-          layout: "max-w-2xl mx-auto",
-          title: "text-2xl md:text-3xl font-light text-amber-900 dark:text-amber-900 mb-4 leading-tight",
-          formVariant: "concise" as const
+          container:
+            'bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12',
+          layout: 'max-w-2xl mx-auto',
+          title:
+            'text-2xl md:text-3xl font-light text-amber-900 dark:text-amber-900 mb-4 leading-tight',
+          formVariant: 'concise' as const,
         };
       default: // detailed (used for both dashboard and article)
         return {
-          container: "mt-16 bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12",
-          layout: "flex flex-col lg:flex-row gap-8 lg:gap-16",
-          title: "text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-6 leading-tight",
-          formVariant: "detailed" as const
+          container:
+            'mt-16 bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12',
+          layout: 'flex flex-col lg:flex-row gap-8 lg:gap-16',
+          title:
+            'text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-6 leading-tight',
+          formVariant: 'detailed' as const,
         };
     }
   };
 
   const styles = getVariantStyles();
-  const defaultTitle = variant === "concise" ? "Join us, help us shape Teerth" : "Want Full Access?";
+  const defaultTitle =
+    variant === 'concise'
+      ? 'Join us, help us shape Teerth'
+      : 'Want Full Access?';
 
-  const isConciseVariant = variant === "concise";
+  const isConciseVariant = variant === 'concise';
 
   return (
-    <motion.div 
+    <motion.div
       className={`${styles.container} ${className}`}
-      initial="initial"
-      whileInView="animate"
+      initial='initial'
+      whileInView='animate'
       viewport={{ once: true }}
       variants={fadeInUp}
     >
@@ -90,16 +95,14 @@ export default function WaitlistSection({
         {isConciseVariant ? (
           // Concise variant - centered layout
           <>
-            <div className="text-center mb-8">
-              <div className="flex justify-center mb-6">
-                <TeerthLogoIcon alt="Teerth Logo Icon" size={150} />
+            <div className='text-center mb-8'>
+              <div className='flex justify-center mb-6'>
+                <TeerthLogoIcon alt='Teerth Logo Icon' size={150} />
               </div>
-              <h3 className={styles.title}>
-                {title || defaultTitle}
-              </h3>
+              <h3 className={styles.title}>{title || defaultTitle}</h3>
             </div>
-            
-            <WaitlistForm 
+
+            <WaitlistForm
               variant={styles.formVariant}
               showLearnMoreButton={showLearnMoreButton}
               learnMoreHref={learnMoreHref}
@@ -110,38 +113,48 @@ export default function WaitlistSection({
           // Detailed variant - side by side layout
           <>
             {/* Left side - Text content */}
-            <div className="w-full lg:w-[35%]">
-              <h3 className={styles.title}>
-                {title || defaultTitle}
-              </h3>
-              
+            <div className='w-full lg:w-[35%]'>
+              <h3 className={styles.title}>{title || defaultTitle}</h3>
+
               {showFeatures && (
-                <ul className="space-y-3">
+                <ul className='space-y-3'>
                   {features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-6 h-6 mt-0.5">
-                        <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={feature.icon} />
+                    <li key={index} className='flex items-start gap-3'>
+                      <div className='flex-shrink-0 w-6 h-6 mt-0.5'>
+                        <svg
+                          className='w-6 h-6 text-amber-600'
+                          fill='none'
+                          stroke='currentColor'
+                          viewBox='0 0 24 24'
+                        >
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d={feature.icon}
+                          />
                         </svg>
                       </div>
-                      <span className="text-amber-800 dark:text-amber-900">{feature.text}</span>
+                      <span className='text-amber-800 dark:text-amber-900'>
+                        {feature.text}
+                      </span>
                     </li>
                   ))}
                 </ul>
               )}
-              
+
               {/* Teerth Logo Icon under features */}
-              <div className="flex justify-center mt-6">
-                <TeerthLogoIcon alt="Teerth Logo Icon" size={150} />
+              <div className='flex justify-center mt-6'>
+                <TeerthLogoIcon alt='Teerth Logo Icon' size={150} />
               </div>
             </div>
 
             {/* Divider */}
-            <div className="hidden lg:block w-px bg-amber-300 dark:bg-amber-400"></div>
+            <div className='hidden lg:block w-px bg-amber-300 dark:bg-amber-400'></div>
 
             {/* Right side - Form */}
-            <div className="w-full lg:w-[60%]">
-              <WaitlistForm 
+            <div className='w-full lg:w-[60%]'>
+              <WaitlistForm
                 variant={styles.formVariant}
                 showLearnMoreButton={showLearnMoreButton}
                 learnMoreHref={learnMoreHref}

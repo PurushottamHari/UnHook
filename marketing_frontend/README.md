@@ -5,28 +5,33 @@ A Next.js landing page application for UnHook - a platform for curated daily art
 ## Features
 
 ### Pages
+
 - **Landing Page (`/`)**: Features a main article with clear CTA to join the waitlist
 - **Dashboard Preview (`/dashboard`)**: Shows a preview of today's articles with teaser content
 - **About Page (`/about`)**: Explains the product's purpose and philosophy
 - **Waitlist Page (`/waitlist`)**: Simple form to join the waitlist
 
 ### Components
+
 - **Header**: Navigation with theme toggle
 - **ArticleCard**: Reusable component for displaying articles (featured and preview variants)
 - **CTAButton**: Styled call-to-action buttons with multiple variants
 - **InfoIcon**: Links to the about page
 
 ### Styling & Theming
+
 - **Tailwind CSS**: Modern, utility-first styling
 - **Theme Switching**: Toggle between default and Vipassana-inspired themes
 - **Responsive Design**: Mobile-first approach with desktop optimizations
 - **Dark Mode**: Built-in dark mode support
 
 ### API Endpoints
+
 - **`/api/articles/main`**: Returns the featured article for the landing page
 - **`/api/newspaper/[id]`**: Returns articles for a specific newspaper (used for dashboard preview)
 
 ### Data & Caching
+
 - Mock data for development and testing
 - Built-in caching with Next.js revalidation
 - Fast loading with optimized API responses
@@ -34,17 +39,20 @@ A Next.js landing page application for UnHook - a platform for curated daily art
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -88,10 +96,12 @@ src/
 The application supports two themes:
 
 ### Default Theme
+
 - Clean, modern design with blue accents
 - Standard light/dark mode support
 
 ### Vipassana Theme
+
 - Warm, earthy color palette
 - Pale yellow background with warm wood tones
 - Inspired by mindfulness and meditation practices
@@ -101,16 +111,19 @@ Toggle between themes using the theme switcher in the header.
 ## Customization
 
 ### Colors and Typography
+
 - Modify theme colors in `src/app/globals.css`
 - Adjust typography using Tailwind classes
 - Customize component styles in individual component files
 
 ### Content
+
 - Update mock data in API route files
 - Modify page content in respective page components
 - Customize metadata in `layout.tsx`
 
 ### Styling
+
 - All styling uses Tailwind CSS classes
 - Custom CSS can be added to `globals.css`
 - Component-specific styles are co-located with components
@@ -118,12 +131,14 @@ Toggle between themes using the theme switcher in the header.
 ## Deployment
 
 The application is ready for deployment on platforms like:
+
 - Vercel (recommended for Next.js)
 - Netlify
 - Railway
 - Any Node.js hosting platform
 
 Build the application:
+
 ```bash
 npm run build
 ```

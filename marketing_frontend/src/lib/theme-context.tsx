@@ -27,7 +27,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'default' ? 'vipassana' : 'default');
+    setTheme(prev => (prev === 'default' ? 'vipassana' : 'default'));
   };
 
   return (

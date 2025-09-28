@@ -17,6 +17,7 @@ This guide provides multiple deployment options for the UnHook Marketing Fronten
 Railway is the fastest and easiest option for a prototype deployment.
 
 **Steps:**
+
 1. Go to [railway.app](https://railway.app)
 2. Sign up with GitHub
 3. Create a new project
@@ -32,6 +33,7 @@ Railway is the fastest and easiest option for a prototype deployment.
 7. Deploy!
 
 **Pros:**
+
 - ✅ Free tier available
 - ✅ Automatic deployments from GitHub
 - ✅ Built-in environment variable management
@@ -44,6 +46,7 @@ Railway is the fastest and easiest option for a prototype deployment.
 Vercel is the creator of Next.js and provides excellent Next.js optimization.
 
 **Steps:**
+
 1. Go to [vercel.com](https://vercel.com)
 2. Connect your GitHub repository
 3. Set **Root Directory** to `marketing_frontend`
@@ -51,6 +54,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 5. Deploy!
 
 **Pros:**
+
 - ✅ Free tier available
 - ✅ Optimized for Next.js
 - ✅ Automatic SSL
@@ -61,6 +65,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 ### Option 3: Netlify
 
 **Steps:**
+
 1. Go to [netlify.com](https://netlify.com)
 2. Connect your GitHub repository
 3. Set **Base Directory** to `marketing_frontend`
@@ -70,6 +75,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 7. Deploy!
 
 **Pros:**
+
 - ✅ Free tier available
 - ✅ Automatic SSL
 - ✅ Easy GitHub integration
@@ -79,6 +85,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 ### Option 4: Render
 
 **Steps:**
+
 1. Go to [render.com](https://render.com)
 2. Connect your GitHub repository
 3. Create a new Web Service
@@ -91,6 +98,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 6. Deploy!
 
 **Pros:**
+
 - ✅ Free tier available
 - ✅ Automatic SSL
 - ✅ Easy GitHub integration
@@ -99,6 +107,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 ### Option 5: DigitalOcean App Platform
 
 **Steps:**
+
 1. Go to [DigitalOcean App Platform](https://cloud.digitalocean.com/apps)
 2. Create a new app from GitHub
 3. Configure:
@@ -111,6 +120,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 5. Deploy!
 
 **Pros:**
+
 - ✅ Good performance
 - ✅ Reasonable pricing
 - ✅ Easy scaling
@@ -121,6 +131,7 @@ Vercel is the creator of Next.js and provides excellent Next.js optimization.
 If you have a VPS or server:
 
 **Steps:**
+
 1. Copy the entire project to your server
 2. Create a `.env.local` file with your credentials
 3. Run with Docker:
@@ -131,6 +142,7 @@ If you have a VPS or server:
    ```
 
 **For manual deployment:**
+
 ```bash
 # Install dependencies
 npm ci
@@ -181,6 +193,7 @@ NODE_ENV=production
 ## Recommended for Marketing Site: Vercel
 
 For a marketing frontend, I recommend **Vercel** because:
+
 - Built specifically for Next.js
 - Excellent performance and SEO optimization
 - Free tier is generous
@@ -192,6 +205,7 @@ For a marketing frontend, I recommend **Vercel** because:
 ## Next Steps for Production
 
 When you're ready for a production deployment:
+
 1. Add authentication/authorization
 2. Implement proper caching
 3. Add rate limiting
@@ -205,12 +219,14 @@ When you're ready for a production deployment:
 ## Troubleshooting
 
 **Common Issues:**
+
 1. **Build errors**: Make sure all dependencies are in `package.json`
 2. **MongoDB connection**: Verify your connection string and network access
 3. **Environment variables**: Double-check all required variables are set
 4. **Port issues**: Next.js automatically handles port configuration
 
 **Debug Commands:**
+
 ```bash
 # Test local deployment
 npm run dev
@@ -218,9 +234,6 @@ npm run dev
 # Test production build locally
 npm run build
 npm start
-
-# Check environment variables
-echo $MONGODB_URI
 ```
 
 **Health Check:**
@@ -229,6 +242,7 @@ Visit `/api/health` on your deployed app to verify it's running properly.
 ## Performance Optimization
 
 For better performance in production:
+
 1. Enable Next.js Image Optimization
 2. Use Next.js built-in caching
 3. Implement proper SEO meta tags
