@@ -1,4 +1,7 @@
-# Ignore Docker files to force Nixpacks usage
+# Ignore Docker files to force native build system
+../Dockerfile
+../docker-compose.yml
+../.dockerignore
 Dockerfile
 docker-compose.yml
 .dockerignore
