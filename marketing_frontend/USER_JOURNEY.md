@@ -33,38 +33,30 @@ Back: “Yet in real life, I feel lonelier, more divided, subtly provoked — co
 
 # 3. We need something that respects our attention.
 
-*This isn’t just a patch. It’s the first step toward a future where our digital habits serve us — not the other way around.*
+*The first step to habits that serve you, not control you.*
 
 ---
 
-## Step 1 – Start with what matters to you 🎯
+🎯 Step 1 – Define what matters
+Set themes that align with your goals.
 
-Choose the themes you care about — science, business, health, art, spirituality, whatever fuels your curiosity. If you’d like, connect your current sources (YouTube channels, Instagram pages, Subreddits, news feeds). These serve as raw material, not distractions.
+↓
+📜 Step 2 – Clarity, not noise
+We give you exactly that — no clickbait, no tricks.
 
----
-
-## Step 2 – Get clarity, not noise 📜
-
-No more endless feeds. Instead, you’ll get a crisp daily digest: factual, concise updates with no clickbait or emotional provocation. Limited and focused, so you stay informed while keeping your time and energy for what really matters.
-
----
-
-## Step 3 – Refine, reflect, grow 🌱
-
-Your digest adapts as you do. Highlight what’s helpful, skip what isn’t, and it will adjust. You’ll be nudged to check what you recall, reflect on insights, and engage with thoughtful prompts that help you analyze, connect, and apply what you’ve read. Over time, fleeting information turns into lasting clarity and focus.
+↓
+🌱 Step 3 – Grow with reflection
+Your digest adapts to make you sharper, not distracted.
 
 ---
 
-## 📌 This is where it begins
-
-The foundation of healthier digital habits — one step now, many more ahead.
 
 ⸻
 
 4. The Transformation → Motivation
     •	Visual: Toggle component ("Before vs After").
-   	•	Before: Overstimulated, frustrated, and drained — endless feeds that provoked more stress than insight. Content felt scattered, leaving attention fragmented and emotions unsettled.
-	•	After: Calm, intentional, and restorative — a space designed to let the mind pause, reflect, and gain clarity. Every element encourages healing, understanding, and deeper insight.
+   	•	Before: Feeds weren’t made for you — they were made to capture attention and turn it into a product. The result: overstimulation, scattered focus, and feeling pulled away from yourself.
+	•	After: This space is built for you — to help you slow down, reflect, and strengthen the parts of you that make life richer, calmer, and more intentional.
     •	Tone: Aspirational, but not preachy.
 
 ⸻

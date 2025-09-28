@@ -18,8 +18,8 @@ export default function CTAButton({
   const baseClasses = "inline-flex items-center justify-center font-semibold rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
   
   const variantClasses = {
-    primary: "bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-lg hover:shadow-xl",
-    secondary: "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white focus:ring-gray-500"
+    primary: "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white focus:ring-amber-500/50 shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300",
+    secondary: "bg-amber-100 hover:bg-amber-200 text-amber-800 hover:text-amber-900 border border-amber-300 hover:border-amber-400 focus:ring-amber-500/50 transition-all duration-300"
   };
   
   const sizeClasses = {

@@ -7,7 +7,7 @@ export interface Article {
   newspaperId: string;
 }
 
-export interface UnHookArticle {
+export interface TeerthArticle {
   id: string;
   title: string;
   content: string;

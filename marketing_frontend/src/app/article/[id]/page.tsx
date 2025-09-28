@@ -1,13 +1,14 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import CTAButton from '@/components/CTAButton';
 import TeerthLogo from '@/components/TeerthLogo';
 import TeerthLogoIcon from '@/components/TeerthLogoIcon';
+import WaitlistSection from '@/components/WaitlistSection';
 import { getCachedArticle, CachedArticle } from '@/lib/cache/article-cache';
 import { getCachedNewspaper, CachedNewspaper } from '@/lib/cache/newspaper-cache';
 import ReactMarkdown from 'react-markdown';
 import fs from 'fs';
 import path from 'path';
+import { Metadata } from 'next';
 
 interface ArticlePageProps {
   params: {
@@ -38,6 +39,29 @@ async function getArticleDateForNavigation(article: CachedArticle): Promise<stri
     console.error('Error getting article date for navigation:', error);
     return null;
   }
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { id } = await params;
+  const article = await getArticle(id);
+
+  if (!article) {
+    return {
+      title: "Teerth - Article Not Found",
+      description: "The requested article could not be found.",
+    };
+  }
+
+  return {
+    title: `Teerth - ${article.title}`,
+    description: `Read "${article.title}" - ${article.category} article from Teerth's curated collection.`,
+    openGraph: {
+      title: `Teerth - ${article.title}`,
+      description: `Read "${article.title}" - ${article.category} article from Teerth's curated collection.`,
+      type: "article",
+      publishedTime: article.published_at,
+    },
+  };
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
@@ -71,7 +95,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <header className="mb-8 text-center">
           {/* Teerth Logo */}
           <div className="flex justify-center mb-8">
-            <TeerthLogo alt="Teerth Logo" size={200} />
+            <TeerthLogoIcon alt="Teerth Logo" size={200} />
           </div>
           
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-amber-900 dark:text-amber-900 mb-6 leading-tight">
@@ -113,7 +137,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {/* Article Content */}
         <article className="prose prose-lg max-w-none dark:prose-invert mb-12">
-          <div className="bg-amber-50 dark:bg-amber-100 rounded-xl shadow-lg border border-amber-200 dark:border-amber-300 p-8 md:p-12">
+          <div className="bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12">
             <div className="prose prose-gray dark:prose-invert max-w-none">
               <ReactMarkdown 
                 components={{
@@ -137,96 +161,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
 
         {/* Waitlist Section */}
-        <div className="bg-amber-100 dark:bg-amber-200 rounded-2xl shadow-lg border border-amber-300 dark:border-amber-400 p-8 md:p-12">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-            {/* Left side - Text content */}
-            <div className="w-full lg:w-[35%]">
-              <h3 className="text-2xl md:text-3xl font-bold text-amber-900 dark:text-amber-900 mb-6">
-                Enjoyed this read?
-              </h3>
-              <p className="text-lg text-amber-800 dark:text-amber-900 mb-6">
-                Get a daily, personalized newspaper tailored to your interests:
-              </p>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 mt-0.5">
-                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <span className="text-amber-800 dark:text-amber-900">No clickbait, no noise</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 mt-0.5">
-                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <span className="text-amber-800 dark:text-amber-900">Focused, meaningful articles</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 mt-0.5">
-                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <span className="text-amber-800 dark:text-amber-900">Hyper personalized</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 mt-0.5">
-                    <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <span className="text-amber-800 dark:text-amber-900">Enhance your time and attention</span>
-                </li>
-              </ul>
-              
-              {/* Teerth Logo Icon under features */}
-              <div className="flex justify-center mt-6">
-                <TeerthLogoIcon alt="Teerth Logo Icon" size={150} />
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="hidden lg:block w-px bg-amber-300 dark:bg-amber-400"></div>
-
-            {/* Right side - Form */}
-            <div className="w-full lg:w-[60%]">
-              <form className="max-w-md mx-auto lg:mx-0">
-                <div className="mb-4">
-                  <input
-                    type="email"
-                    placeholder="Enter your email address"
-                    className="w-full px-4 py-3 border border-amber-300 dark:border-amber-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent dark:bg-amber-200 dark:text-amber-900 placeholder-amber-600"
-                    required
-                  />
-                </div>
-                <div className="mb-4">
-                  <textarea
-                    placeholder="Would love to hear your thoughts, feedback, or questions…"
-                    rows={4}
-                    className="w-full px-4 py-3 border border-amber-300 dark:border-amber-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent dark:bg-amber-200 dark:text-amber-900 placeholder-amber-600 resize-none"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 mb-4"
-                >
-                  Join Waitlist
-                </button>
-                <CTAButton 
-                  href="/about" 
-                  variant="secondary" 
-                  size="lg"
-                  className="w-full bg-amber-100 hover:bg-amber-200 text-amber-800 hover:text-amber-900 border border-amber-300 hover:border-amber-400"
-                >
-                  Learn More
-                </CTAButton>
-              </form>
-            </div>
-          </div>
-        </div>
+        <WaitlistSection variant="detailed" />
 
       </div>
     </div>

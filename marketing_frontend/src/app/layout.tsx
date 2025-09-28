@@ -14,17 +14,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "UnHook - Curated Daily Articles for Mindful Living",
+  title: "Teerth",
   description: "Discover thoughtfully curated articles that help you build better digital habits and live more mindfully in our hyperconnected world.",
+  icons: {
+    icon: [
+      { url: '/icon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: '/icon.png',
+  },
   openGraph: {
-    title: "UnHook - Curated Daily Articles for Mindful Living",
+    title: "Teerth",
     description: "Discover thoughtfully curated articles that help you build better digital habits and live more mindfully in our hyperconnected world.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "UnHook - Curated Daily Articles for Mindful Living",
+    title: "Teerth - Curated Daily Articles for Mindful Living",
     description: "Discover thoughtfully curated articles that help you build better digital habits and live more mindfully in our hyperconnected world.",
   },
 };

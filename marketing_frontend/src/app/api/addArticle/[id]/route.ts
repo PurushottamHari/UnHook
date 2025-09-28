@@ -103,7 +103,7 @@ async function fetchArticleFromMongoDB(articleId: string): Promise<CachedArticle
     }
     
     // Set article source and link
-    const article_source = 'UnHook';
+    const article_source = 'Teerth';
     const article_link = `https://unhook-production.up.railway.app/article/${articleId}`;
     
     await client.close();

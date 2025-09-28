@@ -2,118 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import CTAButton from "@/components/CTAButton";
 import TeerthLogo from "@/components/TeerthLogo";
-
-interface ProblemCardProps {
-  card: {
-    front: string;
-    back: string;
-    icon: string;
-  };
-  variants: any;
-}
-
-function ProblemCard({ card, variants }: ProblemCardProps) {
-  const [isRevealed, setIsRevealed] = useState(false);
-
-  const handleToggle = () => {
-    setIsRevealed(!isRevealed);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleToggle();
-    }
-  };
-
-  return (
-    <motion.div
-      variants={variants}
-      className="relative"
-    >
-      <motion.button
-        role="button"
-        tabIndex={0}
-        aria-expanded={isRevealed}
-        aria-label={`${card.front}. Click to reveal more details.`}
-        onClick={handleToggle}
-        onKeyDown={handleKeyDown}
-        className="w-full min-h-[180px] p-6 rounded-2xl cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 relative group"
-        whileHover={{ y: -1, scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-      >
-        {/* Subtle tap indicator */}
-        <div className="absolute top-3 right-3 text-amber-400/40 group-hover:text-amber-400/60 transition-all duration-300">
-          <div className="w-1.5 h-1.5 rounded-full bg-current opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-        </div>
-
-        {/* Front Side - Illusion */}
-        <motion.div
-          className="w-full h-full flex flex-col items-center justify-center text-center"
-          style={{ 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(254,243,199,0.7) 100%)',
-            border: '1px solid rgba(251,191,36,0.3)',
-            boxShadow: '0 4px 20px rgba(251,191,36,0.1)'
-          }}
-          animate={{ 
-            opacity: isRevealed ? 0 : 1,
-            y: isRevealed ? -10 : 0
-          }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        >
-          <div className="text-2xl mb-3">🌀</div>
-          <div className="text-xs text-amber-600/70 font-medium mb-2 tracking-wide">
-            Feels like...
-          </div>
-          <p className="text-base text-amber-800 font-light leading-relaxed px-2 mb-3">
-            {card.front}
-          </p>
-          <div className="text-lg opacity-60">
-            {card.icon}
-          </div>
-        </motion.div>
-
-        {/* Back Side - Reality */}
-        <motion.div
-          className="absolute inset-0 w-full h-full flex flex-col items-center justify-center text-center p-6 rounded-2xl"
-          style={{ 
-            background: 'linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.9) 100%)',
-            border: '1px solid rgba(148,163,184,0.3)',
-            boxShadow: '0 6px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)'
-          }}
-          animate={{ 
-            opacity: isRevealed ? 1 : 0,
-            y: isRevealed ? 0 : 10
-          }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        >
-          <div className="text-2xl mb-3">🔍</div>
-          <div className="text-xs text-slate-600/70 font-medium mb-2 tracking-wide">
-            In reality...
-          </div>
-          <motion.p 
-            className="text-sm text-slate-700 font-medium leading-relaxed px-2"
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ 
-              opacity: isRevealed ? 1 : 0,
-              y: isRevealed ? 0 : 5
-            }}
-            transition={{ 
-              duration: 0.5, 
-              delay: isRevealed ? 0.2 : 0,
-              ease: "easeOut"
-            }}
-          >
-            {card.back}
-          </motion.p>
-        </motion.div>
-      </motion.button>
-    </motion.div>
-  );
-}
+import TeerthLogoIcon from "@/components/TeerthLogoIcon";
+import ProblemCarousel from "@/components/ProblemCarousel";
+import WaitlistSection from "@/components/WaitlistSection";
 
 export default function About() {
   const [showAfter, setShowAfter] = useState(false);
@@ -159,14 +51,6 @@ export default function About() {
             <p className="text-xl md:text-2xl text-amber-700 dark:text-amber-800 font-light leading-relaxed max-w-4xl mx-auto mb-8">
               Daily reads that sharpen focus instead of scatter it.
             </p>
-            <CTAButton 
-              href="/dashboard" 
-              variant="primary" 
-              size="lg"
-              className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-light py-4 px-8 rounded-2xl transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-            >
-              Join the Waitlist → Help Shape Teerth
-            </CTAButton>
           </motion.div>
 
           {/* The Problem Section */}
@@ -178,7 +62,7 @@ export default function About() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="relative bg-gradient-to-br from-amber-50/30 to-amber-100/30 dark:from-amber-100/30 dark:to-amber-200/30 rounded-3xl p-8 md:p-12 border border-amber-200/20 dark:border-amber-300/20 backdrop-blur-sm shadow-lg overflow-hidden">
+            <div className="relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-amber-200/50 dark:border-amber-300/50 shadow-lg overflow-hidden">
               <h2 className="text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-4 text-center">
                 The Problem With Feeds
               </h2>
@@ -188,12 +72,11 @@ export default function About() {
               </p>
               
               <motion.div 
-                className="flex flex-col items-center gap-6 mb-6 relative z-10"
-                variants={staggerChildren}
+                className="flex flex-col items-center mb-6 relative z-10"
+                variants={fadeInUp}
               >
-                {/* Top row - 3 cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-                  {[
+                <ProblemCarousel 
+                  cards={[
                     {
                       front: "I'm always learning something new.",
                       back: "But how much of this sticks? Am I truly reflecting — or just skimming, collecting fleeting knowledge?",
@@ -208,15 +91,7 @@ export default function About() {
                       front: "I feel happy and relaxed while scrolling.",
                       back: "But am I running from my real emotions — numbing what needs attention? Who's quietly keeping me hooked to this fleeting relief?",
                       icon: "🌿"
-                    }
-                  ].map((card, index) => (
-                    <ProblemCard key={index} card={card} variants={fadeInUp} />
-                  ))}
-                </div>
-                
-                {/* Bottom row - 3 cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-                  {[
+                    },
                     {
                       front: "Feeds surprise me with exciting, edgy content.",
                       back: "But much of it is engineered provocation — sexual, shocking, or agitating — designed to hijack emotion, not nurture focus or clarity.",
@@ -232,20 +107,10 @@ export default function About() {
                       back: "Yet in real life, I feel lonelier, more divided, subtly provoked — connection feels shallow.",
                       icon: "🤝"
                     }
-                  ].map((card, index) => (
-                    <ProblemCard key={index + 3} card={card} variants={fadeInUp} />
-                  ))}
-                </div>
+                  ]}
+                />
               </motion.div>
               
-              <motion.p 
-                className="text-sm text-amber-600/70 dark:text-amber-700/70 text-center font-light mb-6"
-                initial={{ opacity: 0.7 }}
-                animate={{ opacity: 0.7 }}
-                transition={{ duration: 0.3 }}
-              >
-                Click or tap cards to flip and reveal the reality behind each illusion.
-              </motion.p>
               
               <motion.div 
                 className="mt-12 mb-4"
@@ -280,56 +145,82 @@ export default function About() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="bg-gradient-to-br from-amber-50/30 to-amber-100/30 dark:from-amber-100/30 dark:to-amber-200/30 rounded-3xl p-8 md:p-12 border border-amber-200/20 dark:border-amber-300/20 backdrop-blur-sm shadow-lg">
-              <h2 className="text-3xl md:text-4xl font-bold text-amber-900 dark:text-amber-900 mb-6 text-center">
+            <div className="bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-amber-200/50 dark:border-amber-300/50 shadow-lg">
+              <h2 className="text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-6 text-center">
                 We need something that respects our attention.
               </h2>
               
               <div className="text-center mb-12">
                 <p className="text-lg text-amber-800 dark:text-amber-900 font-light leading-relaxed italic">
-                  This isn't just a patch. It's the first step toward a future where our digital habits serve us — not the other way around.
+                  The first step to habits that serve you, not control you.
                 </p>
               </div>
 
+              {/* Progress Steps with Connector Line */}
               <motion.div 
-                className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
+                className="relative mb-12"
                 variants={staggerChildren}
               >
-                {[
-                  {
-                    step: 1,
-                    title: "Start with what matters to you",
-                    text: "Choose the themes you care about — science, business, health, art, spirituality, whatever fuels your curiosity. If you'd like, connect your current sources (YouTube channels, Instagram pages, Subreddits, news feeds). These serve as raw material, not distractions.",
-                    icon: "🎯"
-                  },
-                  {
-                    step: 2,
-                    title: "Get clarity, not noise",
-                    text: "No more endless feeds. Instead, you'll get a crisp daily digest: factual, concise updates with no clickbait or emotional provocation. Limited and focused, so you stay informed while keeping your time and energy for what really matters.",
-                    icon: "📜"
-                  },
-                  {
-                    step: 3,
-                    title: "Refine, reflect, grow",
-                    text: "Your digest adapts as you do. Highlight what's helpful, skip what isn't, and it will adjust. You'll be nudged to check what you recall, reflect on insights, and engage with thoughtful prompts that help you analyze, connect, and apply what you've read. Over time, fleeting information turns into lasting clarity and focus.",
-                    icon: "🌱"
-                  }
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="text-center p-8 rounded-2xl bg-white/50 dark:bg-amber-100/50 border border-amber-200/30 dark:border-amber-300/30 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
-                    whileHover={{ y: -2 }}
-                    variants={fadeInUp}
-                  >
-                    <div className="text-4xl mb-4">{item.icon}</div>
-                    <div className="text-lg font-bold text-amber-800 dark:text-amber-900 mb-3">
-                      Step {item.step} – {item.title}
-                    </div>
-                    <p className="text-base text-amber-700 dark:text-amber-800 font-light leading-relaxed">
-                      {item.text}
-                    </p>
-                  </motion.div>
-                ))}
+                {/* Vertical Progress Line */}
+                <div className="absolute left-8 md:left-1/2 md:transform md:-translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500 dark:from-amber-400 dark:via-amber-500 dark:to-amber-600"></div>
+                
+                {/* Steps */}
+                <div className="space-y-12">
+                  {[
+                    {
+                      step: 1,
+                      title: "Define what matters",
+                      text: "Set themes that align with your goals.",
+                      icon: "🎯",
+                      bgClass: "bg-gradient-to-br from-amber-50/80 to-amber-100/80 dark:from-amber-100/80 dark:to-amber-200/80"
+                    },
+                    {
+                      step: 2,
+                      title: "Clarity, not noise",
+                      text: "We give you exactly that — no clickbait, no tricks.",
+                      icon: "📜",
+                      bgClass: "bg-gradient-to-br from-amber-100/80 to-amber-150/80 dark:from-amber-150/80 dark:to-amber-200/80"
+                    },
+                    {
+                      step: 3,
+                      title: "Grow with reflection",
+                      text: "Your digest adapts to make you sharper, not distracted.",
+                      icon: "🌱",
+                      bgClass: "bg-gradient-to-br from-amber-150/80 to-amber-200/80 dark:from-amber-200/80 dark:to-amber-250/80"
+                    }
+                  ].map((item, index) => (
+                    <motion.div
+                      key={index}
+                      className="relative flex items-center"
+                      variants={fadeInUp}
+                    >
+                      {/* Step Circle with Icon */}
+                      <div className="absolute left-0 md:left-1/2 md:transform md:-translate-x-1/2 w-16 h-16 bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-full border-4 border-amber-300/50 dark:border-amber-400/50 shadow-lg flex items-center justify-center z-10">
+                        <span className="text-2xl">{item.icon}</span>
+                      </div>
+                      
+                      {/* Step Number Circle */}
+                      <div className="absolute left-0 md:left-1/2 md:transform md:-translate-x-1/2 -bottom-2 w-8 h-8 bg-amber-600 dark:bg-amber-700 rounded-full flex items-center justify-center shadow-md z-20">
+                        <span className="text-white font-bold text-sm">{item.step}</span>
+                      </div>
+                      
+                      {/* Content Card */}
+                      <div className={`ml-20 md:ml-0 md:w-1/2 ${index % 2 === 0 ? 'md:mr-auto md:pr-8' : 'md:ml-auto md:pl-8'}`}>
+                        <motion.div
+                          className="p-6 rounded-2xl border border-amber-200/50 dark:border-amber-300/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm"
+                          whileHover={{ y: -2 }}
+                        >
+                          <div className="text-xl font-bold text-amber-800 dark:text-amber-900 mb-3">
+                            Step {item.step} – {item.title}
+                          </div>
+                          <p className="text-base text-amber-700 dark:text-amber-800 font-light leading-relaxed">
+                            {item.text}
+                          </p>
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
 
               {/* Divider line */}
@@ -337,14 +228,6 @@ export default function About() {
                 <div className="w-32 h-px bg-amber-300 dark:bg-amber-400"></div>
               </div>
 
-              <div className="text-center">
-                <p className="text-lg font-bold text-amber-800 dark:text-amber-900 leading-relaxed">
-                  📌 This is where it begins
-                </p>
-                <p className="text-base text-amber-700 dark:text-amber-800 font-light leading-relaxed mt-2">
-                  The foundation of healthier digital habits — one step now, many more ahead.
-                </p>
-              </div>
             </div>
           </motion.div>
 
@@ -363,8 +246,8 @@ export default function About() {
           >
             <div className={`rounded-3xl p-8 md:p-12 border backdrop-blur-sm shadow-lg transition-all duration-700 ${
               showAfter 
-                ? 'bg-gradient-to-br from-amber-50/30 to-amber-100/30 dark:from-amber-100/30 dark:to-amber-200/30 border-amber-200/20 dark:border-amber-300/20' 
-                : 'bg-gradient-to-br from-red-50/30 to-orange-100/30 dark:from-red-100/30 dark:to-orange-200/30 border-red-200/20 dark:border-orange-300/20'
+                ? 'bg-white/80 dark:bg-amber-100/80 border-amber-200/50 dark:border-amber-300/50' 
+                : 'bg-white/80 dark:bg-red-100/80 border-red-200/50 dark:border-orange-300/50'
             }`}>
               <h2 className="text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-8 text-center">
                 The Transformation
@@ -372,7 +255,7 @@ export default function About() {
               
               {/* Toggle */}
               <div className="flex justify-center mb-8">
-                <div className="bg-white/50 dark:bg-amber-100/50 rounded-full p-1 border border-amber-200/30 dark:border-amber-300/30">
+                <div className="bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-full p-1 border border-amber-200/50 dark:border-amber-300/50">
                   <button
                     onClick={() => setShowAfter(false)}
                     className={`px-6 py-2 rounded-full transition-all duration-300 ${
@@ -405,24 +288,36 @@ export default function About() {
               >
                 <div className={`p-8 rounded-2xl border mb-6 transition-all duration-700 ${
                   showAfter 
-                    ? 'bg-white/50 dark:bg-amber-100/50 border-amber-200/30 dark:border-amber-300/30' 
-                    : 'bg-white/50 dark:bg-red-100/50 border-red-200/30 dark:border-orange-300/30'
+                    ? 'bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm border-amber-200/50 dark:border-amber-300/50' 
+                    : 'bg-white/80 dark:bg-red-100/80 backdrop-blur-sm border-red-200/50 dark:border-orange-300/50'
                 }`}>
-                  <p className={`text-2xl font-light leading-relaxed transition-colors duration-700 ${
+                  <div className={`transition-colors duration-700 ${
                     showAfter 
                       ? 'text-amber-800 dark:text-amber-900' 
                       : 'text-red-800 dark:text-red-900'
                   }`}>
-                    {showAfter 
-                      ? "Calm, intentional, and restorative — a space designed to let the mind pause, reflect, and gain clarity. Every element encourages healing, understanding, and deeper insight."
-                      : "Overstimulated, frustrated, and drained — endless feeds that provoked more stress than insight. Content felt scattered, leaving attention fragmented and emotions unsettled."
-                    }
-                  </p>
+                    {showAfter ? (
+                      <div className="space-y-4">
+                        <p className="text-xl font-medium leading-relaxed">
+                          This space is built for you
+                        </p>
+                        <p className="text-lg font-light leading-relaxed">
+                          — to help you slow down, reflect, and strengthen the parts of you that make life richer, calmer, and more intentional.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <p className="text-xl font-medium leading-relaxed">
+                          Feeds weren't made for you
+                        </p>
+                        <p className="text-lg font-light leading-relaxed">
+                          — they were made to capture attention and turn it into a product. The result: overstimulation, scattered focus, and feeling pulled away from yourself.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
-                <p className="text-xl text-amber-800 dark:text-amber-900 font-light leading-relaxed">
-                  Imagine shifting from scattered to centered.
-                </p>
               </motion.div>
             </div>
           </motion.div>
@@ -433,30 +328,7 @@ export default function About() {
           </div>
 
           {/* Final CTA Section */}
-          <motion.div 
-            className="bg-gradient-to-br from-amber-100/80 to-amber-200/80 dark:from-amber-200/80 dark:to-amber-300/80 rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12 backdrop-blur-sm"
-            initial="initial"
-            whileInView="animate"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="text-center">
-              <h3 className="text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-6 leading-tight">
-                ⚡ Join us, don't just sign up.
-              </h3>
-              <p className="text-lg text-amber-800 dark:text-amber-900 mb-8 font-light leading-relaxed">
-                Help shape Teerth. Share ideas. Be part of the waitlist.
-              </p>
-              <CTAButton 
-                href="/dashboard" 
-                variant="primary" 
-                size="lg"
-                className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-light py-4 px-8 rounded-2xl transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
-              >
-                Join the Waitlist → Help Us Build This
-              </CTAButton>
-            </div>
-          </motion.div>
+          <WaitlistSection variant="concise" />
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ export default function InfoIcon({ className = '' }: InfoIconProps) {
     <Link 
       href="/about" 
       className={`inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${className}`}
-      aria-label="Learn more about UnHook"
+      aria-label="Learn more about Teerth"
     >
       <svg 
         className="w-4 h-4 text-gray-600 dark:text-gray-400" 
