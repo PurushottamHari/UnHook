@@ -1,3 +1,8 @@
+# Ignore Docker files to force Nixpacks usage
+Dockerfile
+docker-compose.yml
+.dockerignore
+
 # Ignore development files
 .env
 .env.local

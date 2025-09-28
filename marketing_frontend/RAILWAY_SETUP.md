@@ -21,9 +21,9 @@ In the Railway dashboard, you need to configure the following:
 - This tells Railway to treat the `marketing_frontend` folder as the project root
 
 #### **Build Method**
-- Make sure Railway uses **Nixpacks** (not Docker)
-- The `railway.json` file will automatically configure this
-- If Railway tries to use Docker, you can force Nixpacks in the settings
+- Railway will automatically detect this as a Node.js project
+- The `railway.json` file will configure the build and start commands
+- Railway's current build system will handle the deployment
 
 **Note**: The `railway.json` file in the `marketing_frontend` directory will automatically configure the build and start commands for you. You don't need to manually set them.
 
@@ -109,8 +109,10 @@ UnHook/
 ### If Build Fails:
 - Check that the root directory is set to `marketing_frontend`
 - Verify that `package.json` exists in the marketing_frontend folder
-- **Make sure Railway is using Nixpacks, not Docker** (check the build logs)
-- If Railway is using Docker, go to Settings → Build and change to Nixpacks
+- **If you see Python/Dockerfile errors**: Railway is detecting the root-level Dockerfile instead of recognizing it as a Node.js project. Make sure:
+  - Root directory is set to `marketing_frontend`
+  - The `.railwayignore` file excludes Dockerfiles
+  - Railway detects it as a Node.js project (should show Node.js in build logs)
 - Check Railway logs for specific error messages
 
 ### If Import Errors Occur:

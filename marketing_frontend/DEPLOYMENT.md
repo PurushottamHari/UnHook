@@ -37,7 +37,7 @@ Railway is the fastest and easiest option for a prototype deployment.
 - ✅ Built-in environment variable management
 - ✅ Custom domains available
 - ✅ SSL certificates included
-- ✅ Optimized for Next.js
+- ✅ Modern build system with automatic Node.js detection
 
 ### Option 2: Vercel (Recommended for Next.js)
 
