@@ -23,16 +23,22 @@ async function fetchArticleFromMongoDB(
     const generatedContentCollection = db.collection('generated_content');
 
     // Try different query approaches
-    let doc = await generatedContentCollection.findOne({
-      _id: new ObjectId(articleId),
+    let doc = null;
+    
+    // First try as string ID (UUID format) - cast to any to bypass TypeScript strict typing
+    doc = await generatedContentCollection.findOne({
+      _id: articleId as any,
     });
 
-    // If not found by _id, try by ObjectId
+    // If not found by string ID, try as ObjectId (for backward compatibility)
     if (!doc) {
       try {
-        doc = await generatedContentCollection.findOne({
-          _id: new ObjectId(articleId),
-        });
+        // Only try ObjectId if the string looks like a valid ObjectId (24 hex chars)
+        if (/^[0-9a-fA-F]{24}$/.test(articleId)) {
+          doc = await generatedContentCollection.findOne({
+            _id: new ObjectId(articleId),
+          });
+        }
       } catch {
         // ObjectId conversion failed, continue
       }
