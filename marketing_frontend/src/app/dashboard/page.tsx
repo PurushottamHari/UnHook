@@ -1,5 +1,6 @@
 import {
   getCachedNewspaper,
+  getMostRecentCachedNewspaper,
   CachedNewspaper,
 } from '@/lib/cache/newspaper-cache';
 import TeerthLogo from '@/components/TeerthLogo';
@@ -14,7 +15,14 @@ export const metadata: Metadata = {
 async function getNewspaperForToday(): Promise<CachedNewspaper | null> {
   // Always use today's date
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-  return getCachedNewspaper(today);
+  const todayNewspaper = getCachedNewspaper(today);
+  
+  // If today's newspaper is not found, fallback to the most recent cached newspaper
+  if (!todayNewspaper) {
+    return getMostRecentCachedNewspaper();
+  }
+  
+  return todayNewspaper;
 }
 
 export default async function Dashboard() {

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import TeerthLogoIcon from '@/components/TeerthLogoIcon';
 import WaitlistForm from '@/components/WaitlistForm';
 
@@ -114,6 +115,11 @@ export default function WaitlistSection({
           <>
             {/* Left side - Text content */}
             <div className='w-full lg:w-[35%]'>
+              {/* Teerth Logo Icon at the top */}
+              <div className='flex justify-center mb-6'>
+                <TeerthLogoIcon alt='Teerth Logo Icon' size={150} />
+              </div>
+              
               <h3 className={styles.title}>{title || defaultTitle}</h3>
 
               {showFeatures && (
@@ -143,10 +149,29 @@ export default function WaitlistSection({
                 </ul>
               )}
 
-              {/* Teerth Logo Icon under features */}
-              <div className='flex justify-center mt-6'>
-                <TeerthLogoIcon alt='Teerth Logo Icon' size={150} />
-              </div>
+               {/* Learn More Button */}
+               <div className='mt-6'>
+                 <Link
+                   href={learnMoreHref}
+                   className='inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105'
+                 >
+                   <span>Learn More</span>
+                   <svg
+                     className='w-4 h-4'
+                     fill='none'
+                     stroke='currentColor'
+                     viewBox='0 0 24 24'
+                   >
+                     <path
+                       strokeLinecap='round'
+                       strokeLinejoin='round'
+                       strokeWidth={2}
+                       d='M9 5l7 7-7 7'
+                     />
+                   </svg>
+                 </Link>
+               </div>
+
             </div>
 
             {/* Divider */}
