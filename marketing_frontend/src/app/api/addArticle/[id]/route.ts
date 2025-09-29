@@ -25,10 +25,10 @@ async function fetchArticleFromMongoDB(
     // Try different query approaches
     let doc = null;
     
-    // First try as string ID (UUID format) - cast to any to bypass TypeScript strict typing
-    doc = await generatedContentCollection.findOne({
-      _id: articleId as any,
-    });
+    // First try as string ID (UUID format)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const query: any = { _id: articleId };
+    doc = await generatedContentCollection.findOne(query);
 
     // If not found by string ID, try as ObjectId (for backward compatibility)
     if (!doc) {
