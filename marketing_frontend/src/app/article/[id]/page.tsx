@@ -24,20 +24,6 @@ async function getArticle(id: string): Promise<CachedArticle | null> {
   return null;
 }
 
-async function getArticleDateForNavigation(
-  article: CachedArticle
-): Promise<string | null> {
-  try {
-    // Use the article's published date to determine which newspaper date to navigate to
-    const publishedDate = new Date(article.published_at);
-    const articleDate = publishedDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-
-    return articleDate;
-  } catch (error) {
-    console.error('Error getting article date for navigation:', error);
-    return null;
-  }
-}
 
 export async function generateMetadata({
   params,
@@ -72,8 +58,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     notFound();
   }
 
-  // Get the date for navigation based on article's published date
-  const navigationDate = await getArticleDateForNavigation(article);
 
   return (
     <div className='min-h-screen bg-yellow-50 dark:bg-amber-50'>
@@ -81,11 +65,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {/* Breadcrumb */}
         <nav className='mb-8'>
           <Link
-            href={
-              navigationDate
-                ? `/dashboard?date=${navigationDate}`
-                : '/dashboard'
-            }
+            href='/dashboard'
             className='inline-flex items-center text-sm text-amber-700 dark:text-amber-800 hover:text-amber-900 dark:hover:text-amber-900 transition-colors'
           >
             <svg

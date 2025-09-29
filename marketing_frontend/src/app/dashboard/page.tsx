@@ -6,27 +6,19 @@ import TeerthLogo from '@/components/TeerthLogo';
 import WaitlistSection from '@/components/WaitlistSection';
 import { Metadata } from 'next';
 
-interface DashboardPageProps {
-  searchParams: { date?: string };
-}
-
 export const metadata: Metadata = {
   title: 'Teerth - Dashboard',
   description: 'Your daily curated digest of mindful articles and insights.',
 };
 
-async function getNewspaperForDate(
-  date?: string
-): Promise<CachedNewspaper | null> {
-  // If no date provided, use today's date
-  // If date provided, use that specific date
-  const targetDate = date || new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-  return getCachedNewspaper(targetDate);
+async function getNewspaperForToday(): Promise<CachedNewspaper | null> {
+  // Always use today's date
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  return getCachedNewspaper(today);
 }
 
-export default async function Dashboard({ searchParams }: DashboardPageProps) {
-  const resolvedSearchParams = await searchParams;
-  const newspaper = await getNewspaperForDate(resolvedSearchParams.date);
+export default async function Dashboard() {
+  const newspaper = await getNewspaperForToday();
 
   // Only format date if newspaper exists
   const formattedDate = newspaper
