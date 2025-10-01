@@ -106,9 +106,9 @@ export default function ProblemCarousel({ cards }: ProblemCarouselProps) {
         </button>
 
         {/* Card Container */}
-        <div className='relative h-[300px] overflow-hidden rounded-2xl'>
+        <div className='relative h-[250px] sm:h-[280px] md:h-[300px] overflow-hidden rounded-2xl'>
           <div className='flex items-center justify-center h-full'>
-            <div className='w-[55%] h-[300px] relative'>
+            <div className='w-[90%] sm:w-[70%] md:w-[55%] h-[250px] sm:h-[280px] md:h-[300px] relative'>
               <AnimatePresence mode='wait'>
                 <motion.div
                   key={currentIndex}
@@ -125,7 +125,7 @@ export default function ProblemCarousel({ cards }: ProblemCarouselProps) {
                     aria-label={`${currentCard.front}. Click to reveal more details.`}
                     onClick={handleToggle}
                     onKeyDown={handleKeyDown}
-                    className='w-full h-full p-8 rounded-2xl cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 relative group'
+                    className='w-full h-full p-4 sm:p-6 md:p-8 rounded-2xl cursor-pointer text-left focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 relative group'
                     whileHover={{ y: -2, scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
@@ -137,7 +137,7 @@ export default function ProblemCarousel({ cards }: ProblemCarouselProps) {
 
                     {/* Front Side - Illusion */}
                     <motion.div
-                      className='w-full h-full flex flex-col items-center justify-center text-center'
+                      className='w-full h-full flex flex-col items-center justify-center text-center overflow-hidden py-2 sm:py-6'
                       style={{
                         background:
                           'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(254,243,199,0.7) 100%)',
@@ -150,21 +150,23 @@ export default function ProblemCarousel({ cards }: ProblemCarouselProps) {
                       }}
                       transition={{ duration: 0.4, ease: 'easeOut' }}
                     >
-                      <div className='text-4xl mb-4'>🌀</div>
-                      <div className='text-sm text-amber-600/70 font-medium mb-3 tracking-wide'>
+                      <div className='text-3xl sm:text-4xl mb-2 sm:mb-4'>🌀</div>
+                      <div className='text-xs sm:text-sm text-amber-600/70 font-medium mb-2 sm:mb-3 tracking-wide'>
                         Feels like...
                       </div>
-                      <p className='text-lg text-amber-800 font-light leading-relaxed px-4 mb-4 max-w-2xl'>
-                        {currentCard.front}
-                      </p>
-                      <div className='text-2xl opacity-60'>
+                      <div className='flex-1 flex items-center justify-center min-h-0 px-2 sm:px-4'>
+                        <p className='text-sm sm:text-base md:text-lg text-amber-800 font-light leading-relaxed max-w-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-amber-300/50 scrollbar-track-transparent'>
+                          {currentCard.front}
+                        </p>
+                      </div>
+                      <div className='text-xl sm:text-2xl opacity-60 mt-2 sm:mt-4'>
                         {currentCard.icon}
                       </div>
                     </motion.div>
 
                     {/* Back Side - Reality */}
                     <motion.div
-                      className='absolute inset-0 w-full h-full flex flex-col items-center justify-center text-center p-8 rounded-2xl'
+                      className='absolute inset-0 w-full h-full flex flex-col items-center justify-center text-center p-4 sm:p-6 md:p-8 rounded-2xl overflow-hidden'
                       style={{
                         background:
                           'linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.9) 100%)',
@@ -178,25 +180,27 @@ export default function ProblemCarousel({ cards }: ProblemCarouselProps) {
                       }}
                       transition={{ duration: 0.4, ease: 'easeOut' }}
                     >
-                      <div className='text-4xl mb-4'>🔍</div>
-                      <div className='text-sm text-slate-600/70 font-medium mb-3 tracking-wide'>
+                      <div className='text-3xl sm:text-4xl mb-2 sm:mb-4'>🔍</div>
+                      <div className='text-xs sm:text-sm text-slate-600/70 font-medium mb-2 sm:mb-3 tracking-wide'>
                         In reality...
                       </div>
-                      <motion.p
-                        className='text-base text-slate-700 font-medium leading-relaxed px-4 max-w-2xl'
-                        initial={{ opacity: 0, y: 5 }}
-                        animate={{
-                          opacity: isRevealed ? 1 : 0,
-                          y: isRevealed ? 0 : 5,
-                        }}
-                        transition={{
-                          duration: 0.5,
-                          delay: isRevealed ? 0.2 : 0,
-                          ease: 'easeOut',
-                        }}
-                      >
-                        {currentCard.back}
-                      </motion.p>
+                      <div className='flex-1 flex items-center justify-center min-h-0 px-2 sm:px-4'>
+                        <motion.p
+                          className='text-xs sm:text-sm md:text-base text-slate-700 font-medium leading-relaxed max-w-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300/50 scrollbar-track-transparent'
+                          initial={{ opacity: 0, y: 5 }}
+                          animate={{
+                            opacity: isRevealed ? 1 : 0,
+                            y: isRevealed ? 0 : 5,
+                          }}
+                          transition={{
+                            duration: 0.5,
+                            delay: isRevealed ? 0.2 : 0,
+                            ease: 'easeOut',
+                          }}
+                        >
+                          {currentCard.back}
+                        </motion.p>
+                      </div>
                     </motion.div>
                   </motion.button>
                 </motion.div>

@@ -48,8 +48,18 @@ Your digest adapts to make you sharper, not distracted.
 
 4. The Transformation → Motivation
    • Visual: Toggle component ("Before vs After").
-   • Before: Feeds weren’t made for you — they were made to capture attention and turn it into a product. The result: overstimulation, scattered focus, and feeling pulled away from yourself.
-   • After: This space is built for you — to help you slow down, reflect, and strengthen the parts of you that make life richer, calmer, and more intentional.
+   • Before: Social Feeds Exploit You
+   You end up feeling…
+   	•	Addicted
+   	•	Provoked
+   	•	Time drained
+   	•	Distracted
+   • After: This Space Empowers You
+   You end up feeling…
+   	•	In control
+   	•	Grounded
+   	•	Time preserved
+   	•	Focused
    • Tone: Aspirational, but not preachy.
 
 ⸻

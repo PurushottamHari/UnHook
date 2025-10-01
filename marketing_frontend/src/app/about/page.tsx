@@ -300,26 +300,86 @@ export default function About() {
                     }`}
                   >
                     {showAfter ? (
-                      <div className='space-y-4'>
-                        <p className='text-xl font-medium leading-relaxed'>
-                          This space is built for you
-                        </p>
-                        <p className='text-lg font-light leading-relaxed'>
-                          — to help you slow down, reflect, and strengthen the
-                          parts of you that make life richer, calmer, and more
-                          intentional.
-                        </p>
+                      <div className='space-y-8'>
+                        <div className='text-center'>
+                          <h3 className='text-2xl md:text-3xl font-medium leading-tight mb-2'>
+                            This Space Empowers You
+                          </h3>
+                          <p className='text-lg font-light text-amber-600 dark:text-amber-700 mb-8 sm:mb-6'>
+                            You end up feeling…
+                          </p>
+                        </div>
+                        
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto'>
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-amber-50/30 dark:bg-amber-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-amber-600 dark:text-amber-700 text-sm font-medium'>✓</span>
+                            </div>
+                            <span className='text-lg font-medium text-amber-800 dark:text-amber-900'>In control</span>
+                          </div>
+                          
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-amber-50/30 dark:bg-amber-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-amber-600 dark:text-amber-700 text-sm font-medium'>✓</span>
+                            </div>
+                            <span className='text-lg font-medium text-amber-800 dark:text-amber-900'>Grounded</span>
+                          </div>
+                          
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-amber-50/30 dark:bg-amber-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-amber-600 dark:text-amber-700 text-sm font-medium'>✓</span>
+                            </div>
+                            <span className='text-lg font-medium text-amber-800 dark:text-amber-900'>Time preserved</span>
+                          </div>
+                          
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-amber-50/30 dark:bg-amber-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-200 dark:to-amber-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-amber-600 dark:text-amber-700 text-sm font-medium'>✓</span>
+                            </div>
+                            <span className='text-lg font-medium text-amber-800 dark:text-amber-900'>Focused</span>
+                          </div>
+                        </div>
                       </div>
                     ) : (
-                      <div className='space-y-4'>
-                        <p className='text-xl font-medium leading-relaxed'>
-                          Feeds weren&apos;t made for you
-                        </p>
-                        <p className='text-lg font-light leading-relaxed'>
-                          — they were made to capture attention and turn it into
-                          a product. The result: overstimulation, scattered
-                          focus, and feeling pulled away from yourself.
-                        </p>
+                      <div className='space-y-8'>
+                        <div className='text-center'>
+                          <h3 className='text-2xl md:text-3xl font-medium leading-tight mb-2'>
+                            Social Feeds Exploit You
+                          </h3>
+                          <p className='text-lg font-light text-red-600 dark:text-red-700 mb-8 sm:mb-6'>
+                            You end up feeling…
+                          </p>
+                        </div>
+                        
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto'>
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-red-50/30 dark:bg-red-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-200 dark:to-red-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-red-600 dark:text-red-700 text-sm font-medium'>✗</span>
+                            </div>
+                            <span className='text-lg font-medium text-red-800 dark:text-red-900'>Addicted</span>
+                          </div>
+                          
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-red-50/30 dark:bg-red-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-200 dark:to-red-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-red-600 dark:text-red-700 text-sm font-medium'>✗</span>
+                            </div>
+                            <span className='text-lg font-medium text-red-800 dark:text-red-900'>Provoked</span>
+                          </div>
+                          
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-red-50/30 dark:bg-red-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-200 dark:to-red-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-red-600 dark:text-red-700 text-sm font-medium'>✗</span>
+                            </div>
+                            <span className='text-lg font-medium text-red-800 dark:text-red-900'>Time drained</span>
+                          </div>
+                          
+                          <div className='flex items-center space-x-3 p-4 rounded-2xl bg-red-50/30 dark:bg-red-100/20 shadow-sm hover:shadow-md transition-all duration-300'>
+                            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-200 dark:to-red-300 flex items-center justify-center shadow-sm'>
+                              <span className='text-red-600 dark:text-red-700 text-sm font-medium'>✗</span>
+                            </div>
+                            <span className='text-lg font-medium text-red-800 dark:text-red-900'>Distracted</span>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

@@ -46,9 +46,9 @@ export default async function Dashboard() {
         <div className='max-w-6xl mx-auto'>
           {/* Header Section */}
           <div className='relative mb-12'>
-            {/* Date in top right corner - only show if newspaper exists */}
+            {/* Desktop: Date in top right corner */}
             {formattedDate && (
-              <div className='absolute top-0 right-0 text-sm font-light text-amber-600 dark:text-amber-700'>
+              <div className='hidden md:block absolute top-0 right-0 text-sm font-light text-amber-600 dark:text-amber-700'>
                 {formattedDate}
               </div>
             )}
@@ -58,6 +58,13 @@ export default async function Dashboard() {
               <div className='flex justify-center mb-6'>
                 <TeerthLogo alt='Teerth Logo' size={200} />
               </div>
+
+              {/* Mobile: Date below logo */}
+              {formattedDate && (
+                <div className='md:hidden text-center text-sm font-light text-amber-600 dark:text-amber-700 mb-4'>
+                  {formattedDate}
+                </div>
+              )}
 
               <h1 className='text-4xl md:text-5xl lg:text-6xl font-light text-amber-900 dark:text-amber-900 mb-8 leading-tight tracking-tight'>
                 Puru&apos;s Digest
