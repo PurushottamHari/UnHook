@@ -1,0 +1,62 @@
+{
+  "date": "2025-10-03",
+  "articles": [
+    {
+      "id": "799d74b4-caab-4f62-95a9-c025d48b4858",
+      "title": "India Excludes Pakistan and China from UN Peacekeepers Meet",
+      "category": "NEWS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    },
+    {
+      "id": "9a4ea656-7775-4898-9175-899151252f32",
+      "title": "India Warns Pakistan Over Military Buildup Near Sir Creek",
+      "category": "NEWS",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    },
+    {
+      "id": "8954a8c6-f2b3-4670-a9d1-79b4fa720ee6",
+      "title": "The Ethical Dilemmas of AI Decision-Making",
+      "category": "TECHNOLOGY",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    },
+    {
+      "id": "07c82b92-9d57-4778-ae1d-87c5a7f150b1",
+      "title": "Arattai vs WhatsApp: Features and Comparison",
+      "category": "TECHNOLOGY",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    },
+    {
+      "id": "192a1baf-8f02-4362-9255-ff7d70bf23a4",
+      "title": "India's E20 Fuel Policy: Controversy and Scientific Analysis",
+      "category": "ENVIRONMENT",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    },
+    {
+      "id": "41089a35-6202-4209-b961-962bd9e6e7aa",
+      "title": "iPhone 17 Review: The Best Base iPhone in Years",
+      "category": "TECHNOLOGY",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    },
+    {
+      "id": "1d1769d3-eef3-44ca-8401-7bab7f654118",
+      "title": "Tata Sons vs RBI: The IPO Listing Dispute Explained",
+      "category": "BUSINESS",
+      "time_to_read": "8m read",
+      "cached_at": "2025-10-03T15:58:05.596Z"
+    }
+  ],
+  "total_time_to_read": "40m read",
+  "topics": [
+    "NEWS",
+    "TECHNOLOGY",
+    "ENVIRONMENT",
+    "BUSINESS"
+  ],
+  "cached_at": "2025-10-03T15:58:05.597Z"
+}
