@@ -1,0 +1,467 @@
+{
+  "date": "2025-10-12",
+  "articles": [
+    {
+      "id": "8cd82afa-3a2a-43c1-832b-8a7cf8d8b330",
+      "title": "Japan's Rise Through Meiji Restoration",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.517Z"
+    },
+    {
+      "id": "4b446a44-f9db-4b28-9bc8-e6bf38638d46",
+      "title": "IB ACIO 2025 Notification Details",
+      "category": "EDUCATION",
+      "time_to_read": "2m read",
+      "cached_at": "2025-10-12T15:39:44.517Z"
+    },
+    {
+      "id": "126d674a-18b0-4f1b-8ecf-c92b1e00e803",
+      "title": "Jonathan Haidt on Social Media's Harm to Youth Mental Health",
+      "category": "HEALTH",
+      "time_to_read": "8m read",
+      "cached_at": "2025-10-12T15:39:44.517Z"
+    },
+    {
+      "id": "1bf4af0f-66c3-47f9-a303-e2595314c4f9",
+      "title": "4 Levels of Productivity Explained",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.517Z"
+    },
+    {
+      "id": "9dfb570a-367c-4708-b637-625fd9cbdd6b",
+      "title": "Why Learning Feels Boring and How to Fix It",
+      "category": "EDUCATION",
+      "time_to_read": "8m read",
+      "cached_at": "2025-10-12T15:39:44.517Z"
+    },
+    {
+      "id": "36a7f72f-c0b4-43c9-a5e1-422f004fb72e",
+      "title": "AI's Impact on Learning and Brain Function",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.517Z"
+    },
+    {
+      "id": "1e6e2b1d-f48a-4062-b865-77d17ffdd142",
+      "title": "Japan's Post-WWII Economic Miracle: How It Recovered",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "7c3d5b50-1d54-4415-a803-c8ca76ce999e",
+      "title": "China Mandates AI in Schools, India Lags Behind",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "82382181-9364-4073-a7b0-9b7e4723166d",
+      "title": "Study Less, Achieve More: 3 Mistakes to Avoid",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "e345d0cd-c9e2-468c-8cd8-fceda656e1e4",
+      "title": "Mastering Focus for Peak Performance",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "58e0e309-b231-4b92-82a3-61f7f942bcaa",
+      "title": "Controversy Over Maria Corina's 2025 Nobel Peace Prize",
+      "category": "PERSPECTIVES",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "294174c3-86f6-4bd3-86e8-27c0f6c2a602",
+      "title": "Why Rajputana History is Absent in School Books",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "ca282707-01df-4884-bdc7-8469ebe0c6f8",
+      "title": "How to Learn and Retain High Volumes of Information",
+      "category": "EDUCATION",
+      "time_to_read": "8m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "33524c44-e2c6-4a89-a7aa-bca3e250c230",
+      "title": "NV Sir on Parenting, AI in Education, and a Mysterious Investor",
+      "category": "EDUCATION",
+      "time_to_read": "45m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "fa9f470e-e75e-4ca6-bdf0-b3b0baf35894",
+      "title": "Controversy Over SSC Exam Issues",
+      "category": "EDUCATION",
+      "time_to_read": "2m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "0093b0ca-0f37-4dde-b2d6-11f332252fec",
+      "title": "Why Adult Learning Is Challenging",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "cbc83490-3cdf-4ad5-9328-dae8672b3927",
+      "title": "6 Research-Backed Tips to Upgrade iPad Note-Taking",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "70f61c37-e999-4ca2-88cc-c5258650590f",
+      "title": "Rising School Fees Burden Indian Families",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "5d3b33f4-13e6-463f-8749-c6e4e43fa61a",
+      "title": "Four Science-Based Principles to Train an Exceptional Memory",
+      "category": "EDUCATION",
+      "time_to_read": "9m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "d257a13f-ff90-4291-8f2c-bd2c2809fb73",
+      "title": "Singapore's Development: Lessons for India",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "27d29e1a-1e38-415b-87c1-384b0d37b344",
+      "title": "SSC Exam Protests and Police Lathi Charge in Delhi",
+      "category": "EDUCATION",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "a35dd4f1-ebf1-4aba-a15a-60b82de2d2f3",
+      "title": "Schema Priming: Learn More in Less Time",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "2de71d3c-ea14-422a-ac18-3e91d8dd3e54",
+      "title": "Historical Roots and Responsibility for India's Partition",
+      "category": "EDUCATION",
+      "time_to_read": "9m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "c524bcdd-f48b-42db-baa3-3f04eaed1419",
+      "title": "How India Measures Inflation: WPI, CPI, and GDP Deflator Explained",
+      "category": "EDUCATION",
+      "time_to_read": "12m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "0f4d10a1-4630-45a6-a196-314c102a400f",
+      "title": "Introduction to Psychology: Understanding Human Mind and Behavior",
+      "category": "EDUCATION",
+      "time_to_read": "2m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "421d2859-23ef-4b1b-b4d7-fcef2e71d66e",
+      "title": "RBI Grade B Current Affairs & PIB MCQs Session",
+      "category": "EDUCATION",
+      "time_to_read": "10m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "2970253d-97d3-41b9-bbd6-2548ec4eff8f",
+      "title": "India's Vice President Election Process Explained",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "1e561aee-7a07-48fa-91d7-186d8a7b5d95",
+      "title": "SSC Exam Mismanagement Protests in India",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "c8d83c3b-c962-4266-956e-89c99ac09878",
+      "title": "How British Defeated Mughals Using Chanakya's Strategies",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "f4c2a464-59c0-4984-90ec-ca2f1f279600",
+      "title": "IB ACIO Exam Pattern and Preparation Tips",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "821c4934-656d-4ff0-b6b4-cf7eda541c8e",
+      "title": "The Rise and Fall of the Indian National Congress",
+      "category": "EDUCATION",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "c0ad010d-36aa-40cf-a6ed-87997331b1a8",
+      "title": "Abraham Lincoln's Legacy: Abolishing Slavery and Reshaping America",
+      "category": "EDUCATION",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "b98b9b4e-5678-4079-bddd-53f756f3e05c",
+      "title": "SSC Exam Controversy: Tender Irregularities and Paper Leaks",
+      "category": "EDUCATION",
+      "time_to_read": "15m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "ca09b4cf-b1e6-4355-b9cf-77cf8f05af20",
+      "title": "Historical Foundations of Psychology: From Philosophy to Science",
+      "category": "EDUCATION",
+      "time_to_read": "15m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "95d717c4-5ca5-4571-b5cc-4944b85533b6",
+      "title": "History of India-Pakistan Wars: 1947 to 1999",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "dc1a21e3-908b-4a53-87ea-64dfd3e4d169",
+      "title": "Fall of the Soviet Union Explained",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "d09afb1b-9c61-403b-8bef-d79b03bf95f0",
+      "title": "7 Olympic Athlete Principles for Faster Skill Learning",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "6b3b3849-a806-42e8-9df1-8bd1ded6fcaf",
+      "title": "Nationwide School Safety Audits Ordered After Incidents",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "456ab63f-a0be-4624-86f2-72c5a107482a",
+      "title": "Why Saving Money in the Bank Makes You Poorer",
+      "category": "EDUCATION",
+      "time_to_read": "34m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "52f028a7-4395-4b14-976f-97a45615db8a",
+      "title": "6-Year-Old Genius Agniv on Rockets, Coding, and Aliens",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "98960219-6180-490c-94fd-cec50e1f897c",
+      "title": "StudyIQ's Independence Day 2025 Message",
+      "category": "EDUCATION",
+      "time_to_read": "2m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "4c4cd0fc-ce45-4388-8340-2aeb3075a233",
+      "title": "Teachers Detained in SSC Exam Protest",
+      "category": "EDUCATION",
+      "time_to_read": "2m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "09f6d488-1fb5-4bb1-944e-266ea724c3ce",
+      "title": "IAS Officer Alok Ranjan on Governance and Civil Service",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "2b6b53dc-cecd-4dfd-bc26-4fabebbfcbc0",
+      "title": "Why Bombay was Divided into Maharashtra and Gujarat",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "ede73563-3f4c-4565-86e8-4311edf6e2f2",
+      "title": "Santhal Rebellion: Tribal Uprising Against British Exploitation",
+      "category": "EDUCATION",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "3a2ac0f6-8943-442f-85e8-7347f3814a4e",
+      "title": "Understanding Inflation: Causes, Effects, and Control Measures",
+      "category": "EDUCATION",
+      "time_to_read": "9m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "9bb55e92-9382-4c15-8fb7-0aa04849c065",
+      "title": "ChatGPT Study Mode: A Learning Coach's In-Depth Review",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "f57c99c2-7e79-43ea-96ce-fb2b0a5ccb6e",
+      "title": "SSC Stenographer Exam Issues and Protests",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "e95157e2-21ae-41d1-8df8-4b27a0c33811",
+      "title": "Mughal Invasion of India Explained",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "bd3a0878-54de-48cd-916d-cc978f5b1edd",
+      "title": "7 Strategies to Stop Wasting Evenings After Work",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "2a983f86-4b81-4051-bd93-55fce363052d",
+      "title": "How to Read Faster with Better Comprehension",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "20d0323c-676e-4d8d-a3c4-0e90567ca430",
+      "title": "IB ACIO 2025: 3717 Vacancies Announced",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "6952bd34-d155-442d-afa2-df7a79098d6e",
+      "title": "SSC Exam Glitches Spark Nationwide Protests",
+      "category": "EDUCATION",
+      "time_to_read": "2m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "69bed761-dd2f-4193-974f-81d7921c4ba3",
+      "title": "Yoga and Science: Regulating the Nervous System",
+      "category": "HEALTH",
+      "time_to_read": "23m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "701c693c-4b27-4436-86f5-738989f466e5",
+      "title": "Descartes' Philosophy: Cogito, God, and Dualism Explained",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "326bcd98-03cc-4b77-b144-a7e9ac509750",
+      "title": "Mastering AI Avatar Creation: A Complete Course",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "faa1c582-e9b9-49e9-a681-7e31042cf785",
+      "title": "Top 1% Success Mantra: Dopamine & Habits",
+      "category": "EDUCATION",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "414a855b-5d3a-4df9-98ca-c822d3986ad6",
+      "title": "History and Formation of the World Trade Organization (WTO)",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "e1a5b4a9-883c-4b98-a223-26106dae0b98",
+      "title": "YouTube Expert Reveals Key Channel Mistakes",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "26e21d72-2e5a-4b24-9185-e28096605364",
+      "title": "India's Partition: Causes and Consequences",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "5c4691f1-9ede-4617-839e-c1f71aec9050",
+      "title": "StudyIQ's 10-Year Journey from Humble Start to UPSC Leader",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "8f4722e0-3e13-454f-aa98-74e075a353c9",
+      "title": "Israel Updates Textbooks to Credit Indian Soldiers for Haifa Liberation",
+      "category": "EDUCATION",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "c2b7f95f-2f77-4f66-8be1-713bec597364",
+      "title": "How to Enter Deep Work on Command: A Science-Based Toolkit",
+      "category": "EDUCATION",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "9bd20419-44dd-4aab-acec-8c7e60615a46",
+      "title": "RN Kao: The Secret Founder of India's RAW",
+      "category": "EDUCATION",
+      "time_to_read": "17m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    },
+    {
+      "id": "822de91c-bda3-478c-bb2b-0238b5e19609",
+      "title": "Why ADHD Makes Waiting Ruin Your Day",
+      "category": "HEALTH",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-12T15:39:44.518Z"
+    }
+  ],
+  "total_time_to_read": "7h 22m read",
+  "topics": [
+    "EDUCATION",
+    "HEALTH",
+    "PERSPECTIVES"
+  ],
+  "cached_at": "2025-10-12T15:39:44.518Z"
+}
