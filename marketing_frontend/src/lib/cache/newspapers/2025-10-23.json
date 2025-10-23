@@ -1,0 +1,69 @@
+{
+  "date": "2025-10-23",
+  "articles": [
+    {
+      "id": "f84eefed-105d-4f9d-90ce-0397f2ba0e84",
+      "title": "India's Air Defense Systems and Capabilities Explained",
+      "category": "NEWS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "2b46f460-1781-43fb-ac57-8720fa84905a",
+      "title": "Why Wealthy Indians Are Leaving India and Its Impact",
+      "category": "PERSPECTIVES",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "3ecf9923-df48-4fa1-b5d0-d3367bac3ba5",
+      "title": "Three Principles for Dangerous Productivity",
+      "category": "EDUCATION",
+      "time_to_read": "10m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "7135473d-b25c-4d5b-ae8c-ad5cefd158b8",
+      "title": "Trump's Diwali Celebration and Trade Talks with India",
+      "category": "NEWS",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "229a5e2a-2c42-4aca-94a0-7aef928f6aca",
+      "title": "Why Restarting Your Life Feels So Hard",
+      "category": "PERSPECTIVES",
+      "time_to_read": "11m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "f33334e3-7de5-459b-8eb1-bee3b7221d60",
+      "title": "PM Modi and Trump's Diwali Call: No Pakistan Discussion",
+      "category": "NEWS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "2a99b9c4-3931-447c-a3de-e965e7bd7a7e",
+      "title": "DRG: Chhattisgarh's Anti-Naxal Force and Its Success",
+      "category": "NEWS",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    },
+    {
+      "id": "3d5a09ba-cc13-4071-933d-bf8333f757b6",
+      "title": "Why Lunar Eclipses Don't Occur Every Month",
+      "category": "SCIENCE",
+      "time_to_read": "3m read",
+      "cached_at": "2025-10-23T14:42:15.165Z"
+    }
+  ],
+  "total_time_to_read": "48m read",
+  "topics": [
+    "NEWS",
+    "PERSPECTIVES",
+    "EDUCATION",
+    "SCIENCE"
+  ],
+  "cached_at": "2025-10-23T14:42:15.166Z"
+}

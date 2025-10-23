@@ -1,0 +1,69 @@
+{
+  "date": "2025-10-22",
+  "articles": [
+    {
+      "id": "094ef31e-af95-4026-9ff9-a9b291805199",
+      "title": "India Reopens Embassy in Kabul, Engages with Taliban",
+      "category": "NEWS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "18c2d5e2-c2da-4a78-b13a-f303ef03dc8c",
+      "title": "Food, Spirituality, and Cooking as Therapy",
+      "category": "SPIRITUALITY",
+      "time_to_read": "28m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "17a65c77-94a5-40fb-91d0-7a62314573f3",
+      "title": "Bima Sugam: India's New Digital Insurance Marketplace",
+      "category": "BUSINESS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "483e9e06-01d2-4313-9b40-66cd38e44664",
+      "title": "Gold Replaces Crude Oil as Key Economic Indicator",
+      "category": "BUSINESS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "02d18abb-ce82-41dc-9fa4-a5cea233e01c",
+      "title": "RBI Skips Dollar Purchases, Buys Gold in Strategy Shift",
+      "category": "BUSINESS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "849d6e1c-b09a-4aa9-8a32-3b478c766c62",
+      "title": "NotebookLM 2025: A Complete AI Learning Platform",
+      "category": "TECHNOLOGY",
+      "time_to_read": "10m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "db603dea-c2d7-450d-9583-b2ab99ba13e2",
+      "title": "Apple Vision Pro 2: M5 Chip and New Comfort Band",
+      "category": "TECHNOLOGY",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    },
+    {
+      "id": "c7ad73f7-225b-4d05-b541-059df2ead680",
+      "title": "India's Suspected Drone Strike on NSCN-KYA Camps",
+      "category": "NEWS",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-22T12:19:04.368Z"
+    }
+  ],
+  "total_time_to_read": "1h 4m read",
+  "topics": [
+    "NEWS",
+    "SPIRITUALITY",
+    "BUSINESS",
+    "TECHNOLOGY"
+  ],
+  "cached_at": "2025-10-22T12:19:04.369Z"
+}
