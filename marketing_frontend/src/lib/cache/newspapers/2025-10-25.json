@@ -1,0 +1,63 @@
+{
+  "date": "2025-10-25",
+  "articles": [
+    {
+      "id": "fa7cdca6-54b4-466e-b660-509c2ba70e6b",
+      "title": "Overcoming Fear of Death Through Completing Life's Story",
+      "category": "SPIRITUALITY",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    },
+    {
+      "id": "ca59418d-0dcf-45a9-bba8-3e120cf849fb",
+      "title": "Kurzgesagt's 10-Year Anniversary Human Era Calendar and Artbook",
+      "category": "CULTURE",
+      "time_to_read": "4m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    },
+    {
+      "id": "e0ea9754-aae8-4740-bff6-32c217be2daa",
+      "title": "Shelby Oaks Review: Chris Stuckmann's Horror Debut",
+      "category": "MOVIES",
+      "time_to_read": "5m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    },
+    {
+      "id": "bc667f30-2688-4f9f-80d6-443874c550d2",
+      "title": "Ravie Dubey and Sargun Mehta on Love, Career, and Ramayana",
+      "category": "MOVIES",
+      "time_to_read": "39m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    },
+    {
+      "id": "1bfe8540-6865-4a5f-8cf0-3e8f15032ddb",
+      "title": "Afghanistan-Pakistan Water Dispute and India's Role",
+      "category": "NEWS",
+      "time_to_read": "6m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    },
+    {
+      "id": "415ce0d9-48ba-47df-a4e6-8a9187562053",
+      "title": "Klopp on Leadership, Liverpool, and Future",
+      "category": "SPORTS",
+      "time_to_read": "14m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    },
+    {
+      "id": "c3d5ae39-a360-41ee-9f46-bb8e9e1af804",
+      "title": "Chris Stuckmann's Journey to His Film Shelby Oaks",
+      "category": "MOVIES",
+      "time_to_read": "7m read",
+      "cached_at": "2025-10-25T15:20:12.476Z"
+    }
+  ],
+  "total_time_to_read": "1h 22m read",
+  "topics": [
+    "SPIRITUALITY",
+    "CULTURE",
+    "MOVIES",
+    "NEWS",
+    "SPORTS"
+  ],
+  "cached_at": "2025-10-25T15:20:12.476Z"
+}
