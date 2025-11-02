@@ -1,29 +1,84 @@
+import { Article } from '@/models/article.model';
 import { getDatabase } from '@/lib/db/connection';
-import { Article } from '@/types';
 import { ObjectId } from 'mongodb';
+import { articleCache } from '@/lib/services/cache/article/article-cache';
 
 export class ArticleService {
-  async fetchArticleFromMongoDB(articleId: string): Promise<Article | null> {
+  /**
+   * Check if running on client-side
+   */
+  private isClient(): boolean {
+    return typeof window !== 'undefined';
+  }
+
+  /**
+   * Fetch an article by its ID
+   * On client: uses API + caching
+   * On server: uses direct DB access
+   * 
+   * @param articleId - The article identifier
+   * @returns Article model or null if not found
+   */
+  async getArticleById(articleId: string): Promise<Article | null> {
+    if (this.isClient()) {
+      return this.getArticleByIdClient(articleId);
+    } else {
+      return this.getArticleByIdServer(articleId);
+    }
+  }
+
+  /**
+   * Client-side article fetching with caching
+   * @private
+   */
+  private async getArticleByIdClient(articleId: string): Promise<Article | null> {
+    // Check cache first for instant return
+    const cachedArticle = articleCache.get(articleId);
+    if (cachedArticle) {
+      return cachedArticle;
+    }
+
+    // Not in cache, fetch from API
+    return this.fetchAndCacheArticle(articleId);
+  }
+
+  /**
+   * Fetch article from API and cache it (client-side only)
+   * @private
+   */
+  private async fetchAndCacheArticle(articleId: string): Promise<Article | null> {
+    try {
+      const response = await fetch(`/api/articles/${articleId}`);
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch article');
+      }
+
+      // Store in cache for future use
+      articleCache.set(data.article);
+      
+      return data.article;
+    } catch (error) {
+      console.error('Error fetching article:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Server-side article fetching (direct DB access)
+   * @private
+   */
+  private async getArticleByIdServer(articleId: string): Promise<Article | null> {
     try {
       const db = await getDatabase();
       const generatedContentCollection = db.collection('generated_content');
 
-      // Try different query approaches
-      let doc = null;
-      
-      // First try as string ID
-      doc = await generatedContentCollection.findOne({ _id: articleId });
-
-      // If not found, try as ObjectId
-      if (!doc && /^[0-9a-fA-F]{24}$/.test(articleId)) {
-        try {
-          doc = await generatedContentCollection.findOne({
-            _id: new ObjectId(articleId),
-          });
-        } catch {
-          // ObjectId conversion failed
-        }
-      }
+      // Convert string ID to ObjectId for MongoDB query
+      const objectId = new ObjectId(articleId);
+      const doc = await generatedContentCollection.findOne({
+        _id: objectId,
+      });
 
       if (!doc) {
         return null;
@@ -111,8 +166,45 @@ export class ArticleService {
         cached_at: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Error fetching article from MongoDB:', error);
+      console.error('Error fetching article:', error);
       return null;
     }
+  }
+
+  /**
+   * Get cached article without fetching (client-side only)
+   * Useful for instant display while data is being fetched
+   * 
+   * @param articleId - The article identifier
+   * @returns Article from cache or null if not cached
+   */
+  async getCachedArticle(articleId: string): Promise<Article | null> {
+    if (!this.isClient()) {
+      return null; // No cache on server
+    }
+
+    return articleCache.get(articleId);
+  }
+
+  /**
+   * Clear the article cache (client-side only)
+   */
+  async clearCache(): Promise<void> {
+    if (!this.isClient()) {
+      return;
+    }
+
+    articleCache.clear();
+  }
+
+  /**
+   * Remove a specific article from cache (client-side only)
+   */
+  async removeFromCache(articleId: string): Promise<void> {
+    if (!this.isClient()) {
+      return;
+    }
+
+    articleCache.remove(articleId);
   }
 }

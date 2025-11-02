@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { CachedNewspaper } from '@/types';
+import { CachedNewspaper } from '@/models/newspaper.model';
 import ArticleCard from './ArticleCard';
 import { useAuthStore } from '@/store/auth-store';
 
@@ -23,7 +23,7 @@ export default function DashboardContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg text-gray-600">Loading today's articles...</div>
+        <div className="text-lg text-gray-600">Loading today&apos;s articles...</div>
       </div>
     );
   }

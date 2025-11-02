@@ -2,8 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { Article } from '@/types';
+import { Article } from '@/models/article.model';
 import ReactMarkdown from 'react-markdown';
+import { ArticleService } from '@/lib/services/article-service';
+
+const articleService = new ArticleService();
 
 export default function ArticlePage() {
   const params = useParams();
@@ -12,12 +15,11 @@ export default function ArticlePage() {
   const { data: article, isLoading, error } = useQuery<Article>({
     queryKey: ['article', articleId],
     queryFn: async () => {
-      const response = await fetch(`/api/articles/${articleId}`);
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error);
+      const article = await articleService.getArticleById(articleId);
+      if (!article) {
+        throw new Error('Article not found');
       }
-      return data.article;
+      return article;
     },
     enabled: !!articleId,
   });

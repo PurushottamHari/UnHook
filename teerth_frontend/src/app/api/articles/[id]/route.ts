@@ -17,7 +17,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const articleService = new ArticleService();
-    const article = await articleService.fetchArticleFromMongoDB(id);
+    const article = await articleService.getArticleById(id);
 
     if (!article) {
       return NextResponse.json(

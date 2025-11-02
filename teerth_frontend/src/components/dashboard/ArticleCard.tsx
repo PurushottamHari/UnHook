@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CachedNewspaperArticle } from '@/types';
+import { CachedNewspaperArticle } from '@/models/newspaper.model';
 
 interface ArticleCardProps {
   article: CachedNewspaperArticle;

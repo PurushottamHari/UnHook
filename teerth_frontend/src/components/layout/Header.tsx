@@ -1,20 +1,11 @@
 'use client';
 
 import { useAuthStore } from '@/store/auth-store';
-import { useRouter } from 'next/navigation';
 
 export default function Header() {
-  const { user, logout, isAuthenticated } = useAuthStore();
-  const router = useRouter();
-
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
-
-  if (!isAuthenticated) {
-    return null;
-  }
+  const { user } = useAuthStore();
+  // Always show header - user is always signed in
+  // Logout removed - user stays signed in
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -28,12 +19,6 @@ export default function Header() {
             <span className="text-sm text-gray-700">
               Welcome, {user?.username} ({user?.role})
             </span>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Logout
-            </button>
           </div>
         </div>
       </div>

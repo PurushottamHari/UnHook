@@ -1,8 +1,13 @@
 import { getDatabase } from '@/lib/db/connection';
-import { CachedNewspaper, CachedNewspaperArticle } from '@/types';
+import { CachedNewspaper, CachedNewspaperArticle } from '@/models/newspaper.model';
 
 export class NewspaperService {
-  async fetchNewspaperFromMongoDB(date: string): Promise<CachedNewspaper | null> {
+  /**
+   * Fetch a newspaper by date
+   * @param date - Date in YYYY-MM-DD format
+   * @returns CachedNewspaper model or null if not found
+   */
+  async getNewspaperByDate(date: string): Promise<CachedNewspaper | null> {
     try {
       const db = await getDatabase();
       const newspapersCollection = db.collection('newspapers');
@@ -38,8 +43,8 @@ export class NewspaperService {
 
       const consideredContentList = newspaper.considered_content_list || [];
       const consideredContentIds = consideredContentList
-        .map((item: any) => item.user_collected_content_id)
-        .filter(Boolean);
+        .map((item: { user_collected_content_id?: string }) => item.user_collected_content_id)
+        .filter((id: string | undefined): id is string => Boolean(id));
 
       if (consideredContentIds.length === 0) {
         return {
@@ -133,13 +138,17 @@ export class NewspaperService {
         cached_at: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Error fetching newspaper from MongoDB:', error);
+      console.error('Error fetching newspaper:', error);
       return null;
     }
   }
 
+  /**
+   * Fetch today's newspaper
+   * @returns CachedNewspaper model or null if not found
+   */
   async getTodayNewspaper(): Promise<CachedNewspaper | null> {
     const today = new Date().toISOString().split('T')[0];
-    return this.fetchNewspaperFromMongoDB(today);
+    return this.getNewspaperByDate(today);
   }
 }
