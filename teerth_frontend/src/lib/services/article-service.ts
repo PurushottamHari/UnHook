@@ -1,6 +1,5 @@
 import { Article } from '@/models/article.model';
 import { getDatabase } from '@/lib/db/connection';
-import { ObjectId } from 'mongodb';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
 
 export class ArticleService {
@@ -74,11 +73,10 @@ export class ArticleService {
       const db = await getDatabase();
       const generatedContentCollection = db.collection('generated_content');
 
-      // Convert string ID to ObjectId for MongoDB query
-      const objectId = new ObjectId(articleId);
-      const doc = await generatedContentCollection.findOne({
-        _id: objectId,
-      });
+      // Query by string ID (UUID format) - this is how articles are stored
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const query: any = { _id: articleId };
+      const doc = await generatedContentCollection.findOne(query);
 
       if (!doc) {
         return null;

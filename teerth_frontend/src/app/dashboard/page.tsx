@@ -1,9 +1,9 @@
 import { NewspaperService } from '@/lib/services/newspaper-service';
 import TeerthLogo from '@/components/TeerthLogo';
 import WaitlistSection from '@/components/WaitlistSection';
+import ExpandableArticleCard from '@/components/ExpandableArticleCard';
 import { Metadata } from 'next';
 import { CachedNewspaper } from '@/models/newspaper.model';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Teerth - Dashboard',
@@ -80,106 +80,9 @@ export default async function Dashboard() {
           {/* Articles Section */}
           {newspaper ? (
             <div className='bg-white/50 dark:bg-amber-100/50 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-amber-200/50 dark:border-amber-300/50 shadow-lg'>
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 items-start'>
                 {newspaper.articles.map(article => (
-                  <Link
-                    key={article.id}
-                    href={`/articles/${article.id}`}
-                    className='block'
-                  >
-                    <div className='group relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.01]'>
-                      {/* Subtle Pattern Overlay */}
-                      <div className='absolute inset-0 opacity-5'>
-                        <div
-                          className='absolute inset-0'
-                          style={{
-                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d97706' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                          }}
-                        />
-                      </div>
-
-                      {/* Article Title and Metadata - Always Visible */}
-                      <div className='relative z-20 p-6 pb-3'>
-                        <h3 className='text-xl font-bold text-amber-900 dark:text-amber-900 mb-3 leading-tight'>
-                          {article.title}
-                        </h3>
-
-                        <div className='flex items-center gap-4 text-sm text-amber-700 dark:text-amber-800'>
-                          <span className='inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-amber-200/50 text-amber-800 dark:bg-amber-300/50 dark:text-amber-900 border border-amber-300/30'>
-                            {article.category}
-                          </span>
-                          <span className='flex items-center gap-2 text-amber-600 dark:text-amber-700'>
-                            <svg
-                              className='w-4 h-4'
-                              fill='none'
-                              stroke='currentColor'
-                              viewBox='0 0 24 24'
-                            >
-                              <path
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                strokeWidth={2}
-                                d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'
-                              />
-                            </svg>
-                            {article.time_to_read}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Lock Overlay - Only on Content */}
-                      <div
-                        className='absolute inset-0 bg-gradient-to-br from-amber-100/90 to-amber-200/90 dark:from-amber-200/90 dark:to-amber-300/90 backdrop-blur-sm flex items-center justify-center z-10 transition-all duration-300 group-hover:from-amber-200/95 group-hover:to-amber-300/95'
-                        style={{ top: '120px' }}
-                      >
-                        <div className='text-center p-4 w-full'>
-                          <div className='w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-amber-200 to-amber-300 dark:from-amber-300 dark:to-amber-400 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300'>
-                            <svg
-                              className='w-6 h-6 text-amber-700 dark:text-amber-800'
-                              fill='none'
-                              stroke='currentColor'
-                              viewBox='0 0 24 24'
-                            >
-                              <path
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                                strokeWidth={2}
-                                d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
-                              />
-                            </svg>
-                          </div>
-                          <h4 className='text-base font-semibold text-amber-800 dark:text-amber-900 mb-1'>
-                            Subscribe to Unlock
-                          </h4>
-                          <p className='text-xs text-amber-700 dark:text-amber-800 leading-relaxed'>
-                            Read the full article
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Article Content (Blurred) */}
-                      <div className='opacity-25 p-6 pt-0'>
-                        <div className='text-amber-800 dark:text-amber-900 space-y-2'>
-                          <p className='text-base leading-relaxed'>
-                            This is a preview of the article content...
-                          </p>
-                          <p className='text-sm leading-relaxed'>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit. Sed do eiusmod tempor incididunt ut labore et
-                            dolore magna aliqua.
-                          </p>
-                          <p className='text-sm leading-relaxed'>
-                            Ut enim ad minim veniam, quis nostrud exercitation
-                            ullamco laboris nisi ut aliquip ex ea commodo
-                            consequat.
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Subtle Border Glow */}
-                      <div className='absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-br from-amber-300/20 to-amber-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
-                    </div>
-                  </Link>
+                  <ExpandableArticleCard key={article.id} article={article} />
                 ))}
               </div>
             </div>

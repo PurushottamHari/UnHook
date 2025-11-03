@@ -21,13 +21,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
-          <QueryProvider>
-            <AuthProvider>
-              <main className="min-h-screen bg-gray-50">
-                {children}
-              </main>
-            </AuthProvider>
-          </QueryProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <main className="min-h-screen bg-gray-50">
+              {children}
+            </main>
+          </AuthProvider>
+        </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

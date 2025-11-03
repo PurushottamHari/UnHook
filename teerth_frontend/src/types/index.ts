@@ -24,6 +24,7 @@ export interface CachedNewspaperArticle {
   title: string;
   category: string;
   time_to_read: string;
+  summary?: string;
   cached_at: string;
 }
 

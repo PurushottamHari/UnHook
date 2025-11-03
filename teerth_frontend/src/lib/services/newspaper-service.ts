@@ -103,6 +103,9 @@ export class NewspaperService {
             : firstSentence;
         }
 
+        // Extract summary from SHORT content
+        const summary = generated.SHORT.string;
+
         const category = article.category?.category || 'Uncategorized';
         const readingTimeSeconds = article.reading_time_seconds || 0;
         const timeToRead = readingTimeSeconds > 0
@@ -114,6 +117,7 @@ export class NewspaperService {
           title: title || 'Untitled Article',
           category: category,
           time_to_read: timeToRead,
+          summary: summary,
           cached_at: new Date().toISOString(),
         };
       });
