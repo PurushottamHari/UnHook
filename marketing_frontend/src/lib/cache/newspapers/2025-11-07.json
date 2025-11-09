@@ -1,0 +1,55 @@
+{
+  "date": "2025-11-07",
+  "articles": [
+    {
+      "id": "2baa243a-b6b8-4f8b-bb0b-d250345acba7",
+      "title": "Delhi's Toxic Air Crisis: Causes and Consequences",
+      "category": "ENVIRONMENT",
+      "time_to_read": "17m read",
+      "cached_at": "2025-11-07T15:18:39.534Z"
+    },
+    {
+      "id": "1f87e5a0-0253-4d58-9384-b99f039dbedd",
+      "title": "Pakistan's Risky Geopolitical Balancing Between US and China",
+      "category": "NEWS",
+      "time_to_read": "5m read",
+      "cached_at": "2025-11-07T15:18:39.534Z"
+    },
+    {
+      "id": "ab3d8b19-533c-489d-b306-891e9114e0c5",
+      "title": "Self-Purification and the Path to Inner Peace",
+      "category": "SPIRITUALITY",
+      "time_to_read": "8m read",
+      "cached_at": "2025-11-07T15:18:39.534Z"
+    },
+    {
+      "id": "809ad7a3-2d4a-46aa-abf3-480d2bab3157",
+      "title": "Pakistan's Agriculture at Risk from India's Indus Water Policy",
+      "category": "ENVIRONMENT",
+      "time_to_read": "5m read",
+      "cached_at": "2025-11-07T15:18:39.534Z"
+    },
+    {
+      "id": "8e49be71-73b0-4232-9bff-077b7a3b7c27",
+      "title": "Guru Nanak and Naam Simran: The Path to Spiritual Realization",
+      "category": "SPIRITUALITY",
+      "time_to_read": "4m read",
+      "cached_at": "2025-11-07T15:18:39.534Z"
+    },
+    {
+      "id": "202793fe-e331-46a8-af1b-64cc53fdcc5b",
+      "title": "NVIDIA's AI Boom and the Risk of a Market Bubble",
+      "category": "TECHNOLOGY",
+      "time_to_read": "4m read",
+      "cached_at": "2025-11-07T15:18:39.534Z"
+    }
+  ],
+  "total_time_to_read": "43m read",
+  "topics": [
+    "ENVIRONMENT",
+    "NEWS",
+    "SPIRITUALITY",
+    "TECHNOLOGY"
+  ],
+  "cached_at": "2025-11-07T15:18:39.535Z"
+}
