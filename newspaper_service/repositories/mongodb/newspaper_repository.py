@@ -3,7 +3,7 @@ MongoDB implementation of newspaper repository.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from data_collector_service.models.user_collected_content import \
@@ -82,15 +82,24 @@ class MongoDBNewspaperRepository(NewspaperRepository):
         """Get a newspaper for a specific user and date."""
         try:
             # Convert date to start and end of day for comparison
+            # Ensure timezone-aware datetime for proper timestamp conversion
+            if for_date.tzinfo is None:
+                for_date = for_date.replace(tzinfo=timezone.utc)
+
             start_of_day = for_date.replace(hour=0, minute=0, second=0, microsecond=0)
             end_of_day = for_date.replace(
                 hour=23, minute=59, second=59, microsecond=999999
             )
 
+            # Convert datetime objects to timestamps (floats) for MongoDB query
+            # since created_at is stored as UTC epoch seconds in the database
+            start_timestamp = start_of_day.astimezone(timezone.utc).timestamp()
+            end_timestamp = end_of_day.astimezone(timezone.utc).timestamp()
+
             document = self.collection.find_one(
                 {
                     "user_id": user_id,
-                    "created_at": {"$gte": start_of_day, "$lte": end_of_day},
+                    "created_at": {"$gte": start_timestamp, "$lte": end_timestamp},
                 }
             )
 
