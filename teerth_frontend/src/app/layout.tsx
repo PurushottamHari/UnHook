@@ -4,13 +4,14 @@ import './globals.css';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ThemeProvider } from '@/lib/theme-context';
+import { createPageMetadata } from '@/lib/metadata';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: 'Teerth - Daily Curated Articles',
-  description: 'Your daily curated digest of mindful articles and insights.',
-};
+export const metadata: Metadata = createPageMetadata(
+  'Teerth',
+  ''
+);
 
 export default function RootLayout({
   children,

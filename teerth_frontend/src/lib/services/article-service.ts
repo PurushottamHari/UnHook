@@ -82,19 +82,11 @@ export class ArticleService {
         return null;
       }
 
-      // Extract title from VERY_SHORT content
+      // Title should ONLY come from VERY_SHORT, never extracted from SHORT
       let title = '';
       const generated = doc.generated || {};
       if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
         title = generated.VERY_SHORT.string;
-      }
-
-      // If no title from VERY_SHORT, try to extract from SHORT
-      if (!title && generated.SHORT && generated.SHORT.string) {
-        const summary = generated.SHORT.string;
-        title = summary.split('.')[0].length > 50
-          ? summary.split('.')[0].substring(0, 50) + '...'
-          : summary.split('.')[0];
       }
 
       // Get content - prefer LONG, then MEDIUM, then SHORT

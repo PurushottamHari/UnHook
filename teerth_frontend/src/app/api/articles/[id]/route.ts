@@ -21,7 +21,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (!article) {
       return NextResponse.json(
-        { error: 'Article not found' },
+        { error: 'No article found' },
         { status: 404 }
       );
     }
@@ -32,8 +32,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
   } catch (error) {
     console.error('Error fetching article:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    // Log full error details
+    console.error('Error details:', {
+      message: errorMessage,
+      stack: errorStack,
+    });
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        message: process.env.NODE_ENV === 'development' ? errorMessage : undefined,
+      },
       { status: 500 }
     );
   }

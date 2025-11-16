@@ -3,11 +3,12 @@ import { CachedNewspaper, CachedNewspaperArticle } from '@/models/newspaper.mode
 
 export class NewspaperService {
   /**
-   * Fetch a newspaper by date
+   * Fetch a newspaper by date and user ID
    * @param date - Date in YYYY-MM-DD format
+   * @param userId - User ID to filter newspapers
    * @returns CachedNewspaper model or null if not found
    */
-  async getNewspaperByDate(date: string): Promise<CachedNewspaper | null> {
+  async getNewspaperByDate(date: string, userId: string): Promise<CachedNewspaper | null> {
     try {
       const db = await getDatabase();
       const newspapersCollection = db.collection('newspapers');
@@ -31,6 +32,7 @@ export class NewspaperService {
       const endOfDayTimestamp = Math.floor(endOfDay.getTime() / 1000);
 
       const newspaper = await newspapersCollection.findOne({
+        user_id: userId,
         created_at: {
           $gte: startOfDayTimestamp,
           $lte: endOfDayTimestamp,
@@ -91,20 +93,18 @@ export class NewspaperService {
       const cachedArticles: CachedNewspaperArticle[] = articles.map(article => {
         const generated = article.generated || {};
         
+        // Title should ONLY come from VERY_SHORT, never extracted from SHORT
         let title = '';
         if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
           title = generated.VERY_SHORT.string;
         }
 
-        if (!title && generated.SHORT && generated.SHORT.string) {
-          const firstSentence = generated.SHORT.string.split('.')[0];
-          title = firstSentence.length > 50
-            ? firstSentence.substring(0, 50) + '...'
-            : firstSentence;
+        // Summary should be the full SHORT content (for expandable card)
+        // SHORT is the summary shown in the dashboard cards
+        let summary = '';
+        if (generated.SHORT && generated.SHORT.string) {
+          summary = generated.SHORT.string;
         }
-
-        // Extract summary from SHORT content
-        const summary = generated.SHORT.string;
 
         const category = article.category?.category || 'Uncategorized';
         const readingTimeSeconds = article.reading_time_seconds || 0;
@@ -117,7 +117,7 @@ export class NewspaperService {
           title: title || 'Untitled Article',
           category: category,
           time_to_read: timeToRead,
-          summary: summary,
+          summary: summary || '', // Return empty string if no SHORT content
           cached_at: new Date().toISOString(),
         };
       });
@@ -149,10 +149,11 @@ export class NewspaperService {
 
   /**
    * Fetch today's newspaper
+   * @param userId - User ID to filter newspapers
    * @returns CachedNewspaper model or null if not found
    */
-  async getTodayNewspaper(): Promise<CachedNewspaper | null> {
+  async getTodayNewspaper(userId: string): Promise<CachedNewspaper | null> {
     const today = new Date().toISOString().split('T')[0];
-    return this.getNewspaperByDate(today);
+    return this.getNewspaperByDate(today, userId);
   }
 }

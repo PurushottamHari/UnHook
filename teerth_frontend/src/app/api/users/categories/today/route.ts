@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { NewspaperService } from '@/lib/services/newspaper-service';
+import { UserService } from '@/lib/services/user-service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,25 +14,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const newspaperService = new NewspaperService();
+    const userService = new UserService();
     
     // Use provided date or default to today
     const targetDate = date || new Date().toISOString().split('T')[0];
-    const newspaper = await newspaperService.getNewspaperByDate(targetDate, userId);
-
-    if (!newspaper) {
-      return NextResponse.json(
-        { error: 'No digest available for this date' },
-        { status: 404 }
-      );
-    }
+    const categories = await userService.getUserCategoriesForDate(userId, targetDate);
 
     return NextResponse.json({
       success: true,
-      newspaper,
+      categories,
     });
   } catch (error) {
-    console.error('Error fetching newspaper:', error);
+    console.error('Error fetching user categories:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const errorStack = error instanceof Error ? error.stack : undefined;
     
@@ -51,3 +44,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

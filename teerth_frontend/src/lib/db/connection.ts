@@ -4,8 +4,11 @@ let client: MongoClient | null = null;
 
 export async function getMongoClient(): Promise<MongoClient> {
   if (!client) {
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-    const dbName = process.env.DATABASE_NAME || 'youtube_newspaper';
+    const uri = process.env.MONGODB_URI;
+    
+    if (!uri) {
+      throw new Error('MONGODB_URI environment variable is required');
+    }
     
     client = new MongoClient(uri);
     await client.connect();
@@ -15,6 +18,12 @@ export async function getMongoClient(): Promise<MongoClient> {
 }
 
 export async function getDatabase() {
+  const databaseName = process.env.DATABASE_NAME;
+  
+  if (!databaseName) {
+    throw new Error('DATABASE_NAME environment variable is required');
+  }
+  
   const client = await getMongoClient();
-  return client.db(process.env.DATABASE_NAME || 'youtube_newspaper');
+  return client.db(databaseName);
 }

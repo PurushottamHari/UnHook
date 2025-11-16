@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import TeerthLogo from '@/components/TeerthLogo';
 import ProblemCarousel from '@/components/ProblemCarousel';
 import WaitlistSection from '@/components/WaitlistSection';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 export default function About() {
   const [showAfter, setShowAfter] = useState(false);
@@ -27,6 +28,9 @@ export default function About() {
     <div className='min-h-screen bg-yellow-50 dark:bg-amber-50'>
       <div className='w-full px-4 sm:px-6 lg:px-8 py-8'>
         <div className='max-w-6xl mx-auto'>
+          {/* Breadcrumb */}
+          <Breadcrumb href="/dashboard" label="Puru's Digest" />
+          
           {/* Hero Section */}
           <motion.div
             className='text-center mb-16'
