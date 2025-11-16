@@ -36,7 +36,7 @@ export default function ArticleContent({
   return (
     <article className={`prose prose-lg max-w-none dark:prose-invert mb-12 pb-24 ${className}`}>
       <div className="relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 p-6 md:p-8 lg:p-10">
-        <div className="relative prose prose-gray dark:prose-invert max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
+        <div className="relative prose dark:prose-invert max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
           <ReactMarkdown
             components={{
               h1: ({ children }) => (
@@ -53,6 +53,21 @@ export default function ArticleContent({
                 <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-900 mb-2 mt-4">
                   {children}
                 </h3>
+              ),
+              h4: ({ children }) => (
+                <h4 className="text-base font-semibold text-amber-900 dark:text-amber-900 mb-2 mt-4">
+                  {children}
+                </h4>
+              ),
+              h5: ({ children }) => (
+                <h5 className="text-sm font-semibold text-amber-900 dark:text-amber-900 mb-2 mt-3">
+                  {children}
+                </h5>
+              ),
+              h6: ({ children }) => (
+                <h6 className="text-sm font-semibold text-amber-900 dark:text-amber-900 mb-2 mt-3">
+                  {children}
+                </h6>
               ),
               p: ({ children }) => (
                 <p className="text-amber-800 dark:text-amber-900 mb-4 leading-relaxed">
