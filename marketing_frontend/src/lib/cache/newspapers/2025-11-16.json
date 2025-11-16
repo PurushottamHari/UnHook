@@ -1,0 +1,46 @@
+{
+  "date": "2025-11-16",
+  "articles": [
+    {
+      "id": "050cdbe0-05bb-47c6-bd75-8f0dc61dba5f",
+      "title": "The Life and Genius of Srinivasa Ramanujan",
+      "category": "EDUCATION",
+      "time_to_read": "22m read",
+      "cached_at": "2025-11-16T14:38:09.431Z"
+    },
+    {
+      "id": "265ac864-4d15-4eed-b737-3fcdfaff4b0e",
+      "title": "How to Future-Proof Your Career from AI Displacement",
+      "category": "EDUCATION",
+      "time_to_read": "13m read",
+      "cached_at": "2025-11-16T14:38:09.431Z"
+    },
+    {
+      "id": "a379512b-bcef-4189-bfe7-9c118d393455",
+      "title": "Risks of Selling Your Car Without Proper Documentation",
+      "category": "EDUCATION",
+      "time_to_read": "6m read",
+      "cached_at": "2025-11-16T14:38:09.431Z"
+    },
+    {
+      "id": "e4219173-11cf-4508-9c55-4f96fc1e7f2d",
+      "title": "Nehru and Bose: From Allies to Rivals Explained",
+      "category": "EDUCATION",
+      "time_to_read": "8m read",
+      "cached_at": "2025-11-16T14:38:09.431Z"
+    },
+    {
+      "id": "d66b3fe1-a2a0-43ad-874b-039ac0adc268",
+      "title": "Analysis of Congress Party's Electoral Crisis and Leadership",
+      "category": "PERSPECTIVES",
+      "time_to_read": "6m read",
+      "cached_at": "2025-11-16T14:38:09.431Z"
+    }
+  ],
+  "total_time_to_read": "55m read",
+  "topics": [
+    "EDUCATION",
+    "PERSPECTIVES"
+  ],
+  "cached_at": "2025-11-16T14:38:09.432Z"
+}
