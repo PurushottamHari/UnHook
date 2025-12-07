@@ -50,10 +50,10 @@ class GeneratedContentService:
 
     async def get_generated_content_by_id(self, content_id: str) -> GeneratedContent:
         """
-        Get generated content by its ID (external_id).
+        Get generated content by its MongoDB _id.
 
         Args:
-            content_id: External ID of the generated content
+            content_id: MongoDB _id of the generated content
 
         Returns:
             GeneratedContent: The generated content object
@@ -61,9 +61,7 @@ class GeneratedContentService:
         Raises:
             ValueError: If content not found
         """
-        content = self._generated_content_repository.get_content_by_external_id(
-            content_id
-        )
+        content = self._generated_content_repository.get_content_by_id(content_id)
         if not content:
             raise ValueError(f"Content not found: {content_id}")
 

@@ -165,7 +165,7 @@ async def get_generated_content(
     Get generated content by its ID.
 
     Args:
-        content_id: External ID of the generated content
+        content_id: MongoDB _id of the generated content
         content_service: Injected content service
 
     Returns:

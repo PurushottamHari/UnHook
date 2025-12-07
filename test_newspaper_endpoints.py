@@ -10,7 +10,7 @@ from urllib.parse import quote, urlencode
 import requests
 
 # Configuration
-BASE_URL = "http://localhost:8000"
+BASE_URL = "https://unhook-production-b172.up.railway.app"
 TEST_USER_ID = "607d95f0-47ef-444c-89d2-d05f257d1265"
 TEST_NEWSPAPER_ID = (
     "fe207d6e-8151-4bd8-9b06-3f91bc259740"  # Replace with actual ID from your DB
@@ -244,12 +244,11 @@ response = requests.get(
 )
 print_response("GET /list_user_interactions (with pagination)", response)
 
-# 11. GET /generated_content/{content_id} (uses external_id)
-print("\n11. Testing GET /generated_content/{content_id} (uses external_id)")
-print_curl_command("GET", f"{BASE_URL}/generated_content/{TEST_CONTENT_EXTERNAL_ID}")
-response = requests.get(f"{BASE_URL}/generated_content/{TEST_CONTENT_EXTERNAL_ID}")
+# 11. GET /generated_content/{content_id} (uses MongoDB _id)
+print("\n11. Testing GET /generated_content/{content_id} (uses MongoDB _id)")
+print_curl_command("GET", f"{BASE_URL}/generated_content/{TEST_GENERATED_CONTENT_ID}")
+response = requests.get(f"{BASE_URL}/generated_content/{TEST_GENERATED_CONTENT_ID}")
 print_response("GET /generated_content/{content_id}", response)
-# Note: Use the 'id' field from this response as TEST_GENERATED_CONTENT_ID for interaction endpoints
 
 # 12. GET /newspapers/{newspaper_id}/generated_content (now includes active interactions)
 print(
@@ -323,11 +322,14 @@ print(
     "at the top of this script with actual IDs from your database for accurate testing."
 )
 print("\nImportant:")
-print("- TEST_CONTENT_EXTERNAL_ID: External ID (e.g., YouTube video ID)")
 print(
-    "- TEST_GENERATED_CONTENT_ID: MongoDB internal _id (get from GET /generated_content/{external_id} response 'id' field)"
+    "- TEST_CONTENT_EXTERNAL_ID: External ID (e.g., YouTube video ID) - used for reference only"
 )
-print("- Interaction endpoints now use MongoDB internal _id, not external_id")
+print(
+    "- TEST_GENERATED_CONTENT_ID: MongoDB internal _id - used for GET /generated_content/{content_id} and interaction endpoints"
+)
+print("- GET /generated_content/{content_id} now uses MongoDB _id, not external_id")
+print("- Interaction endpoints use MongoDB internal _id")
 print(
     "- GET /newspapers/{newspaper_id}/generated_content now requires X-User-ID header and includes active_user_interactions"
 )

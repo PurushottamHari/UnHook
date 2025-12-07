@@ -1,6 +1,7 @@
 import { Article } from '@/models/article.model';
-import { getDatabase } from '@/lib/db/connection';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
+
+const NEWSPAPER_SERVICE_URL = 'https://unhook-production-b172.up.railway.app';
 
 export class ArticleService {
   /**
@@ -65,26 +66,32 @@ export class ArticleService {
   }
 
   /**
-   * Server-side article fetching (direct DB access)
+   * Server-side article fetching (REST API)
    * @private
    */
   private async getArticleByIdServer(articleId: string): Promise<Article | null> {
     try {
-      const db = await getDatabase();
-      const generatedContentCollection = db.collection('generated_content');
+      // The backend endpoint expects MongoDB _id (generated_content_id)
+      const articleUrl = `${NEWSPAPER_SERVICE_URL}/generated_content/${articleId}`;
+      const response = await fetch(articleUrl);
 
-      // Query by string ID (UUID format) - this is how articles are stored
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const query: any = { _id: articleId };
-      const doc = await generatedContentCollection.findOne(query);
-
-      if (!doc) {
-        return null;
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        // For 400 Bad Request, log the error but return null
+        if (response.status === 400) {
+          console.error(`Article fetch failed: articleId ${articleId} may not be a valid MongoDB _id`);
+          return null;
+        }
+        throw new Error(`Failed to fetch article: ${response.statusText}`);
       }
+
+      const article = await response.json();
 
       // Title should ONLY come from VERY_SHORT, never extracted from SHORT
       let title = '';
-      const generated = doc.generated || {};
+      const generated = article.generated || {};
       if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
         title = generated.VERY_SHORT.string;
       }
@@ -104,46 +111,43 @@ export class ArticleService {
       }
 
       // Get category
-      const category = doc.category?.category || 'TECHNOLOGY';
+      const category = article.category?.category || 'TECHNOLOGY';
 
       // Get reading time
-      const readingTimeSeconds = doc.reading_time_seconds || 0;
+      const readingTimeSeconds = article.reading_time_seconds || 0;
       const minutes = Math.ceil(readingTimeSeconds / 60);
-      const time_to_read = minutes < 1 ? 'Less than 1 min read' : `${minutes} min read`;
+      const time_to_read =
+        minutes < 1 ? 'Less than 1 min read' : `${minutes} min read`;
 
       // Get published date
       let published_at = new Date().toISOString();
-      if (doc.content_generated_at) {
-        published_at = new Date(doc.content_generated_at * 1000).toISOString();
-      } else if (doc.created_at) {
-        published_at = new Date(doc.created_at * 1000).toISOString();
+      if (article.content_generated_at) {
+        published_at = new Date(article.content_generated_at * 1000).toISOString();
+      } else if (article.created_at) {
+        published_at = new Date(article.created_at * 1000).toISOString();
       }
 
       // Get external_id (YouTube video ID)
-      const external_id = doc.external_id || '';
+      const external_id = article.external_id || '';
 
-      // Fetch channel name from collected_content collection
+      // Note: youtube_channel may not be included in the GeneratedContent response
+      // If needed, this would require an additional API call or the backend to include it
+      // For now, we'll leave it empty if not in the response
       let youtube_channel = '';
-      if (external_id) {
-        const collectedContentCollection = db.collection('collected_content');
-        const collectedDoc = await collectedContentCollection.findOne({
-          external_id: external_id,
-        });
-
-        if (collectedDoc && collectedDoc.data && collectedDoc.data.YOUTUBE_VIDEO) {
-          const videoDetails = collectedDoc.data.YOUTUBE_VIDEO;
-          if (videoDetails.channel_name) {
-            youtube_channel = videoDetails.channel_name;
-          }
-        }
+      // Check if youtube_channel is included in the response
+      if (article.youtube_channel) {
+        youtube_channel = article.youtube_channel;
       }
 
       // Set article source and link
       const article_source = 'Teerth';
       const article_link = `https://unhook-production.up.railway.app/article/${articleId}`;
 
+      // Use MongoDB _id if available, otherwise use external_id or the provided articleId
+      const articleIdToUse = article.id || article.external_id || articleId;
+
       return {
-        id: articleId,
+        id: articleIdToUse,
         title: title || 'Article Not Found',
         content: content || '',
         category,
