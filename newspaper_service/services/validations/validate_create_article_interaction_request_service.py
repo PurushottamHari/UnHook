@@ -64,12 +64,12 @@ class ValidateCreateArticleInteractionRequestService:
             existing_like = self._interaction_repository.get_user_interaction(
                 generated_content_id, user_id, InteractionType.LIKE
             )
-            
+
             # Check for existing DISLIKE interaction
             existing_dislike = self._interaction_repository.get_user_interaction(
                 generated_content_id, user_id, InteractionType.DISLIKE
             )
-            
+
             # Enforce mutual exclusivity - only one LIKE or DISLIKE should exist
             if existing_like and existing_dislike:
                 raise ValueError(
@@ -77,15 +77,15 @@ class ValidateCreateArticleInteractionRequestService:
                     f"content {generated_content_id} and user {user_id}. "
                     f"This violates mutual exclusivity constraint."
                 )
-            
+
             # Get whichever exists (only one can exist due to mutual exclusivity)
             existing_interaction = existing_like or existing_dislike
-            
+
             if existing_interaction:
                 # Return existing interaction without modification
                 # Service layer will handle type updates
                 return interaction_type, existing_interaction
-            
+
             # No existing LIKE/DISLIKE interaction, create new
             return interaction_type, None
 
@@ -102,4 +102,3 @@ class ValidateCreateArticleInteractionRequestService:
                 return interaction_type, existing_interaction
 
         return interaction_type, None
-

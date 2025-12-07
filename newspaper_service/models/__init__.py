@@ -2,9 +2,9 @@
 Models package for newspaper service.
 """
 
-from .generated_content_interaction import (
-    GeneratedContentInteraction, InteractionStatus, InteractionType,
-    InteractionTypeDetail)
+from .generated_content_interaction import (GeneratedContentInteraction,
+                                            InteractionStatus, InteractionType,
+                                            InteractionTypeDetail)
 from .generated_content_interaction_list import \
     GeneratedContentInteractionListResponse
 from .generated_content_list import GeneratedContentListResponse

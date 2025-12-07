@@ -6,8 +6,8 @@ from fastapi import FastAPI
 
 from ..repositories.mongodb.config.database import MongoDB
 from ..repositories.mongodb.config.settings import get_mongodb_settings
-from .controllers.generated_content_controller import (
-    router as interaction_router)
+from .controllers.generated_content_controller import \
+    router as interaction_router
 from .controllers.newspaper_controller import router as newspaper_router
 
 app = FastAPI(
@@ -34,7 +34,7 @@ async def startup_db_client():
     # Ensure database is accessible
     settings = get_mongodb_settings()
     database = MongoDB.get_database()
-    
+
     # Create unique compound index on interaction collection
     interaction_collection = database[
         settings.GENERATED_CONTENT_INTERACTION_COLLECTION_NAME
@@ -48,4 +48,3 @@ async def startup_db_client():
     except Exception:
         # Index might already exist, which is fine
         pass
-

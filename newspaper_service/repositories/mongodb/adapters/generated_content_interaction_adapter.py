@@ -58,7 +58,9 @@ class GeneratedContentInteractionAdapter:
             ),
             status=InteractionStatus(db_model.status),
             type_details=[
-                GeneratedContentInteractionAdapter._type_detail_to_internal_model(detail)
+                GeneratedContentInteractionAdapter._type_detail_to_internal_model(
+                    detail
+                )
                 for detail in db_model.type_details
             ],
         )
@@ -74,7 +76,9 @@ class GeneratedContentInteractionAdapter:
         return datetime.fromtimestamp(ts, tz=timezone.utc)
 
     @staticmethod
-    def _type_detail_to_db_model(detail: InteractionTypeDetail) -> InteractionTypeDetailDBModel:
+    def _type_detail_to_db_model(
+        detail: InteractionTypeDetail,
+    ) -> InteractionTypeDetailDBModel:
         """Convert InteractionTypeDetail to InteractionTypeDetailDBModel."""
         return InteractionTypeDetailDBModel(
             interaction_type=detail.interaction_type.value,
@@ -96,4 +100,3 @@ class GeneratedContentInteractionAdapter:
             ),
             reason=db_detail.reason,
         )
-

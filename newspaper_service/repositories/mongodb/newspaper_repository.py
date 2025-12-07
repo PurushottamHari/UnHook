@@ -185,7 +185,9 @@ class MongoDBNewspaperRepository(NewspaperRepository):
                 if for_date.tzinfo is None:
                     for_date = for_date.replace(tzinfo=timezone.utc)
 
-                start_of_day = for_date.replace(hour=0, minute=0, second=0, microsecond=0)
+                start_of_day = for_date.replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
                 end_of_day = for_date.replace(
                     hour=23, minute=59, second=59, microsecond=999999
                 )
@@ -223,7 +225,5 @@ class MongoDBNewspaperRepository(NewspaperRepository):
 
             return newspapers
         except Exception as e:
-            self.logger.error(
-                f"Error listing newspapers for user {user_id}: {str(e)}"
-            )
+            self.logger.error(f"Error listing newspapers for user {user_id}: {str(e)}")
             raise

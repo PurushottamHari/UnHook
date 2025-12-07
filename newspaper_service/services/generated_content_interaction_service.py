@@ -15,7 +15,8 @@ from ..models.generated_content_interaction_list import (
     GeneratedContentInteractionListResponse)
 from ..repositories.generated_content_interaction_repository import \
     GeneratedContentInteractionRepository
-from ..repositories.generated_content_repository import GeneratedContentRepository
+from ..repositories.generated_content_repository import \
+    GeneratedContentRepository
 from .validations.validate_create_article_interaction_request_service import \
     ValidateCreateArticleInteractionRequestService
 
@@ -102,42 +103,66 @@ class ContentInteractionService:
                 # For REPORT, raise error if already reported
                 if validated_interaction_type == InteractionType.REPORT:
                     raise ValueError("Content already reported")
-                
-                # For LIKE, DISLIKE, and SAVED, mark as INACTIVE and add reason
+
+                # For LIKE, DISLIKE, and SAVED, toggle between ACTIVE and INACTIVE
+                new_status = (
+                    InteractionStatus.INACTIVE
+                    if existing_interaction.status == InteractionStatus.ACTIVE
+                    else InteractionStatus.ACTIVE
+                )
+
                 reason_map = {
-                    InteractionType.LIKE: "Like clicked again",
-                    InteractionType.DISLIKE: "Dislike clicked again",
-                    InteractionType.SAVED: "Save clicked again",
+                    InteractionType.LIKE: f"Like {'deactivated' if new_status == InteractionStatus.INACTIVE else 'activated'}",
+                    InteractionType.DISLIKE: f"Dislike {'deactivated' if new_status == InteractionStatus.INACTIVE else 'activated'}",
+                    InteractionType.SAVED: f"Save {'deactivated' if new_status == InteractionStatus.INACTIVE else 'activated'}",
                 }
-                
+
                 existing_interaction.set_status(
-                    InteractionStatus.INACTIVE,
-                    reason=reason_map[validated_interaction_type]
+                    new_status, reason=reason_map[validated_interaction_type]
                 )
-                
-                return self._interaction_repository.update_generated_content_interaction(
-                    existing_interaction
+
+                return (
+                    self._interaction_repository.update_generated_content_interaction(
+                        existing_interaction
+                    )
                 )
-            
+
             # For LIKE/DISLIKE, convert opposite type
             # Since we already checked same type above, existing must be opposite type
-            if validated_interaction_type in (InteractionType.LIKE, InteractionType.DISLIKE):
+            if validated_interaction_type in (
+                InteractionType.LIKE,
+                InteractionType.DISLIKE,
+            ):
+                # Capture the old interaction type before changing it
+                old_interaction_type = existing_interaction.interaction_type
                 existing_interaction.set_interaction_type(validated_interaction_type)
                 existing_interaction.metadata = metadata
-            
+
+                # Use override_interaction_type to filter by the old type while updating to new type
+                return (
+                    self._interaction_repository.update_generated_content_interaction(
+                        existing_interaction,
+                        override_interaction_type=old_interaction_type,
+                    )
+                )
+
             # For REPORT/SAVED, update metadata
-            elif validated_interaction_type in (InteractionType.REPORT, InteractionType.SAVED):
+            elif validated_interaction_type in (
+                InteractionType.REPORT,
+                InteractionType.SAVED,
+            ):
                 existing_interaction.metadata = metadata
                 existing_interaction.updated_at = datetime.utcnow()
+                return (
+                    self._interaction_repository.update_generated_content_interaction(
+                        existing_interaction
+                    )
+                )
             else:
                 raise ValueError(
                     f"Unexpected interaction type: {validated_interaction_type.value}. "
                     f"Expected LIKE, DISLIKE, REPORT, or SAVED."
                 )
-            
-            return self._interaction_repository.update_generated_content_interaction(
-                existing_interaction
-            )
 
         # Create new interaction
         interaction = GeneratedContentInteraction(
@@ -221,7 +246,7 @@ class ContentInteractionService:
             raise ValueError("page_limit must be greater than 0")
         if page_limit > 10:
             raise ValueError("page_limit cannot exceed 10")
-        
+
         # Validate content exists
         content = self._generated_content_repository.get_content_by_id(
             generated_content_id
@@ -229,12 +254,14 @@ class ContentInteractionService:
         if not content:
             raise ValueError(f"Content not found: {generated_content_id}")
 
-        interactions, has_next = self._interaction_repository.list_user_interactions_for_content(
-            generated_content_id=generated_content_id,
-            starting_after=starting_after,
-            page_limit=page_limit,
+        interactions, has_next = (
+            self._interaction_repository.list_user_interactions_for_content(
+                generated_content_id=generated_content_id,
+                starting_after=starting_after,
+                page_limit=page_limit,
+            )
         )
-        
+
         return GeneratedContentInteractionListResponse(
             data=GeneratedContentInteractionListData(
                 list_response=interactions,
@@ -269,7 +296,7 @@ class ContentInteractionService:
             raise ValueError("page_limit must be greater than 0")
         if page_limit > 10:
             raise ValueError("page_limit cannot exceed 10")
-        
+
         # Validate user exists
         user = self._user_service_client.get_user(user_id)
         if not user:
@@ -292,11 +319,10 @@ class ContentInteractionService:
             starting_after=starting_after,
             page_limit=page_limit,
         )
-        
+
         return GeneratedContentInteractionListResponse(
             data=GeneratedContentInteractionListData(
                 list_response=interactions,
                 hasNext=has_next,
             )
         )
-

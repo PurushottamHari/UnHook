@@ -35,4 +35,3 @@ class GeneratedContentInteractionDBModel(BaseModel):
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
-

@@ -3,7 +3,7 @@ Abstract base class for generated content interaction repository.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from ..models.generated_content_interaction import (
     GeneratedContentInteraction, InteractionType)
@@ -29,13 +29,18 @@ class GeneratedContentInteractionRepository(ABC):
 
     @abstractmethod
     def update_generated_content_interaction(
-        self, interaction: GeneratedContentInteraction
+        self,
+        interaction: GeneratedContentInteraction,
+        override_interaction_type: Optional[InteractionType] = None,
     ) -> GeneratedContentInteraction:
         """
         Update an existing interaction.
 
         Args:
             interaction: The interaction to update
+            override_interaction_type: Optional interaction type to use for filtering.
+                If provided, filters by this type instead of interaction.interaction_type.
+                Useful for converting LIKE to DISLIKE or vice versa.
 
         Returns:
             The updated interaction
@@ -104,3 +109,20 @@ class GeneratedContentInteractionRepository(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_active_interactions_by_generated_content_ids(
+        self,
+        user_id: str,
+        generated_content_ids: List[str],
+    ) -> Dict[str, List[GeneratedContentInteraction]]:
+        """
+        Get active interactions for multiple generated content IDs for a specific user.
+
+        Args:
+            user_id: ID of the user
+            generated_content_ids: List of generated content IDs (MongoDB _id)
+
+        Returns:
+            Dictionary mapping generated_content_id to list of active interactions
+        """
+        pass

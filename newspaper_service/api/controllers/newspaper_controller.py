@@ -11,8 +11,8 @@ from ...models.newspaper import Newspaper
 from ...models.newspaper_list import NewspaperListResponse
 from ...services.generated_content_service import GeneratedContentService
 from ...services.newspaper_service import NewspaperService
-from ..dependencies import (
-    get_generated_content_service, get_newspaper_service, get_user_id_from_header)
+from ..dependencies import (get_generated_content_service,
+                            get_newspaper_service, get_user_id_from_header)
 
 router = APIRouter(tags=["newspapers"])
 
@@ -102,32 +102,35 @@ async def list_newspapers(
 )
 async def list_generated_content_for_newspaper(
     newspaper_id: str,
+    user_id: str = Depends(get_user_id_from_header),
     starting_after: Optional[str] = Query(
         None, description="Cursor ID to start after (for pagination)"
     ),
-    page_limit: int = Query(10, le=10, description="Maximum number of items to return (max 10)"),
-    content_service: GeneratedContentService = Depends(
-        get_generated_content_service
+    page_limit: int = Query(
+        10, le=10, description="Maximum number of items to return (max 10)"
     ),
+    content_service: GeneratedContentService = Depends(get_generated_content_service),
 ) -> GeneratedContentListResponse:
     """
-    List generated content for a specific newspaper with pagination.
+    List generated content for a specific newspaper with pagination, including active user interactions.
 
     Args:
         newspaper_id: ID of the newspaper
+        user_id: User ID from X-User-ID header
         starting_after: Optional cursor ID to start after (for pagination)
         page_limit: Maximum number of items to return (default=10, max=10)
         content_service: Injected content service
 
     Returns:
-        Paginated list response with content and hasNext flag
+        Paginated list response with content, active interactions, and hasNext flag
 
     Raises:
-        HTTPException: If newspaper not found or retrieval fails
+        HTTPException: If newspaper not found, user not found, or retrieval fails
     """
     try:
         return await content_service.list_generated_content_for_newspaper(
             newspaper_id=newspaper_id,
+            user_id=user_id,
             starting_after=starting_after,
             page_limit=page_limit,
         )
@@ -135,4 +138,3 @@ async def list_generated_content_for_newspaper(
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-

@@ -130,7 +130,9 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
 
         return reading_times
 
-    def get_contents_by_external_ids(self, external_ids: List[str]) -> List[GeneratedContent]:
+    def get_contents_by_external_ids(
+        self, external_ids: List[str]
+    ) -> List[GeneratedContent]:
         """
         Fetch multiple GeneratedContent objects by external_ids.
 
@@ -144,9 +146,7 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
             return []
 
         cursor = self.generated_content_collection.find(
-            {
-                "external_id": {"$in": external_ids}
-            }
+            {"external_id": {"$in": external_ids}}
         )
 
         contents = []

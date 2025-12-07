@@ -24,4 +24,3 @@ class GeneratedContentInteractionListResponse(BaseModel):
     data: GeneratedContentInteractionListData = Field(
         ..., description="Paginated list data"
     )
-

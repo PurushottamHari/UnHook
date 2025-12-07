@@ -69,7 +69,9 @@ class GeneratedContentRepository(ABC):
         pass
 
     @abstractmethod
-    def get_contents_by_external_ids(self, external_ids: List[str]) -> List[GeneratedContent]:
+    def get_contents_by_external_ids(
+        self, external_ids: List[str]
+    ) -> List[GeneratedContent]:
         """
         Fetch multiple GeneratedContent objects by external_ids.
 

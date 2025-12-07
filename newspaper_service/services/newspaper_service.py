@@ -33,9 +33,7 @@ class NewspaperService:
         self._user_service_client = user_service_client
         self.logger = logging.getLogger(__name__)
 
-    async def get_newspaper_by_id(
-        self, newspaper_id: str, user_id: str
-    ) -> Newspaper:
+    async def get_newspaper_by_id(self, newspaper_id: str, user_id: str) -> Newspaper:
         """
         Get a newspaper by its ID, validating it belongs to the user.
 
@@ -52,9 +50,7 @@ class NewspaperService:
         # Validate user exists
         user = self._user_service_client.get_user(user_id)
         if not user:
-            raise HTTPException(
-                status_code=404, detail=f"User not found: {user_id}"
-            )
+            raise HTTPException(status_code=404, detail=f"User not found: {user_id}")
 
         newspaper = self._newspaper_repository.get_newspaper(newspaper_id)
         if not newspaper:
@@ -95,9 +91,7 @@ class NewspaperService:
         # Validate user exists
         user = self._user_service_client.get_user(user_id)
         if not user:
-            raise HTTPException(
-                status_code=404, detail=f"User not found: {user_id}"
-            )
+            raise HTTPException(status_code=404, detail=f"User not found: {user_id}")
 
         # Validate page_limit
         if page_limit <= 0:
@@ -116,7 +110,9 @@ class NewspaperService:
 
                     for_date = for_date.replace(tzinfo=timezone.utc)
             except ValueError as e:
-                raise ValueError(f"Invalid date format. Expected DD/MM/YYYY: {date}") from e
+                raise ValueError(
+                    f"Invalid date format. Expected DD/MM/YYYY: {date}"
+                ) from e
 
         # Request page_limit + 1 items to determine hasNext
         newspapers = self._newspaper_repository.list_newspapers_by_user(
@@ -136,4 +132,3 @@ class NewspaperService:
                 hasNext=has_next,
             )
         )
-

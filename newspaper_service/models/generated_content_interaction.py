@@ -64,7 +64,9 @@ class GeneratedContentInteraction(BaseModel):
         default_factory=list, description="History of status changes"
     )
 
-    def set_interaction_type(self, interaction_type: InteractionType, reason: str = "") -> None:
+    def set_interaction_type(
+        self, interaction_type: InteractionType, reason: str = ""
+    ) -> None:
         """Set interaction type and append to type_details with timestamp."""
         self.interaction_type = interaction_type
         self.type_details.append(
@@ -112,7 +114,7 @@ class GeneratedContentInteraction(BaseModel):
             return []
         return v
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def initialize_type_details(self):
         """Initialize type_details with the initial interaction_type if empty."""
         if not self.type_details:
@@ -131,4 +133,3 @@ class GeneratedContentInteraction(BaseModel):
 
     class Config:
         json_encoders = {datetime: lambda v: v.isoformat() + "Z", UUID: str}
-

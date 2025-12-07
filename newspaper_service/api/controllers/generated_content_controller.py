@@ -15,9 +15,9 @@ from ...models.generated_content_interaction_list import \
 from ...services.generated_content_interaction_service import \
     ContentInteractionService
 from ...services.generated_content_service import GeneratedContentService
-from ..dependencies import (
-    get_generated_content_interaction_service, get_generated_content_service,
-    get_user_id_from_header)
+from ..dependencies import (get_generated_content_interaction_service,
+                            get_generated_content_service,
+                            get_user_id_from_header)
 
 router = APIRouter(tags=["content-interactions"])
 
@@ -77,7 +77,9 @@ async def list_user_interactions_for_content(
     starting_after: Optional[str] = Query(
         None, description="Cursor ID to start after (for pagination)"
     ),
-    page_limit: int = Query(10, le=10, description="Maximum number of items to return (max 10)"),
+    page_limit: int = Query(
+        10, le=10, description="Maximum number of items to return (max 10)"
+    ),
     interaction_service: ContentInteractionService = Depends(
         get_generated_content_interaction_service
     ),
@@ -117,7 +119,9 @@ async def list_user_interactions(
     starting_after: Optional[str] = Query(
         None, description="Cursor ID to start after (for pagination)"
     ),
-    page_limit: int = Query(10, le=10, description="Maximum number of items to return (max 10)"),
+    page_limit: int = Query(
+        10, le=10, description="Maximum number of items to return (max 10)"
+    ),
     user_id: str = Depends(get_user_id_from_header),
     interaction_service: ContentInteractionService = Depends(
         get_generated_content_interaction_service
@@ -155,9 +159,7 @@ async def list_user_interactions(
 )
 async def get_generated_content(
     content_id: str,
-    content_service: GeneratedContentService = Depends(
-        get_generated_content_service
-    ),
+    content_service: GeneratedContentService = Depends(get_generated_content_service),
 ) -> GeneratedContent:
     """
     Get generated content by its ID.
@@ -178,5 +180,3 @@ async def get_generated_content(
         raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-
