@@ -33,9 +33,9 @@ COPY data_collector_service/ ./data_collector_service/
 # Copy newspaper_service directory
 COPY newspaper_service/ ./newspaper_service/
 
-# Fix path references in pyproject.toml for Docker container
+# Fix path references in ALL pyproject.toml files for Docker container
 # Replace local paths with Docker container paths
-RUN sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' newspaper_service/pyproject.toml || true
+RUN find . -name "pyproject.toml" -type f -exec sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' {} \;
 
 # Change to newspaper_service directory and install Python dependencies
 WORKDIR /app/newspaper_service
