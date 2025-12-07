@@ -70,3 +70,15 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             db_model = CollectedContentDBModel(**doc)
             return CollectedContentAdapter.to_user_collected_content(db_model)
         return None
+
+    def get_contents_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
+        """Get multiple user collected content objects by IDs."""
+        if not content_ids:
+            return []
+
+        cursor = self.collection.find({"_id": {"$in": content_ids}})
+        results: List[UserCollectedContent] = []
+        for doc in cursor:
+            db_model = CollectedContentDBModel(**doc)
+            results.append(CollectedContentAdapter.to_user_collected_content(db_model))
+        return results

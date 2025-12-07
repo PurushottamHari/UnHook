@@ -68,6 +68,25 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
 
         return matching_external_ids
 
+    def get_content_by_id(self, content_id: str) -> GeneratedContent:
+        """
+        Fetch a single GeneratedContent object by MongoDB _id.
+
+        Args:
+            content_id: MongoDB _id to fetch
+
+        Returns:
+            GeneratedContent: Generated content object or None if not found
+        """
+        doc = self.generated_content_collection.find_one({"_id": content_id})
+
+        if not doc:
+            return None
+
+        return GeneratedContentAdapter.from_generated_content_db_model(
+            GeneratedContentDBModel(**doc)
+        )
+
     def get_content_by_external_id(self, external_id: str) -> GeneratedContent:
         """
         Fetch a single GeneratedContent object by external_id.
@@ -110,3 +129,31 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
             reading_times[doc["external_id"]] = doc.get("reading_time_seconds", 0)
 
         return reading_times
+
+    def get_contents_by_external_ids(self, external_ids: List[str]) -> List[GeneratedContent]:
+        """
+        Fetch multiple GeneratedContent objects by external_ids.
+
+        Args:
+            external_ids: List of external IDs to fetch
+
+        Returns:
+            List[GeneratedContent]: List of generated content objects with ARTICLE_GENERATED status
+        """
+        if not external_ids:
+            return []
+
+        cursor = self.generated_content_collection.find(
+            {
+                "external_id": {"$in": external_ids}
+            }
+        )
+
+        contents = []
+        for doc in cursor:
+            db_model = GeneratedContentDBModel(**doc)
+            contents.append(
+                GeneratedContentAdapter.from_generated_content_db_model(db_model)
+            )
+
+        return contents

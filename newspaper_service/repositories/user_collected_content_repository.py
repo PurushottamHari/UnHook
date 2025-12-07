@@ -33,3 +33,8 @@ class UserCollectedContentRepository(ABC):
     def get_content_by_id(self, content_id: str) -> Optional[UserCollectedContent]:
         """Get a single user collected content by ID."""
         pass
+
+    @abstractmethod
+    def get_contents_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
+        """Get multiple user collected content objects by IDs."""
+        pass

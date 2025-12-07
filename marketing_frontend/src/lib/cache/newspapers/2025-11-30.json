@@ -1,0 +1,39 @@
+{
+  "date": "2025-11-30",
+  "articles": [
+    {
+      "id": "ea2e1578-b16a-46dd-abd6-c8418738e97b",
+      "title": "Low Testosterone Signs, Symptoms, and Lifestyle Impact",
+      "category": "HEALTH",
+      "time_to_read": "26m read",
+      "cached_at": "2025-11-30T10:15:25.464Z"
+    },
+    {
+      "id": "95461464-7cc7-4f6b-abba-72eb7152fe77",
+      "title": "Career Opportunities in Artificial Intelligence and AI Education",
+      "category": "EDUCATION",
+      "time_to_read": "5m read",
+      "cached_at": "2025-11-30T10:15:25.464Z"
+    },
+    {
+      "id": "6ce5cc91-a577-4acb-905f-4c1563fa5a4a",
+      "title": "How to Identify Trustworthy Information Online",
+      "category": "EDUCATION",
+      "time_to_read": "6m read",
+      "cached_at": "2025-11-30T10:15:25.464Z"
+    },
+    {
+      "id": "9bc66a5b-fb6e-47d6-badf-7fd56340aeb8",
+      "title": "What Defines Personal Identity and Consciousness?",
+      "category": "EDUCATION",
+      "time_to_read": "8m read",
+      "cached_at": "2025-11-30T10:15:25.464Z"
+    }
+  ],
+  "total_time_to_read": "45m read",
+  "topics": [
+    "HEALTH",
+    "EDUCATION"
+  ],
+  "cached_at": "2025-11-30T10:15:25.465Z"
+}

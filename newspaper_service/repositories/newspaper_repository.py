@@ -38,3 +38,25 @@ class NewspaperRepository(ABC):
     def upsert_newspaper(self, newspaper: Newspaper) -> Newspaper:
         """Create or update newspaper with all its associated content."""
         pass
+
+    @abstractmethod
+    def list_newspapers_by_user(
+        self,
+        user_id: str,
+        for_date: Optional[datetime] = None,
+        starting_after: Optional[str] = None,
+        page_limit: int = 10,
+    ) -> List[Newspaper]:
+        """
+        List newspapers for a user with pagination, optionally filtered by date.
+
+        Args:
+            user_id: User ID to filter newspapers
+            for_date: Optional date to filter newspapers (within that day)
+            starting_after: Optional cursor ID to start after (for pagination)
+            page_limit: Maximum number of items to return
+
+        Returns:
+            List of Newspaper objects sorted by id descending
+        """
+        pass

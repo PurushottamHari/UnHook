@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import ArticleLikeDislike from '@/components/article/ArticleLikeDislike';
 import CTAButton from '@/components/CTAButton';
 
@@ -38,6 +39,7 @@ export default function ArticleContent({
       <div className="relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 p-6 md:p-8 lg:p-10">
         <div className="relative prose dark:prose-invert max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
           <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
               h1: ({ children }) => (
                 <h1 className="text-2xl font-bold text-amber-900 dark:text-amber-900 mb-4">
@@ -100,6 +102,89 @@ export default function ArticleContent({
                 </ol>
               ),
               li: ({ children }) => <li className="mb-2 leading-relaxed">{children}</li>,
+              // Table components
+              table: ({ children }) => (
+                <div className="overflow-x-auto my-6">
+                  <table className="min-w-full border-collapse border border-amber-300 dark:border-amber-400 rounded-lg">
+                    {children}
+                  </table>
+                </div>
+              ),
+              thead: ({ children }) => (
+                <thead className="bg-amber-100 dark:bg-amber-200">
+                  {children}
+                </thead>
+              ),
+              tbody: ({ children }) => (
+                <tbody className="divide-y divide-amber-200 dark:divide-amber-300">
+                  {children}
+                </tbody>
+              ),
+              tr: ({ children }) => (
+                <tr className="hover:bg-amber-50 dark:hover:bg-amber-100/50 transition-colors">
+                  {children}
+                </tr>
+              ),
+              th: ({ children }) => (
+                <th className="border border-amber-300 dark:border-amber-400 px-4 py-3 text-left font-semibold text-amber-900 dark:text-amber-900">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="border border-amber-300 dark:border-amber-400 px-4 py-3 text-amber-800 dark:text-amber-900">
+                  {children}
+                </td>
+              ),
+              // Code block components
+              code: ({ className, children, ...props }) => {
+                const isInline = !className;
+                if (isInline) {
+                  return (
+                    <code className="bg-amber-100 dark:bg-amber-200 text-amber-900 dark:text-amber-900 px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                      {children}
+                    </code>
+                  );
+                }
+                return (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              pre: ({ children }) => (
+                <pre className="bg-amber-50 dark:bg-amber-100/50 border border-amber-200 dark:border-amber-300 rounded-lg p-4 overflow-x-auto my-4">
+                  {children}
+                </pre>
+              ),
+              // Link component
+              a: ({ href, children }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-700 dark:text-amber-800 hover:text-amber-900 dark:hover:text-amber-900 underline font-medium transition-colors"
+                >
+                  {children}
+                </a>
+              ),
+              // Image component
+              img: ({ src, alt }) => (
+                <img
+                  src={src}
+                  alt={alt}
+                  className="rounded-lg shadow-md my-6 max-w-full h-auto"
+                />
+              ),
+              // Horizontal rule
+              hr: () => (
+                <hr className="border-amber-300 dark:border-amber-400 my-6" />
+              ),
+              // Strikethrough (del)
+              del: ({ children }) => (
+                <del className="line-through text-amber-600 dark:text-amber-700">
+                  {children}
+                </del>
+              ),
             }}
           >
             {content}

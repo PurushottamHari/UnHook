@@ -155,3 +155,75 @@ class MongoDBNewspaperRepository(NewspaperRepository):
         except Exception as e:
             self.logger.error(f"Error upserting newspaper: {str(e)}")
             raise
+
+    def list_newspapers_by_user(
+        self,
+        user_id: str,
+        for_date: Optional[datetime] = None,
+        starting_after: Optional[str] = None,
+        page_limit: int = 10,
+    ) -> List[Newspaper]:
+        """
+        List newspapers for a user with pagination, optionally filtered by date.
+
+        Args:
+            user_id: User ID to filter newspapers
+            for_date: Optional date to filter newspapers (within that day)
+            starting_after: Optional cursor ID to start after (for pagination)
+            page_limit: Maximum number of items to return
+
+        Returns:
+            List of Newspaper objects sorted by id descending
+        """
+        try:
+            # Build query filter
+            query_filter = {"user_id": user_id}
+
+            # Add date filter if provided
+            if for_date:
+                # Ensure timezone-aware datetime for proper timestamp conversion
+                if for_date.tzinfo is None:
+                    for_date = for_date.replace(tzinfo=timezone.utc)
+
+                start_of_day = for_date.replace(hour=0, minute=0, second=0, microsecond=0)
+                end_of_day = for_date.replace(
+                    hour=23, minute=59, second=59, microsecond=999999
+                )
+
+                # Convert datetime objects to timestamps (floats) for MongoDB query
+                start_timestamp = start_of_day.astimezone(timezone.utc).timestamp()
+                end_timestamp = end_of_day.astimezone(timezone.utc).timestamp()
+
+                query_filter["created_at"] = {
+                    "$gte": start_timestamp,
+                    "$lte": end_timestamp,
+                }
+
+            # Build cursor query if starting_after is provided
+            if starting_after:
+                # For cursor-based pagination with descending sort by _id,
+                # we need to find documents with _id less than starting_after
+                query_filter["_id"] = {"$lt": starting_after}
+
+            # Query with sort by _id descending and limit
+            cursor = (
+                self.collection.find(query_filter)
+                .sort("_id", -1)  # Sort by id descending
+                .limit(page_limit)
+            )
+
+            documents = list(cursor)
+
+            # Convert documents to Newspaper objects
+            newspapers = []
+            for document in documents:
+                db_model = NewspaperDBModel(**document)
+                newspaper = NewspaperAdapter.to_internal_model(db_model)
+                newspapers.append(newspaper)
+
+            return newspapers
+        except Exception as e:
+            self.logger.error(
+                f"Error listing newspapers for user {user_id}: {str(e)}"
+            )
+            raise
