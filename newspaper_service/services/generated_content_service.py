@@ -202,9 +202,9 @@ class GeneratedContentService:
 
         # Build response with content and interactions
         content_with_interactions = [
-            GeneratedContentWithInteractions(
-                generated_content=content,
-                active_user_interactions=interactions_by_content_id.get(content.id, []),
+            GeneratedContentWithInteractions.from_generated_content_with_interactions(
+                content=content,
+                interactions=interactions_by_content_id.get(content.id, []),
             )
             for content in collated_contents
         ]

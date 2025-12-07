@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from ...models.generated_content_list import GeneratedContentListResponse
 from ...models.newspaper import Newspaper
 from ...models.newspaper_list import NewspaperListResponse
+from ...models.newspaper_response import NewspaperResponse
 from ...services.generated_content_service import GeneratedContentService
 from ...services.newspaper_service import NewspaperService
 from ..dependencies import (get_generated_content_service,
@@ -19,13 +20,13 @@ router = APIRouter(tags=["newspapers"])
 
 @router.get(
     "/newspapers/{newspaper_id}",
-    response_model=Newspaper,
+    response_model=NewspaperResponse,
 )
 async def get_newspaper_by_id(
     newspaper_id: str,
     user_id: str = Depends(get_user_id_from_header),
     newspaper_service: NewspaperService = Depends(get_newspaper_service),
-) -> Newspaper:
+) -> NewspaperResponse:
     """
     Get a newspaper by its ID, validating it belongs to the user.
 
@@ -35,15 +36,16 @@ async def get_newspaper_by_id(
         newspaper_service: Injected newspaper service
 
     Returns:
-        Newspaper: The newspaper object
+        NewspaperResponse: The newspaper object with Unix timestamps
 
     Raises:
         HTTPException: If newspaper not found or doesn't belong to user
     """
     try:
-        return await newspaper_service.get_newspaper_by_id(
+        newspaper = await newspaper_service.get_newspaper_by_id(
             newspaper_id=newspaper_id, user_id=user_id
         )
+        return NewspaperResponse.from_newspaper(newspaper)
     except HTTPException:
         raise
     except Exception as e:

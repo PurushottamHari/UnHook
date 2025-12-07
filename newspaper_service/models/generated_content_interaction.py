@@ -2,12 +2,13 @@
 Model for generated content interactions (like/dislike/report/save).
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import (BaseModel, Field, field_serializer, field_validator,
+                      model_validator)
 
 
 class InteractionType(str, Enum):
@@ -33,6 +34,11 @@ class InteractionTypeDetail(BaseModel):
     created_at: datetime
     reason: str = ""
 
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> float:
+        """Serialize datetime to Unix timestamp."""
+        return value.astimezone(timezone.utc).timestamp()
+
 
 class StatusDetail(BaseModel):
     """Detail information about a status change."""
@@ -40,6 +46,11 @@ class StatusDetail(BaseModel):
     status: InteractionStatus
     created_at: datetime
     reason: str = ""
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> float:
+        """Serialize datetime to Unix timestamp."""
+        return value.astimezone(timezone.utc).timestamp()
 
 
 class GeneratedContentInteraction(BaseModel):
@@ -114,6 +125,16 @@ class GeneratedContentInteraction(BaseModel):
             return []
         return v
 
+    @field_serializer("created_at", "updated_at")
+    def serialize_datetime(self, value: datetime) -> float:
+        """Serialize datetime to Unix timestamp."""
+        return value.astimezone(timezone.utc).timestamp()
+
+    @field_serializer("id")
+    def serialize_uuid(self, value: UUID) -> str:
+        """Serialize UUID to string."""
+        return str(value)
+
     @model_validator(mode="after")
     def initialize_type_details(self):
         """Initialize type_details with the initial interaction_type if empty."""
@@ -130,6 +151,3 @@ class GeneratedContentInteraction(BaseModel):
         if self.status_details is None:
             self.status_details = []
         return self
-
-    class Config:
-        json_encoders = {datetime: lambda v: v.isoformat() + "Z", UUID: str}

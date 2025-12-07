@@ -12,6 +12,7 @@ from data_processing_service.models.generated_content import GeneratedContent
 from ...models.generated_content_interaction import GeneratedContentInteraction
 from ...models.generated_content_interaction_list import \
     GeneratedContentInteractionListResponse
+from ...models.generated_content_response import GeneratedContentResponse
 from ...services.generated_content_interaction_service import \
     ContentInteractionService
 from ...services.generated_content_service import GeneratedContentService
@@ -155,12 +156,12 @@ async def list_user_interactions(
 
 @router.get(
     "/generated_content/{content_id}",
-    response_model=GeneratedContent,
+    response_model=GeneratedContentResponse,
 )
 async def get_generated_content(
     content_id: str,
     content_service: GeneratedContentService = Depends(get_generated_content_service),
-) -> GeneratedContent:
+) -> GeneratedContentResponse:
     """
     Get generated content by its ID.
 
@@ -169,13 +170,16 @@ async def get_generated_content(
         content_service: Injected content service
 
     Returns:
-        GeneratedContent: The generated content object
+        GeneratedContentResponse: The generated content object with Unix timestamps
 
     Raises:
         HTTPException: If content not found or retrieval fails
     """
     try:
-        return await content_service.get_generated_content_by_id(content_id=content_id)
+        content = await content_service.get_generated_content_by_id(
+            content_id=content_id
+        )
+        return GeneratedContentResponse.from_generated_content(content)
     except HTTPException:
         raise
     except Exception as e:

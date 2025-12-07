@@ -11,6 +11,7 @@ from fastapi import HTTPException
 from ..external.user_service import UserServiceClient
 from ..models.newspaper import Newspaper
 from ..models.newspaper_list import NewspaperListData, NewspaperListResponse
+from ..models.newspaper_response import NewspaperResponse
 from ..repositories.newspaper_repository import NewspaperRepository
 
 
@@ -126,9 +127,15 @@ class NewspaperService:
         has_next = len(newspapers) > page_limit
         newspapers_to_return = newspapers[:page_limit]
 
+        # Convert Newspaper dataclass objects to NewspaperResponse objects
+        newspapers_response = [
+            NewspaperResponse.from_newspaper(newspaper)
+            for newspaper in newspapers_to_return
+        ]
+
         return NewspaperListResponse(
             data=NewspaperListData(
-                list_response=newspapers_to_return,
+                list_response=newspapers_response,
                 hasNext=has_next,
             )
         )

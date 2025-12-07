@@ -11,6 +11,7 @@ import {
   articleInteractionService,
   ArticleInteractionState,
 } from '@/lib/services/article-interaction-service';
+import { articleCache } from '@/lib/services/cache/article/article-cache';
 import DislikeModal from './DislikeModal';
 import ReportModal from './ReportModal';
 import CategoryTag from './CategoryTag';
@@ -24,51 +25,46 @@ interface ExpandableArticleCardProps {
 }
 
 /**
- * Fetch full article data from API
+ * Fetch full article data from API or cache
  * Converts Article to CachedNewspaperArticle format for display
  * Preserves the SHORT summary from placeholder data (newspaper metadata)
+ * Checks cache first to avoid redundant API calls
  */
 async function fetchFullArticle(
   articleId: string,
   existingSummary?: string
 ): Promise<CachedNewspaperArticle> {
+  // Check cache first (cache uses MongoDB _id as key)
+  const cachedArticle = articleCache.get(articleId);
+  
+  if (cachedArticle) {
+    return {
+      id: cachedArticle.id,
+      title: cachedArticle.title,
+      category: cachedArticle.category,
+      time_to_read: cachedArticle.time_to_read,
+      summary: existingSummary || '',
+      cached_at: cachedArticle.cached_at,
+    };
+  }
+  
+  // Not in cache, fetch from API
   const response = await fetch(`/api/articles/${articleId}`);
   const data = await response.json();
   
   if (!data.success) {
-    // Handle 404 errors gracefully - preserve error message
     throw new Error(data.error || 'Failed to fetch article');
   }
   
   const article: Article = data.article;
-  
-  // Use existing summary from newspaper metadata (SHORT version) if available
-  // This is the correct summary, not extracted from content
-  // Only extract from content as fallback if no summary provided
-  let summary = existingSummary || '';
-  
-  if (!summary && article.content) {
-    // Fallback: Extract summary from content if no SHORT version available
-    const cleanContent = article.content
-      .replace(/#{1,6}\s+/g, '') // Remove headers
-      .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold
-      .replace(/\*([^*]+)\*/g, '$1') // Remove italic
-      .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Remove links
-      .trim();
-    
-    const firstParagraph = cleanContent.split('\n\n')[0] || cleanContent.split('\n')[0] || cleanContent;
-    summary = firstParagraph.length > 300 
-      ? firstParagraph.substring(0, 300) + '...'
-      : firstParagraph;
-  }
   
   return {
     id: article.id,
     title: article.title,
     category: article.category,
     time_to_read: article.time_to_read,
-    summary: summary || 'No summary available',
-    cached_at: article.cached_at || new Date().toISOString(),
+    summary: existingSummary || '',
+    cached_at: article.cached_at,
   };
 }
 

@@ -9,18 +9,31 @@ from pydantic import BaseModel, Field
 from data_processing_service.models.generated_content import GeneratedContent
 
 from .generated_content_interaction import GeneratedContentInteraction
+from .generated_content_response import GeneratedContentResponse
 
 
 class GeneratedContentWithInteractions(BaseModel):
     """Generated content with its active user interactions."""
 
-    generated_content: GeneratedContent = Field(
+    generated_content: GeneratedContentResponse = Field(
         ..., description="The generated content object"
     )
     active_user_interactions: List[GeneratedContentInteraction] = Field(
         default_factory=list,
         description="List of active user interactions for this content",
     )
+
+    @classmethod
+    def from_generated_content_with_interactions(
+        cls,
+        content: GeneratedContent,
+        interactions: List[GeneratedContentInteraction],
+    ) -> "GeneratedContentWithInteractions":
+        """Convert GeneratedContent and interactions to response model."""
+        return cls(
+            generated_content=GeneratedContentResponse.from_generated_content(content),
+            active_user_interactions=interactions,
+        )
 
 
 class GeneratedContentListData(BaseModel):

@@ -1,4 +1,6 @@
 import { CachedNewspaper, CachedNewspaperArticle } from '@/models/newspaper.model';
+import { Article } from '@/models/article.model';
+import { articleCache } from '@/lib/services/cache/article/article-cache';
 
 const NEWSPAPER_SERVICE_URL = 'https://unhook-production-b172.up.railway.app';
 
@@ -13,6 +15,82 @@ export class NewspaperService {
       throw new Error(`Invalid date format: ${date}. Expected YYYY-MM-DD`);
     }
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+
+  /**
+   * Transform GeneratedContent object to full Article object
+   * Used to populate ArticleCache when fetching newspapers
+   * @private
+   */
+  private transformToArticle(article: any): Article {
+    const generated = article.generated || {};
+
+    // Title should ONLY come from VERY_SHORT, never extracted from SHORT
+    let title = '';
+    if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
+      title = generated.VERY_SHORT.string;
+    }
+
+    // Get content - prefer LONG, then MEDIUM, then SHORT
+    let content = '';
+    if (generated.LONG && generated.LONG.markdown_string) {
+      content = generated.LONG.markdown_string;
+    } else if (generated.LONG && generated.LONG.string) {
+      content = generated.LONG.string;
+    } else if (generated.MEDIUM && generated.MEDIUM.markdown_string) {
+      content = generated.MEDIUM.markdown_string;
+    } else if (generated.MEDIUM && generated.MEDIUM.string) {
+      content = generated.MEDIUM.string;
+    } else if (generated.SHORT && generated.SHORT.string) {
+      content = generated.SHORT.string;
+    }
+
+    // Get category
+    const category = article.category?.category || 'TECHNOLOGY';
+
+    // Get reading time
+    const readingTimeSeconds = article.reading_time_seconds || 0;
+    const minutes = Math.ceil(readingTimeSeconds / 60);
+    const time_to_read =
+      minutes < 1 ? 'Less than 1 min read' : `${minutes} min read`;
+
+    // Get published date
+    let published_at = new Date().toISOString();
+    if (article.content_generated_at) {
+      published_at = new Date(article.content_generated_at * 1000).toISOString();
+    } else if (article.created_at) {
+      published_at = new Date(article.created_at * 1000).toISOString();
+    }
+
+    // Get external_id (YouTube video ID)
+    const external_id = article.external_id || '';
+
+    // Note: youtube_channel may not be included in the GeneratedContent response
+    let youtube_channel = '';
+    if (article.youtube_channel) {
+      youtube_channel = article.youtube_channel;
+    }
+
+    // Use MongoDB _id as the Article ID (backend endpoint expects MongoDB _id)
+    const articleId = article.id;
+
+    // Set article source and link
+    const article_source = 'Teerth';
+    const article_link = `https://unhook-production.up.railway.app/article/${articleId}`;
+
+    return {
+      id: articleId,
+      title: title || 'Untitled Article',
+      content: content || '',
+      category,
+      time_to_read,
+      article_link,
+      article_source,
+      external_id,
+      youtube_channel,
+      published_at,
+      cached_at: new Date().toISOString(),
+    };
   }
 
   /**
@@ -105,9 +183,8 @@ export class NewspaperService {
               ? `${Math.ceil(readingTimeSeconds / 60)}m read`
               : '5 min read';
 
-          // Use external_id as the article ID since the backend endpoint expects external_id
-          // Fallback to MongoDB _id (article.id) if external_id is not available
-          const articleId = article.external_id || article.id || '';
+          // Use MongoDB _id as the article ID (backend endpoint expects MongoDB _id)
+          const articleId = article.id;
 
           return {
             id: articleId,
@@ -119,6 +196,22 @@ export class NewspaperService {
           };
         }
       );
+
+      // Step 4.5: Transform articles to full Article objects and populate cache
+      // This allows other pages (like article detail pages) to use cached data
+      // Cache uses MongoDB _id as key (matching CachedNewspaperArticle.id)
+      contentWithInteractions.forEach((item: { generated_content: any }) => {
+        const article = item.generated_content;
+        if (!article.id) {
+          return; // Skip articles without MongoDB _id
+        }
+        try {
+          const fullArticle = this.transformToArticle(article);
+          articleCache.set(fullArticle);
+        } catch (error) {
+          console.warn('Failed to cache article:', error);
+        }
+      });
 
       // Step 5: Calculate total time to read
       const totalMinutes = cachedArticles.reduce((total, article) => {
