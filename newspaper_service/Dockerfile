@@ -48,8 +48,8 @@ RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Set working directory for the app user
-WORKDIR /app/newspaper_service
+# Set working directory to /app (parent directory) so relative imports work correctly
+WORKDIR /app
 
 # Expose the port (Railway will set PORT env var)
 EXPOSE 8000
@@ -59,5 +59,6 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
 # Default command to run the FastAPI application
+# Run from /app directory using full module path: newspaper_service.api.app
 # Railway sets PORT env var, but uvicorn defaults to 8000 if not set
-CMD uvicorn api.app:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD uvicorn newspaper_service.api.app:app --host 0.0.0.0 --port ${PORT:-8000}
