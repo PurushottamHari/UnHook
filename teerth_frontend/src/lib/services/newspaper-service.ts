@@ -94,6 +94,99 @@ export class NewspaperService {
   }
 
   /**
+   * Fetch a single page of articles for a newspaper
+   * @param newspaperId - Newspaper ID
+   * @param userId - User ID
+   * @param startingAfter - Optional cursor for pagination (external_id of last item)
+   * @param pageLimit - Number of items per page (default: 10)
+   * @returns Object with articles and hasNext flag
+   */
+  async getNewspaperArticlesPage(
+    newspaperId: string,
+    userId: string,
+    startingAfter?: string | null,
+    pageLimit: number = 10
+  ): Promise<{ articles: any[], hasNext: boolean, lastExternalId: string | null }> {
+    const articlesUrl = new URL(
+      `${NEWSPAPER_SERVICE_URL}/newspapers/${newspaperId}/generated_content`
+    );
+    
+    if (startingAfter) {
+      articlesUrl.searchParams.set('starting_after', startingAfter);
+    }
+    articlesUrl.searchParams.set('page_limit', pageLimit.toString());
+
+    const articlesResponse = await fetch(articlesUrl.toString(), {
+      headers: {
+        'X-User-ID': userId,
+      },
+    });
+
+    if (!articlesResponse.ok) {
+      if (articlesResponse.status === 404) {
+        return { articles: [], hasNext: false, lastExternalId: null };
+      }
+      throw new Error(`Failed to fetch articles: ${articlesResponse.statusText}`);
+    }
+
+    const articlesData = await articlesResponse.json();
+    const contentWithInteractions = articlesData?.data?.list_response || [];
+    const hasNext = articlesData?.data?.hasNext || false;
+    
+    // Get last item's external_id for next page cursor
+    const lastExternalId = contentWithInteractions.length > 0
+      ? contentWithInteractions[contentWithInteractions.length - 1]?.generated_content?.external_id || null
+      : null;
+
+    return {
+      articles: contentWithInteractions,
+      hasNext,
+      lastExternalId,
+    };
+  }
+
+  /**
+   * Get newspaper ID by date
+   * @param date - Date in YYYY-MM-DD format
+   * @param userId - User ID to filter newspapers
+   * @returns Newspaper ID or null if not found
+   */
+  async getNewspaperIdByDate(date: string, userId: string): Promise<string | null> {
+    try {
+      // Convert date format from YYYY-MM-DD to DD/MM/YYYY
+      const convertedDate = this.convertDateFormat(date);
+
+      // Fetch newspapers for the date
+      const newspapersUrl = `${NEWSPAPER_SERVICE_URL}/newspapers?date=${encodeURIComponent(convertedDate)}`;
+      const newspapersResponse = await fetch(newspapersUrl, {
+        headers: {
+          'X-User-ID': userId,
+        },
+      });
+
+      if (!newspapersResponse.ok) {
+        if (newspapersResponse.status === 404) {
+          return null;
+        }
+        throw new Error(`Failed to fetch newspapers: ${newspapersResponse.statusText}`);
+      }
+
+      const newspapersData = await newspapersResponse.json();
+      const newspapers = newspapersData?.data?.list_response || [];
+
+      if (newspapers.length === 0) {
+        return null;
+      }
+
+      // Return the first newspaper ID (assuming backend filters correctly by date)
+      return newspapers[0].id;
+    } catch (error) {
+      console.error('Error fetching newspaper ID:', error);
+      return null;
+    }
+  }
+
+  /**
    * Fetch a newspaper by date and user ID
    * @param date - Date in YYYY-MM-DD format
    * @param userId - User ID to filter newspapers

@@ -4,6 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Article } from '@/models/article.model';
+import { useAuthStore } from '@/store/auth-store';
+import { articleInteractionService } from '@/lib/services/article-interaction-service';
+import { GeneratedContentInteraction } from '@/types';
 import TeerthLogoIcon from '@/components/TeerthLogoIcon';
 import WaitlistSection from '@/components/WaitlistSection';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -70,6 +73,8 @@ export default function ArticlePage() {
   const articleId = params.id as string;
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  // Interactions will be fetched by ArticleActionBar component using the shared hook
+  // No need to fetch here - the hook handles it
 
   // Get placeholder data from sessionStorage for instant display
   const placeholderData = useMemo(
@@ -430,7 +435,7 @@ export default function ArticlePage() {
       />
 
       {/* Floating Action Bar */}
-      {article && <ArticleActionBar articleId={article.id} />}
+      {article && <ArticleActionBar articleId={article.id} interactions={interactions} />}
     </div>
   );
 }

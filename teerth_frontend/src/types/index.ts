@@ -26,6 +26,7 @@ export interface CachedNewspaperArticle {
   time_to_read: string;
   summary?: string;
   cached_at: string;
+  interactions?: GeneratedContentInteraction[];
 }
 
 export interface CachedNewspaper {
@@ -42,4 +43,15 @@ export interface UserInteraction {
   type: 'like' | 'dislike' | 'read_later';
   reason?: string;
   createdAt: string;
+}
+
+export interface GeneratedContentInteraction {
+  id: string;
+  generated_content_id: string;
+  user_id: string;
+  interaction_type: 'LIKE' | 'DISLIKE' | 'REPORT' | 'SAVED';
+  status: 'ACTIVE' | 'INACTIVE';
+  metadata?: Record<string, string>;
+  created_at: number; // Unix timestamp
+  updated_at: number;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { CachedNewspaperArticle } from '@/models/newspaper.model';
@@ -12,6 +12,8 @@ import {
   ArticleInteractionState,
 } from '@/lib/services/article-interaction-service';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
+import { useDebounce } from '@/lib/hooks/useDebounce';
+import { useArticleInteractions } from '@/lib/hooks/useArticleInteractions';
 import DislikeModal from './DislikeModal';
 import ReportModal from './ReportModal';
 import CategoryTag from './CategoryTag';
@@ -77,24 +79,32 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDislikeModalOpen, setIsDislikeModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [interactionState, setInteractionState] = useState<ArticleInteractionState>({
-    isRead: false,
-    isSaved: false,
-    isLiked: false,
-    isDisliked: false,
-    isReported: false,
-  });
+  // Interaction state is now derived from interactions via getInteractionState
+  // No need for separate state
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingType, setProcessingType] = useState<string | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const { user } = useAuthStore();
   const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
 
-  // Load interaction state
+  // Use shared interactions hook
+  const { interactions, getInteractionState, updateInteractionsOptimistically, handleInteractionUpdate } = useArticleInteractions(
+    article.id,
+    article.interactions
+  );
+
+  // Listen for interaction updates
   useEffect(() => {
-    if (article.id) {
-      const state = articleInteractionService.getArticleState(userId, article.id);
-      setInteractionState(state);
-    }
-  }, [article.id, userId]);
+    if (typeof window === 'undefined') return;
+    window.addEventListener('articleInteractionUpdated', handleInteractionUpdate as EventListener);
+    return () => {
+      window.removeEventListener('articleInteractionUpdated', handleInteractionUpdate as EventListener);
+    };
+  }, [handleInteractionUpdate]);
+
+  // Get current interaction state - memoized to prevent unnecessary recalculations
+  const interactionState = useMemo(() => getInteractionState(), [getInteractionState]);
 
   // Each card fetches its own full article data independently
   // Uses article metadata as placeholderData for instant display
@@ -158,80 +168,265 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
     }
   };
 
-  // Action handlers
-  const handleToggleRead = (e: React.MouseEvent) => {
+  // Note: interactionState is now derived from interactions via getInteractionState
+  // No need for separate state management
+
+  // Action handlers with debouncing and loading states
+  const handleToggleRead = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const newState = articleInteractionService.toggleRead(userId, article.id);
-    setInteractionState(newState);
-  };
+    if (isProcessing) return;
+    
+    // Read state is frontend-only, no API call needed
+    articleInteractionService.toggleRead(userId, article.id);
+  }, [userId, article.id, isProcessing]);
 
-  const handleToggleSave = (e: React.MouseEvent) => {
+  const handleToggleSave = useDebounce(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const newState = articleInteractionService.toggleSaveForLater(userId, article.id);
-    setInteractionState(newState);
-  };
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('save');
+    setLastError(null);
+    
+    try {
+      const currentState = getInteractionState();
+      const isCurrentlySaved = currentState.isSaved;
+      
+      // Optimistic update
+      updateInteractionsOptimistically((current) => {
+        if (isCurrentlySaved) {
+          return current.filter(i => !(i.interaction_type === 'SAVED' && i.status === 'ACTIVE'));
+        } else {
+          return [...current, {
+            id: 'temp',
+            generated_content_id: article.id,
+            user_id: userId,
+            interaction_type: 'SAVED' as const,
+            status: 'ACTIVE' as const,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        }
+      });
 
-  const handleToggleLike = (e: React.MouseEvent) => {
+      const response = await articleInteractionService.toggleSaveForLater(userId, article.id, interactions);
+      
+      // Update cache with actual response
+      updateInteractionsOptimistically((current) => {
+        const filtered = current.filter(i => 
+          !(i.user_id === userId && i.interaction_type === 'SAVED')
+        );
+        if (response && response.status === 'ACTIVE') {
+          return [...filtered, response];
+        }
+        return filtered;
+      });
+    } catch (error) {
+      // Revert on error
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update save state');
+      console.error('Error toggling save:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
+
+  const handleToggleLike = useDebounce(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsMenuOpen(false);
-    const newState = articleInteractionService.toggleLike(userId, article.id);
-    setInteractionState(newState);
-  };
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('like');
+    setLastError(null);
+    
+    try {
+      const currentState = getInteractionState();
+      const isCurrentlyLiked = currentState.isLiked;
+      
+      // Optimistic update
+      updateInteractionsOptimistically((current) => {
+        if (isCurrentlyLiked) {
+          return current.filter(i => !(i.interaction_type === 'LIKE' && i.status === 'ACTIVE'));
+        } else {
+          const filtered = current.filter(i => !(i.interaction_type === 'DISLIKE' && i.status === 'ACTIVE'));
+          return [...filtered, {
+            id: 'temp',
+            generated_content_id: article.id,
+            user_id: userId,
+            interaction_type: 'LIKE' as const,
+            status: 'ACTIVE' as const,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        }
+      });
 
-  const handleDislikeClick = (e: React.MouseEvent) => {
+      const response = await articleInteractionService.toggleLike(userId, article.id, interactions);
+      
+      // Update cache with actual response
+      updateInteractionsOptimistically((current) => {
+        const filtered = current.filter(i => 
+          !(i.user_id === userId && (i.interaction_type === 'LIKE' || i.interaction_type === 'DISLIKE'))
+        );
+        if (response && response.status === 'ACTIVE') {
+          return [...filtered, response];
+        }
+        return filtered;
+      });
+    } catch (error) {
+      // Revert on error
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update like');
+      console.error('Error toggling like:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
+
+  const handleDislikeConfirm = useDebounce(async (reason?: string, otherReason?: string) => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('dislike');
+    setLastError(null);
+    setIsDislikeModalOpen(false);
+    
+    try {
+      const currentState = getInteractionState();
+      const isCurrentlyDisliked = currentState.isDisliked;
+      
+      // Optimistic update
+      updateInteractionsOptimistically((current) => {
+        if (isCurrentlyDisliked) {
+          return current.filter(i => !(i.interaction_type === 'DISLIKE' && i.status === 'ACTIVE'));
+        } else {
+          const filtered = current.filter(i => !(i.interaction_type === 'LIKE' && i.status === 'ACTIVE'));
+          return [...filtered, {
+            id: 'temp',
+            generated_content_id: article.id,
+            user_id: userId,
+            interaction_type: 'DISLIKE' as const,
+            status: 'ACTIVE' as const,
+            metadata: reason ? { reason, ...(otherReason ? { other_reason: otherReason } : {}) } : undefined,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        }
+      });
+
+      const response = await articleInteractionService.dislikeArticle(userId, article.id, reason, otherReason, interactions);
+      
+      // Update cache with actual response
+      updateInteractionsOptimistically((current) => {
+        const filtered = current.filter(i => 
+          !(i.user_id === userId && (i.interaction_type === 'LIKE' || i.interaction_type === 'DISLIKE'))
+        );
+        if (response && response.status === 'ACTIVE') {
+          return [...filtered, response];
+        }
+        return filtered;
+      });
+    } catch (error) {
+      // Revert on error
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update dislike');
+      console.error('Error updating dislike:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
+
+  const handleDislikeClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsMenuOpen(false);
+    if (isProcessing) return;
+    
     if (interactionState.isDisliked) {
       // Toggle off - ask for confirmation
       if (window.confirm('Remove dislike from this article?')) {
-        const newState = articleInteractionService.dislikeArticle(userId, article.id);
-        setInteractionState(newState);
+        handleDislikeConfirm(undefined, undefined);
       }
     } else {
       setIsDislikeModalOpen(true);
     }
-  };
+  }, [interactionState.isDisliked, isProcessing, handleDislikeConfirm]);
 
-  const handleReportClick = (e: React.MouseEvent) => {
+  const handleReportConfirm = useDebounce(async (reasons?: string[], otherReason?: string) => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('report');
+    setLastError(null);
+    setIsReportModalOpen(false);
+    
+    try {
+      const currentState = getInteractionState();
+      
+      // Optimistic update - add report
+      if (!currentState.isReported) {
+        updateInteractionsOptimistically((current) => {
+          return [...current, {
+            id: 'temp',
+            generated_content_id: article.id,
+            user_id: userId,
+            interaction_type: 'REPORT' as const,
+            status: 'ACTIVE' as const,
+            metadata: reasons ? { reasons: JSON.stringify(reasons), ...(otherReason ? { other_reason: otherReason } : {}) } : undefined,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        });
+      }
+
+      const response = await articleInteractionService.reportArticle(userId, article.id, reasons, otherReason, interactions);
+      
+      // Update cache with actual response if report was created
+      if (response) {
+        updateInteractionsOptimistically((current) => {
+          const filtered = current.filter(i => 
+            !(i.user_id === userId && i.interaction_type === 'REPORT')
+          );
+          return [...filtered, response];
+        });
+      }
+    } catch (error) {
+      // Revert on error
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update report');
+      console.error('Error updating report:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
+
+  const handleReportClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsMenuOpen(false);
+    if (isProcessing) return;
+    
     if (interactionState.isReported) {
       // Toggle off - ask for confirmation
       if (window.confirm('Remove report from this article?')) {
-        const newState = articleInteractionService.reportArticle(userId, article.id);
-        setInteractionState(newState);
+        handleReportConfirm(undefined, undefined);
       }
     } else {
       setIsReportModalOpen(true);
     }
-  };
-
-  const handleDislikeConfirm = (reason: string, otherReason?: string) => {
-    const newState = articleInteractionService.dislikeArticle(
-      userId,
-      article.id,
-      reason,
-      otherReason
-    );
-    setInteractionState(newState);
-    setIsDislikeModalOpen(false);
-  };
-
-  const handleReportConfirm = (reasons: string[], otherReason?: string) => {
-    const newState = articleInteractionService.reportArticle(
-      userId,
-      article.id,
-      reasons,
-      otherReason
-    );
-    setInteractionState(newState);
-    setIsReportModalOpen(false);
-  };
+  }, [interactionState.isReported, isProcessing, handleReportConfirm]);
 
   // Show skeleton while loading (only if no cache exists)
   // If we have placeholder data (metadata), show the card immediately
@@ -259,13 +454,27 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
             {/* Save for Later - Desktop Only */}
             <button
               onClick={handleToggleSave}
-              className='article-action-button hidden md:block opacity-75 hover:opacity-100 transition-opacity'
+              disabled={isProcessing && processingType === 'save'}
+              className={`article-action-button hidden md:block opacity-75 hover:opacity-100 transition-all duration-200 ${
+                isProcessing && processingType === 'save' 
+                  ? 'opacity-50 cursor-not-allowed animate-pulse' 
+                  : ''
+              } ${interactionState.isSaved ? 'scale-110' : ''}`}
               aria-label={interactionState.isSaved ? 'Remove from saved' : 'Save for later'}
               title={interactionState.isSaved ? 'Remove from saved' : 'Save for later'}
             >
-              {interactionState.isSaved ? (
+              {isProcessing && processingType === 'save' ? (
                 <svg
-                  className='w-5 h-5 text-amber-600 dark:text-amber-700'
+                  className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                >
+                  <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                  <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                </svg>
+              ) : interactionState.isSaved ? (
+                <svg
+                  className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200'
                   fill='currentColor'
                   viewBox='0 0 24 24'
                 >
@@ -369,11 +578,23 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                         handleToggleSave(e);
                         setIsMenuOpen(false);
                       }}
-                      className='w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30'
+                      disabled={isProcessing && processingType === 'save'}
+                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
+                        isProcessing && processingType === 'save' ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
-                      {interactionState.isSaved ? (
+                      {isProcessing && processingType === 'save' ? (
                         <svg
-                          className='w-5 h-5 text-amber-600 dark:text-amber-700'
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                        >
+                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                        </svg>
+                      ) : interactionState.isSaved ? (
+                        <svg
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200'
                           fill='currentColor'
                           viewBox='0 0 24 24'
                         >
@@ -405,11 +626,23 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                         handleToggleLike(e);
                         setIsMenuOpen(false);
                       }}
-                      className='w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30'
+                      disabled={isProcessing && processingType === 'like'}
+                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
+                        isProcessing && processingType === 'like' ? 'opacity-50 cursor-not-allowed' : ''
+                      } ${interactionState.isLiked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                     >
-                      {interactionState.isLiked ? (
+                      {isProcessing && processingType === 'like' ? (
                         <svg
-                          className='w-5 h-5 text-amber-600 dark:text-amber-700'
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                        >
+                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                        </svg>
+                      ) : interactionState.isLiked ? (
+                        <svg
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110'
                           fill='currentColor'
                           viewBox='0 0 24 24'
                         >
@@ -440,11 +673,23 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                         e.stopPropagation();
                         handleDislikeClick(e);
                       }}
-                      className='w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30'
+                      disabled={isProcessing && processingType === 'dislike'}
+                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
+                        isProcessing && processingType === 'dislike' ? 'opacity-50 cursor-not-allowed' : ''
+                      } ${interactionState.isDisliked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                     >
-                      {interactionState.isDisliked ? (
+                      {isProcessing && processingType === 'dislike' ? (
                         <svg
-                          className='w-5 h-5 text-amber-600 dark:text-amber-700'
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                        >
+                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                        </svg>
+                      ) : interactionState.isDisliked ? (
+                        <svg
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110'
                           fill='currentColor'
                           viewBox='0 0 24 24'
                         >
@@ -475,11 +720,23 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                         e.stopPropagation();
                         handleReportClick(e);
                       }}
-                      className='w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3'
+                      disabled={isProcessing && processingType === 'report'}
+                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 ${
+                        isProcessing && processingType === 'report' ? 'opacity-50 cursor-not-allowed' : ''
+                      } ${interactionState.isReported ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                     >
-                      {interactionState.isReported ? (
+                      {isProcessing && processingType === 'report' ? (
                         <svg
-                          className='w-5 h-5 text-amber-600 dark:text-amber-700'
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
+                          fill='none'
+                          viewBox='0 0 24 24'
+                        >
+                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
+                        </svg>
+                      ) : interactionState.isReported ? (
+                        <svg
+                          className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110'
                           fill='currentColor'
                           viewBox='0 0 24 24'
                         >
@@ -611,6 +868,13 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
           <div className='absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-br from-amber-300/20 to-amber-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300' />
         </div>
       </Link>
+
+      {/* Error Toast */}
+      {lastError && (
+        <div className='absolute top-4 right-4 z-50 bg-red-100 dark:bg-red-200 text-red-800 dark:text-red-900 px-4 py-2 rounded-lg shadow-lg animate-shake'>
+          <p className='text-sm font-medium'>{lastError}</p>
+        </div>
+      )}
 
       {/* Modals */}
       <DislikeModal

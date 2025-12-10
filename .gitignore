@@ -7,7 +7,11 @@ venv/
 metrics_data/
 /debug_subtitles*
 @debug_subtitles_**/
-/scripts/
 /youtube_cookies.txt
 /youtube_cookies_compressed.txt
 /youtube_cookies_decompressed.txt
+
+
+scripts/daily_discipline/*/
+
+

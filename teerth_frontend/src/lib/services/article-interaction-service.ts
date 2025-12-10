@@ -1,16 +1,17 @@
 /**
- * Mock Article Interaction Service
+ * Article Interaction Service
  * 
  * This service handles user interactions with articles:
- * - Mark as Read/Unread
+ * - Mark as Read/Unread (frontend-only)
  * - Save for Later / Remove from Saved
  * - Like/Unlike
  * - Dislike (with reason)
  * - Report (with reasons)
  * 
- * Currently uses localStorage for state management.
- * Backend implementation will replace this later.
+ * Uses API endpoints for backend interactions.
  */
+
+import { GeneratedContentInteraction } from '@/types';
 
 export interface ArticleInteractionState {
   isRead: boolean;
@@ -52,21 +53,82 @@ export const REPORT_REASONS: ReportReason[] = [
   { value: 'other', label: 'Other' },
 ];
 
+/**
+ * Parse active_user_interactions array into ArticleInteractionState
+ */
+export function parseInteractionsToState(
+  interactions: GeneratedContentInteraction[],
+  userId: string
+): ArticleInteractionState {
+  const state: ArticleInteractionState = {
+    isRead: false, // Frontend-only, not in backend
+    isSaved: false,
+    isLiked: false,
+    isDisliked: false,
+    isReported: false,
+  };
+
+  if (!interactions || interactions.length === 0) {
+    return state;
+  }
+
+  // Filter interactions for this user and ACTIVE status
+  const activeInteractions = interactions.filter(
+    (interaction) =>
+      interaction.user_id === userId && interaction.status === 'ACTIVE'
+  );
+
+  for (const interaction of activeInteractions) {
+    switch (interaction.interaction_type) {
+      case 'LIKE':
+        state.isLiked = true;
+        break;
+      case 'DISLIKE':
+        state.isDisliked = true;
+        if (interaction.metadata) {
+          state.dislikedReason = interaction.metadata.reason || interaction.metadata.dislike_reason;
+          state.dislikedOtherReason = interaction.metadata.other_reason || interaction.metadata.otherReason;
+        }
+        break;
+      case 'SAVED':
+        state.isSaved = true;
+        break;
+      case 'REPORT':
+        state.isReported = true;
+        if (interaction.metadata) {
+          const reasonsStr = interaction.metadata.reasons || interaction.metadata.report_reasons;
+          if (reasonsStr) {
+            // Parse comma-separated reasons or JSON array
+            try {
+              state.reportedReasons = JSON.parse(reasonsStr);
+            } catch {
+              state.reportedReasons = reasonsStr.split(',').map((r) => r.trim());
+            }
+          }
+          state.reportedOtherReason = interaction.metadata.other_reason || interaction.metadata.otherReason;
+        }
+        break;
+    }
+  }
+
+  return state;
+}
+
 class ArticleInteractionService {
-  private readonly STORAGE_KEY = 'article_interactions';
+  private readonly STORAGE_KEY = 'article_read_state'; // Only for read state (frontend-only)
   private readonly USER_PREFIX = 'user_';
 
   /**
-   * Get storage key for a specific user
+   * Get storage key for a specific user (read state only)
    */
   private getUserStorageKey(userId: string): string {
     return `${this.USER_PREFIX}${userId}`;
   }
 
   /**
-   * Get all interactions for a user
+   * Get read state for a user (frontend-only, uses localStorage)
    */
-  private getUserInteractions(userId: string): Record<string, ArticleInteractionState> {
+  private getUserReadStates(userId: string): Record<string, boolean> {
     if (typeof window === 'undefined') {
       return {};
     }
@@ -76,17 +138,17 @@ class ArticleInteractionService {
       const stored = localStorage.getItem(storageKey);
       return stored ? JSON.parse(stored) : {};
     } catch (error) {
-      console.error('Error reading article interactions:', error);
+      console.error('Error reading read states:', error);
       return {};
     }
   }
 
   /**
-   * Save interactions for a user
+   * Save read state for a user (frontend-only)
    */
-  private saveUserInteractions(
+  private saveUserReadStates(
     userId: string,
-    interactions: Record<string, ArticleInteractionState>
+    readStates: Record<string, boolean>
   ): void {
     if (typeof window === 'undefined') {
       return;
@@ -94,180 +156,278 @@ class ArticleInteractionService {
 
     try {
       const storageKey = this.getUserStorageKey(userId);
-      localStorage.setItem(storageKey, JSON.stringify(interactions));
+      localStorage.setItem(storageKey, JSON.stringify(readStates));
     } catch (error) {
-      console.error('Error saving article interactions:', error);
+      console.error('Error saving read states:', error);
     }
   }
 
   /**
    * Get interaction state for a specific article
+   * Combines API interactions with frontend read state
    */
-  getArticleState(userId: string, articleId: string): ArticleInteractionState {
-    const interactions = this.getUserInteractions(userId);
-    return interactions[articleId] || {
-      isRead: false,
-      isSaved: false,
-      isLiked: false,
-      isDisliked: false,
-      isReported: false,
+  getArticleState(
+    userId: string,
+    articleId: string,
+    interactions?: GeneratedContentInteraction[]
+  ): ArticleInteractionState {
+    // Parse API interactions
+    const apiState = interactions
+      ? parseInteractionsToState(interactions, userId)
+      : {
+          isSaved: false,
+          isLiked: false,
+          isDisliked: false,
+          isReported: false,
+        };
+
+    // Get read state from localStorage (frontend-only)
+    const readStates = this.getUserReadStates(userId);
+    const isRead = readStates[articleId] || false;
+
+    return {
+      ...apiState,
+      isRead,
     };
   }
 
   /**
-   * Update interaction state for a specific article
+   * Fetch interactions for an article from API
    */
-  private updateArticleState(
-    userId: string,
+  async fetchInteractions(
     articleId: string,
-    updates: Partial<ArticleInteractionState>
-  ): ArticleInteractionState {
-    const interactions = this.getUserInteractions(userId);
-    const currentState = interactions[articleId] || {
-      isRead: false,
-      isSaved: false,
-      isLiked: false,
-      isDisliked: false,
-      isReported: false,
-    };
+    userId: string
+  ): Promise<GeneratedContentInteraction[]> {
+    try {
+      const response = await fetch(`/api/articles/${articleId}/interactions?userId=${userId}`, {
+        method: 'GET',
+      });
 
-    const newState: ArticleInteractionState = {
-      ...currentState,
-      ...updates,
-    };
+      if (!response.ok) {
+        // If 404, return empty array (no interactions yet)
+        if (response.status === 404) {
+          return [];
+        }
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to fetch interactions');
+      }
 
-    interactions[articleId] = newState;
-    this.saveUserInteractions(userId, interactions);
+      const data = await response.json();
+      return data.interactions || [];
+    } catch (error) {
+      console.error('Error fetching interactions:', error);
+      return [];
+    }
+  }
 
-    // Dispatch custom event to notify components of changes (same tab)
+  /**
+   * Create or update an interaction via API
+   */
+  async createInteraction(
+    articleId: string,
+    userId: string,
+    interactionType: 'LIKE' | 'DISLIKE' | 'REPORT' | 'SAVED',
+    metadata?: Record<string, string>
+  ): Promise<GeneratedContentInteraction> {
+    try {
+      const response = await fetch(`/api/articles/${articleId}/interactions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          interactionType,
+          metadata: metadata || {},
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create interaction');
+      }
+
+      const data = await response.json();
+      const interaction = data.interaction;
+
+      // Dispatch custom event to notify components of changes
+      // Mark as local update so components don't refetch unnecessarily
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('articleInteractionChange', {
+          detail: { articleId, interactionType },
+        }));
+        // Dispatch with interaction data so components can update optimistically
+        window.dispatchEvent(new CustomEvent('articleInteractionUpdated', {
+          detail: { articleId, interaction, source: 'local' },
+        }));
+      }
+
+      return interaction;
+    } catch (error) {
+      console.error('Error creating interaction:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Toggle read state (frontend-only, no API call)
+   */
+  toggleRead(userId: string, articleId: string): ArticleInteractionState {
+    const readStates = this.getUserReadStates(userId);
+    const currentRead = readStates[articleId] || false;
+    readStates[articleId] = !currentRead;
+    this.saveUserReadStates(userId, readStates);
+
+    // Dispatch custom event
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('articleInteractionChange'));
     }
 
-    // Log for debugging (will be replaced with API call)
-    console.log(`[ArticleInteraction] ${articleId}:`, newState);
-
-    return newState;
-  }
-
-  /**
-   * Toggle read state
-   */
-  toggleRead(userId: string, articleId: string): ArticleInteractionState {
-    const currentState = this.getArticleState(userId, articleId);
-    return this.updateArticleState(userId, articleId, {
-      isRead: !currentState.isRead,
-    });
+    // Return updated state (read state only, other states would need to be passed in)
+    return {
+      isRead: !currentRead,
+      isSaved: false,
+      isLiked: false,
+      isDisliked: false,
+      isReported: false,
+    };
   }
 
   /**
    * Toggle save for later
    */
-  toggleSaveForLater(userId: string, articleId: string): ArticleInteractionState {
-    const currentState = this.getArticleState(userId, articleId);
-    return this.updateArticleState(userId, articleId, {
-      isSaved: !currentState.isSaved,
-    });
+  async toggleSaveForLater(
+    userId: string,
+    articleId: string,
+    currentInteractions: GeneratedContentInteraction[]
+  ): Promise<GeneratedContentInteraction> {
+    // Create interaction - backend handles toggle logic
+    return await this.createInteraction(articleId, userId, 'SAVED');
   }
 
   /**
    * Toggle like
    */
-  toggleLike(userId: string, articleId: string): ArticleInteractionState {
-    const currentState = this.getArticleState(userId, articleId);
-    return this.updateArticleState(userId, articleId, {
-      isLiked: !currentState.isLiked,
-      // If liking, remove dislike
-      isDisliked: currentState.isLiked ? currentState.isDisliked : false,
-      dislikedReason: currentState.isLiked ? currentState.dislikedReason : undefined,
-      dislikedOtherReason: currentState.isLiked ? currentState.dislikedOtherReason : undefined,
-    });
+  async toggleLike(
+    userId: string,
+    articleId: string,
+    currentInteractions: GeneratedContentInteraction[]
+  ): Promise<GeneratedContentInteraction> {
+    // Backend handles toggle logic - creating LIKE will deactivate if already active
+    return await this.createInteraction(articleId, userId, 'LIKE');
   }
 
   /**
    * Set dislike with reason
    */
-  dislikeArticle(
+  async dislikeArticle(
     userId: string,
     articleId: string,
     reason?: string,
-    otherReason?: string
-  ): ArticleInteractionState {
-    const currentState = this.getArticleState(userId, articleId);
-    
-    // If already disliked and toggling off, remove dislike
-    if (currentState.isDisliked && !reason) {
-      return this.updateArticleState(userId, articleId, {
-        isDisliked: false,
-        dislikedReason: undefined,
-        dislikedOtherReason: undefined,
-      });
+    otherReason?: string,
+    currentInteractions?: GeneratedContentInteraction[]
+  ): Promise<GeneratedContentInteraction> {
+    // If toggling off, reason will be undefined
+    const metadata: Record<string, string> = {};
+    if (reason) {
+      metadata.reason = reason;
+    }
+    if (otherReason) {
+      metadata.other_reason = otherReason;
     }
 
-    // Set dislike
-    return this.updateArticleState(userId, articleId, {
-      isDisliked: true,
-      dislikedReason: reason,
-      dislikedOtherReason: otherReason,
-      // If disliking, remove like
-      isLiked: false,
-    });
+    return await this.createInteraction(
+      articleId,
+      userId,
+      'DISLIKE',
+      Object.keys(metadata).length > 0 ? metadata : undefined
+    );
   }
 
   /**
    * Set report with reasons
    */
-  reportArticle(
+  async reportArticle(
     userId: string,
     articleId: string,
     reasons?: string[],
-    otherReason?: string
-  ): ArticleInteractionState {
-    const currentState = this.getArticleState(userId, articleId);
-    
-    // If already reported and toggling off, remove report
-    if (currentState.isReported && !reasons) {
-      return this.updateArticleState(userId, articleId, {
-        isReported: false,
-        reportedReasons: undefined,
-        reportedOtherReason: undefined,
-      });
+    otherReason?: string,
+    currentInteractions?: GeneratedContentInteraction[]
+  ): Promise<GeneratedContentInteraction | null> {
+    // Report cannot be toggled off per backend logic
+    const metadata: Record<string, string> = {};
+    if (reasons && reasons.length > 0) {
+      metadata.reasons = JSON.stringify(reasons);
+    }
+    if (otherReason) {
+      metadata.other_reason = otherReason;
     }
 
-    // Set report
-    return this.updateArticleState(userId, articleId, {
-      isReported: true,
-      reportedReasons: reasons,
-      reportedOtherReason: otherReason,
-    });
+    try {
+      return await this.createInteraction(
+        articleId,
+        userId,
+        'REPORT',
+        Object.keys(metadata).length > 0 ? metadata : undefined
+      );
+    } catch (error) {
+      // If already reported, backend will reject - that's expected behavior
+      console.warn('Report interaction failed (may already be reported):', error);
+      return null;
+    }
   }
 
   /**
    * Get all articles by state (for dashboard sections)
+   * Note: This now requires interactions to be passed in from API responses
+   * For read state, still uses localStorage
    */
   getArticlesByState(
     userId: string,
-    state: 'read' | 'saved' | 'liked' | 'disliked' | 'reported'
+    state: 'read' | 'saved' | 'liked' | 'disliked' | 'reported',
+    articlesWithInteractions?: Array<{
+      id: string;
+      interactions?: GeneratedContentInteraction[];
+    }>
   ): string[] {
-    const interactions = this.getUserInteractions(userId);
     const articleIds: string[] = [];
 
-    for (const [articleId, interactionState] of Object.entries(interactions)) {
+    if (state === 'read') {
+      // Read state is frontend-only, use localStorage
+      const readStates = this.getUserReadStates(userId);
+      for (const [articleId, isRead] of Object.entries(readStates)) {
+        if (isRead) articleIds.push(articleId);
+      }
+      return articleIds;
+    }
+
+    // For other states, use API interactions
+    if (!articlesWithInteractions) {
+      return [];
+    }
+
+    for (const article of articlesWithInteractions) {
+      if (!article.interactions || article.interactions.length === 0) {
+        continue;
+      }
+
+      const stateFromInteractions = parseInteractionsToState(
+        article.interactions,
+        userId
+      );
+
       switch (state) {
-        case 'read':
-          if (interactionState.isRead) articleIds.push(articleId);
-          break;
         case 'saved':
-          if (interactionState.isSaved) articleIds.push(articleId);
+          if (stateFromInteractions.isSaved) articleIds.push(article.id);
           break;
         case 'liked':
-          if (interactionState.isLiked) articleIds.push(articleId);
+          if (stateFromInteractions.isLiked) articleIds.push(article.id);
           break;
         case 'disliked':
-          if (interactionState.isDisliked) articleIds.push(articleId);
+          if (stateFromInteractions.isDisliked) articleIds.push(article.id);
           break;
         case 'reported':
-          if (interactionState.isReported) articleIds.push(articleId);
+          if (stateFromInteractions.isReported) articleIds.push(article.id);
           break;
       }
     }
@@ -278,4 +438,3 @@ class ArticleInteractionService {
 
 // Export singleton instance
 export const articleInteractionService = new ArticleInteractionService();
-

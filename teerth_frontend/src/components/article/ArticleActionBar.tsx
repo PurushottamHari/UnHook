@@ -1,40 +1,50 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuthStore } from '@/store/auth-store';
 import {
   articleInteractionService,
   ArticleInteractionState,
 } from '@/lib/services/article-interaction-service';
+import { useDebounce } from '@/lib/hooks/useDebounce';
+import { useArticleInteractions } from '@/lib/hooks/useArticleInteractions';
+import { GeneratedContentInteraction } from '@/types';
 import DislikeModal from '@/components/DislikeModal';
 import ReportModal from '@/components/ReportModal';
 
 interface ArticleActionBarProps {
   articleId: string;
+  interactions?: GeneratedContentInteraction[];
 }
 
-export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
-  const [interactionState, setInteractionState] = useState<ArticleInteractionState>({
-    isRead: false,
-    isSaved: false,
-    isLiked: false,
-    isDisliked: false,
-    isReported: false,
-  });
+export default function ArticleActionBar({ articleId, interactions: providedInteractions }: ArticleActionBarProps) {
   const [isDislikeModalOpen, setIsDislikeModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingType, setProcessingType] = useState<string | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const { user } = useAuthStore();
   const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
 
-  // Load interaction state
+  // Use shared interactions hook
+  const { interactions, getInteractionState, updateInteractionsOptimistically, handleInteractionUpdate } = useArticleInteractions(
+    articleId,
+    providedInteractions
+  );
+
+  // Listen for interaction updates
   useEffect(() => {
-    if (articleId) {
-      const state = articleInteractionService.getArticleState(userId, articleId);
-      setInteractionState(state);
-    }
-  }, [articleId, userId]);
+    if (typeof window === 'undefined') return;
+    window.addEventListener('articleInteractionUpdated', handleInteractionUpdate as EventListener);
+    return () => {
+      window.removeEventListener('articleInteractionUpdated', handleInteractionUpdate as EventListener);
+    };
+  }, [handleInteractionUpdate]);
+
+  // Get current interaction state - memoized
+  const interactionState = useMemo(() => getInteractionState(), [getInteractionState]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -51,71 +61,255 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMenuOpen]);
 
-  // Action handlers
-  const handleToggleRead = () => {
+  // Action handlers with optimistic updates
+  const handleToggleRead = useCallback(() => {
+    if (isProcessing) return;
     const newState = articleInteractionService.toggleRead(userId, articleId);
-    setInteractionState(newState);
-  };
+    // Read state is frontend-only, no API call needed
+  }, [userId, articleId, isProcessing]);
 
-  const handleToggleSave = () => {
-    const newState = articleInteractionService.toggleSaveForLater(userId, articleId);
-    setInteractionState(newState);
-  };
+  const handleToggleSave = useDebounce(async () => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('save');
+    setLastError(null);
+    
+    try {
+      const currentState = getInteractionState();
+      const isCurrentlySaved = currentState.isSaved;
+      
+      // Optimistic update
+      updateInteractionsOptimistically((current) => {
+        if (isCurrentlySaved) {
+          return current.filter(i => !(i.interaction_type === 'SAVED' && i.status === 'ACTIVE'));
+        } else {
+          return [...current, {
+            id: 'temp',
+            generated_content_id: articleId,
+            user_id: userId,
+            interaction_type: 'SAVED' as const,
+            status: 'ACTIVE' as const,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        }
+      });
 
-  const handleToggleLike = () => {
-    const newState = articleInteractionService.toggleLike(userId, articleId);
-    setInteractionState(newState);
-  };
+      const response = await articleInteractionService.toggleSaveForLater(userId, articleId, interactions);
+      
+      // Update cache with actual response
+      updateInteractionsOptimistically((current) => {
+        const filtered = current.filter(i => 
+          !(i.user_id === userId && i.interaction_type === 'SAVED')
+        );
+        if (response && response.status === 'ACTIVE') {
+          return [...filtered, response];
+        }
+        return filtered;
+      });
+    } catch (error) {
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update save state');
+      console.error('Error toggling save:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
 
-  const handleDislikeClick = () => {
-    if (interactionState.isDisliked) {
-      // Toggle off - ask for confirmation
+  const handleToggleLike = useDebounce(async () => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('like');
+    setLastError(null);
+    
+    try {
+      const currentState = getInteractionState();
+      const isCurrentlyLiked = currentState.isLiked;
+      
+      // Optimistic update
+      updateInteractionsOptimistically((current) => {
+        if (isCurrentlyLiked) {
+          return current.filter(i => !(i.interaction_type === 'LIKE' && i.status === 'ACTIVE'));
+        } else {
+          const filtered = current.filter(i => !(i.interaction_type === 'DISLIKE' && i.status === 'ACTIVE'));
+          return [...filtered, {
+            id: 'temp',
+            generated_content_id: articleId,
+            user_id: userId,
+            interaction_type: 'LIKE' as const,
+            status: 'ACTIVE' as const,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        }
+      });
+
+      const response = await articleInteractionService.toggleLike(userId, articleId, interactions);
+      
+      // Update cache with actual response
+      updateInteractionsOptimistically((current) => {
+        const filtered = current.filter(i => 
+          !(i.user_id === userId && (i.interaction_type === 'LIKE' || i.interaction_type === 'DISLIKE'))
+        );
+        if (response && response.status === 'ACTIVE') {
+          return [...filtered, response];
+        }
+        return filtered;
+      });
+    } catch (error) {
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update like');
+      console.error('Error toggling like:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
+
+  const handleDislikeClick = useCallback(() => {
+    if (isProcessing) return;
+    
+    const currentState = getInteractionState();
+    if (currentState.isDisliked) {
       if (window.confirm('Remove dislike from this article?')) {
-        const newState = articleInteractionService.dislikeArticle(userId, articleId);
-        setInteractionState(newState);
+        handleDislikeConfirm(undefined, undefined);
       }
     } else {
       setIsDislikeModalOpen(true);
     }
-  };
+  }, [isProcessing, getInteractionState]);
 
-  const handleReportClick = () => {
-    if (interactionState.isReported) {
-      // Toggle off - ask for confirmation
+  const handleDislikeConfirm = useDebounce(async (reason?: string, otherReason?: string) => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('dislike');
+    setLastError(null);
+    setIsDislikeModalOpen(false);
+    
+    try {
+      const currentState = getInteractionState();
+      const isCurrentlyDisliked = currentState.isDisliked;
+      
+      // Optimistic update
+      updateInteractionsOptimistically((current) => {
+        if (isCurrentlyDisliked) {
+          return current.filter(i => !(i.interaction_type === 'DISLIKE' && i.status === 'ACTIVE'));
+        } else {
+          const filtered = current.filter(i => !(i.interaction_type === 'LIKE' && i.status === 'ACTIVE'));
+          return [...filtered, {
+            id: 'temp',
+            generated_content_id: articleId,
+            user_id: userId,
+            interaction_type: 'DISLIKE' as const,
+            status: 'ACTIVE' as const,
+            metadata: reason ? { reason, ...(otherReason ? { other_reason: otherReason } : {}) } : undefined,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        }
+      });
+
+      const response = await articleInteractionService.dislikeArticle(userId, articleId, reason, otherReason, interactions);
+      
+      // Update cache with actual response
+      updateInteractionsOptimistically((current) => {
+        const filtered = current.filter(i => 
+          !(i.user_id === userId && (i.interaction_type === 'LIKE' || i.interaction_type === 'DISLIKE'))
+        );
+        if (response && response.status === 'ACTIVE') {
+          return [...filtered, response];
+        }
+        return filtered;
+      });
+    } catch (error) {
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update dislike');
+      console.error('Error updating dislike:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
+
+  const handleReportClick = useCallback(() => {
+    if (isProcessing) return;
+    
+    const currentState = getInteractionState();
+    if (currentState.isReported) {
       if (window.confirm('Remove report from this article?')) {
-        const newState = articleInteractionService.reportArticle(userId, articleId);
-        setInteractionState(newState);
+        handleReportConfirm(undefined, undefined);
       }
     } else {
       setIsReportModalOpen(true);
     }
-  };
+  }, [isProcessing, getInteractionState]);
 
-  const handleDislikeConfirm = (reason: string, otherReason?: string) => {
-    const newState = articleInteractionService.dislikeArticle(
-      userId,
-      articleId,
-      reason,
-      otherReason
-    );
-    setInteractionState(newState);
-    setIsDislikeModalOpen(false);
-  };
-
-  const handleReportConfirm = (reasons: string[], otherReason?: string) => {
-    const newState = articleInteractionService.reportArticle(
-      userId,
-      articleId,
-      reasons,
-      otherReason
-    );
-    setInteractionState(newState);
+  const handleReportConfirm = useDebounce(async (reasons?: string[], otherReason?: string) => {
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    setProcessingType('report');
+    setLastError(null);
     setIsReportModalOpen(false);
-  };
+    
+    try {
+      const currentState = getInteractionState();
+      
+      // Optimistic update - add report
+      if (!currentState.isReported) {
+        updateInteractionsOptimistically((current) => {
+          return [...current, {
+            id: 'temp',
+            generated_content_id: articleId,
+            user_id: userId,
+            interaction_type: 'REPORT' as const,
+            status: 'ACTIVE' as const,
+            metadata: reasons ? { reasons: JSON.stringify(reasons), ...(otherReason ? { other_reason: otherReason } : {}) } : undefined,
+            created_at: Date.now() / 1000,
+            updated_at: Date.now() / 1000,
+          }];
+        });
+      }
 
+      const response = await articleInteractionService.reportArticle(userId, articleId, reasons, otherReason, interactions);
+      
+      // Update cache with actual response if report was created
+      if (response) {
+        updateInteractionsOptimistically((current) => {
+          // Remove any existing REPORT interactions and add new one
+          const filtered = current.filter(i => 
+            !(i.user_id === userId && i.interaction_type === 'REPORT')
+          );
+          return [...filtered, response];
+        });
+      }
+    } catch (error) {
+      updateInteractionsOptimistically(() => interactions);
+      setLastError('Failed to update report');
+      console.error('Error updating report:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingType(null);
+      setTimeout(() => setLastError(null), 3000);
+    }
+  }, 400);
 
   return (
     <>
+      {/* Error Toast */}
+      {lastError && (
+        <div className='fixed bottom-24 right-6 z-[101] bg-red-100 dark:bg-red-200 text-red-800 dark:text-red-900 px-4 py-2 rounded-lg shadow-lg animate-shake'>
+          <p className='text-sm font-medium'>{lastError}</p>
+        </div>
+      )}
+
       {/* Floating 3-Dot Menu - Always Collapsed */}
       <div className="fixed bottom-6 right-6 z-[100] pointer-events-auto" data-action-menu>
         <div className="relative">
@@ -155,7 +349,7 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
                       handleToggleRead();
                       setIsMenuOpen(false);
                     }}
-                    className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30"
+                    className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30"
                   >
                     {interactionState.isRead ? (
                       <svg className="w-5 h-5 text-amber-600 dark:text-amber-700" fill="currentColor" viewBox="0 0 24 24">
@@ -175,10 +369,18 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
                       handleToggleSave();
                       setIsMenuOpen(false);
                     }}
-                    className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30"
+                    disabled={isProcessing && processingType === 'save'}
+                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
+                      isProcessing && processingType === 'save' ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    {interactionState.isSaved ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700" fill="currentColor" viewBox="0 0 24 24">
+                    {isProcessing && processingType === 'save' ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : interactionState.isSaved ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
                       </svg>
                     ) : (
@@ -195,10 +397,18 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
                       handleToggleLike();
                       setIsMenuOpen(false);
                     }}
-                    className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30"
+                    disabled={isProcessing && processingType === 'like'}
+                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
+                      isProcessing && processingType === 'like' ? 'opacity-50 cursor-not-allowed' : ''
+                    } ${interactionState.isLiked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                   >
-                    {interactionState.isLiked ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700" fill="currentColor" viewBox="0 0 24 24">
+                    {isProcessing && processingType === 'like' ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : interactionState.isLiked ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                       </svg>
                     ) : (
@@ -215,10 +425,18 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
                       handleDislikeClick();
                       setIsMenuOpen(false);
                     }}
-                    className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30"
+                    disabled={isProcessing && processingType === 'dislike'}
+                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
+                      isProcessing && processingType === 'dislike' ? 'opacity-50 cursor-not-allowed' : ''
+                    } ${interactionState.isDisliked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                   >
-                    {interactionState.isDisliked ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700" fill="currentColor" viewBox="0 0 24 24">
+                    {isProcessing && processingType === 'dislike' ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : interactionState.isDisliked ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M15 3H6c-.83 0-1.54.5-1.85 1.22l-3.02 7.05c-.09.23-.13.47-.13.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
                       </svg>
                     ) : (
@@ -235,10 +453,18 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
                       handleReportClick();
                       setIsMenuOpen(false);
                     }}
-                    className="w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-colors flex items-center gap-3"
+                    disabled={isProcessing && processingType === 'report'}
+                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 ${
+                      isProcessing && processingType === 'report' ? 'opacity-50 cursor-not-allowed' : ''
+                    } ${interactionState.isReported ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                   >
-                    {interactionState.isReported ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700" fill="currentColor" viewBox="0 0 24 24">
+                    {isProcessing && processingType === 'report' ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : interactionState.isReported ? (
+                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                       </svg>
                     ) : (
@@ -273,4 +499,3 @@ export default function ArticleActionBar({ articleId }: ArticleActionBarProps) {
     </>
   );
 }
-
