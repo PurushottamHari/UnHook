@@ -228,6 +228,10 @@ class YtDlpClient:
             "no_warnings": True,
             "skip_download": True,
             "paths": {"subtitle": str(output_dir)},
+            # Use only video ID in filename to avoid "File name too long" errors
+            # with Unicode characters and long titles
+            # Format: {video_id}.{language}.{extension}
+            "outtmpl": {"subtitle": "%(id)s.%(lang)s.%(ext)s"},
             "retries": 3,
             "limit_rate": "150K",
         }
@@ -248,11 +252,32 @@ class YtDlpClient:
                     time.sleep(wait_time)
                     ydl.download([video_url])
 
-                video_id = None
+                # Extract video_id from URL if not already available
+                extracted_video_id = video_id
                 m = re.search(r"v=([\w-]+)", video_url)
                 if m:
-                    video_id = m.group(1)
-                pattern = re.compile(rf".*\[{video_id}\]\.{language}\.{fmt}$")
+                    extracted_video_id = m.group(1)
+                
+                # Pattern matches: {video_id}.{language}.{fmt}
+                # This matches the simplified filename format we set with outtmpl
+                expected_filename = f"{extracted_video_id}.{language}.{fmt}"
+                subtitle_file = output_dir / expected_filename
+                
+                if subtitle_file.exists():
+                    try:
+                        with open(subtitle_file, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        subtitle_file.unlink()  # Delete the file after reading
+                        return content
+                    except Exception as e:
+                        logger.error(
+                            f"Error reading/deleting subtitle file {subtitle_file}: {str(e)}"
+                        )
+                        return None
+                
+                # Fallback: try to find any file with the video_id in the name
+                # (in case yt-dlp still uses a different format)
+                pattern = re.compile(rf".*{re.escape(extracted_video_id)}.*\.{language}\.{fmt}$")
                 for file in os.listdir(output_dir):
                     if pattern.match(file):
                         src = output_dir / file
