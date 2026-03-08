@@ -16,7 +16,7 @@ dependencies = [
     "pymongo>=4.0.0",  # Required for MongoDB operations
     "httpx>=0.24.0",  # Required for HTTP client operations
     "langcodes>=3.3.0", # Required for language code validation
-    "user-service @ file:///Users/puru/Workspace/UnHook/user_service",  # Local dependency
+    "user-service @ file:///home/purubro/Workspace/UnHook/user_service",  # Local dependency
     "curl-cffi",
     "black>=23.0.0",
     "isort>=5.12.0",

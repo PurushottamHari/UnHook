@@ -89,6 +89,10 @@ class YouTubeStaticCollector(BaseStaticCollector):
             )
             self.user_repository.add_collected_videos(user_collected_content, user_id)
 
+            print(
+                f"Added {len(user_collected_content)} out of considered {len(uncollected_video_ids)} videos for channel: {channel_name}"
+            )
+
             # Record metrics for collected videos
             self._record_collection_metrics(channel_name, user_collected_content)
 

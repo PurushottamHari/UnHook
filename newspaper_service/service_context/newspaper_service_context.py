@@ -52,7 +52,9 @@ class NewspaperServiceContext(BaseServiceContext):
                     f"✅ Newspaper metrics processor initialized for pipeline: {pipeline_id}"
                 )
             else:
-                print("⚠️  No pipeline ID found - newspaper metrics collection disabled")
+                print(
+                    "⚠️  No pipeline ID found - newspaper metrics collection disabled"
+                )
         except Exception as e:
             print(f"⚠️  Failed to initialize newspaper metrics processor: {e}")
 

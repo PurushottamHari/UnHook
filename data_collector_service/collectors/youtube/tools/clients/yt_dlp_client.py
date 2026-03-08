@@ -87,7 +87,9 @@ class YtDlpClient:
         # Add proxy-specific yt-dlp options
         opts.update(
             {
+                "proxy": zyte_proxy_url,
                 "nocheckcertificate": True,  # Correct yt-dlp option name for --no-check-certificate
+                "impersonate": ImpersonateTarget(client="chrome"),
                 "http_headers": {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
                 },
@@ -230,8 +232,7 @@ class YtDlpClient:
             "paths": {"subtitle": str(output_dir)},
             # Use only video ID in filename to avoid "File name too long" errors
             # with Unicode characters and long titles
-            # Format: {video_id}.{language}.{extension}
-            "outtmpl": {"subtitle": "%(id)s.%(lang)s.%(ext)s"},
+            "outtmpl": {"default": "%(id)s.%(ext)s", "subtitle": "%(id)s.%(ext)s"},
             "retries": 3,
             "limit_rate": "150K",
         }
@@ -257,12 +258,12 @@ class YtDlpClient:
                 m = re.search(r"v=([\w-]+)", video_url)
                 if m:
                     extracted_video_id = m.group(1)
-                
+
                 # Pattern matches: {video_id}.{language}.{fmt}
                 # This matches the simplified filename format we set with outtmpl
                 expected_filename = f"{extracted_video_id}.{language}.{fmt}"
                 subtitle_file = output_dir / expected_filename
-                
+
                 if subtitle_file.exists():
                     try:
                         with open(subtitle_file, "r", encoding="utf-8") as f:
@@ -274,10 +275,12 @@ class YtDlpClient:
                             f"Error reading/deleting subtitle file {subtitle_file}: {str(e)}"
                         )
                         return None
-                
+
                 # Fallback: try to find any file with the video_id in the name
                 # (in case yt-dlp still uses a different format)
-                pattern = re.compile(rf".*{re.escape(extracted_video_id)}.*\.{language}\.{fmt}$")
+                pattern = re.compile(
+                    rf".*{re.escape(extracted_video_id)}.*\.{language}\.{fmt}$"
+                )
                 for file in os.listdir(output_dir):
                     if pattern.match(file):
                         src = output_dir / file

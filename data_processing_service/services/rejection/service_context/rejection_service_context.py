@@ -36,7 +36,9 @@ class RejectionServiceContext(BaseServiceContext):
                     f"✅ Rejection metrics processor initialized for pipeline: {pipeline_id}"
                 )
             else:
-                print("⚠️  No pipeline ID found - rejection metrics collection disabled")
+                print(
+                    "⚠️  No pipeline ID found - rejection metrics collection disabled"
+                )
         except Exception as e:
             print(f"⚠️  Failed to initialize rejection metrics processor: {e}")
 
