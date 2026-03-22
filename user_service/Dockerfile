@@ -11,16 +11,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Set work directory
 WORKDIR /app
 
-# Copy .env file first and source all environment variables
-COPY .env .env
-RUN if [ ! -f ".env" ]; then \
-        echo "ERROR: .env file not found"; \
-        echo "Please create a .env file with your environment variables"; \
-        exit 1; \
-    fi && \
-    export $(cat .env | grep -v '^#' | xargs) && \
-    echo "Environment variables loaded from .env file" && \
-    rm .env
+# Note: .env file is not copied here as Railway injects environment variables at runtime
+# For local development, ensure .env file is present before building
 
 # Install system dependencies
 RUN apt-get update \
@@ -28,28 +20,46 @@ RUN apt-get update \
         gcc \
         g++ \
         curl \
+        sed \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml and install Python dependencies
-COPY pyproject.toml .
+# Copy other service directories (for path dependencies)
+# Railway builds from repo root, so these should be available
+COPY commons/ ./commons/
+COPY data_processing_service/ ./data_processing_service/
+COPY newspaper_service/ ./newspaper_service/
+COPY data_collector_service/ ./data_collector_service/
+
+# Copy user_service directory
+COPY user_service/ ./user_service/
+
+# Fix path references in ALL pyproject.toml files for Docker container
+# Replace local paths with Docker container paths
+RUN find . -name "pyproject.toml" -type f -exec sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' {} \;
+
+# Change to user_service directory and install Python dependencies
+WORKDIR /app/user_service
 RUN pip install --upgrade pip \
     && pip install hatchling \
     && pip install -e .
-
-# Copy the rest of the application
-COPY . .
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Expose the port (will be overridden by environment config)
+# Set working directory to /app (parent directory) so relative imports work correctly
+WORKDIR /app
+
+# Expose the port (Railway will set PORT env var)
 EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Default command to run the application
-CMD ["uvicorn", "api.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Default command to run the FastAPI application
+# Run from /app directory using full module path: user_service.api.app
+# Railway sets PORT env var, but uvicorn defaults to 8000 if not set
+CMD uvicorn user_service.api.app:app --host 0.0.0.0 --port ${PORT:-8000}
+
