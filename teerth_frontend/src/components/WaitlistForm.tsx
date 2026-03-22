@@ -95,13 +95,13 @@ export default function WaitlistForm({
         };
       default: // detailed (used for both dashboard and article)
         return {
-          container: 'max-w-md mx-auto lg:mx-0',
+          container: 'w-full max-w-lg mx-auto',
           input:
             'w-full px-4 py-3 rounded-xl border border-amber-200/50 dark:border-amber-300/50 bg-white/80 dark:bg-amber-100/80 text-amber-800 dark:text-amber-900 placeholder-amber-600/70 dark:placeholder-amber-700/70 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent transition-all duration-300',
           textarea:
             'w-full px-4 py-3 rounded-xl border border-amber-200/50 dark:border-amber-300/50 bg-white/80 dark:bg-amber-100/80 text-amber-800 dark:text-amber-900 placeholder-amber-600/70 dark:placeholder-amber-700/70 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent transition-all duration-300 resize-none',
           button:
-            'w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-light py-4 px-8 rounded-2xl transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] mb-4',
+            `w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-light py-4 px-8 rounded-2xl transition-all duration-300 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] ${showLearnMoreButton ? 'mb-4' : 'mb-0'}`,
           buttonContainer: '',
           showIcon: false,
         };

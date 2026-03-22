@@ -37,7 +37,7 @@ export default function ArticleContent({
 }: ArticleContentProps) {
 
   return (
-    <article className={`prose prose-lg max-w-none dark:prose-invert mb-12 pb-24 ${className}`}>
+    <article className={`prose prose-lg max-w-none dark:prose-invert mb-8 pb-8 ${className}`}>
       <div className="relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 p-6 md:p-8 lg:p-10">
         <div className="relative prose dark:prose-invert max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
           <ReactMarkdown

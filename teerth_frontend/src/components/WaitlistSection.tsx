@@ -67,10 +67,10 @@ export default function WaitlistSection({
       default: // detailed (used for both dashboard and article)
         return {
           container:
-            'mt-16 bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12',
-          layout: 'flex flex-col lg:flex-row gap-8 lg:gap-16',
+            'mt-8 w-full bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-amber-200/50 dark:border-amber-300/50 p-8 md:p-12 md:pb-8',
+          layout: 'max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 lg:gap-16 lg:items-center lg:justify-center',
           title:
-            'text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-6 leading-tight',
+            'text-3xl md:text-4xl font-light text-amber-900 dark:text-amber-900 mb-6 leading-tight text-center',
           formVariant: 'detailed' as const,
         };
     }
@@ -114,7 +114,7 @@ export default function WaitlistSection({
           // Detailed variant - side by side layout
           <>
             {/* Left side - Text content */}
-            <div className='w-full lg:w-[35%]'>
+            <div className='flex-1 flex flex-col items-center text-center'>
               {/* Teerth Logo Icon at the top */}
               <div className='flex justify-center mb-6'>
                 <TeerthLogoIcon alt='Teerth Logo Icon' size={150} />
@@ -123,7 +123,7 @@ export default function WaitlistSection({
               <h3 className={styles.title}>{title || defaultTitle}</h3>
 
               {showFeatures && (
-                <ul className='space-y-3'>
+                <ul className='space-y-3 mx-auto w-fit text-left'>
                   {features.map((feature, index) => (
                     <li key={index} className='flex items-start gap-3'>
                       <div className='flex-shrink-0 w-6 h-6 mt-0.5'>
@@ -150,7 +150,7 @@ export default function WaitlistSection({
               )}
 
                {/* Learn More Button */}
-               <div className='mt-6'>
+               <div className='mt-6 flex justify-center'>
                  <Link
                    href={learnMoreHref}
                    className='inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105'
@@ -175,10 +175,10 @@ export default function WaitlistSection({
             </div>
 
             {/* Divider */}
-            <div className='hidden lg:block w-px bg-amber-300 dark:bg-amber-400'></div>
+            <div className='hidden lg:block w-px self-stretch bg-amber-300 dark:bg-amber-400'></div>
 
             {/* Right side - Form */}
-            <div className='w-full lg:w-[60%]'>
+            <div className='flex-1 w-full'>
               <WaitlistForm
                 variant={styles.formVariant}
                 showLearnMoreButton={showLearnMoreButton}
