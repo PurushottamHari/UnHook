@@ -84,6 +84,8 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingType, setProcessingType] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [isPopLike, setIsPopLike] = useState(false);
+  const [isPopDislike, setIsPopDislike] = useState(false);
 
   const { user } = useAuthStore();
   const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
@@ -623,24 +625,17 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        setIsPopLike(true);
+                        setTimeout(() => setIsPopLike(false), 300);
                         handleToggleLike(e);
                         setIsMenuOpen(false);
                       }}
-                      disabled={isProcessing && processingType === 'like'}
-                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
-                        isProcessing && processingType === 'like' ? 'opacity-50 cursor-not-allowed' : ''
+                      disabled={(isProcessing && processingType === 'like') || isPopLike}
+                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${isPopLike ? 'animate-pop' : ''} ${
+                        (isProcessing && processingType === 'like') || isPopLike ? 'cursor-not-allowed' : ''
                       } ${interactionState.isLiked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                     >
-                      {isProcessing && processingType === 'like' ? (
-                        <svg
-                          className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                        >
-                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
-                        </svg>
-                      ) : interactionState.isLiked ? (
+                      {interactionState.isLiked ? (
                         <svg
                           className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110'
                           fill='currentColor'
@@ -671,23 +666,16 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        setIsPopDislike(true);
+                        setTimeout(() => setIsPopDislike(false), 300);
                         handleDislikeClick(e);
                       }}
-                      disabled={isProcessing && processingType === 'dislike'}
-                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
-                        isProcessing && processingType === 'dislike' ? 'opacity-50 cursor-not-allowed' : ''
+                      disabled={(isProcessing && processingType === 'dislike') || isPopDislike}
+                      className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${isPopDislike ? 'animate-pop' : ''} ${
+                        (isProcessing && processingType === 'dislike') || isPopDislike ? 'cursor-not-allowed' : ''
                       } ${interactionState.isDisliked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                     >
-                      {isProcessing && processingType === 'dislike' ? (
-                        <svg
-                          className='w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin'
-                          fill='none'
-                          viewBox='0 0 24 24'
-                        >
-                          <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                          <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z' />
-                        </svg>
-                      ) : interactionState.isDisliked ? (
+                      {interactionState.isDisliked ? (
                         <svg
                           className='w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110'
                           fill='currentColor'

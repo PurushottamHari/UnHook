@@ -30,6 +30,8 @@ export default function ArticleLikeDislike({
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingType, setProcessingType] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [isPopLike, setIsPopLike] = useState(false);
+  const [isPopDislike, setIsPopDislike] = useState(false);
 
   const { user } = useAuthStore();
   const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
@@ -197,24 +199,23 @@ export default function ArticleLikeDislike({
           {/* Like Button */}
           <div className="flex flex-col items-center gap-1">
             <button
-              onClick={handleToggleLike}
-              disabled={isProcessing && processingType === 'like'}
-              className={`p-2.5 rounded-full transition-all duration-200 ${
-                isProcessing && processingType === 'like'
-                  ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md opacity-50 cursor-not-allowed'
-                  : interactionState.isLiked
+              onClick={() => {
+                setIsPopLike(true);
+                setTimeout(() => setIsPopLike(false), 300);
+                handleToggleLike();
+              }}
+              disabled={(isProcessing && processingType === 'like') || isPopLike}
+              className={`p-2.5 rounded-full transition-all duration-200 ${isPopLike ? 'animate-pop' : ''} ${
+                (isProcessing && processingType === 'like') || isPopLike ? 'cursor-not-allowed' : ''
+              } ${
+                interactionState.isLiked
                   ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md scale-110'
                   : 'bg-white dark:bg-amber-100 backdrop-blur-sm text-amber-600 dark:text-amber-700 hover:text-amber-600 dark:hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-200/50 border border-amber-200 dark:border-amber-300 shadow-sm'
               }`}
               aria-label={interactionState.isLiked ? 'Unlike' : 'Like'}
               title={interactionState.isLiked ? 'Unlike' : 'Like'}
             >
-              {isProcessing && processingType === 'like' ? (
-                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-              ) : interactionState.isLiked ? (
+              {interactionState.isLiked ? (
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
@@ -230,24 +231,23 @@ export default function ArticleLikeDislike({
           {/* Dislike Button */}
           <div className="flex flex-col items-center gap-1">
             <button
-              onClick={handleDislikeClick}
-              disabled={isProcessing && processingType === 'dislike'}
-              className={`p-2.5 rounded-full transition-all duration-200 ${
-                isProcessing && processingType === 'dislike'
-                  ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md opacity-50 cursor-not-allowed'
-                  : interactionState.isDisliked
+              onClick={() => {
+                setIsPopDislike(true);
+                setTimeout(() => setIsPopDislike(false), 300);
+                handleDislikeClick();
+              }}
+              disabled={(isProcessing && processingType === 'dislike') || isPopDislike}
+              className={`p-2.5 rounded-full transition-all duration-200 ${isPopDislike ? 'animate-pop' : ''} ${
+                (isProcessing && processingType === 'dislike') || isPopDislike ? 'cursor-not-allowed' : ''
+              } ${
+                interactionState.isDisliked
                   ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md scale-110'
                   : 'bg-white dark:bg-amber-100 backdrop-blur-sm text-amber-600 dark:text-amber-700 hover:text-amber-600 dark:hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-200/50 border border-amber-200 dark:border-amber-300 shadow-sm'
               }`}
               aria-label={interactionState.isDisliked ? 'Remove dislike' : 'Dislike'}
               title={interactionState.isDisliked ? 'Remove dislike' : 'Dislike'}
             >
-              {isProcessing && processingType === 'dislike' ? (
-                <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-              ) : interactionState.isDisliked ? (
+              {interactionState.isDisliked ? (
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M15 3H6c-.83 0-1.54.5-1.85 1.22l-3.02 7.05c-.09.23-.13.47-.13.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
                 </svg>
@@ -303,24 +303,23 @@ export default function ArticleLikeDislike({
         {/* Like Button */}
         <div className="flex flex-col items-center gap-1">
           <button
-            onClick={handleToggleLike}
-            disabled={isProcessing && processingType === 'like'}
-            className={`rounded-full transition-all duration-200 ${
-              isProcessing && processingType === 'like'
-                ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md opacity-50 cursor-not-allowed'
-                : interactionState.isLiked
+            onClick={() => {
+              setIsPopLike(true);
+              setTimeout(() => setIsPopLike(false), 300);
+              handleToggleLike();
+            }}
+            disabled={(isProcessing && processingType === 'like') || isPopLike}
+            className={`rounded-full transition-all duration-200 ${isPopLike ? 'animate-pop' : ''} ${
+              (isProcessing && processingType === 'like') || isPopLike ? 'cursor-not-allowed' : ''
+            } ${
+              interactionState.isLiked
                 ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md scale-110'
                 : 'bg-white/90 dark:bg-amber-100/90 backdrop-blur-sm text-amber-600/70 dark:text-amber-700/70 hover:text-amber-600 dark:hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-200/50 border border-amber-200/60 dark:border-amber-300/60'
             } ${showOnMobile ? 'p-3' : 'p-2.5'}`}
             aria-label={interactionState.isLiked ? 'Unlike' : 'Like'}
             title={interactionState.isLiked ? 'Unlike' : 'Like'}
           >
-            {isProcessing && processingType === 'like' ? (
-              <svg className={`${showOnMobile ? 'w-6 h-6' : 'w-5 h-5'} animate-spin`} fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-            ) : interactionState.isLiked ? (
+            {interactionState.isLiked ? (
               <svg className={`${showOnMobile ? 'w-6 h-6' : 'w-5 h-5'}`} fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
@@ -346,24 +345,23 @@ export default function ArticleLikeDislike({
         {/* Dislike Button */}
         <div className="flex flex-col items-center gap-1">
           <button
-            onClick={handleDislikeClick}
-            disabled={isProcessing && processingType === 'dislike'}
-            className={`rounded-full transition-all duration-200 ${
-              isProcessing && processingType === 'dislike'
-                ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md opacity-50 cursor-not-allowed'
-                : interactionState.isDisliked
+            onClick={() => {
+              setIsPopDislike(true);
+              setTimeout(() => setIsPopDislike(false), 300);
+              handleDislikeClick();
+            }}
+            disabled={(isProcessing && processingType === 'dislike') || isPopDislike}
+            className={`rounded-full transition-all duration-200 ${isPopDislike ? 'animate-pop' : ''} ${
+              (isProcessing && processingType === 'dislike') || isPopDislike ? 'cursor-not-allowed' : ''
+            } ${
+              interactionState.isDisliked
                 ? 'bg-amber-100 dark:bg-amber-200 text-amber-700 dark:text-amber-900 shadow-md scale-110'
                 : 'bg-white/90 dark:bg-amber-100/90 backdrop-blur-sm text-amber-600/70 dark:text-amber-700/70 hover:text-amber-600 dark:hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-200/50 border border-amber-200/60 dark:border-amber-300/60'
             } ${showOnMobile ? 'p-3' : 'p-2.5'}`}
             aria-label={interactionState.isDisliked ? 'Remove dislike' : 'Dislike'}
             title={interactionState.isDisliked ? 'Remove dislike' : 'Dislike'}
           >
-            {isProcessing && processingType === 'dislike' ? (
-              <svg className={`${showOnMobile ? 'w-6 h-6' : 'w-5 h-5'} animate-spin`} fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-            ) : interactionState.isDisliked ? (
+            {interactionState.isDisliked ? (
               <svg className={`${showOnMobile ? 'w-6 h-6' : 'w-5 h-5'}`} fill="currentColor" viewBox="0 0 24 24">
                 <path d="M15 3H6c-.83 0-1.54.5-1.85 1.22l-3.02 7.05c-.09.23-.13.47-.13.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
               </svg>

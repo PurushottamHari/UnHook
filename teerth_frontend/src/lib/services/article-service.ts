@@ -1,7 +1,7 @@
 import { Article } from '@/models/article.model';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
 
-const NEWSPAPER_SERVICE_URL = 'https://unhook-production-b172.up.railway.app';
+const NEWSPAPER_SERVICE_URL = process.env.NEWSPAPER_SERVICE_URL;
 
 export class ArticleService {
   /**
@@ -50,14 +50,14 @@ export class ArticleService {
     try {
       const response = await fetch(`/api/articles/${articleId}`);
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to fetch article');
       }
 
       // Store in cache for future use
       articleCache.set(data.article);
-      
+
       return data.article;
     } catch (error) {
       console.error('Error fetching article:', error);

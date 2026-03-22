@@ -11,7 +11,7 @@ const HARDCODED_USERS: User[] = [
   {
     id: '2',
     username: 'customer',
-    role: 'customer',
+    role: 'user',
     createdAt: new Date().toISOString(),
   },
 ];

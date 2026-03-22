@@ -24,6 +24,8 @@ export default function ArticleActionBar({ articleId, interactions: providedInte
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingType, setProcessingType] = useState<string | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [isPopLike, setIsPopLike] = useState(false);
+  const [isPopDislike, setIsPopDislike] = useState(false);
 
   const { user } = useAuthStore();
   const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
@@ -394,20 +396,17 @@ export default function ArticleActionBar({ articleId, interactions: providedInte
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      setIsPopLike(true);
+                      setTimeout(() => setIsPopLike(false), 300);
                       handleToggleLike();
                       setIsMenuOpen(false);
                     }}
-                    disabled={isProcessing && processingType === 'like'}
-                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
-                      isProcessing && processingType === 'like' ? 'opacity-50 cursor-not-allowed' : ''
+                    disabled={(isProcessing && processingType === 'like') || isPopLike}
+                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${isPopLike ? 'animate-pop' : ''} ${
+                      (isProcessing && processingType === 'like') || isPopLike ? 'cursor-not-allowed' : ''
                     } ${interactionState.isLiked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                   >
-                    {isProcessing && processingType === 'like' ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                    ) : interactionState.isLiked ? (
+                    {interactionState.isLiked ? (
                       <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                       </svg>
@@ -422,20 +421,17 @@ export default function ArticleActionBar({ articleId, interactions: providedInte
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      setIsPopDislike(true);
+                      setTimeout(() => setIsPopDislike(false), 300);
                       handleDislikeClick();
                       setIsMenuOpen(false);
                     }}
-                    disabled={isProcessing && processingType === 'dislike'}
-                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${
-                      isProcessing && processingType === 'dislike' ? 'opacity-50 cursor-not-allowed' : ''
+                    disabled={(isProcessing && processingType === 'dislike') || isPopDislike}
+                    className={`w-full px-4 py-3 text-left hover:bg-amber-50 dark:hover:bg-amber-200/50 active:bg-amber-100 dark:active:bg-amber-200 transition-all duration-200 flex items-center gap-3 border-b border-amber-200/30 dark:border-amber-300/30 ${isPopDislike ? 'animate-pop' : ''} ${
+                      (isProcessing && processingType === 'dislike') || isPopDislike ? 'cursor-not-allowed' : ''
                     } ${interactionState.isDisliked ? 'bg-amber-50/50 dark:bg-amber-200/30' : ''}`}
                   >
-                    {isProcessing && processingType === 'dislike' ? (
-                      <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                    ) : interactionState.isDisliked ? (
+                    {interactionState.isDisliked ? (
                       <svg className="w-5 h-5 text-amber-600 dark:text-amber-700 transition-transform duration-200 scale-110" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M15 3H6c-.83 0-1.54.5-1.85 1.22l-3.02 7.05c-.09.23-.13.47-.13.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" />
                       </svg>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const NEWSPAPER_SERVICE_URL = 'https://unhook-production-b172.up.railway.app';
+const NEWSPAPER_SERVICE_URL = process.env.NEWSPAPER_SERVICE_URL;
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -45,7 +45,7 @@ export async function GET(
           interactions: [],
         });
       }
-      
+
       const errorData = await backendResponse.json().catch(() => ({}));
       return NextResponse.json(
         {
@@ -66,7 +66,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching interactions:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+
     return NextResponse.json(
       {
         error: 'Internal server error',
@@ -141,7 +141,7 @@ export async function POST(
   } catch (error) {
     console.error('Error creating interaction:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+
     return NextResponse.json(
       {
         error: 'Internal server error',

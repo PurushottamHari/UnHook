@@ -2,7 +2,7 @@ import { CachedNewspaper, CachedNewspaperArticle } from '@/models/newspaper.mode
 import { Article } from '@/models/article.model';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
 
-const NEWSPAPER_SERVICE_URL = 'https://unhook-production-b172.up.railway.app';
+const NEWSPAPER_SERVICE_URL = process.env.NEWSPAPER_SERVICE_URL;
 
 export class NewspaperService {
   /**
@@ -110,7 +110,7 @@ export class NewspaperService {
     const articlesUrl = new URL(
       `${NEWSPAPER_SERVICE_URL}/newspapers/${newspaperId}/generated_content`
     );
-    
+
     if (startingAfter) {
       articlesUrl.searchParams.set('starting_after', startingAfter);
     }
@@ -132,7 +132,7 @@ export class NewspaperService {
     const articlesData = await articlesResponse.json();
     const contentWithInteractions = articlesData?.data?.list_response || [];
     const hasNext = articlesData?.data?.hasNext || false;
-    
+
     // Get last item's external_id for next page cursor
     const lastExternalId = contentWithInteractions.length > 0
       ? contentWithInteractions[contentWithInteractions.length - 1]?.generated_content?.external_id || null

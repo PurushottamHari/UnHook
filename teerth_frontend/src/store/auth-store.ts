@@ -9,21 +9,21 @@ interface AuthState {
   logout: () => void;
 }
 
-// Hardcoded user - always signed in
-const HARDCODED_USER: User = {
-  id: '607d95f0-47ef-444c-89d2-d05f257d1265',
-  username: 'user',
-  role: 'customer',
+// Default guest user
+const GUEST_USER: User = {
+  id: 'guest',
+  username: 'Guest',
+  role: 'guest',
   createdAt: new Date().toISOString(),
 };
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      user: HARDCODED_USER,
-      isAuthenticated: true,
+      user: GUEST_USER,
+      isAuthenticated: false,
       login: (user: User) => set({ user, isAuthenticated: true }),
-      logout: () => set({ user: HARDCODED_USER, isAuthenticated: true }), // Keep user signed in even on logout
+      logout: () => set({ user: GUEST_USER, isAuthenticated: false }),
     }),
     {
       name: 'auth-storage',

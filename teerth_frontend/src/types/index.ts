@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   username: string;
-  role: 'admin' | 'customer';
+  role: 'admin' | 'user' | 'guest';
   createdAt: string;
 }
 
