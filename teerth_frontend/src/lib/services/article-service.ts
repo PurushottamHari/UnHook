@@ -127,15 +127,14 @@ export class ArticleService {
         published_at = new Date(article.created_at * 1000).toISOString();
       }
 
-      // Get external_id (YouTube video ID)
-      const external_id = article.external_id || '';
+      // Get external_id (YouTube video ID) from source_details if available
+      const external_id = article.source_details?.video_id || article.external_id || '';
 
-      // Note: youtube_channel may not be included in the GeneratedContent response
-      // If needed, this would require an additional API call or the backend to include it
-      // For now, we'll leave it empty if not in the response
+      // Get youtube_channel from source_details if available
       let youtube_channel = '';
-      // Check if youtube_channel is included in the response
-      if (article.youtube_channel) {
+      if (article.source_details?.channel_name) {
+        youtube_channel = article.source_details.channel_name;
+      } else if (article.youtube_channel) {
         youtube_channel = article.youtube_channel;
       }
 

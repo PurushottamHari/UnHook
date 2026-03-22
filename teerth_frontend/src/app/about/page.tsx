@@ -5,9 +5,13 @@ import { motion } from 'framer-motion';
 import TeerthLogo from '@/components/TeerthLogo';
 import ProblemCarousel from '@/components/ProblemCarousel';
 import WaitlistSection from '@/components/WaitlistSection';
+import TeerthLogoIcon from '@/components/TeerthLogoIcon';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
+import { useRouter } from 'next/navigation';
 
-export default function About() {
+export default function AboutPage() {
+  const router = useRouter();
+  
   const [showAfter, setShowAfter] = useState(false);
 
   const fadeInUp = {
@@ -28,8 +32,13 @@ export default function About() {
     <div className='min-h-screen bg-yellow-50 dark:bg-amber-50'>
       <div className='w-full px-4 sm:px-6 lg:px-8 py-8'>
         <div className='max-w-6xl mx-auto'>
-          {/* Breadcrumb */}
-          <Breadcrumb href="/dashboard" label="Puru's Digest" />
+          {/* Header */}
+        <header className="mb-12 text-center">
+          <Breadcrumb onClick={() => router.back()} label="Back to Dashboard" />
+          <div className="flex justify-center mb-6">
+            <TeerthLogoIcon alt='Teerth Logo' size={200} />
+          </div>
+        </header>
           
           {/* Hero Section */}
           <motion.div

@@ -24,6 +24,7 @@ interface ExpandableArticleCardProps {
    * This contains basic info: id, title, category, time_to_read, summary
    */
   article: CachedNewspaperArticle;
+  isGuestMode?: boolean;
 }
 
 /**
@@ -74,7 +75,7 @@ async function fetchFullArticle(
  * ExpandableArticleCard component with independent loading state
  * Each card manages its own data fetching and displays loading state internally
  */
-export default function ExpandableArticleCard({ article }: ExpandableArticleCardProps) {
+export default function ExpandableArticleCard({ article, isGuestMode }: ExpandableArticleCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDislikeModalOpen, setIsDislikeModalOpen] = useState(false);
@@ -159,6 +160,8 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
             title: displayArticle.title,
             category: displayArticle.category,
             time_to_read: displayArticle.time_to_read,
+            youtube_channel: displayArticle.youtube_channel || '',
+            published_at: displayArticle.published_at || '',
             summary: displayArticle.summary,
             cached_at: displayArticle.cached_at,
           })
@@ -452,6 +455,7 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
       >
         <div className='group relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.01] flex flex-col'>
           {/* Action Buttons - Bottom Right */}
+          {!isGuestMode && (
           <div className='absolute bottom-4 right-4 z-30 flex items-center gap-2'>
             {/* Save for Later - Desktop Only */}
             <button
@@ -754,6 +758,7 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
               )}
             </div>
           </div>
+          )}
           {/* Subtle Pattern Overlay */}
           <div className='absolute inset-0 opacity-5'>
             <div
@@ -783,7 +788,7 @@ export default function ExpandableArticleCard({ article }: ExpandableArticleCard
                     strokeLinecap='round'
                     strokeLinejoin='round'
                     strokeWidth={2}
-                    d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
+                    d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
                   />
                 </svg>
                 {displayArticle.time_to_read}

@@ -4,9 +4,9 @@ service:
 
 external:
   user_service:
-    base_url: "https://unhook-1aci.onrender.com"
+    base_url: "https://unhook-production-0e0c.up.railway.app"
     port: 443
-    timeout: 120.0  # 2 minutes timeout
+    timeout: 120.0 # 2 minutes timeout
 
 proxy:
   base_url: "api.zyte.com:8011"

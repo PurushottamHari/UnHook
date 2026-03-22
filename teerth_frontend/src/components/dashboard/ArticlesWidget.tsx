@@ -169,9 +169,10 @@ async function fetchNewspaperPage(
 interface ArticlesWidgetProps {
   userId: string;
   selectedDate: string;
+  isGuestMode?: boolean;
 }
 
-export default function ArticlesWidget({ userId, selectedDate }: ArticlesWidgetProps) {
+export default function ArticlesWidget({ userId, selectedDate, isGuestMode }: ArticlesWidgetProps) {
   const queryClient = useQueryClient();
   const [interactionUpdateKey, setInteractionUpdateKey] = useState(0);
 
@@ -342,7 +343,7 @@ export default function ArticlesWidget({ userId, selectedDate }: ArticlesWidgetP
       {newspaper && (
         <div className='flex items-center justify-center gap-1.5 text-sm font-light text-amber-600 dark:text-amber-700 mb-8'>
           <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' />
+            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' />
           </svg>
           <span>{newspaper.total_time_to_read}</span>
         </div>
@@ -372,7 +373,7 @@ export default function ArticlesWidget({ userId, selectedDate }: ArticlesWidgetP
 
               <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 items-start'>
                 {mainArticles.map(article => (
-                  <ExpandableArticleCard key={article.id} article={article} />
+                  <ExpandableArticleCard key={article.id} article={article} isGuestMode={isGuestMode} />
                 ))}
               </div>
             </div>
@@ -382,6 +383,7 @@ export default function ArticlesWidget({ userId, selectedDate }: ArticlesWidgetP
             title='Read Articles'
             articles={readArticles}
             defaultCollapsed={true}
+            isGuestMode={isGuestMode}
             icon={
               <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
                 <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' />
@@ -393,6 +395,7 @@ export default function ArticlesWidget({ userId, selectedDate }: ArticlesWidgetP
             title='Disliked Articles'
             articles={dislikedArticles}
             defaultCollapsed={true}
+            isGuestMode={isGuestMode}
             icon={
               <svg className='w-6 h-6' fill='currentColor' viewBox='0 0 24 24'>
                 <path d='M15 3H6c-.83 0-1.54.5-1.85 1.22l-3.02 7.05c-.09.23-.13.47-.13.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z' />

@@ -10,6 +10,8 @@ export interface CachedNewspaperArticle {
   title: string;
   category: string;
   time_to_read: string;
+  youtube_channel?: string;
+  published_at?: string;
   summary?: string;
   cached_at: string;
   interactions?: GeneratedContentInteraction[];

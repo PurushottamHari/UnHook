@@ -12,6 +12,7 @@ interface ArticleContentProps {
   onShare: () => void;
   /** Optional additional CSS classes */
   className?: string;
+  isGuestMode?: boolean;
 }
 
 /**
@@ -32,6 +33,7 @@ export default function ArticleContent({
   articleId,
   onShare,
   className = '',
+  isGuestMode,
 }: ArticleContentProps) {
 
   return (
@@ -192,6 +194,7 @@ export default function ArticleContent({
         </div>
 
         {/* Section 1: Like/Dislike CTAs */}
+        {!isGuestMode && (
         <section className="mt-4 pt-2">
           <div className="max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
             <ArticleLikeDislike
@@ -202,6 +205,7 @@ export default function ArticleContent({
             />
           </div>
         </section>
+        )}
 
         {/* Section 2: AI Enhanced */}
         <section

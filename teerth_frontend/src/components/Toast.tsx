@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ToastProps {
   message: string;
@@ -13,8 +13,23 @@ export default function Toast({
   message,
   isVisible,
   onClose,
-  duration = 3000,
+  duration = 2000,
 }: ToastProps) {
+  const [shouldRender, setShouldRender] = useState(isVisible);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    if (isVisible) {
+      setShouldRender(true);
+      // Slight delay to ensure the DOM updates before adding the animation classes
+      timeoutId = setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+    }
+    return () => clearTimeout(timeoutId);
+  }, [isVisible]);
+
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -25,13 +40,22 @@ export default function Toast({
     }
   }, [isVisible, duration, onClose]);
 
-  if (!isVisible) return null;
+  if (!shouldRender) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-out opacity-100 translate-y-0">
-      <div className="bg-white dark:bg-amber-50 border border-amber-200 dark:border-amber-300 text-amber-900 dark:text-amber-900 px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[280px] max-w-[90vw]">
+    <div
+      className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-200 ease-out ${
+        isAnimating ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+      }`}
+      onTransitionEnd={() => {
+        if (!isVisible && !isAnimating) {
+          setShouldRender(false);
+        }
+      }}
+    >
+      <div className="bg-white dark:bg-amber-50 border border-amber-200 dark:border-amber-300 text-amber-900 dark:text-amber-900 px-8 py-6 rounded-xl shadow-2xl flex items-center justify-center gap-4 min-w-[320px] max-w-[90vw]">
         <svg
-          className="w-5 h-5 flex-shrink-0"
+          className="w-7 h-7 flex-shrink-0 text-amber-600 dark:text-amber-700"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -43,7 +67,7 @@ export default function Toast({
             d="M5 13l4 4L19 7"
           />
         </svg>
-        <span className="text-sm font-medium">{message}</span>
+        <span className="text-base sm:text-lg font-medium">{message}</span>
       </div>
     </div>
   );

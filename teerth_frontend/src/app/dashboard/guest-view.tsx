@@ -109,7 +109,7 @@ export default function GuestView({ userId }: GuestViewProps) {
             </div>
           </div>
           
-          <ArticlesWidget userId={userId} selectedDate={selectedDate} />
+          <ArticlesWidget userId={userId} selectedDate={selectedDate} isGuestMode={true} />
           
           <WaitlistSection variant='detailed' />
         </div>
