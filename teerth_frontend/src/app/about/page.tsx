@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import TeerthLogo from '@/components/TeerthLogo';
 import ProblemCarousel from '@/components/ProblemCarousel';
 import WaitlistSection from '@/components/WaitlistSection';
-import TeerthLogoIcon from '@/components/TeerthLogoIcon';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { useRouter } from 'next/navigation';
 
@@ -31,14 +30,19 @@ export default function AboutPage() {
   return (
     <div className='min-h-screen bg-yellow-50 dark:bg-amber-50'>
       <div className='w-full px-4 sm:px-6 lg:px-8 py-8'>
-        <div className='max-w-6xl mx-auto'>
-          {/* Header */}
-        <header className="mb-12 text-center">
-          <Breadcrumb onClick={() => router.back()} label="Back to Dashboard" />
-          <div className="flex justify-center mb-6">
-            <TeerthLogoIcon alt='Teerth Logo' size={200} />
+        <header className='mb-8 text-center relative'>
+          <div className='absolute top-0 left-0 z-10'>
+            <Breadcrumb
+              onClick={() => router.back()}
+              label='Back to Dashboard'
+            />
+          </div>
+          <div className='flex justify-center mb-8'>
+            <TeerthLogo alt='Teerth Logo' size={200} />
           </div>
         </header>
+
+        <div className='max-w-6xl mx-auto'>
           
           {/* Hero Section */}
           <motion.div
@@ -47,9 +51,6 @@ export default function AboutPage() {
             animate='animate'
             variants={fadeInUp}
           >
-            <div className='flex justify-center mb-8'>
-              <TeerthLogo alt='Teerth Logo' size={200} />
-            </div>
 
             <h1 className='text-4xl md:text-5xl lg:text-6xl font-light text-amber-900 dark:text-amber-900 mb-8 leading-tight tracking-tight'>
               🌱 Reclaim your attention.
