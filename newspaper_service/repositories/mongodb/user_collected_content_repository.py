@@ -8,11 +8,15 @@ from typing import Any, List, Optional
 from pymongo import UpdateOne
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus, UserCollectedContent)
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
-    CollectedContentAdapter
-from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
-    CollectedContentDBModel
+    ContentStatus,
+    UserCollectedContent,
+)
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
+    CollectedContentAdapter,
+)
+from data_collector_service.repositories.mongodb.models.collected_content_db_model import (
+    CollectedContentDBModel,
+)
 
 from ..user_collected_content_repository import UserCollectedContentRepository
 from .config.database import MongoDB

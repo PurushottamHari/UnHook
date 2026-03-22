@@ -6,8 +6,7 @@ from fastapi import FastAPI
 
 from ..repositories.mongodb.config.database import MongoDB
 from ..repositories.mongodb.config.settings import get_mongodb_settings
-from .controllers.generated_content_controller import \
-    router as interaction_router
+from .controllers.generated_content_controller import router as interaction_router
 from .controllers.newspaper_controller import router as newspaper_router
 
 app = FastAPI(

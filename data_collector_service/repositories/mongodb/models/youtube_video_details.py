@@ -3,8 +3,9 @@ from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
 
-from data_collector_service.repositories.mongodb.models.subtitle_db_model import \
-    SubtitleDB
+from data_collector_service.repositories.mongodb.models.subtitle_db_model import (
+    SubtitleDB,
+)
 
 
 class YouTubeVideoDetailsDB(BaseModel):

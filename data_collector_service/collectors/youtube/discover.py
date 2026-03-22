@@ -1,7 +1,8 @@
 from user_service.models.user import User
 
-from ...repositories.user_collected_content_repository import \
-    UserCollectedContentRepository
+from ...repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
 from ...service_context import DataCollectorServiceContext
 from ..base_discover import BaseDiscoverCollector
 

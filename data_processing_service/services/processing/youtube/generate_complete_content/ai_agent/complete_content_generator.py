@@ -7,15 +7,22 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 from data_processing_service.ai import BaseAIClient, ModelConfig, ModelProvider
 from data_processing_service.models.generated_content import (
-    GeneratedContent, GeneratedContentStatus, StatusDetail)
-from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.adaptors.input_adaptor import \
-    CompleteContentInputAdaptor
-from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.adaptors.output_adaptor import \
-    CompleteContentOutputAdaptor
-from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.chunk_summarizer import \
-    ChunkSummarizer
-from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.models.input import \
-    CompleteContentInput
+    GeneratedContent,
+    GeneratedContentStatus,
+    StatusDetail,
+)
+from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.adaptors.input_adaptor import (
+    CompleteContentInputAdaptor,
+)
+from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.adaptors.output_adaptor import (
+    CompleteContentOutputAdaptor,
+)
+from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.chunk_summarizer import (
+    ChunkSummarizer,
+)
+from data_processing_service.services.processing.youtube.generate_complete_content.ai_agent.models.input import (
+    CompleteContentInput,
+)
 from user_service.models.enums import OutputType
 
 
@@ -295,18 +302,18 @@ async def test_generation():
     """Test function to generate complete content for a specific generated content ID."""
     # Import necessary modules for testing
     from data_collector_service.models.enums import ContentType
-    from data_collector_service.models.user_collected_content import \
-        ContentStatus
-    from data_processing_service.models.generated_content import \
-        GeneratedContentStatus
-    from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
-        LocalYoutubeContentEphemeralRepository
-    from data_processing_service.repositories.mongodb.config.database import \
-        MongoDB
-    from data_processing_service.repositories.mongodb.user_content_repository import \
-        MongoDBUserContentRepository
-    from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
-        SubtitleUtils
+    from data_collector_service.models.user_collected_content import ContentStatus
+    from data_processing_service.models.generated_content import GeneratedContentStatus
+    from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import (
+        LocalYoutubeContentEphemeralRepository,
+    )
+    from data_processing_service.repositories.mongodb.config.database import MongoDB
+    from data_processing_service.repositories.mongodb.user_content_repository import (
+        MongoDBUserContentRepository,
+    )
+    from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import (
+        SubtitleUtils,
+    )
 
     # Hardcoded generated content ID for testing
     generated_content_id = (
@@ -335,10 +342,12 @@ async def test_generation():
             return
 
         # Convert MongoDB document to DB model first, then to GeneratedContent object
-        from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
-            GeneratedContentAdapter
-        from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
-            GeneratedContentDBModel
+        from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
+            GeneratedContentAdapter,
+        )
+        from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
+            GeneratedContentDBModel,
+        )
 
         content_db_model = GeneratedContentDBModel(**content_doc)
         content = GeneratedContentAdapter.from_generated_content_db_model(
@@ -362,10 +371,12 @@ async def test_generation():
             return
 
         # Convert MongoDB document to DB model first, then to UserCollectedContent object
-        from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
-            CollectedContentAdapter
-        from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
-            CollectedContentDBModel
+        from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
+            CollectedContentAdapter,
+        )
+        from data_collector_service.repositories.mongodb.models.collected_content_db_model import (
+            CollectedContentDBModel,
+        )
 
         user_collected_content_db_model = CollectedContentDBModel(
             **user_collected_content_doc

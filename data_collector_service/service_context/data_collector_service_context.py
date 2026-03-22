@@ -7,8 +7,9 @@ from typing import Optional
 
 from commons.service_context import BaseServiceContext
 
-from ..metrics_processor.data_collector_metrics_processor import \
-    DataCollectorMetricsProcessor
+from ..metrics_processor.data_collector_metrics_processor import (
+    DataCollectorMetricsProcessor,
+)
 
 
 class DataCollectorServiceContext(BaseServiceContext):

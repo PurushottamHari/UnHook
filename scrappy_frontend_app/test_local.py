@@ -49,8 +49,9 @@ def test_imports():
         return False
 
     try:
-        from data_processing_service.models.generated_content import \
-            GeneratedContentStatus
+        from data_processing_service.models.generated_content import (
+            GeneratedContentStatus,
+        )
 
         print("✅ data_processing_service imported successfully")
     except ImportError as e:

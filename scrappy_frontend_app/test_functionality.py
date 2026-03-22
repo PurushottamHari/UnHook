@@ -60,8 +60,9 @@ def test_newspaper_functionality():
 
                 if considered_content_ids:
                     # Test fetching generated articles
-                    from data_processing_service.models.generated_content import \
-                        GeneratedContentStatus
+                    from data_processing_service.models.generated_content import (
+                        GeneratedContentStatus,
+                    )
                     from user_service.models.enums import OutputType
 
                     articles = db.generated_content.find(

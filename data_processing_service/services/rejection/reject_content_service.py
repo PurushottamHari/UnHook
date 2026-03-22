@@ -6,17 +6,16 @@ import asyncio
 from typing import List
 
 from data_collector_service.models.enums import ContentType
-from data_processing_service.services.rejection.youtube.ai_agent.moderator import \
-    ContentModerator
+from data_processing_service.services.rejection.youtube.ai_agent.moderator import (
+    ContentModerator,
+)
 
 from ...external.user_service.client import UserServiceClient
 from ...repositories.mongodb.config.database import MongoDB
-from ...repositories.mongodb.user_content_repository import \
-    MongoDBUserContentRepository
+from ...repositories.mongodb.user_content_repository import MongoDBUserContentRepository
 from ...repositories.user_content_repository import UserContentRepository
 from .service_context import RejectionServiceContext
-from .youtube.rejection_content_service_youtube import \
-    RejectionContentServiceYoutube
+from .youtube.rejection_content_service_youtube import RejectionContentServiceYoutube
 
 
 class RejectContentService:

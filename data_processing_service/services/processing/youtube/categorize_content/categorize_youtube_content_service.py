@@ -6,18 +6,18 @@ from datetime import datetime
 from typing import List
 
 from data_collector_service.models.enums import ContentType
-from data_processing_service.models.generated_content import \
-    GeneratedContentStatus
-from data_processing_service.repositories.mongodb.config.database import \
-    MongoDB
-from data_processing_service.repositories.mongodb.user_content_repository import \
-    MongoDBUserContentRepository
-from data_processing_service.service_context import \
-    DataProcessingServiceContext
-from data_processing_service.services.processing.youtube.categorize_content.ai_agent.categorization_agent import \
-    CategorizationAgent
-from data_processing_service.services.processing.youtube.categorize_content.metrics_processor.categorize_content_metrics_processor import \
-    CategorizeContentMetricsProcessor
+from data_processing_service.models.generated_content import GeneratedContentStatus
+from data_processing_service.repositories.mongodb.config.database import MongoDB
+from data_processing_service.repositories.mongodb.user_content_repository import (
+    MongoDBUserContentRepository,
+)
+from data_processing_service.service_context import DataProcessingServiceContext
+from data_processing_service.services.processing.youtube.categorize_content.ai_agent.categorization_agent import (
+    CategorizationAgent,
+)
+from data_processing_service.services.processing.youtube.categorize_content.metrics_processor.categorize_content_metrics_processor import (
+    CategorizeContentMetricsProcessor,
+)
 
 
 class CategorizeYoutubeContentService:

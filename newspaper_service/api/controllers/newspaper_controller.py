@@ -12,8 +12,11 @@ from ...models.newspaper_list import NewspaperListResponse
 from ...models.newspaper_response import NewspaperResponse
 from ...services.generated_content_service import GeneratedContentService
 from ...services.newspaper_service import NewspaperService
-from ..dependencies import (get_generated_content_service,
-                            get_newspaper_service, get_user_id_from_header)
+from ..dependencies import (
+    get_generated_content_service,
+    get_newspaper_service,
+    get_user_id_from_header,
+)
 
 router = APIRouter(tags=["newspapers"])
 

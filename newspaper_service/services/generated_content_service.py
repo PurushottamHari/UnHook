@@ -8,16 +8,19 @@ from typing import Optional
 from data_processing_service.models.generated_content import GeneratedContent
 
 from ..external.user_service import UserServiceClient
-from ..models.generated_content_list import (GeneratedContentListData,
-                                             GeneratedContentListResponse,
-                                             GeneratedContentWithInteractions)
-from ..repositories.generated_content_interaction_repository import \
-    GeneratedContentInteractionRepository
-from ..repositories.generated_content_repository import \
-    GeneratedContentRepository
+from ..models.generated_content_list import (
+    GeneratedContentListData,
+    GeneratedContentListResponse,
+    GeneratedContentWithInteractions,
+)
+from ..repositories.generated_content_interaction_repository import (
+    GeneratedContentInteractionRepository,
+)
+from ..repositories.generated_content_repository import GeneratedContentRepository
 from ..repositories.newspaper_repository import NewspaperRepository
-from ..repositories.user_collected_content_repository import \
-    UserCollectedContentRepository
+from ..repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
 
 
 class GeneratedContentService:

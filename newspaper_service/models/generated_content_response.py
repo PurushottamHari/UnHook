@@ -8,7 +8,9 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 
 from data_processing_service.models.generated_content import (
-    GeneratedContent, GeneratedContentStatus)
+    GeneratedContent,
+    GeneratedContentStatus,
+)
 
 
 class StatusDetailResponse(BaseModel):

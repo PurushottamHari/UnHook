@@ -5,8 +5,7 @@ Newspaper service-specific context.
 import os
 from typing import Optional, Type
 
-from commons.metrics_processor.base_metrics_processor import \
-    BaseMetricsProcessor
+from commons.metrics_processor.base_metrics_processor import BaseMetricsProcessor
 from commons.service_context import BaseServiceContext
 
 

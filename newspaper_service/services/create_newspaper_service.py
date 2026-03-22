@@ -12,23 +12,34 @@ from uuid import uuid4
 import pytz
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus, UserCollectedContent)
+    ContentStatus,
+    UserCollectedContent,
+)
 from newspaper_service.external.user_service import UserServiceClient
-from newspaper_service.models import (ConsideredContent,
-                                      ConsideredContentStatus, Newspaper,
-                                      NewspaperStatus)
-from newspaper_service.repositories import (GeneratedContentRepository,
-                                            NewspaperRepository,
-                                            UserCollectedContentRepository)
-from newspaper_service.repositories.mongodb.generated_content_repository import \
-    MongoDBGeneratedContentRepository
-from newspaper_service.repositories.mongodb.newspaper_repository import \
-    MongoDBNewspaperRepository
-from newspaper_service.repositories.mongodb.user_collected_content_repository import \
-    MongoDBUserCollectedContentRepository
+from newspaper_service.models import (
+    ConsideredContent,
+    ConsideredContentStatus,
+    Newspaper,
+    NewspaperStatus,
+)
+from newspaper_service.repositories import (
+    GeneratedContentRepository,
+    NewspaperRepository,
+    UserCollectedContentRepository,
+)
+from newspaper_service.repositories.mongodb.generated_content_repository import (
+    MongoDBGeneratedContentRepository,
+)
+from newspaper_service.repositories.mongodb.newspaper_repository import (
+    MongoDBNewspaperRepository,
+)
+from newspaper_service.repositories.mongodb.user_collected_content_repository import (
+    MongoDBUserCollectedContentRepository,
+)
 from newspaper_service.service_context import NewspaperServiceContext
-from newspaper_service.services.metrics_processor.newspaper_metrics_processor import \
-    NewspaperMetricsProcessor
+from newspaper_service.services.metrics_processor.newspaper_metrics_processor import (
+    NewspaperMetricsProcessor,
+)
 from user_service.models.enums import CategoryName, Weekday
 
 

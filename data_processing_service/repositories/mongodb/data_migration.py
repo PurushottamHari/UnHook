@@ -624,5 +624,97 @@ def migrate_update_sub_status_to_moderation_passed():
     print("Database connection closed.")
 
 
+def migrate_reject_old_processing_content():
+    """
+    Migration script to reject collected_content which are in processing status
+    and linked generated_content is in categorization complete status.
+    """
+    print("Starting migration to reject old processing user_collected_content...")
+
+    # Connect to data processing service MongoDB
+    MongoDB.connect_to_database()
+    processing_db = MongoDB.get_database()
+    generated_content_collection = processing_db.generated_content
+
+    # Connect to data collector service MongoDB
+    CollectorMongoDB.connect_to_database()
+    collector_db = CollectorMongoDB.get_database()
+    collector_settings = get_mongodb_settings()
+    user_collected_content_collection = collector_db[collector_settings.COLLECTION_NAME]
+
+    print(
+        f"Connected to generated_content and {collector_settings.COLLECTION_NAME} collections."
+    )
+
+    # Find all generated_content documents with CATEGORIZATION_COMPLETED status
+    generated_docs = list(
+        generated_content_collection.find(
+            {"status": GeneratedContentStatus.CATEGORIZATION_COMPLETED}
+        )
+    )
+    print(
+        f"Found {len(generated_docs)} generated_content documents with CATEGORIZATION_COMPLETED status."
+    )
+
+    # Extract external_ids from generated content
+    external_ids = [doc["external_id"] for doc in generated_docs]
+
+    # Find corresponding user_collected_content records in PROCESSING status
+    user_collected_docs = list(
+        user_collected_content_collection.find(
+            {
+                "external_id": {"$in": external_ids},
+                "status": ContentStatus.PROCESSING
+            }
+        )
+    )
+
+    print(f"Found {len(user_collected_docs)} user_collected_content records to reject.")
+    # print("Entries to be rejected:")
+    # for doc in user_collected_docs:
+    #     print(f" - Document ID: {doc['_id']}, External ID: {doc['external_id']}")
+
+    updated_count = 0
+    current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+    
+    for doc in user_collected_docs:
+        doc_id = doc["_id"]
+        external_id = doc["external_id"]
+    
+        # Create new status detail for REJECTED status
+        new_status_detail = {
+            "status": ContentStatus.REJECTED,
+            "created_at": current_timestamp,
+            "reason": "Rejected them on march 12 2026 since they were too old",
+        }
+    
+        # Update the document
+        update_result = user_collected_content_collection.update_one(
+            {"_id": doc_id},
+            {
+                "$set": {
+                    "status": ContentStatus.REJECTED,
+                    "updated_at": current_timestamp,
+                },
+                "$push": {"status_details": new_status_detail},
+            },
+        )
+    
+        if update_result.modified_count > 0:
+            updated_count += 1
+            print(
+                f"Updated user_collected_content document {doc_id} to REJECTED for external_id {external_id}"
+            )
+    
+    print(
+        f"Migration complete. {updated_count} user_collected_content documents updated to REJECTED status."
+    )
+
+    # Close the connections
+    MongoDB.close_database_connection()
+    CollectorMongoDB.close_database_connection()
+    print("Database connections closed.")
+
+
 if __name__ == "__main__":
-    migrate_update_sub_status_to_moderation_passed()
+    # migrate_reject_old_processing_content()

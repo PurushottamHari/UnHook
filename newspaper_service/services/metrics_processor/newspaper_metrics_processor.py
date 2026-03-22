@@ -4,8 +4,7 @@ Metrics processor for newspaper service.
 
 from typing import Dict, List
 
-from commons.metrics_processor.base_metrics_processor import \
-    BaseMetricsProcessor
+from commons.metrics_processor.base_metrics_processor import BaseMetricsProcessor
 
 
 class NewspaperMetricsProcessor(BaseMetricsProcessor):

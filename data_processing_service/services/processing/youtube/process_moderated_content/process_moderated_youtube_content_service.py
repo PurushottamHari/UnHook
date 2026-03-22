@@ -7,15 +7,20 @@ from copy import deepcopy
 from datetime import datetime
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus, ContentSubStatus, ContentType)
-from data_processing_service.repositories.user_content_repository import \
-    UserContentRepository
-from data_processing_service.service_context import \
-    DataProcessingServiceContext
-from data_processing_service.services.processing.youtube.process_moderated_content.metrics_processor.process_moderated_content_metrics_processor import \
-    ProcessModeratedContentMetricsProcessor
-from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.process_subtitles_for_youtube_content import \
-    ProcessSubtitlesForYoutubeContent
+    ContentStatus,
+    ContentSubStatus,
+    ContentType,
+)
+from data_processing_service.repositories.user_content_repository import (
+    UserContentRepository,
+)
+from data_processing_service.service_context import DataProcessingServiceContext
+from data_processing_service.services.processing.youtube.process_moderated_content.metrics_processor.process_moderated_content_metrics_processor import (
+    ProcessModeratedContentMetricsProcessor,
+)
+from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.process_subtitles_for_youtube_content import (
+    ProcessSubtitlesForYoutubeContent,
+)
 from user_service.models.user import User
 
 

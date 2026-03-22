@@ -3,12 +3,15 @@ import logging
 from datetime import datetime
 from typing import Dict, List
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import \
-    YouTubeVideoDetails
-from data_collector_service.collectors.youtube.tools.adapters.subtitle_adapter import \
-    SubtitleAdapter
-from data_collector_service.collectors.youtube.tools.exceptions.youtube_video_key_data_missing import \
-    youtube_video_key_data_missing
+from data_collector_service.collectors.youtube.models.youtube_video_details import (
+    YouTubeVideoDetails,
+)
+from data_collector_service.collectors.youtube.tools.adapters.subtitle_adapter import (
+    SubtitleAdapter,
+)
+from data_collector_service.collectors.youtube.tools.exceptions.youtube_video_key_data_missing import (
+    youtube_video_key_data_missing,
+)
 
 logger = logging.getLogger(__name__)
 

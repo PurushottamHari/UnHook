@@ -10,8 +10,9 @@ from .collectors.youtube.static import YouTubeStaticCollector
 from .exceptions.user_exception import user_exception
 from .external.user_service.client import UserServiceClient
 from .repositories.mongodb.config.database import MongoDB
-from .repositories.mongodb.user_collected_content_repository import \
-    MongoDBUserCollectedContentRepository
+from .repositories.mongodb.user_collected_content_repository import (
+    MongoDBUserCollectedContentRepository,
+)
 from .service_context import DataCollectorServiceContext
 
 

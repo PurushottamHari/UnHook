@@ -11,18 +11,24 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from data_collector_service.collectors.youtube.tools.youtube_external_tool import \
-    YouTubeExternalTool
+from data_collector_service.collectors.youtube.tools.youtube_external_tool import (
+    YouTubeExternalTool,
+)
+
 # Now import the modules after setting up the path
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
-    CollectedContentAdapter
-from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import \
-    YouTubeVideoDetailsAdapter
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
+    CollectedContentAdapter,
+)
+from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import (
+    YouTubeVideoDetailsAdapter,
+)
 from data_collector_service.repositories.mongodb.config.database import MongoDB
-from data_collector_service.repositories.mongodb.config.settings import \
-    get_mongodb_settings
-from data_collector_service.repositories.mongodb.models.youtube_video_details import \
-    YouTubeVideoDetailsDB
+from data_collector_service.repositories.mongodb.config.settings import (
+    get_mongodb_settings,
+)
+from data_collector_service.repositories.mongodb.models.youtube_video_details import (
+    YouTubeVideoDetailsDB,
+)
 
 
 def migrate_timestamps():

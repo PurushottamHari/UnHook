@@ -7,8 +7,13 @@ from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID, uuid4
 
-from pydantic import (BaseModel, Field, field_serializer, field_validator,
-                      model_validator)
+from pydantic import (
+    BaseModel,
+    Field,
+    field_serializer,
+    field_validator,
+    model_validator,
+)
 
 
 class InteractionType(str, Enum):

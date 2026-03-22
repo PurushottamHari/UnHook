@@ -4,8 +4,7 @@ Metrics processor for process moderated content service.
 
 from typing import Dict, List
 
-from commons.metrics_processor.base_metrics_processor import \
-    BaseMetricsProcessor
+from commons.metrics_processor.base_metrics_processor import BaseMetricsProcessor
 
 
 class ProcessModeratedContentMetricsProcessor(BaseMetricsProcessor):

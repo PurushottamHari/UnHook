@@ -2,8 +2,11 @@ import uuid
 from typing import List
 
 from ....models.enums import ContentType
-from ....models.user_collected_content import (ContentStatus, StatusDetail,
-                                               UserCollectedContent)
+from ....models.user_collected_content import (
+    ContentStatus,
+    StatusDetail,
+    UserCollectedContent,
+)
 from ..models.youtube_video_details import YouTubeVideoDetails
 
 
