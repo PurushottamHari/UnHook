@@ -37,6 +37,13 @@ class UserCollectedContentRepository(ABC):
         pass
 
     @abstractmethod
+    def get_content_by_external_id(
+        self, external_id: str
+    ) -> Optional[UserCollectedContent]:
+        """Get a single user collected content by external ID."""
+        pass
+
+    @abstractmethod
     def get_contents_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
         """Get multiple user collected content objects by IDs."""
         pass

@@ -178,10 +178,12 @@ async def get_generated_content(
         HTTPException: If content not found or retrieval fails
     """
     try:
-        content = await content_service.get_generated_content_by_id(
-            content_id=content_id
+        content, user_collected_content = (
+            await content_service.get_generated_content_by_id(content_id=content_id)
         )
-        return GeneratedContentResponse.from_generated_content(content)
+        return GeneratedContentResponse.from_generated_content(
+            content, user_collected_content
+        )
     except HTTPException:
         raise
     except Exception as e:

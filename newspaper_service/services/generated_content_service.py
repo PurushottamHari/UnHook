@@ -3,9 +3,10 @@ Service for handling generated content business logic.
 """
 
 import logging
-from typing import Optional
+from typing import Optional, Tuple
 
 from data_processing_service.models.generated_content import GeneratedContent
+from data_collector_service.models.user_collected_content import UserCollectedContent
 
 from ..external.user_service import UserServiceClient
 from ..models.generated_content_list import (
@@ -51,24 +52,31 @@ class GeneratedContentService:
         self._user_service_client = user_service_client
         self.logger = logging.getLogger(__name__)
 
-    async def get_generated_content_by_id(self, content_id: str) -> GeneratedContent:
+    async def get_generated_content_by_id(
+        self, content_id: str
+    ) -> Tuple[GeneratedContent, UserCollectedContent]:
         """
-        Get generated content by its MongoDB _id.
+        Get generated content by its MongoDB _id and return it with its external_id.
 
         Args:
             content_id: MongoDB _id of the generated content
 
         Returns:
-            GeneratedContent: The generated content object
+            Tuple[GeneratedContent, str]: The generated content object and its external_id.
 
         Raises:
             ValueError: If content not found
         """
         content = self._generated_content_repository.get_content_by_id(content_id)
+        user_collected_content = (
+            self._user_collected_content_repository.get_content_by_external_id(
+                content.external_id
+            )
+        )
         if not content:
             raise ValueError(f"Content not found: {content_id}")
 
-        return content
+        return content, user_collected_content
 
     async def list_generated_content_for_newspaper(
         self,
@@ -186,6 +194,9 @@ class GeneratedContentService:
 
         # Create mapping dict for efficient collation
         content_map = {content.external_id: content for content in generated_contents}
+        user_collected_contents_map = {
+            ucc.external_id: ucc for ucc in user_collected_contents if ucc.external_id
+        }
 
         # Collate results: match GeneratedContent objects back to paginated external_ids order
         collated_contents = [
@@ -208,6 +219,9 @@ class GeneratedContentService:
             GeneratedContentWithInteractions.from_generated_content_with_interactions(
                 content=content,
                 interactions=interactions_by_content_id.get(content.id, []),
+                user_collected_content=user_collected_contents_map.get(
+                    content.external_id
+                ),
             )
             for content in collated_contents
         ]

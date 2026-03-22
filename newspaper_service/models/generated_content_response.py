@@ -11,6 +11,14 @@ from data_processing_service.models.generated_content import (
     GeneratedContent,
     GeneratedContentStatus,
 )
+from data_collector_service.models.user_collected_content import UserCollectedContent
+
+
+class SourceDetails(BaseModel):
+    """Source details for the generated content."""
+
+    channel_name: Optional[str] = None
+    video_id: Optional[str] = None
 
 
 class StatusDetailResponse(BaseModel):
@@ -52,10 +60,13 @@ class GeneratedContentResponse(BaseModel):
     reading_time_seconds: int = 0
     created_at: float = Field(..., description="Unix timestamp in seconds")
     updated_at: float = Field(..., description="Unix timestamp in seconds")
+    source_details: Optional[SourceDetails] = None
 
     @classmethod
     def from_generated_content(
-        cls, content: GeneratedContent
+        cls,
+        content: GeneratedContent,
+        user_collected_content: Optional[UserCollectedContent] = None,
     ) -> "GeneratedContentResponse":
         """Convert GeneratedContent dataclass to response model."""
 
@@ -97,6 +108,30 @@ class GeneratedContentResponse(BaseModel):
                 geography=content.category.geography,
             )
 
+        source_details_response = None
+        if user_collected_content and user_collected_content.data:
+            youtube_data = user_collected_content.data.get("YOUTUBE_VIDEO")
+
+            channel_name = None
+            video_id = None
+
+            if youtube_data:
+                if isinstance(youtube_data, dict):
+                    channel_name = youtube_data.get("channel_name")
+                    video_id = youtube_data.get("video_id")
+                else:
+                    channel_name = getattr(youtube_data, "channel_name", None)
+                    video_id = getattr(youtube_data, "video_id", None)
+
+            if not channel_name and not video_id:
+                channel_name = user_collected_content.data.get("channel_name")
+                video_id = user_collected_content.data.get("video_id")
+
+            if channel_name or video_id:
+                source_details_response = SourceDetails(
+                    channel_name=channel_name, video_id=video_id
+                )
+
         return cls(
             id=content.id,
             external_id=content.external_id,
@@ -109,4 +144,5 @@ class GeneratedContentResponse(BaseModel):
             reading_time_seconds=content.reading_time_seconds,
             created_at=datetime_to_timestamp(content.created_at),
             updated_at=datetime_to_timestamp(content.updated_at),
+            source_details=source_details_response,
         )

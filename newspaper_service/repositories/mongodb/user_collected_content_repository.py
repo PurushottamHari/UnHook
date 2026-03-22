@@ -75,6 +75,16 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             return CollectedContentAdapter.to_user_collected_content(db_model)
         return None
 
+    def get_content_by_external_id(
+        self, external_id: str
+    ) -> Optional[UserCollectedContent]:
+        """Get a single user collected content by external ID."""
+        doc = self.collection.find_one({"external_id": external_id})
+        if doc:
+            db_model = CollectedContentDBModel(**doc)
+            return CollectedContentAdapter.to_user_collected_content(db_model)
+        return None
+
     def get_contents_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
         """Get multiple user collected content objects by IDs."""
         if not content_ids:

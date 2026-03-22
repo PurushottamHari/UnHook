@@ -8,20 +8,23 @@ if project_root not in sys.path:
 from datetime import datetime, timezone
 
 from data_collector_service.models.user_collected_content import ContentStatus
-from data_collector_service.repositories.mongodb.config.database import \
-    MongoDB as CollectorMongoDB
-from data_collector_service.repositories.mongodb.config.settings import \
-    get_mongodb_settings
-from data_processing_service.models.generated_content import \
-    GeneratedContentStatus
-from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
-    LocalYoutubeContentEphemeralRepository
-from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
-    GeneratedContentAdapter
-from data_processing_service.repositories.mongodb.config.database import \
-    MongoDB
-from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
-    GeneratedContentDBModel
+from data_collector_service.repositories.mongodb.config.database import (
+    MongoDB as CollectorMongoDB,
+)
+from data_collector_service.repositories.mongodb.config.settings import (
+    get_mongodb_settings,
+)
+from data_processing_service.models.generated_content import GeneratedContentStatus
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import (
+    LocalYoutubeContentEphemeralRepository,
+)
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
+    GeneratedContentAdapter,
+)
+from data_processing_service.repositories.mongodb.config.database import MongoDB
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
+    GeneratedContentDBModel,
+)
 from data_processing_service.utils.content_utils import calculate_reading_time
 from user_service.models import OutputType
 
@@ -662,10 +665,7 @@ def migrate_reject_old_processing_content():
     # Find corresponding user_collected_content records in PROCESSING status
     user_collected_docs = list(
         user_collected_content_collection.find(
-            {
-                "external_id": {"$in": external_ids},
-                "status": ContentStatus.PROCESSING
-            }
+            {"external_id": {"$in": external_ids}, "status": ContentStatus.PROCESSING}
         )
     )
 
@@ -676,18 +676,18 @@ def migrate_reject_old_processing_content():
 
     updated_count = 0
     current_timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
-    
+
     for doc in user_collected_docs:
         doc_id = doc["_id"]
         external_id = doc["external_id"]
-    
+
         # Create new status detail for REJECTED status
         new_status_detail = {
             "status": ContentStatus.REJECTED,
             "created_at": current_timestamp,
             "reason": "Rejected them on march 12 2026 since they were too old",
         }
-    
+
         # Update the document
         update_result = user_collected_content_collection.update_one(
             {"_id": doc_id},
@@ -699,13 +699,13 @@ def migrate_reject_old_processing_content():
                 "$push": {"status_details": new_status_detail},
             },
         )
-    
+
         if update_result.modified_count > 0:
             updated_count += 1
             print(
                 f"Updated user_collected_content document {doc_id} to REJECTED for external_id {external_id}"
             )
-    
+
     print(
         f"Migration complete. {updated_count} user_collected_content documents updated to REJECTED status."
     )
@@ -717,4 +717,4 @@ def migrate_reject_old_processing_content():
 
 
 if __name__ == "__main__":
-    # migrate_reject_old_processing_content()
+    migrate_reject_old_processing_content()

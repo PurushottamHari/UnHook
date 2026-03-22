@@ -2,11 +2,12 @@
 Model for paginated list response of generated content.
 """
 
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
 from data_processing_service.models.generated_content import GeneratedContent
+from data_collector_service.models.user_collected_content import UserCollectedContent
 
 from .generated_content_interaction import GeneratedContentInteraction
 from .generated_content_response import GeneratedContentResponse
@@ -28,10 +29,13 @@ class GeneratedContentWithInteractions(BaseModel):
         cls,
         content: GeneratedContent,
         interactions: List[GeneratedContentInteraction],
+        user_collected_content: Optional[UserCollectedContent] = None,
     ) -> "GeneratedContentWithInteractions":
         """Convert GeneratedContent and interactions to response model."""
         return cls(
-            generated_content=GeneratedContentResponse.from_generated_content(content),
+            generated_content=GeneratedContentResponse.from_generated_content(
+                content, user_collected_content
+            ),
             active_user_interactions=interactions,
         )
 
