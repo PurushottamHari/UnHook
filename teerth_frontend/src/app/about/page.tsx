@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import TeerthLogo from '@/components/TeerthLogo';
-import ProblemCarousel from '@/components/ProblemCarousel';
+import ProblemGrid from '@/components/ProblemGrid';
 import WaitlistSection from '@/components/WaitlistSection';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import { useRouter } from 'next/navigation';
@@ -83,7 +83,7 @@ export default function AboutPage() {
                 className='flex flex-col items-center mb-6 relative z-10'
                 variants={fadeInUp}
               >
-                <ProblemCarousel
+                <ProblemGrid
                   cards={[
                     {
                       front: "I'm always learning something new.",
