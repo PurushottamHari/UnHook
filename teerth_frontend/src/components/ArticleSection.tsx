@@ -26,10 +26,10 @@ export default function ArticleSection({
   }
 
   return (
-    <div className="bg-white/50 dark:bg-amber-100/50 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-amber-200/50 dark:border-amber-300/50 shadow-lg mb-6">
+    <div className="bg-transparent md:bg-white/50 md:dark:bg-amber-100/50 backdrop-blur-none md:backdrop-blur-sm rounded-none md:rounded-3xl p-0 md:p-12 border-none md:border border-amber-200/50 md:dark:border-amber-300/50 shadow-none md:shadow-lg mb-6 -mx-4 sm:mx-0">
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between mb-6 text-left"
+        className="w-full flex items-center justify-between mb-4 md:mb-6 px-4 md:px-0 text-left"
       >
         <div className="flex items-center gap-3">
           {icon && (
@@ -60,9 +60,11 @@ export default function ArticleSection({
       </button>
 
       {!isCollapsed && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-6 items-start h-[85dvh] md:h-auto overflow-y-auto overflow-x-hidden snap-y snap-mandatory md:snap-none md:overflow-visible pb-12 md:pb-0 scroll-smooth px-4 md:px-0">
           {articles.map((article) => (
-            <ExpandableArticleCard key={article.id} article={article} isGuestMode={isGuestMode} />
+            <div key={article.id} className="w-full h-full min-h-[80dvh] md:min-h-0 snap-center snap-always shrink-0 flex flex-col md:block py-2 md:py-0">
+              <ExpandableArticleCard article={article} isGuestMode={isGuestMode} />
+            </div>
           ))}
         </div>
       )}

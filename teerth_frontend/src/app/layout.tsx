@@ -5,6 +5,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ThemeProvider } from '@/lib/theme-context';
 import { createPageMetadata } from '@/lib/metadata';
+import { NavigationProvider } from '@/components/navigation/NavigationProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,9 +25,11 @@ export default function RootLayout({
         <ThemeProvider>
         <QueryProvider>
           <AuthProvider>
-            <main className="min-h-screen bg-gray-50">
-              {children}
-            </main>
+            <NavigationProvider>
+              <main className="min-h-screen bg-gray-50">
+                {children}
+              </main>
+            </NavigationProvider>
           </AuthProvider>
         </QueryProvider>
         </ThemeProvider>

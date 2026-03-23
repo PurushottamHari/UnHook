@@ -11,7 +11,6 @@ import ShareModal from '@/components/ShareModal';
 import Toast from '@/components/Toast';
 import WaitlistSection from '@/components/WaitlistSection';
 import ArticleContent from '@/components/article/ArticleContent';
-import MobileMetadataDropdown from '@/components/MobileMetadataDropdown';
 import CategoryTag from '@/components/CategoryTag';
 import ArticleTitle from '@/components/article/ArticleTitle';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
@@ -194,7 +193,7 @@ export default function GuestView({ articleId }: { articleId: string }) {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-8 pt-12">
         <header className="mb-8 text-center relative">
           <div className="absolute top-0 left-0 z-10">
-            <Breadcrumb onClick={() => router.back()} label="Back to Dashboard" />
+            <Breadcrumb onClick={() => router.back()} label="Back to Dashboard" hideLabelOnMobile={true} />
           </div>
 
           <div className="absolute top-0 right-0 z-10">
@@ -219,12 +218,51 @@ export default function GuestView({ articleId }: { articleId: string }) {
           <ArticleTitle title={displayArticle.title || ''} />
 
           <div className="flex flex-col items-center gap-4 mb-4">
-            <MobileMetadataDropdown
-              label="Article Info"
-              items={[
-                <div key="category" className="flex items-center gap-1.5">
+            <div className="flex md:hidden items-center justify-center gap-4 text-[13px] text-amber-700 dark:text-amber-800 flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                {displayArticle?.published_at ? (
+                  <time dateTime={displayArticle.published_at}>
+                    {(() => {
+                      const date = new Date(displayArticle.published_at);
+                      const day = String(date.getDate()).padStart(2, '0');
+                      const month = String(date.getMonth() + 1).padStart(2, '0');
+                      const year = date.getFullYear();
+                      return `${day}/${month}/${year}`;
+                    })()}
+                  </time>
+                ) : (
+                  <span>Loading date...</span>
+                )}
+              </div>
+
+              {displayArticle?.youtube_channel ? (
+                <div className="flex items-center gap-1.5">
                   <svg
-                    className="w-3 h-3 md:w-4 md:h-4"
+                    className="w-3.5 h-3.5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  </svg>
+                  <span className="italic">{displayArticle.youtube_channel}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <svg
+                    className="w-3.5 h-3.5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -233,55 +271,13 @@ export default function GuestView({ articleId }: { articleId: string }) {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                      d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
                     />
                   </svg>
-                  <CategoryTag category={displayArticle.category || ''} variant="article" />
-                </div>,
-                <div key="date" className="flex items-center gap-1.5">
-                  <svg
-                    className="w-3 h-3 md:w-4 md:h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  {displayArticle?.published_at ? (
-                    <time dateTime={displayArticle.published_at}>
-                      {(() => {
-                        const date = new Date(displayArticle.published_at);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        return `${day}/${month}/${year}`;
-                      })()}
-                    </time>
-                  ) : (
-                    <span>Loading date...</span>
-                  )}
-                </div>,
-                ...(displayArticle?.youtube_channel
-                  ? [
-                      <div key="channel" className="flex items-center gap-1.5">
-                        <svg
-                          className="w-3 h-3 md:w-4 md:h-4"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                        </svg>
-                        <span className="italic">{displayArticle.youtube_channel}</span>
-                      </div>,
-                    ]
-                  : []),
-              ]}
-            />
+                  <span>{displayArticle?.article_source || 'Teerth'}</span>
+                </div>
+              )}
+            </div>
 
             <div className="hidden md:flex items-center justify-center gap-6 text-[13px] text-amber-700 dark:text-amber-800 flex-wrap">
               <div className="flex items-center gap-1.5">

@@ -15,14 +15,14 @@ export default function DashboardDatePicker({
 }: DashboardDatePickerProps) {
   if (variant === 'desktop') {
     return (
-      <div className='hidden md:block absolute top-0 right-0'>
+      <div className='hidden md:block absolute top-0 right-0 z-50'>
         <DatePicker selectedDate={selectedDate} onDateChange={onDateChange} />
       </div>
     );
   }
 
   return (
-    <div className='md:hidden flex justify-center mb-4'>
+    <div className='md:hidden flex justify-center'>
       <DatePicker selectedDate={selectedDate} onDateChange={onDateChange} />
     </div>
   );

@@ -8,7 +8,6 @@ import CategoryTagsSkeleton from '@/components/CategoryTagsSkeleton';
 import DashboardDatePicker from '@/components/dashboard/DashboardDatePicker';
 import DashboardTitle from '@/components/dashboard/DashboardTitle';
 import CategoriesError from '@/components/dashboard/CategoriesError';
-import MobileMetadataDropdown from '@/components/MobileMetadataDropdown';
 import CategoryTag from '@/components/CategoryTag';
 import ModeBanner from '@/components/ModeBanner';
 import ArticlesWidget from '@/components/dashboard/ArticlesWidget';
@@ -52,9 +51,9 @@ export default function AdminView({ userId }: AdminViewProps) {
   return (
     <div className='min-h-screen bg-yellow-50 dark:bg-amber-50'>
       <ModeBanner mode="admin" />
-      <div className='w-full px-4 sm:px-6 lg:px-8 py-8'>
+      <div className='w-full px-4 sm:px-6 lg:px-8 py-2 md:py-8'>
         <div className='max-w-6xl mx-auto'>
-          <div className='relative mb-12'>
+          <div className='relative mb-4 md:mb-12'>
             <DashboardDatePicker
               selectedDate={selectedDate}
               onDateChange={setSelectedDate}
@@ -62,36 +61,30 @@ export default function AdminView({ userId }: AdminViewProps) {
             />
 
             <div className='text-center'>
-              <div className='flex justify-center mb-6'>
-                <TeerthLogo alt='Teerth Logo' size={200} />
+              <div className="flex items-center justify-center relative mb-6">
+                <TeerthLogo alt="Teerth Logo" size={200} useIconOnMobile={true} />
+                <div className="absolute right-0 md:hidden">
+                  <DashboardDatePicker
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                    variant="mobile"
+                  />
+                </div>
               </div>
 
               <DashboardTitle title="Welcome Puru" />
-
-              <DashboardDatePicker
-                selectedDate={selectedDate}
-                onDateChange={setSelectedDate}
-                variant='mobile'
-              />
 
               {isLoadingCategories && !userCategories ? (
                 <CategoryTagsSkeleton />
               ) : categoriesError ? (
                 <CategoriesError />
               ) : userCategories && userCategories.length > 0 ? (
-                <div className='text-center text-amber-700 dark:text-amber-800 mb-8'>
+                <div className='hidden md:block text-center text-amber-700 dark:text-amber-800 mb-8'>
                   {isFetchingCategories && userCategories && (
                     <div className='flex justify-center mb-2'>
                       <LoadingSpinner size='sm' />
                     </div>
                   )}
-
-                  <MobileMetadataDropdown
-                    label="In Focus Today:"
-                    items={userCategories.map((category: string, index: number) => (
-                      <CategoryTag key={index} category={category} variant="default" />
-                    ))}
-                  />
 
                   <div className="hidden md:flex flex-col items-center mb-3">
                     <p className="text-lg font-medium leading-relaxed mb-3">

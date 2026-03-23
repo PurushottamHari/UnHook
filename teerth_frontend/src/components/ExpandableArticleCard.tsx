@@ -76,7 +76,6 @@ async function fetchFullArticle(
  * Each card manages its own data fetching and displays loading state internally
  */
 export default function ExpandableArticleCard({ article, isGuestMode }: ExpandableArticleCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDislikeModalOpen, setIsDislikeModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -176,7 +175,6 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
   // Note: interactionState is now derived from interactions via getInteractionState
   // No need for separate state management
 
-  // Action handlers with debouncing and loading states
   const handleToggleRead = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -440,7 +438,7 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
   }
 
   return (
-    <div className='relative'>
+    <div className='relative h-full flex flex-col'>
       {/* Show subtle loading indicator when refetching in background */}
       {isFetching && fullArticle && (
         <div className='absolute -top-2 -right-2 z-30'>
@@ -450,13 +448,58 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
       
       <Link
         href={`/articles/${displayArticle.id}`}
-        className='block'
+        className='block flex-1 h-full'
         onClick={handleArticleClick}
       >
-        <div className='group relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.01] flex flex-col'>
-          {/* Action Buttons - Bottom Right */}
+        <div className='group relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.01] flex flex-col h-full'>
+          {/* Subtle Pattern Overlay */}
+          <div className='absolute inset-0 opacity-5'>
+            <div
+              className='absolute inset-0'
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d97706' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+          </div>
+
+          {/* Article Title and Metadata */}
+          <div className='relative z-20 p-6 flex-1 flex flex-col pb-8 md:pb-6'>
+            <h3 className='text-xl font-bold text-amber-900 dark:text-amber-900 mb-3 leading-tight'>
+              {displayArticle.title}
+            </h3>
+
+            <div className='flex items-center gap-4 mb-4 flex-wrap'>
+              <CategoryTag category={displayArticle.category} variant="compact" />
+              <span className='flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-700'>
+                <svg
+                  className='w-4 h-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
+                  />
+                </svg>
+                {displayArticle.time_to_read}
+              </span>
+            </div>
+
+            {/* Article Summary */}
+            {displayArticle.summary && (
+              <div className='flex-1 flex flex-col'>
+                <p className='text-sm text-amber-700 dark:text-amber-800 leading-relaxed'>
+                  {displayArticle.summary}
+                </p>
+              </div>
+            )}
+
+          {/* Action Buttons */}
           {!isGuestMode && (
-          <div className='absolute bottom-4 right-4 z-30 flex items-center gap-2'>
+          <div className='z-30 flex items-center justify-end gap-2 mt-6 md:mt-4'>
             {/* Save for Later - Desktop Only */}
             <button
               onClick={handleToggleSave}
@@ -759,102 +802,6 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
             </div>
           </div>
           )}
-          {/* Subtle Pattern Overlay */}
-          <div className='absolute inset-0 opacity-5'>
-            <div
-              className='absolute inset-0'
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d97706' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }}
-            />
-          </div>
-
-          {/* Article Title and Metadata */}
-          <div className='relative z-20 p-6 flex-1 flex flex-col pb-16'>
-            <h3 className='text-xl font-bold text-amber-900 dark:text-amber-900 mb-3 leading-tight'>
-              {displayArticle.title}
-            </h3>
-
-            <div className='flex items-center gap-4 mb-4 flex-wrap'>
-              <CategoryTag category={displayArticle.category} variant="compact" />
-              <span className='flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-700'>
-                <svg
-                  className='w-4 h-4'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
-                  />
-                </svg>
-                {displayArticle.time_to_read}
-              </span>
-            </div>
-
-            {/* Article Summary */}
-            {displayArticle.summary && (
-              <div className='flex-1 flex flex-col min-h-[180px] md:min-h-[140px]'>
-                <p
-                  className={
-                    !isExpanded
-                      ? 'text-sm text-amber-700 dark:text-amber-800 leading-relaxed line-clamp-8 md:line-clamp-3'
-                      : 'text-sm text-amber-700 dark:text-amber-800 leading-relaxed'
-                  }
-                >
-                  {displayArticle.summary}
-                </p>
-                {displayArticle.summary.length > 150 && (
-                  <button
-                    className='read-more-button mt-2 mb-2 inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-700 hover:text-amber-800 dark:hover:text-amber-900 transition-colors self-start'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setIsExpanded(!isExpanded);
-                    }}
-                  >
-                    {isExpanded ? (
-                      <>
-                        <span>Read less</span>
-                        <svg
-                          className='w-4 h-4'
-                          fill='none'
-                          stroke='currentColor'
-                          viewBox='0 0 24 24'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M5 15l7-7 7 7'
-                          />
-                        </svg>
-                      </>
-                    ) : (
-                      <>
-                        <span>Read more</span>
-                        <svg
-                          className='w-4 h-4'
-                          fill='none'
-                          stroke='currentColor'
-                          viewBox='0 0 24 24'
-                        >
-                          <path
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                            strokeWidth={2}
-                            d='M19 9l-7 7-7-7'
-                          />
-                        </svg>
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Subtle Border Glow */}

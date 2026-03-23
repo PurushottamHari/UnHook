@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { useNavigation } from './NavigationProvider';
+
 interface BreadcrumbProps {
   /** The URL to navigate to when the breadcrumb is clicked (optional if onClick is provided) */
   href?: string;
@@ -9,6 +11,10 @@ interface BreadcrumbProps {
   label: string;
   /** Optional additional CSS classes */
   className?: string;
+  /** Whether to hide the label on mobile (defaults to false) */
+  hideLabelOnMobile?: boolean;
+  /** Whether the current page is the main dashboard */
+  isDashboard?: boolean;
 }
 
 /**
@@ -19,7 +25,17 @@ export default function Breadcrumb({
   onClick,
   label,
   className = '',
+  hideLabelOnMobile = false,
+  isDashboard = false,
 }: BreadcrumbProps) {
+  const { hasPreviousTeerthPage } = useNavigation();
+
+  // Don't show breadcrumb on the main dashboard,
+  // or if the user didn't land from a previously visited teerth page
+  if (isDashboard || !hasPreviousTeerthPage) {
+    return null;
+  }
+
   const content = (
     <>
       <svg
@@ -35,7 +51,7 @@ export default function Breadcrumb({
           d="M15 19l-7-7 7-7"
         />
       </svg>
-      {label}
+      <span className={hideLabelOnMobile ? 'hidden sm:inline' : ''}>{label}</span>
     </>
   );
 

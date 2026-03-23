@@ -176,6 +176,7 @@ export default function WaitlistSection({
 
             {/* Divider */}
             <div className='hidden lg:block w-px self-stretch bg-amber-300 dark:bg-amber-400'></div>
+            <div className='block lg:hidden h-px w-full bg-amber-300 dark:bg-amber-400'></div>
 
             {/* Right side - Form */}
             <div className='flex-1 w-full'>
