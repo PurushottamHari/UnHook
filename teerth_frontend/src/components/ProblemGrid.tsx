@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 
 interface ProblemCardData {
@@ -14,51 +14,71 @@ interface ProblemGridProps {
 }
 
 function ProblemCard({ card }: { card: ProblemCardData }) {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
-      className='relative h-64 w-full perspective-1000 cursor-pointer group'
-      onMouseEnter={() => setIsFlipped(true)}
-      onMouseLeave={() => setIsFlipped(false)}
-      onClick={() => setIsFlipped(!isFlipped)}
+      className='relative h-64 w-full cursor-pointer group overflow-hidden rounded-2xl'
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => setIsHovered(!isHovered)}
     >
-      <motion.div
-        className='relative w-full h-full preserve-3d'
-        animate={{ rotateY: isFlipped ? 180 : 0 }}
-        transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 20 }}
+      {/* Reality Base (Always Underneath) */}
+      <div 
+        className='absolute inset-0 w-full h-full bg-white rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-slate-200 shadow-sm'
+        style={{
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
+        }}
       >
-        {/* Front Side - Illusion */}
-        <div 
-          className='absolute inset-0 w-full h-full backface-hidden rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-md'
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(254,243,199,0.7) 100%)',
-            border: '1px solid rgba(251,191,36,0.2)',
-          }}
-        >
-          <div className='text-3xl mb-4 group-hover:scale-110 transition-transform duration-300'>{card.icon}</div>
-          <div className='text-xs text-amber-600/70 font-medium mb-2 tracking-wide uppercase'>The Illusion</div>
-          <p className='text-amber-900 font-light leading-relaxed'>{card.front}</p>
-          <div className='mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
-             <span className='text-[10px] text-amber-500 font-medium tracking-widest uppercase'>Reveal reality →</span>
-          </div>
+        <div className='text-3xl mb-4'>🔍</div>
+        <div className='text-[10px] text-slate-500 font-bold mb-2 tracking-[0.2em] uppercase'>The Reality</div>
+        <p className='text-slate-800 font-medium leading-relaxed text-sm'>{card.back}</p>
+        <div className='mt-4'>
+           <span className='text-[10px] text-slate-400 font-medium tracking-widest uppercase'>Click to cover</span>
         </div>
+      </div>
 
-        {/* Back Side - Reality */}
-        <div 
-          className='absolute inset-0 w-full h-full backface-hidden rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-lg'
-          style={{
-            background: 'linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.9) 100%)',
-            border: '1px solid rgba(148,163,184,0.3)',
-            transform: 'rotateY(180deg)',
-          }}
-        >
-          <div className='text-3xl mb-4'>🔍</div>
-          <div className='text-xs text-slate-600/70 font-medium mb-2 tracking-wide uppercase'>The Reality</div>
-          <p className='text-slate-800 font-medium leading-relaxed text-sm'>{card.back}</p>
-          <div className='mt-4'>
-             <span className='text-[10px] text-slate-400 font-medium tracking-widest uppercase'>← Flip back</span>
-          </div>
+      {/* Illusion Overlay (Curtains) */}
+      <div className='absolute inset-0 w-full h-full flex overflow-hidden pointer-events-none'>
+        {/* Left Curtain */}
+        <motion.div
+          className='w-1/2 h-full bg-gradient-to-br from-amber-100 to-amber-200 border-r border-amber-300/30 shadow-[inset_-2px_0_10px_rgba(251,191,36,0.1)]'
+          animate={{ x: isHovered ? '-100%' : '0%' }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        />
+        {/* Right Curtain */}
+        <motion.div
+          className='w-1/2 h-full bg-gradient-to-bl from-amber-100 to-amber-200 border-l border-amber-300/30 shadow-[inset_2px_0_10px_rgba(251,191,36,0.1)]'
+          animate={{ x: isHovered ? '100%' : '0%' }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        />
+      </div>
+
+      {/* Illusion Content (Fades out) */}
+      <motion.div
+        className='absolute inset-0 w-full h-full flex flex-col items-center justify-center text-center p-6 pointer-events-none z-10'
+        animate={{ 
+          opacity: isHovered ? 0 : 1,
+          scale: isHovered ? 1.1 : 1,
+          filter: isHovered ? 'blur(10px)' : 'blur(0px)'
+        }}
+        transition={{ duration: 0.4 }}
+      >
+        {/* Decorative elements for the "Illusion" side */}
+        <div className='absolute -top-10 -right-10 w-32 h-32 bg-amber-200/20 blur-3xl rounded-full'></div>
+        <div className='absolute -bottom-10 -left-10 w-32 h-32 bg-amber-100/30 blur-3xl rounded-full'></div>
+        
+        <div className='text-3xl mb-4 group-hover:scale-110 transition-transform duration-300'>{card.icon}</div>
+        <div className='text-[10px] text-amber-600 font-bold mb-2 tracking-[0.2em] uppercase'>The Illusion</div>
+        <p className='text-amber-900 font-light leading-relaxed'>{card.front}</p>
+        
+        <div className='mt-5'>
+           <div className='flex items-center space-x-2 text-amber-700 font-bold'>
+             <span className='text-[10px] tracking-widest uppercase'>Reveal truth</span>
+             <svg className='w-3.5 h-3.5 animate-pulse' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M14 5l7 7m0 0l-7 7m7-7H3' />
+             </svg>
+           </div>
         </div>
       </motion.div>
     </div>
@@ -80,11 +100,6 @@ export default function ProblemGrid({ cards }: ProblemGridProps) {
             <ProblemCard card={card} />
           </motion.div>
         ))}
-      </div>
-      <div className='text-center mt-12'>
-        <p className='text-sm text-amber-600/60 font-light italic'>
-          Hover or tap on the cards to see the hidden cost of traditional feeds.
-        </p>
       </div>
     </div>
   );

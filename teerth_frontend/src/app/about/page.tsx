@@ -75,8 +75,7 @@ export default function AboutPage() {
               </h2>
 
               <p className='text-lg text-amber-700 dark:text-amber-800 font-light text-center mb-8'>
-                Social, video, and news feeds — endless streams designed to grab
-                your attention.
+                Social, video, and news feeds
               </p>
 
               <motion.div
@@ -207,12 +206,6 @@ export default function AboutPage() {
                         <span className='text-2xl'>{item.icon}</span>
                       </div>
 
-                      {/* Step Number Circle */}
-                      <div className='absolute left-0 md:left-1/2 md:transform md:-translate-x-1/2 -bottom-2 w-8 h-8 bg-amber-600 dark:bg-amber-700 rounded-full flex items-center justify-center shadow-md z-20'>
-                        <span className='text-white font-bold text-sm'>
-                          {item.step}
-                        </span>
-                      </div>
 
                       {/* Content Card */}
                       <div
@@ -223,7 +216,7 @@ export default function AboutPage() {
                           whileHover={{ y: -2 }}
                         >
                           <div className='text-xl font-bold text-amber-800 dark:text-amber-900 mb-3'>
-                            Step {item.step} – {item.title}
+                            {item.title}
                           </div>
                           <p className='text-base text-amber-700 dark:text-amber-800 font-light leading-relaxed'>
                             {item.text}
