@@ -111,9 +111,9 @@ export default function ShareModal({
       />
 
       {/* Modal Container */}
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 sm:p-10 overflow-y-auto">
         <div
-          className="bg-white/95 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] max-w-lg md:max-w-4xl w-full transform transition-all my-4 sm:my-8 border border-white"
+          className="bg-white/95 dark:bg-amber-50/95 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] max-w-lg md:max-w-4xl w-full transform transition-all my-8 sm:my-12 border border-white dark:border-amber-200/50"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header / Close Button Section */}
@@ -145,14 +145,14 @@ export default function ShareModal({
           <div className="flex flex-col md:flex-row p-4 sm:p-6 md:p-8 gap-6 md:gap-10 items-center justify-center">
             {/* Preview Section */}
             <div className="flex justify-center flex-shrink-0">
-              <div className="w-[280px] h-[500px] sm:w-[320px] sm:h-[570px] md:w-[360px] md:h-[640px] shadow-[0_48px_96px_-12px_rgba(0,0,0,0.25)] rounded-3xl overflow-hidden relative bg-[#fffbeb] transition-all duration-300">
+              <div className="w-[240px] h-[426px] sm:w-[320px] sm:h-[570px] md:w-[360px] md:h-[640px] shadow-[0_48px_96px_-12px_rgba(0,0,0,0.25)] rounded-3xl overflow-hidden relative bg-[#fffbeb] transition-all duration-300">
                 <ArticleShareCard
                   article={article}
                   className="absolute top-0 left-0 pointer-events-none"
                   scale={
                     // Calculate scale based on container width (w/1080)
                     typeof window !== 'undefined' ? (
-                      window.innerWidth < 640 ? 0.259259 : // 280/1080
+                      window.innerWidth < 640 ? 0.222222 : // 240/1080
                       window.innerWidth < 768 ? 0.296296 : // 320/1080
                       0.333333 // 360/1080
                     ) : 0.333333
@@ -204,7 +204,7 @@ export default function ShareModal({
                   className={`flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-2 py-3 sm:px-6 sm:py-4 rounded-2xl font-bold transition-colors duration-300 shadow-lg border-2 text-sm sm:text-base text-center ${
                     copied
                       ? ""
-                      : "bg-white border-amber-900 text-amber-900 hover:bg-amber-50"
+                      : "bg-white dark:bg-amber-100 border-amber-900 text-amber-900 hover:bg-amber-50 dark:hover:bg-amber-200"
                   }`}
                   style={
                     copied
@@ -260,6 +260,7 @@ export default function ShareModal({
                   </button>
                 </div>
               )}
+
             </div>
           </div>
         </div>

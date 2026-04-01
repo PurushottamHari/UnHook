@@ -25,14 +25,14 @@ function ProblemCard({ card }: { card: ProblemCardData }) {
     >
       {/* Reality Base (Always Underneath) */}
       <div 
-        className='absolute inset-0 w-full h-full bg-white rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-slate-200 shadow-sm'
+        className='absolute inset-0 w-full h-full bg-white dark:bg-amber-50 rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-slate-200 dark:border-amber-200/50 shadow-sm'
         style={{
           boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
         }}
       >
         <div className='text-3xl mb-4'>🔍</div>
-        <div className='text-[10px] text-slate-500 font-bold mb-2 tracking-[0.2em] uppercase'>The Reality</div>
-        <p className='text-slate-800 font-medium leading-relaxed text-sm'>{card.back}</p>
+        <div className='text-[10px] text-slate-500 dark:text-amber-700 font-bold mb-2 tracking-[0.2em] uppercase'>The Reality</div>
+        <p className='text-slate-800 dark:text-amber-900 font-medium leading-relaxed text-sm'>{card.back}</p>
         <div className='mt-4'>
            <span className='text-[10px] text-slate-400 font-medium tracking-widest uppercase'>Click to cover</span>
         </div>
