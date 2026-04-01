@@ -6,6 +6,7 @@ export interface Article {
   id: string;
   title: string;
   content: string;
+  summary?: string;
   category: string;
   time_to_read: string;
   article_link: string;

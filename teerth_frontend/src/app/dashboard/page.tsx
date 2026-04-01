@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth-store';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function DashboardRedirect() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    if (isAuthenticated && user?.id && user.role !== 'guest') {
+    if (isAuthenticated && user?.id && user.role !== "guest") {
       router.replace(`/dashboard/${user.id}`);
     } else {
-      router.replace('/about');
+      router.replace("/dashboard/607d95f0-47ef-444c-89d2-d05f257d1265");
     }
   }, [isAuthenticated, user, router]);
 

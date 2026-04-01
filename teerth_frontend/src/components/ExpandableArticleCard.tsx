@@ -17,6 +17,7 @@ import { useArticleInteractions } from '@/lib/hooks/useArticleInteractions';
 import DislikeModal from './DislikeModal';
 import ReportModal from './ReportModal';
 import CategoryTag from './CategoryTag';
+import ReadTimeBadge from '@/components/ReadTimeBadge';
 
 interface ExpandableArticleCardProps {
   /**
@@ -470,22 +471,11 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
 
             <div className='flex items-center gap-4 mb-4 flex-wrap'>
               <CategoryTag category={displayArticle.category} variant="compact" />
-              <span className='flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-700'>
-                <svg
-                  className='w-4 h-4'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
-                  />
-                </svg>
-                {displayArticle.time_to_read}
-              </span>
+              <ReadTimeBadge
+                timeToRead={displayArticle.time_to_read}
+                className='flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-700'
+                iconClassName='w-4 h-4'
+              />
             </div>
 
             {/* Article Summary */}

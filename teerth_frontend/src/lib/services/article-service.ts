@@ -113,6 +113,12 @@ export class ArticleService {
       // Get category
       const category = article.category?.category || 'TECHNOLOGY';
 
+      // Get summary
+      let summary = '';
+      if (generated.SHORT && generated.SHORT.string) {
+        summary = generated.SHORT.string;
+      }
+
       // Get reading time
       const readingTimeSeconds = article.reading_time_seconds || 0;
       const minutes = Math.ceil(readingTimeSeconds / 60);
@@ -149,6 +155,7 @@ export class ArticleService {
         id: articleIdToUse,
         title: title || 'Article Not Found',
         content: content || '',
+        summary,
         category,
         time_to_read,
         article_link,
