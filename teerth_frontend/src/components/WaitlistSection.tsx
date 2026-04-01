@@ -86,7 +86,7 @@ export default function WaitlistSection({
 
   return (
     <motion.div
-      className={`${styles.container} ${className}`}
+      className={`${styles.container} ${className} snap-start snap-mt-8`}
       initial='initial'
       whileInView='animate'
       viewport={{ once: true }}

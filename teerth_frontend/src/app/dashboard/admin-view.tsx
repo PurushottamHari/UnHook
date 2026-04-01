@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import TeerthLogo from '@/components/TeerthLogo';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import CategoryTagsSkeleton from '@/components/CategoryTagsSkeleton';
@@ -28,9 +29,32 @@ interface AdminViewProps {
 }
 
 export default function AdminView({ userId }: AdminViewProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const dateParam = searchParams.get('date');
+
   const [selectedDate, setSelectedDate] = useState<string>(() => {
-    return new Date().toISOString().split('T')[0];
+    return dateParam || new Date().toISOString().split('T')[0];
   });
+
+  const handleDateChange = (newDate: string) => {
+    setSelectedDate(newDate);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('date', newDate);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    if (dateParam && dateParam !== selectedDate) {
+      setSelectedDate(dateParam);
+    } else if (!dateParam) {
+      const today = new Date().toISOString().split('T')[0];
+      if (selectedDate !== today) {
+        setSelectedDate(today);
+      }
+    }
+  }, [dateParam, selectedDate]);
 
   const todayDate = new Date().toISOString().split('T')[0];
   const {
@@ -56,7 +80,7 @@ export default function AdminView({ userId }: AdminViewProps) {
           <div className='relative mb-4 md:mb-12'>
             <DashboardDatePicker
               selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
+              onDateChange={handleDateChange}
               variant='desktop'
             />
 
@@ -66,7 +90,7 @@ export default function AdminView({ userId }: AdminViewProps) {
                 <div className="absolute right-0 md:hidden">
                   <DashboardDatePicker
                     selectedDate={selectedDate}
-                    onDateChange={setSelectedDate}
+                    onDateChange={handleDateChange}
                     variant="mobile"
                   />
                 </div>

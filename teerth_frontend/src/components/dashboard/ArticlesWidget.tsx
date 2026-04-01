@@ -379,7 +379,7 @@ export default function ArticlesWidget({ userId, selectedDate, isGuestMode }: Ar
 
               <div className='flex flex-col md:grid md:grid-cols-2 gap-4 md:gap-6 items-start pb-12 md:pb-0 px-4 md:px-0'>
                 {mainArticles.map(article => (
-                  <div key={article.id} className="w-full flex flex-col md:block py-2 md:py-0">
+                  <div key={article.id} className="w-full flex flex-col md:block py-2 md:py-0 snap-start snap-mt-4">
                     <ExpandableArticleCard article={article} isGuestMode={isGuestMode} />
                   </div>
                 ))}
