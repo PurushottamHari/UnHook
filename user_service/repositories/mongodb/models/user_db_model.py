@@ -10,6 +10,27 @@ from .interests_db_model import InterestDBModel, NotInterestedDBModel
 from .manual_config_db_model import ManualConfigDBModel
 
 
+class ScheduledContentDBModel(BaseModel):
+    """Database model for scheduled content."""
+
+    allowed_categories: List[str]  # List of CategoryName string values
+    youtube_channels: List[str]
+
+
+class ScheduleRuleDBModel(BaseModel):
+    """Database model for a schedule rule."""
+
+    rule_type: str
+    rule_value: str
+    content: ScheduledContentDBModel
+
+
+class UserScheduleDBModel(BaseModel):
+    """Database model for a user's schedule."""
+
+    rules: List[ScheduleRuleDBModel]
+
+
 class UserDBModel(BaseModel):
     """Database model for users in MongoDB."""
 
@@ -21,6 +42,9 @@ class UserDBModel(BaseModel):
     interested: List[InterestDBModel] = Field(default_factory=list)
     not_interested: List[NotInterestedDBModel] = Field(default_factory=list)
     manual_configs: ManualConfigDBModel = Field(default_factory=ManualConfigDBModel)
+    schedule: UserScheduleDBModel = Field(
+        default_factory=lambda: UserScheduleDBModel(rules=[])
+    )
 
     class Config:
         populate_by_name = True

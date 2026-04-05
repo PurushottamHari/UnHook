@@ -13,7 +13,6 @@ class InterestDBModel(BaseModel):
 
     category_name: str  # Stored as string representation of CategoryName
     category_definition: str = Field(..., max_length=500)
-    weekdays: List[str]  # Stored as list of string representations of Weekday
     output_type: str  # Stored as string representation of OutputType
 
 

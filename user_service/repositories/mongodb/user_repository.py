@@ -51,6 +51,7 @@ class MongoDBUserRepository(UserRepository):
             "interested",
             "not_interested",
             "manual_configs",
+            "schedule",
         }
 
         # Filter out non-editable fields
@@ -67,7 +68,7 @@ class MongoDBUserRepository(UserRepository):
                     item.model_dump() if hasattr(item, "model_dump") else item
                     for item in value
                 ]
-            elif key == "manual_configs":
+            elif key == "manual_configs" or key == "schedule":
                 db_data[key] = (
                     value.model_dump() if hasattr(value, "model_dump") else value
                 )

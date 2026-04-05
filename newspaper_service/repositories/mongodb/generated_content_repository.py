@@ -38,21 +38,25 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
 
         self.generated_content_collection = self.database.generated_content
 
-    def filter_external_ids_by_category(
-        self, external_ids: List[str], categories: List[CategoryName]
+    def filter_external_ids_by_criteria(
+        self,
+        external_ids: List[str],
+        categories: List[CategoryName],
+        youtube_channels: List[str],
     ) -> List[str]:
         """
-        Filter external IDs by categories, returning only those that have generated content
-        with the specified categories and ARTICLE_GENERATED status.
+        Filter external IDs by categories and channels, returning only those that match
+        the criteria and have ARTICLE_GENERATED status.
 
-        Args:
-            external_ids: List of external IDs to filter
-            categories: List of categories to match against
-
-        Returns:
-            List[str]: List of external IDs that match the criteria
+        NOTE: Currently channel filtering is expected to be handled partially at the
+        service layer if they are not stored in GeneratedContent collection.
+        This implementation filters by categories.
         """
-        if not external_ids or not categories:
+        if not external_ids:
+            return []
+
+        if not categories:
+            # If no categories are provided, we can't filter by them here
             return []
 
         # Convert category enums to string values

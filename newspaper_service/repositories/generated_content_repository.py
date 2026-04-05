@@ -13,16 +13,20 @@ class GeneratedContentRepository(ABC):
     """Abstract base class for managing generated content data."""
 
     @abstractmethod
-    def filter_external_ids_by_category(
-        self, external_ids: List[str], categories: List[CategoryName]
+    def filter_external_ids_by_criteria(
+        self,
+        external_ids: List[str],
+        categories: List[CategoryName],
+        youtube_channels: List[str],
     ) -> List[str]:
         """
-        Filter external IDs by categories, returning only those that have generated content
-        with the specified categories and ARTICLE_GENERATED status.
+        Filter external IDs by categories and channels, returning only those that match
+        the criteria and have ARTICLE_GENERATED status.
 
         Args:
             external_ids: List of external IDs to filter
             categories: List of categories to match against
+            youtube_channels: List of YouTube channel IDs to match against
 
         Returns:
             List[str]: List of external IDs that match the criteria

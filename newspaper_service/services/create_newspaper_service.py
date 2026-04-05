@@ -13,6 +13,7 @@ import pytz
 
 from data_collector_service.models.user_collected_content import (
     ContentStatus,
+    ContentType,
     UserCollectedContent,
 )
 from newspaper_service.external.user_service import UserServiceClient
@@ -160,20 +161,28 @@ class CreateNewspaperService:
         weekday_num = local_date.weekday()
         return weekday_map[weekday_num]
 
-    def _get_allowed_categories_for_date(
+    def _get_scheduled_criteria_for_date(
         self, user, for_date: datetime
-    ) -> List[CategoryName]:
-        """Get categories that should be considered for the given date based on user interests and weekdays."""
-        weekday = self._get_weekday_from_date(for_date)
-        allowed_categories = []
+    ) -> Tuple[List[CategoryName], List[str]]:
+        """Get categories and channels that should be considered for the given date based on user schedule."""
+        # Use the date part for schedule matching
+        target_date = for_date.date()
+        scheduled_contents = user.schedule.get_scheduled_content_list_for_date(
+            target_date
+        )
 
-        for interest in user.interested:
-            if weekday in interest.weekdays:
-                allowed_categories.append(interest.category_name)
+        allowed_categories = set()
+        scheduled_channels = set()
 
-        self.logger.info(f"Allowed categories for {weekday.value} on {for_date}")
-        self.logger.info([cat.value for cat in allowed_categories])
-        return allowed_categories
+        for content in scheduled_contents:
+            allowed_categories.update(content.allowed_categories)
+            scheduled_channels.update(content.youtube_channels)
+
+        self.logger.info(f"Scheduled criteria for {target_date}:")
+        self.logger.info(f"  Categories: {[cat.value for cat in allowed_categories]}")
+        self.logger.info(f"  Channels: {list(scheduled_channels)}")
+
+        return list(allowed_categories), list(scheduled_channels)
 
     def _get_or_create_newspaper(self, user_id: str, for_date: datetime) -> Newspaper:
         """Fetch existing newspaper or create new one with standard template."""
@@ -209,8 +218,10 @@ class CreateNewspaperService:
         if not user:
             raise RuntimeError(f"User not found: {user_id}")
 
-        # Get allowed categories for the given date
-        allowed_categories = self._get_allowed_categories_for_date(user, for_date)
+        # Get allowed categories and channels for the given date
+        allowed_categories, scheduled_channels = self._get_scheduled_criteria_for_date(
+            user, for_date
+        )
 
         # Fetch processed collected content
         # Clone for_date and set time to 11:59:59.999999 PM
@@ -235,20 +246,40 @@ class CreateNewspaperService:
         if not processed_content_list:
             return []
 
-        # Filter by categories
+        # 1. Filter by categories using generated content repository
         external_ids = [content.external_id for content in processed_content_list]
-        filtered_external_ids = (
-            self.generated_content_repository.filter_external_ids_by_category(
+        category_matched_external_ids = (
+            self.generated_content_repository.filter_external_ids_by_criteria(
                 external_ids=external_ids,
                 categories=allowed_categories,
+                youtube_channels=scheduled_channels,
             )
         )
 
-        # Filter content by external IDs
+        # 2. Filter by channels directly from processed_content_list
+        channel_matched_external_ids = []
+        if scheduled_channels:
+            for content in processed_content_list:
+                if content.content_type == ContentType.YOUTUBE_VIDEO:
+                    video_details = content.data.get(ContentType.YOUTUBE_VIDEO)
+                    # We check if video_details has channel_id and if it's in our scheduled list
+                    if (
+                        video_details
+                        and hasattr(video_details, "channel_id")
+                        and video_details.channel_id in scheduled_channels
+                    ):
+                        channel_matched_external_ids.append(content.external_id)
+
+        # 3. Union of matches
+        all_matching_external_ids = set(category_matched_external_ids) | set(
+            channel_matched_external_ids
+        )
+
+        # Filter content list by all matching external IDs
         filtered_content_list = [
             content
             for content in processed_content_list
-            if content.external_id in filtered_external_ids
+            if content.external_id in all_matching_external_ids
         ]
 
         # Filter out content already in newspaper

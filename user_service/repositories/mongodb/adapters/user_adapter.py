@@ -9,12 +9,17 @@ from uuid import UUID
 from models.enums import CategoryName, OutputType, Weekday
 from models.interests import Interest, NotInterested
 from models.manual_config import ManualConfig
-from models.user import User
+from models.user import ScheduledContent, ScheduleRule, User, UserSchedule
 from models.youtube_config import YoutubeChannelConfig, YoutubeConfig
 
 from ..models.interests_db_model import InterestDBModel, NotInterestedDBModel
 from ..models.manual_config_db_model import ManualConfigDBModel
-from ..models.user_db_model import UserDBModel
+from ..models.user_db_model import (
+    ScheduledContentDBModel,
+    ScheduleRuleDBModel,
+    UserDBModel,
+    UserScheduleDBModel,
+)
 from ..models.youtube_config_db_model import (
     YoutubeChannelConfig as YoutubeChannelConfigDBModel,
 )
@@ -30,7 +35,6 @@ class UserAdapter:
         return InterestDBModel(
             category_name=interest.category_name.value,
             category_definition=interest.category_definition,
-            weekdays=[day.value for day in interest.weekdays],
             output_type=interest.output_type.value,
         )
 
@@ -81,12 +85,37 @@ class UserAdapter:
         )
 
     @staticmethod
+    def _to_scheduled_content_db_model(
+        content: ScheduledContent,
+    ) -> ScheduledContentDBModel:
+        """Convert internal ScheduledContent to ScheduledContentDBModel."""
+        return ScheduledContentDBModel(
+            allowed_categories=[cat.value for cat in content.allowed_categories],
+            youtube_channels=list(content.youtube_channels),
+        )
+
+    @staticmethod
+    def _to_schedule_rule_db_model(rule: ScheduleRule) -> ScheduleRuleDBModel:
+        """Convert internal ScheduleRule to ScheduleRuleDBModel."""
+        return ScheduleRuleDBModel(
+            rule_type=rule.rule_type,
+            rule_value=rule.rule_value,
+            content=UserAdapter._to_scheduled_content_db_model(rule.content),
+        )
+
+    @staticmethod
+    def _to_user_schedule_db_model(schedule: UserSchedule) -> UserScheduleDBModel:
+        """Convert internal UserSchedule to UserScheduleDBModel."""
+        return UserScheduleDBModel(
+            rules=[UserAdapter._to_schedule_rule_db_model(r) for r in schedule.rules]
+        )
+
+    @staticmethod
     def _to_interest_model(db_model: InterestDBModel) -> Interest:
         """Convert InterestDBModel to internal Interest."""
         return Interest(
             category_name=CategoryName(db_model.category_name),
             category_definition=db_model.category_definition,
-            weekdays=[Weekday(day) for day in db_model.weekdays],
             output_type=OutputType(db_model.output_type),
         )
 
@@ -133,6 +162,34 @@ class UserAdapter:
         )
 
     @staticmethod
+    def _to_scheduled_content_model(
+        db_model: ScheduledContentDBModel,
+    ) -> ScheduledContent:
+        """Convert ScheduledContentDBModel to internal ScheduledContent."""
+        return ScheduledContent(
+            allowed_categories={
+                CategoryName(cat) for cat in db_model.allowed_categories
+            },
+            youtube_channels=set(db_model.youtube_channels),
+        )
+
+    @staticmethod
+    def _to_schedule_rule_model(db_model: ScheduleRuleDBModel) -> ScheduleRule:
+        """Convert ScheduleRuleDBModel to internal ScheduleRule."""
+        return ScheduleRule(
+            rule_type=db_model.rule_type,
+            rule_value=db_model.rule_value,
+            content=UserAdapter._to_scheduled_content_model(db_model.content),
+        )
+
+    @staticmethod
+    def _to_user_schedule_model(db_model: UserScheduleDBModel) -> UserSchedule:
+        """Convert UserScheduleDBModel to internal UserSchedule."""
+        return UserSchedule(
+            rules=[UserAdapter._to_schedule_rule_model(r) for r in db_model.rules]
+        )
+
+    @staticmethod
     def to_db_model(user: User) -> UserDBModel:
         """Convert internal User model to MongoDB UserDBModel."""
         return UserDBModel(
@@ -146,6 +203,7 @@ class UserAdapter:
                 UserAdapter._to_not_interested_db_model(n) for n in user.not_interested
             ],
             manual_configs=UserAdapter._to_manual_config_db_model(user.manual_configs),
+            schedule=UserAdapter._to_user_schedule_db_model(user.schedule),
         )
 
     @staticmethod
@@ -162,4 +220,5 @@ class UserAdapter:
                 UserAdapter._to_not_interested_model(n) for n in db_model.not_interested
             ],
             manual_configs=UserAdapter._to_manual_config_model(db_model.manual_configs),
+            schedule=UserAdapter._to_user_schedule_model(db_model.schedule),
         )

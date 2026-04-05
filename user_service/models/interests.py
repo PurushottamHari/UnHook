@@ -16,11 +16,4 @@ class NotInterested(BaseModel):
 class Interest(BaseModel):
     category_name: CategoryName
     category_definition: str = Field(..., max_length=500)
-    weekdays: List[Weekday]
     output_type: OutputType
-
-    @validator("weekdays")
-    def validate_weekdays(cls, v):
-        if not v:
-            raise ValueError("At least one weekday must be specified")
-        return v
