@@ -30,9 +30,8 @@ export default function Breadcrumb({
 }: BreadcrumbProps) {
   const { hasPreviousTeerthPage } = useNavigation();
 
-  // Don't show breadcrumb on the main dashboard,
-  // or if the user didn't land from a previously visited teerth page
-  if (isDashboard || !hasPreviousTeerthPage) {
+  // Don't show breadcrumb on the main dashboard
+  if (isDashboard) {
     return null;
   }
 

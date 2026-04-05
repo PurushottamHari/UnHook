@@ -19,6 +19,7 @@ import ArticleTitle from '@/components/article/ArticleTitle';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import ShareButton from '@/components/ShareButton';
 import ModeBanner from '@/components/ModeBanner';
+import { useNavigation } from '@/components/navigation/NavigationProvider';
 import { copyToClipboard, isWebShareAvailable } from '@/lib/share';
 
 function getPlaceholderData(articleId: string): Partial<Article> | undefined {
@@ -61,6 +62,7 @@ function clearPlaceholderData(articleId: string) {
 
 export default function GuestView({ articleId }: { articleId: string }) {
   const router = useRouter();
+  const { hasPreviousTeerthPage } = useNavigation();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
@@ -185,7 +187,12 @@ export default function GuestView({ articleId }: { articleId: string }) {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-8 pt-12">
         <header className="mb-8 text-center relative">
           <div className="absolute top-0 left-0 z-10">
-            <Breadcrumb onClick={() => router.back()} label="Back to Dashboard" hideLabelOnMobile={true} />
+            <Breadcrumb 
+              onClick={hasPreviousTeerthPage ? () => router.back() : undefined} 
+              href={hasPreviousTeerthPage ? undefined : "/dashboard"}
+              label="Back to Dashboard" 
+              hideLabelOnMobile={true} 
+            />
           </div>
 
           <div className="absolute top-0 right-0 z-10">
