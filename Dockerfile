@@ -30,6 +30,10 @@ RUN apt-get update \
         curl \
         uuid-runtime \
         sed \
+        libnss3 \
+        libnspr4 \
+        ca-certificates \
+        libcurl4 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy all service directories

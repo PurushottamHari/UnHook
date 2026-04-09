@@ -70,14 +70,14 @@ async def migrate_user_schedule():
         print("BEFORE (Interested):")
         for i in interested:
             print(f"  - {i}")
-        
+
         print("AFTER (Interested - without weekdays):")
         for i in new_interested:
             print(f"  - {i}")
-            
+
         print("AFTER (New Schedule):")
         import json
-        
+
         # Helper to handle sets in json serialization for printing
         def set_default(obj):
             if isinstance(obj, set):
