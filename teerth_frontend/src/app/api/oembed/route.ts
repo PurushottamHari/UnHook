@@ -23,8 +23,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Article not found' }, { status: 404 });
   }
 
-  // Use the origin from the request to build absolute internal URLs
-  const baseUrl = new URL(request.url).origin;
+  // Use the production domain for consistency with metadataBase
+  const baseUrl = 'https://www.teerth.xyz';
+  const thumbnail_url = `${baseUrl}/articles/${articleId}/opengraph-image`;
 
   return NextResponse.json({
     type: 'link',
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     provider_name: 'Teerth',
     provider_url: baseUrl,
     cache_age: 86400, // 24 hours
-    thumbnail_url: `${baseUrl}/articles/${articleId}/opengraph-image`,
+    thumbnail_url,
     thumbnail_width: 1200,
     thumbnail_height: 630,
     description: article.summary,

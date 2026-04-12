@@ -9,10 +9,10 @@ import { NavigationProvider } from '@/components/navigation/NavigationProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = createPageMetadata(
-  'Teerth',
-  ''
-);
+export const metadata: Metadata = {
+  metadataBase: new URL('https://www.teerth.xyz'),
+  ...createPageMetadata('Teerth', ''),
+};
 
 export default function RootLayout({
   children,

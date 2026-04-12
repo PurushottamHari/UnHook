@@ -18,7 +18,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
   const title = article.title;
   const description = article.summary ?? "";
-  const canonicalUrl = `https://unhook-production.up.railway.app/articles/${id}`;
+  const canonicalUrl = `https://www.teerth.xyz/articles/${id}`;
+  const oEmbedUrl = `https://www.teerth.xyz/api/oembed?url=${encodeURIComponent(canonicalUrl)}`;
 
   return createPageMetadata(
     `${title} | Teerth`,
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       alternates: {
         canonical: canonicalUrl,
         types: {
-          'application/json+oEmbed': `https://unhook-production.up.railway.app/api/oembed?url=${encodeURIComponent(canonicalUrl)}`,
+          'application/json+oEmbed': oEmbedUrl,
         },
       },
       openGraph: {
@@ -41,6 +42,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
             url: `/articles/${id}/opengraph-image`,
             width: 1200,
             height: 630,
+            alt: title,
           },
         ],
       },
