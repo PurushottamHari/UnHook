@@ -54,7 +54,7 @@ export default async function Image({
   }
 
   const title = truncate(article.title, 100);
-  const summary = truncate(article.summary, 700);
+  const summary = truncate(article.summary ?? "", 700);
 
   return new ImageResponse(
     <div

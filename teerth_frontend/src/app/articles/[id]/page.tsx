@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   }
 
   const title = article.title;
-  const description = article.summary;
+  const description = article.summary ?? "";
   const canonicalUrl = `https://unhook-production.up.railway.app/articles/${id}`;
 
   return createPageMetadata(
