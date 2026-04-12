@@ -65,7 +65,7 @@ class GenerateCompleteYoutubeContentService:
                 user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
                 status=GeneratedContentStatus.CATEGORIZATION_COMPLETED,
                 content_type=ContentType.YOUTUBE_VIDEO,
-                user_collected_content_status=ContentStatus.PROCESSED,
+                user_collected_content_status=ContentStatus.PROCESSING,
             )
             print(
                 f"Found {len(generated_content_list)} generated content items with status CATEGORIZATION_COMPLETED"
