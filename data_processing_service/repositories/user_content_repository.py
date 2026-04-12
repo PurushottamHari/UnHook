@@ -82,6 +82,16 @@ class UserContentRepository(ABC):
         pass
 
     @abstractmethod
+    def get_generated_content_by_user_collected_content_status(
+        self,
+        user_id: str,
+        status: GeneratedContentStatus,
+        content_type: ContentType,
+        user_collected_content_status: ContentStatus,
+    ) -> List[GeneratedContent]:
+        pass
+
+    @abstractmethod
     def update_generated_content(self, updated_generated_content: GeneratedContent):
         pass
 

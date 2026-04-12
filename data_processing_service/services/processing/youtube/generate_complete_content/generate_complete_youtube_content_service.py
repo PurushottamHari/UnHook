@@ -60,9 +60,12 @@ class GenerateCompleteYoutubeContentService:
         The processing logic for each entry is to be implemented.
         """
         try:
-            generated_content_list = self.user_content_repository.get_generated_content(
+            generated_content_list = self.user_content_repository.get_generated_content_by_user_collected_content_status(
+                # Todo: Puru hardcoded user id, remove this when building that feature
+                user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
                 status=GeneratedContentStatus.CATEGORIZATION_COMPLETED,
                 content_type=ContentType.YOUTUBE_VIDEO,
+                user_collected_content_status=ContentStatus.PROCESSED,
             )
             print(
                 f"Found {len(generated_content_list)} generated content items with status CATEGORIZATION_COMPLETED"

@@ -209,6 +209,54 @@ class MongoDBUserContentRepository(UserContentRepository):
             for doc in cursor
         ]
 
+    def get_generated_content_by_user_collected_content_status(
+        self,
+        user_id: str,
+        status: GeneratedContentStatus,
+        content_type: ContentType,
+        user_collected_content_status: ContentStatus,
+    ) -> List[GeneratedContent]:
+        """
+        Get list of generated content with the given status and content_type,
+        filtered by the status of the associated user collected content for a specific user.
+        """
+        pipeline = [
+            {
+                "$match": {
+                    "status": status,
+                    "content_type": content_type,
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "collected_content",
+                    "localField": "external_id",
+                    "foreignField": "external_id",
+                    "as": "collected_docs",
+                }
+            },
+            {
+                "$match": {
+                    "collected_docs": {
+                        "$elemMatch": {
+                            "user_id": str(user_id),
+                            "status": user_collected_content_status,
+                        }
+                    }
+                }
+            },
+            {"$project": {"collected_docs": 0}},
+        ]
+
+        cursor = self.generated_content_collection.aggregate(pipeline)
+
+        return [
+            GeneratedContentAdapter.from_generated_content_db_model(
+                GeneratedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
     def update_generated_content(self, updated_generated_content: GeneratedContent):
         """
         Update a single GeneratedContent item in MongoDB.
