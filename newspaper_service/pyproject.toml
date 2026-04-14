@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "newspaper-service"
 version = "0.1.0"
 description = "Service for creating curated newspapers from processed articles"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0.0",
     "python-dateutil>=2.8.2",
@@ -15,9 +15,9 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "python-dotenv>=0.19.0",
     "typing-extensions>=4.0.0",
-    "data-processing-service @ file:///Users/puru/Workspace/UnHook/data_processing_service",
-    "user-service==0.1.0",
-    "data-collector-service @ file:///Users/puru/Workspace/UnHook/data_collector_service",
+    "data-processing-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_processing_service",
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",
+    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service",
     "fastapi>=0.68.0",
     "uvicorn>=0.15.0",
     "apscheduler>=3.10.0",
