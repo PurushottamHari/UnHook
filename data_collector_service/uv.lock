@@ -193,7 +193,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#8ddf75f389b035d35502c87077e05d0620137ab0" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#daebe9c7d38c7090fb31e33fc393062af89bb6ad" }
 
 [[package]]
 name = "curl-cffi"
@@ -221,7 +221,7 @@ wheels = [
 [[package]]
 name = "data-collector-service"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "black" },
     { name = "commons" },
@@ -855,7 +855,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#8ddf75f389b035d35502c87077e05d0620137ab0" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#daebe9c7d38c7090fb31e33fc393062af89bb6ad" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },

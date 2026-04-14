@@ -44,7 +44,10 @@ force_grid_wrap = 0
 use_parentheses = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+sources = {"." = "newspaper_service"}
+
+[tool.uv]
+package = false
 
 [tool.hatch.metadata]
 allow-direct-references = true 

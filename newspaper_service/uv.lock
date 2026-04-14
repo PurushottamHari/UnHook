@@ -475,7 +475,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#8ddf75f389b035d35502c87077e05d0620137ab0" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#daebe9c7d38c7090fb31e33fc393062af89bb6ad" }
 
 [[package]]
 name = "curl-cffi"
@@ -503,9 +503,10 @@ wheels = [
 [[package]]
 name = "data-collector-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service#8ddf75f389b035d35502c87077e05d0620137ab0" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service#daebe9c7d38c7090fb31e33fc393062af89bb6ad" }
 dependencies = [
     { name = "black" },
+    { name = "commons" },
     { name = "curl-cffi" },
     { name = "httpx" },
     { name = "isort" },
@@ -523,9 +524,10 @@ dependencies = [
 [[package]]
 name = "data-processing-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service#8ddf75f389b035d35502c87077e05d0620137ab0" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service#daebe9c7d38c7090fb31e33fc393062af89bb6ad" }
 dependencies = [
     { name = "black" },
+    { name = "commons" },
     { name = "curl-cffi" },
     { name = "data-collector-service" },
     { name = "isort" },
@@ -1339,7 +1341,7 @@ wheels = [
 [[package]]
 name = "newspaper-service"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "apscheduler" },
     { name = "black" },
@@ -2632,7 +2634,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#8ddf75f389b035d35502c87077e05d0620137ab0" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#daebe9c7d38c7090fb31e33fc393062af89bb6ad" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },

@@ -36,7 +36,7 @@ RUN uv pip install --system hatchling
 ARG GITHUB_TOKEN
 RUN if [ -z "${GITHUB_TOKEN}" ]; then echo "ERROR: GITHUB_TOKEN build arg is required" && exit 1; fi && \
     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    uv pip install --system -e .
+    uv pip install --system .
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
