@@ -6,15 +6,15 @@ build-backend = "hatchling.build"
 name = "data-processing-service"
 version = "0.1.0"
 description = "Service for processing and analyzing collected data"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "pydantic>=2.0.0",
     "python-dateutil>=2.8.2",
     "motor>=3.0.0",
     "pymongo>=4.0.0",
     "python-dotenv>=0.19.0",
-    "data-collector-service @ file:///Users/puru/Workspace/UnHook/data_collector_service",
-    "user-service==0.1.0",
+    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service",
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",
     "langchain>=0.3.25",
     "langchain-community>=0.3.25",
     "langchain-core>=0.3.25",

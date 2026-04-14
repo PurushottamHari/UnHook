@@ -11,21 +11,10 @@ Follow these steps to set up the development environment for this project:
    source venv/bin/activate
    ```
 
-2. **Configure authentication for GitHub Packages:**
-   - Create a Personal Access Token (PAT) with `read:packages` scope.
-   - Set the following environment variable:
-     ```bash
-     export UV_EXTRA_INDEX_URL="https://PurushottamHari:<YOUR_PAT>@pypi.pkg.github.com/PurushottamHari/UnHook"
-     ```
+2. **Authentication for Private Dependencies:**
+   You need a PAT or SSH configured for the github repo access.
 
-3. **Install dependencies:**
-   - From the root of your project, run:
-     ```bash
-     uv sync
-     ```
-   - _Note: Other services like `data-collector-service` still use local paths for now, but `user-service` is pulled from the registry._
-
-4. **Install each service in editable mode:**
+3. **Install each service in editable mode:**
    - From the root of your project, run the following commands for each service:
 
    ```bash
@@ -38,7 +27,7 @@ Follow these steps to set up the development environment for this project:
    cd ..
    ```
 
-5. **Create a `.env` file in each module:**
+4. **Create a `.env` file in each module:**
    - In each of the following directories: `user_service`, `data_collector_service`, and `data_processing_service`, create a `.env` file with the following content:
      ```env
      MONGODB_URI=your_mongodb_connection_string
