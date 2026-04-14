@@ -11,15 +11,21 @@ Follow these steps to set up the development environment for this project:
    source venv/bin/activate
    ```
 
-2. **Update local dependency paths in `pyproject.toml` files:**
-   - Ensure that the local dependency paths in the `pyproject.toml` files for each service reflect your local directory structure. For example, update lines like:
-     ```toml
-     user-service @ file:///Users/puru/Workspace/UnHook/user_service
-     data-collector-service @ file:///Users/puru/Workspace/UnHook/data_collector_service
+2. **Configure authentication for GitHub Packages:**
+   - Create a Personal Access Token (PAT) with `read:packages` scope.
+   - Set the following environment variable:
+     ```bash
+     export UV_EXTRA_INDEX_URL="https://PurushottamHari:<YOUR_PAT>@pypi.pkg.github.com/PurushottamHari/UnHook"
      ```
-     to match your actual local path if it differs.
 
-3. **Install each service in editable mode:**
+3. **Install dependencies:**
+   - From the root of your project, run:
+     ```bash
+     uv sync
+     ```
+   - _Note: Other services like `data-collector-service` still use local paths for now, but `user-service` is pulled from the registry._
+
+4. **Install each service in editable mode:**
    - From the root of your project, run the following commands for each service:
 
    ```bash
@@ -32,7 +38,7 @@ Follow these steps to set up the development environment for this project:
    cd ..
    ```
 
-4. **Create a `.env` file in each module:**
+5. **Create a `.env` file in each module:**
    - In each of the following directories: `user_service`, `data_collector_service`, and `data_processing_service`, create a `.env` file with the following content:
      ```env
      MONGODB_URI=your_mongodb_connection_string
@@ -48,11 +54,13 @@ YouTube has implemented strict bot detection that blocks GitHub Actions IP addre
 ### Option 1: Using the Cookie Export Script (Recommended)
 
 1. **Activate your virtual environment:**
+
    ```bash
    source venv/bin/activate
    ```
 
 2. **Run the cookie export script:**
+
    ```bash
    python scripts/export_youtube_cookies.py chrome
    ```
@@ -62,18 +70,20 @@ YouTube has implemented strict bot detection that blocks GitHub Actions IP addre
 ### Option 2: Manual yt-dlp Export
 
 1. **Install yt-dlp locally:**
+
    ```bash
    pip install yt-dlp
    ```
 
 2. **Export cookies from your browser:**
+
    ```bash
    # For Chrome/Chromium
    yt-dlp --cookies-from-browser chrome --cookies youtube_cookies.txt
-   
+
    # For Firefox
    yt-dlp --cookies-from-browser firefox --cookies youtube_cookies.txt
-   
+
    # For Safari (macOS)
    yt-dlp --cookies-from-browser safari --cookies youtube_cookies.txt
    ```
@@ -85,12 +95,14 @@ YouTube has implemented strict bot detection that blocks GitHub Actions IP addre
 To test if your cookies work:
 
 1. **Test the cookie export script:**
+
    ```bash
    source venv/bin/activate
    python scripts/export_youtube_cookies.py chrome
    ```
 
 2. **Test locally with cookies:**
+
    ```bash
    source venv/bin/activate
    export YOUTUBE_COOKIES=./youtube_cookies.txt
@@ -98,11 +110,13 @@ To test if your cookies work:
    ```
 
 3. **Test with a YouTube video:**
+
    ```bash
    yt-dlp --cookies youtube_cookies.txt "https://www.youtube.com/watch?v=dQw4w9WgXcQ" --skip-download --write-sub
    ```
 
 4. **Test subtitle download:**
+
    ```bash
    python -c "
    from data_collector_service.collectors.youtube.tools.clients.yt_dlp_client import YtDlpClient
@@ -163,22 +177,25 @@ python3 -m data_processing_service.services.processing.process_moderated_content
 ```
 
 # Generating the required data for Youtube Video
+
 ```sh
 python3 -m data_processing_service.services.processing.youtube.generate_required_content.generate_required_youtube_content_service
 ```
 
 # Categorizing the generated content
+
 ```sh
 python3 -m data_processing_service.services.processing.youtube.categorize_content.categorize_youtube_content_service
 ```
 
 # Generating the Final Article
+
 ```sh
 python3 -m data_processing_service.services.processing.youtube.generate_complete_content.generate_complete_youtube_content_service
 ```
 
 # Create the newspaper for the day
+
 ```sh
 python -m newspaper_service.services.create_newspaper_service
 ```
-

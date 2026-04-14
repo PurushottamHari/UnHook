@@ -14,7 +14,7 @@ dependencies = [
     "pymongo>=4.0.0",
     "python-dotenv>=0.19.0",
     "data-collector-service @ file:///Users/puru/Workspace/UnHook/data_collector_service",
-    "user-service @ file:///Users/puru/Workspace/UnHook/user_service",
+    "user-service==0.1.0",
     "langchain>=0.3.25",
     "langchain-community>=0.3.25",
     "langchain-core>=0.3.25",

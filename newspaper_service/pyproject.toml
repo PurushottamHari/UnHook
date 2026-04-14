@@ -16,7 +16,7 @@ dependencies = [
     "python-dotenv>=0.19.0",
     "typing-extensions>=4.0.0",
     "data-processing-service @ file:///Users/puru/Workspace/UnHook/data_processing_service",
-    "user-service @ file:///Users/puru/Workspace/UnHook/user_service",
+    "user-service==0.1.0",
     "data-collector-service @ file:///Users/puru/Workspace/UnHook/data_collector_service",
     "fastapi>=0.68.0",
     "uvicorn>=0.15.0",
