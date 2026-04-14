@@ -34,7 +34,8 @@ RUN uv pip install --system hatchling
 
 # GITHUB_TOKEN is injected by Railway as a build-time variable
 ARG GITHUB_TOKEN
-RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
+RUN if [ -z "${GITHUB_TOKEN}" ]; then echo "ERROR: GITHUB_TOKEN build arg is required" && exit 1; fi && \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
     uv pip install --system -e .
 
 # Create a non-root user
