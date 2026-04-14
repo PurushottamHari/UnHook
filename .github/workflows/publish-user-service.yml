@@ -31,10 +31,10 @@ jobs:
 
       - name: Publish to GitHub Packages
         env:
-          UV_PUBLISH_USERNAME: ${{ github.actor }}
-          UV_PUBLISH_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          UV_PUBLISH_URL: https://pypi.pkg.github.com/PurushottamHari/UnHook/
+          TWINE_USERNAME: ${{ github.actor }}
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          TWINE_REPOSITORY_URL: https://pypi.pkg.github.com/PurushottamHari/UnHook/
         run: |
           cd user_service
-          uv publish
+          uvx twine upload --repository-url $TWINE_REPOSITORY_URL dist/* --verbose
 
