@@ -2,7 +2,7 @@ name: UnHook Pipeline Daily Run
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: teerth/unhook-pipeline
+  IMAGE_NAME: purushottamhari/unhook-pipeline
 
 on:
   schedule:
