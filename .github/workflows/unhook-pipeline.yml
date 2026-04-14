@@ -2,7 +2,7 @@ name: UnHook Pipeline Daily Run
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/unhook-pipeline
+  IMAGE_NAME: teerth/unhook-pipeline
 
 on:
   schedule:
@@ -30,8 +30,7 @@ jobs:
 
       - name: Pull latest pipeline image
         run: |
-          IMAGE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" | tr '[:upper:]' '[:lower:]')
-          docker pull $IMAGE
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Set up Python
         uses: actions/setup-python@v4
