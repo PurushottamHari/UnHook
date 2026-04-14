@@ -4,16 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'Dockerfile'
-      - 'commons/**'
-      - 'user_service/**'
-      - 'data_collector_service/**'
-      - 'data_processing_service/**'
-      - 'newspaper_service/**'
-      - 'run_unhook_pipeline.sh'
-      - 'setup_cookies.sh'
-  workflow_dispatch:  # Allow manual triggering
+  workflow_dispatch: # Allow manual triggering
 
 env:
   REGISTRY: ghcr.io
@@ -22,6 +13,8 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    # Only run when commit message contains '--build-image'
+    if: contains(github.event.head_commit.message, '--build-image') || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       packages: write
