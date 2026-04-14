@@ -23,14 +23,12 @@ class MongoDBUserRepository(UserRepository):
         if MongoDB.db is None:
             MongoDB.connect_to_database()
         self.collection = MongoDB.get_database()[self.settings.COLLECTION_NAME]
-        # Create unique index on email field
-        self.collection.create_index("email", unique=True)
 
-    def create_user(self, user: User) -> User:
+    async def create_user(self, user: User) -> User:
         """Create a new user in MongoDB."""
         db_model = UserAdapter.to_db_model(user)
         try:
-            self.collection.insert_one(db_model.model_dump(by_alias=True))
+            await self.collection.insert_one(db_model.model_dump(by_alias=True))
             return user
         except DuplicateKeyError:
             raise Exception("A user with this email already exists.")
