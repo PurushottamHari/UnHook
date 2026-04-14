@@ -30,7 +30,8 @@ jobs:
 
       - name: Pull latest pipeline image
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          IMAGE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" | tr '[:upper:]' '[:lower:]')
+          docker pull $IMAGE
 
       - name: Set up Python
         uses: actions/setup-python@v4
