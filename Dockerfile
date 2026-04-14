@@ -14,16 +14,16 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        gcc \
-        g++ \
-        curl \
-        git \
-        uuid-runtime \
-        sed \
-        libnss3 \
-        libnspr4 \
-        ca-certificates \
-        libcurl4 \
+    gcc \
+    g++ \
+    curl \
+    git \
+    uuid-runtime \
+    sed \
+    libnss3 \
+    libnspr4 \
+    ca-certificates \
+    libcurl4 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
@@ -38,16 +38,21 @@ RUN --mount=type=secret,id=GITHUB_TOKEN \
     GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
-# Install all services directly from GitHub (Pure Git Build)
-# This ensures that the services are completely separated and environment-agnostic.
-# Note: This will build using the code currently pushed to GitHub.
+# Copy all services and commons
+COPY commons/ ./commons/
+COPY user_service/ ./user_service/
+COPY data_collector_service/ ./data_collector_service/
+COPY data_processing_service/ ./data_processing_service/
+COPY newspaper_service/ ./newspaper_service/
+
+# Create venvs and install dependencies for each service
+# Note: Keeping git dependencies as requested by the user
 RUN --mount=type=secret,id=GITHUB_TOKEN \
-    uv pip install --system \
-    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons" \
-    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service" \
-    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service" \
-    "data-processing-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_processing_service" \
-    "newspaper-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=newspaper_service"
+    for service in user_service data_collector_service data_processing_service newspaper_service; do \
+        echo "Setting up venv for $service..." && \
+        uv venv --clear $service/.venv && \
+        uv pip install -e ./$service --python ./$service/.venv/bin/python; \
+    done
 
 # Copy essential runner scripts and configuration
 COPY run_unhook_pipeline.sh ./run_unhook_pipeline.sh
@@ -57,10 +62,10 @@ RUN chmod +x ./run_unhook_pipeline.sh ./setup_cookies.sh
 
 # Create entrypoint script
 RUN echo '#!/bin/bash\n\
-# Setup cookies first\n\
-./setup_cookies.sh\n\
-# Execute the original command\n\
-exec "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
+    # Setup cookies first\n\
+    ./setup_cookies.sh\n\
+    # Execute the original command\n\
+    exec "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
