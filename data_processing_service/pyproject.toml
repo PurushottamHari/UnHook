@@ -15,6 +15,7 @@ dependencies = [
     "python-dotenv>=0.19.0",
     "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service",
     "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons",
     "langchain>=0.3.25",
     "langchain-community>=0.3.25",
     "langchain-core>=0.3.25",

@@ -64,6 +64,8 @@ jobs:
         context: .
         push: false
         tags: unhook-pipeline:latest
+        secrets: |
+          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         cache-from: |
           type=gha,scope=unhook-docker-cache
         cache-to: |

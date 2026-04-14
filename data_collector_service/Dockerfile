@@ -11,31 +11,27 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Set work directory
 WORKDIR /app
 
-# Copy .env file first and source all environment variables
-COPY .env .env
-RUN if [ ! -f ".env" ]; then \
-        echo "ERROR: .env file not found"; \
-        echo "Please create a .env file with your environment variables"; \
-        exit 1; \
-    fi && \
-    export $(cat .env | grep -v '^#' | xargs) && \
-    echo "Environment variables loaded from .env file" && \
-    rm .env
-
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
         g++ \
         curl \
+        git \
         ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy pyproject.toml and install Python dependencies
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
+ENV PATH="/uv/bin:${PATH}"
+
+# Copy pyproject.toml and install Python dependencies securely
 COPY pyproject.toml .
-RUN pip install --upgrade pip \
-    && pip install hatchling \
-    && pip install -e .
+RUN uv pip install --system hatchling
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" \
+    && uv pip install --system -e .
 
 # Copy the rest of the application
 COPY . .

@@ -18,6 +18,7 @@ dependencies = [
     "data-processing-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_processing_service",
     "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",
     "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service",
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons",
     "fastapi>=0.68.0",
     "uvicorn>=0.15.0",
     "apscheduler>=3.10.0",

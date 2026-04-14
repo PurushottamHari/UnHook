@@ -11,23 +11,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Set work directory
 WORKDIR /app
 
-# Copy .env file first and source all environment variables
-COPY .env .env
-RUN if [ ! -f ".env" ]; then \
-        echo "ERROR: .env file not found"; \
-        echo "Please create a .env file with your environment variables"; \
-        exit 1; \
-    fi && \
-    export $(cat .env | grep -v '^#' | xargs) && \
-    echo "Environment variables loaded from .env file" && \
-    rm .env
-
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         gcc \
         g++ \
         curl \
+        git \
         uuid-runtime \
         sed \
         libnss3 \
@@ -36,35 +26,34 @@ RUN apt-get update \
         libcurl4 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy all service directories
-COPY data_collector_service/ ./data_collector_service/
-COPY data_processing_service/ ./data_processing_service/
-COPY newspaper_service/ ./newspaper_service/
-COPY user_service/ ./user_service/
-COPY commons/ ./commons/
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
+ENV PATH="/uv/bin:${PATH}"
 
-# Fix path references in pyproject.toml files for Docker container
-RUN sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' data_processing_service/pyproject.toml && \
-    sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' data_collector_service/pyproject.toml && \
-    sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' newspaper_service/pyproject.toml
+# Install Hatchling (build backend) using uv
+RUN uv pip install --system hatchling
 
-# Install Python dependencies for all services
-RUN pip install --upgrade pip \
-    && pip install hatchling
+# Configure git to use the GITHUB_TOKEN for private dependencies securely
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
-# Install all services from project root to handle relative dependencies
-RUN pip install -e ./user_service
-RUN pip install -e ./data_collector_service
-RUN pip install -e ./data_processing_service
-RUN pip install -e ./newspaper_service
+# Install all services directly from GitHub (Pure Git Build)
+# This ensures that the services are completely separated and environment-agnostic.
+# Note: This will build using the code currently pushed to GitHub.
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    uv pip install --system \
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons" \
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service" \
+    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service" \
+    "data-processing-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_processing_service" \
+    "newspaper-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=newspaper_service"
 
-# Copy the pipeline script
+# Copy essential runner scripts and configuration
 COPY run_unhook_pipeline.sh ./run_unhook_pipeline.sh
-RUN chmod +x ./run_unhook_pipeline.sh
-
-# Copy the cookies setup script
 COPY setup_cookies.sh ./setup_cookies.sh
-RUN chmod +x ./setup_cookies.sh
+COPY cookies/ ./cookies/
+RUN chmod +x ./run_unhook_pipeline.sh ./setup_cookies.sh
 
 # Create entrypoint script
 RUN echo '#!/bin/bash\n\

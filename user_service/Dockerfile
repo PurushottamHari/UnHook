@@ -20,28 +20,25 @@ RUN apt-get update \
         gcc \
         g++ \
         curl \
+        git \
         sed \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy other service directories (for path dependencies)
-# Railway builds from repo root, so these should be available
-COPY commons/ ./commons/
-COPY data_processing_service/ ./data_processing_service/
-COPY newspaper_service/ ./newspaper_service/
-COPY data_collector_service/ ./data_collector_service/
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
+ENV PATH="/uv/bin:${PATH}"
 
 # Copy user_service directory
 COPY user_service/ ./user_service/
-
-# Fix path references in ALL pyproject.toml files for Docker container
-# Replace local paths with Docker container paths
-RUN find . -name "pyproject.toml" -type f -exec sed -i 's|file:///Users/puru/Workspace/UnHook/|file:///app/|g' {} \;
+COPY commons/ ./commons/
 
 # Change to user_service directory and install Python dependencies
 WORKDIR /app/user_service
-RUN pip install --upgrade pip \
-    && pip install hatchling \
-    && pip install -e .
+RUN uv pip install --system hatchling
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
+    uv pip install --system -e .
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
