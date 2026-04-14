@@ -17,11 +17,11 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        gcc \
-        g++ \
-        curl \
-        git \
-        sed \
+    gcc \
+    g++ \
+    curl \
+    git \
+    sed \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
@@ -35,9 +35,10 @@ COPY commons/ ./commons/
 # Change to user_service directory and install Python dependencies
 WORKDIR /app/user_service
 RUN uv pip install --system hatchling
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
-    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
+
+# GITHUB_TOKEN is injected by Railway as a build-time variable
+ARG GITHUB_TOKEN
+RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
     uv pip install --system -e .
 
 # Create a non-root user
