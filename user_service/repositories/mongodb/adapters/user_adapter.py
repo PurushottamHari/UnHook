@@ -6,11 +6,11 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
-from models.enums import CategoryName, OutputType, Weekday
-from models.interests import Interest, NotInterested
-from models.manual_config import ManualConfig
-from models.user import ScheduledContent, ScheduleRule, User, UserSchedule
-from models.youtube_config import YoutubeChannelConfig, YoutubeConfig
+from ....models.enums import CategoryName, OutputType, Weekday
+from ....models.interests import Interest, NotInterested
+from ....models.manual_config import ManualConfig
+from ....models.user import ScheduledContent, ScheduleRule, User, UserSchedule
+from ....models.youtube_config import YoutubeChannelConfig, YoutubeConfig
 
 from ..models.interests_db_model import InterestDBModel, NotInterestedDBModel
 from ..models.manual_config_db_model import ManualConfigDBModel

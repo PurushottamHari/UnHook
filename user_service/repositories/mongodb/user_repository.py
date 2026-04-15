@@ -5,9 +5,9 @@ MongoDB implementation of the UserRepository interface.
 from typing import Optional
 from uuid import UUID
 
-from models.user import User
+from ...models.user import User
 from pymongo.errors import DuplicateKeyError
-from repositories.user_repository import UserRepository
+from ...repositories.user_repository import UserRepository
 
 from .adapters.user_adapter import UserAdapter
 from .config.database import MongoDB

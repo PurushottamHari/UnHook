@@ -4,10 +4,10 @@ User controller handling HTTP requests for user operations.
 
 from typing import Any, Dict
 
-from api.dependencies import get_user_service
+from ..api.dependencies import get_user_service
 from fastapi import APIRouter, Depends, HTTPException
-from models.user import User
-from services.user_service import UserService
+from ..models.user import User
+from ..services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
 
