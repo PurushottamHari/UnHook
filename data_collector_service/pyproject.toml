@@ -16,8 +16,8 @@ dependencies = [
     "pymongo>=4.0.0",  # Required for MongoDB operations
     "httpx>=0.24.0",  # Required for HTTP client operations
     "langcodes>=3.3.0", # Required for language code validation
-    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@refactoring101#subdirectory=user_service",  # Local dependency
-    "commons @ git+https://github.com/PurushottamHari/UnHook.git@refactoring101#subdirectory=commons",  # Shared commons dependency
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",  # Local dependency
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons",  # Shared commons dependency
     "curl-cffi",
     "black>=23.0.0",
     "isort>=5.12.0",
