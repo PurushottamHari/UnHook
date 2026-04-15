@@ -310,7 +310,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "langchain-core" },
     { name = "langchain-deepseek" },
@@ -346,7 +346,7 @@ wheels = [
 [[package]]
 name = "data-collector-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "black" },
     { name = "commons" },
@@ -367,7 +367,7 @@ dependencies = [
 [[package]]
 name = "data-processing-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "black" },
     { name = "commons" },
@@ -736,10 +736,10 @@ dependencies = [
 requires-dist = [
     { name = "apscheduler", specifier = ">=3.10.0" },
     { name = "black", specifier = ">=23.0.0" },
-    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=refactoring101" },
+    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons" },
     { name = "curl-cffi" },
-    { name = "data-collector-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=refactoring101" },
-    { name = "data-processing-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service&rev=refactoring101" },
+    { name = "data-collector-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service" },
+    { name = "data-processing-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service" },
     { name = "fastapi", specifier = ">=0.68.0" },
     { name = "httpx", specifier = ">=0.24.0" },
     { name = "isort", specifier = ">=5.12.0" },
@@ -752,7 +752,7 @@ requires-dist = [
     { name = "pytz", specifier = ">=2023.3" },
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0" },
-    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=refactoring101" },
+    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service" },
     { name = "uvicorn", specifier = ">=0.15.0" },
 ]
 
@@ -1610,7 +1610,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },

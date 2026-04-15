@@ -298,7 +298,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "langchain-core" },
     { name = "langchain-deepseek" },
@@ -334,7 +334,7 @@ wheels = [
 [[package]]
 name = "data-collector-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "black" },
     { name = "commons" },
@@ -375,9 +375,9 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "black", specifier = ">=23.0.0" },
-    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=refactoring101" },
+    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons" },
     { name = "curl-cffi" },
-    { name = "data-collector-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=refactoring101" },
+    { name = "data-collector-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service" },
     { name = "isort", specifier = ">=5.12.0" },
     { name = "motor", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
@@ -386,7 +386,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=0.19.0" },
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "requests" },
-    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=refactoring101" },
+    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service" },
 ]
 
 [[package]]
@@ -1534,7 +1534,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=refactoring101#13cc92180bcdf805e47005ba02ac40f6847fdb15" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#2069b9c63d7dd895c79af65d593a20ca0693df0a" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },
