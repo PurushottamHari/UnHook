@@ -1,7 +1,7 @@
 import os
 from typing import Any
 
-from data_processing_service.ai import BaseAIClient, ModelConfig
+from commons.ai import BaseAIClient, ModelConfig
 
 
 class ChunkSummarizer(BaseAIClient[str]):

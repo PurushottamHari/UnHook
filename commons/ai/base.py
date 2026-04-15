@@ -14,7 +14,7 @@ from langchain_deepseek import ChatDeepSeek
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
-from data_processing_service.ai.config import ModelConfig, ModelProvider
+from commons.ai.config import ModelConfig, ModelProvider
 
 T = TypeVar("T", bound=BaseModel)
 

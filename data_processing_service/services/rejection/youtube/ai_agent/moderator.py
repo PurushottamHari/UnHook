@@ -6,7 +6,7 @@ import json
 import os
 from typing import List
 
-from data_processing_service.ai import BaseAIClient, ModelConfig, ModelProvider
+from commons.ai import BaseAIClient, ModelConfig, ModelProvider
 
 from .models import ContentItem, ModerationInput, ModerationOutput
 

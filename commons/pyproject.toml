@@ -7,7 +7,14 @@ name = "commons"
 version = "0.1.0"
 description = "Shared utilities and base classes for UnHook services"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "langchain-core>=0.3.0",
+    "langchain-deepseek>=0.1.0",
+    "langchain-openai>=0.3.0",
+    "tiktoken"
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 
 # Define the path outside the class
-ENV_FILE_PATH = str(Path(__file__).parent.parent / ".env")
+ENV_FILE_PATH = ".env"
 
 
 class AISettings(BaseSettings):
