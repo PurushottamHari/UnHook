@@ -3,6 +3,7 @@ MongoDB implementation of the UserCollectedContentRepository interface.
 """
 
 from typing import List
+from pymongo import UpdateOne
 
 from data_collector_service.collectors.youtube.adapters.youtube_to_user_content_adapter import (
     YouTubeToUserContentAdapter,
@@ -103,3 +104,40 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             f"Found {len(content_list)} processed contents with moderation passed for user {user_id}"
         )
         return content_list
+
+    def get_unprocessed_content_for_user(
+        self, user_id: str
+    ) -> List[UserCollectedContent]:
+        """
+        Get list of unprocessed content for a user.
+        """
+        cursor = self.collection.find(
+            {"user_id": str(user_id), "status": ContentStatus.COLLECTED}
+        )
+
+        return [
+            CollectedContentAdapter.to_user_collected_content(
+                CollectedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
+    def update_user_collected_content_batch(
+        self, updated_user_collected_content_list: List[UserCollectedContent]
+    ) -> None:
+        """
+        Update a batch of UserCollectedContent items in MongoDB.
+        """
+        operations = []
+        for content in updated_user_collected_content_list:
+            db_model = CollectedContentAdapter.to_collected_content_db_model(content)
+            update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
+            # Mongodb does not allow _id to be passed even if same
+            if "_id" in update_dict:
+                _id = update_dict.pop("_id")
+            else:
+                _id = db_model.id
+            operations.append(UpdateOne({"_id": _id}, {"$set": update_dict}))
+
+        if operations:
+            self.collection.bulk_write(operations)

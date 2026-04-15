@@ -6,14 +6,18 @@ import asyncio
 from typing import List
 
 from data_collector_service.models.enums import ContentType
-from data_processing_service.services.rejection.youtube.ai_agent.moderator import (
+from .youtube.ai_agent.moderator import (
     ContentModerator,
 )
 
-from ...external.user_service.client import UserServiceClient
-from ...repositories.mongodb.config.database import MongoDB
-from ...repositories.mongodb.user_content_repository import MongoDBUserContentRepository
-from ...repositories.user_content_repository import UserContentRepository
+from data_collector_service.external.user_service.client import UserServiceClient
+from data_collector_service.repositories.mongodb.config.database import MongoDB
+from data_collector_service.repositories.mongodb.user_collected_content_repository import (
+    MongoDBUserCollectedContentRepository,
+)
+from data_collector_service.repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
 from .service_context import RejectionServiceContext
 from .youtube.rejection_content_service_youtube import RejectionContentServiceYoutube
 
@@ -35,9 +39,7 @@ class RejectContentService:
         # Initialize MongoDB connection
         MongoDB.connect_to_database()
         # Create MongoDB repository instance
-        self.user_content_repository = MongoDBUserContentRepository(
-            MongoDB.get_database()
-        )
+        self.user_content_repository = MongoDBUserCollectedContentRepository()
 
         # Initialize service-specific context (auto-initializes metrics processor)
         self.service_context = RejectionServiceContext()

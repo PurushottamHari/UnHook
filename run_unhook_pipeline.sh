@@ -12,7 +12,7 @@ echo "Starting Data Collector Service..."
 
 # Run moderation (content rejection)
 echo "Running Content Moderation (Rejection)..."
-./data_processing_service/.venv/bin/python -m data_processing_service.services.rejection.reject_content_service
+./data_collector_service/.venv/bin/python -m data_collector_service.services.rejection.reject_content_service
 
 # Run processing moderated content
 echo "Processing Moderated Content..."

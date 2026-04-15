@@ -42,3 +42,30 @@ class UserCollectedContentRepository(ABC):
         self, user_id: str
     ) -> List[UserCollectedContent]:
         pass
+
+    @abstractmethod
+    def get_unprocessed_content_for_user(
+        self, user_id: str
+    ) -> List[UserCollectedContent]:
+        """
+        Get a list of unprocessed collected content for a specific user.
+
+        Args:
+            user_id: The ID of the user.
+
+        Returns:
+            List[UserCollectedContent]: List of unprocessed content.
+        """
+        pass
+
+    @abstractmethod
+    def update_user_collected_content_batch(
+        self, updated_user_collected_content_list: List[UserCollectedContent]
+    ) -> None:
+        """
+        Batch update UserCollectedContent items.
+
+        Args:
+            updated_user_collected_content_list: The updated list.
+        """
+        pass
