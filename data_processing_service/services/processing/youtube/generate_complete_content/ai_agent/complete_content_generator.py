@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from data_processing_service.ai import BaseAIClient, ModelConfig, ModelProvider
+from commons.ai import BaseAIClient, ModelConfig, ModelProvider
 from data_processing_service.models.generated_content import (
     GeneratedContent,
     GeneratedContentStatus,
