@@ -32,3 +32,14 @@ class MessageProducer(ABC):
             command: The fully constructed Command model.
         """
         pass
+
+    @abstractmethod
+    async def send_commands(self, topic: str, commands: list[Command]) -> None:
+        """
+        Send multiple commands to a specific service's topic or queue in batch.
+
+        Args:
+            topic: The destination topic/queue for the commands.
+            commands: A list of fully constructed Command models.
+        """
+        pass

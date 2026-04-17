@@ -53,6 +53,24 @@ class RedisMessageProducer(MessageProducer):
         await self.redis_client.lpush(topic, message_json)
         print(f"📤 [Redis] Command sent to queue '{topic}': {command.action_name}")
 
+    async def send_commands(self, topic: str, commands: list[Command]) -> None:
+        """
+        Send multiple commands to a Redis list (queue) in one batch.
+
+        Args:
+            topic: The Redis list key to push the commands to
+            commands: A list of Command objects to send
+        """
+        if not commands:
+            return
+
+        message_jsons = [command.model_dump_json() for command in commands]
+        # LPUSH supports multiple values: LPUSH key value1 value2 ...
+        await self.redis_client.lpush(topic, *message_jsons)
+        print(
+            f"📤 [Redis] {len(commands)} commands batch sent to queue '{topic}': {[c.action_name for c in commands][:3]}..."
+        )
+
     async def close(self) -> None:
         """Close the Redis client connection."""
         await self.redis_client.close()
