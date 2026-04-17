@@ -2,24 +2,33 @@ import logging
 
 from user_service.models.user import User
 
-from ...repositories.user_collected_content_repository import (
+from data_collector_service.repositories.user_collected_content_repository import (
     UserCollectedContentRepository,
 )
-from ...service_context import DataCollectorServiceContext
-from ..base_static import BaseStaticCollector
+from data_collector_service.service_context import DataCollectorServiceContext
+from data_collector_service.services.collection.collectors.base_static import (
+    BaseStaticCollector,
+)
 from .adapters.youtube_to_user_content_adapter import YouTubeToUserContentAdapter
 from .tools.youtube_external_tool import YouTubeExternalTool
+
+from data_collector_service.infra.dependency_injection.injectable import injectable
+from injector import inject
 
 logger = logging.getLogger(__name__)
 
 
+@injectable()
 class YouTubeStaticCollector(BaseStaticCollector):
     """YouTube-specific implementation of static data collection."""
 
+    @inject
     def __init__(
         self,
         user_repository: UserCollectedContentRepository,
         service_context: DataCollectorServiceContext,
+        youtube_tool: YouTubeExternalTool,
+        adapter: YouTubeToUserContentAdapter,
     ):
         """
         Initialize the YouTube static collector.
@@ -28,9 +37,9 @@ class YouTubeStaticCollector(BaseStaticCollector):
             user_repository: Repository for managing user collected content
             service_context: Data collector service context for dependency injection
         """
-        self.youtube_tool = YouTubeExternalTool()
+        self.youtube_tool = youtube_tool
         self.user_repository = user_repository
-        self.adapter = YouTubeToUserContentAdapter()
+        self.adapter = adapter
         self.service_context = service_context
 
     def collect(self, user: User) -> None:

@@ -10,3 +10,11 @@ external:
 
 proxy:
   base_url: "api.zyte.com:8011"
+
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+
+messaging:
+  command_topic: "data_collector.commands"

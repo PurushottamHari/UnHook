@@ -1,15 +1,19 @@
 import uuid
 from typing import List
 
-from ....models.enums import ContentType
-from ....models.user_collected_content import (
+from data_collector_service.models.enums import ContentType
+from data_collector_service.models.user_collected_content import (
     ContentStatus,
     StatusDetail,
     UserCollectedContent,
 )
-from ..models.youtube_video_details import YouTubeVideoDetails
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
+    YouTubeVideoDetails,
+)
+from data_collector_service.infra.dependency_injection.injectable import injectable
 
 
+@injectable()
 class YouTubeToUserContentAdapter:
     """Adapter to convert YouTube video details to user collected content."""
 

@@ -1,15 +1,22 @@
 from user_service.models.user import User
 
-from ...repositories.user_collected_content_repository import (
+from data_collector_service.repositories.user_collected_content_repository import (
     UserCollectedContentRepository,
 )
-from ...service_context import DataCollectorServiceContext
-from ..base_discover import BaseDiscoverCollector
+from data_collector_service.service_context import DataCollectorServiceContext
+from data_collector_service.services.collection.collectors.base_discover import (
+    BaseDiscoverCollector,
+)
+
+from data_collector_service.infra.dependency_injection.injectable import injectable
+from injector import inject
 
 
+@injectable()
 class YouTubeDiscoverCollector(BaseDiscoverCollector):
     """YouTube-specific implementation of discover data collection."""
 
+    @inject
     def __init__(
         self,
         user_repository: UserCollectedContentRepository,

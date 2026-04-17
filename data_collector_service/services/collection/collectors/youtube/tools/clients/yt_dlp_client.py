@@ -12,16 +12,20 @@ import yt_dlp
 from yt_dlp.networking.impersonate import ImpersonateTarget
 
 from data_collector_service.config.config import Config
+from data_collector_service.infra.dependency_injection.injectable import injectable
+from injector import inject
 
 logger = logging.getLogger(__name__)
 
 
+@injectable()
 class YtDlpClient:
     """Client for interacting with YouTube using yt-dlp."""
 
-    def __init__(self):
+    @inject
+    def __init__(self, config: Config):
         # Initialize configuration
-        self.config = Config()
+        self.config = config
 
         # Base configuration for metadata extraction
         self.metadata_opts = {

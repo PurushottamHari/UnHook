@@ -10,6 +10,10 @@ from commons.service_context import BaseServiceContext
 from ..metrics_processor.rejection_metrics_processor import RejectionMetricsProcessor
 
 
+from data_collector_service.infra.dependency_injection.injectable import injectable
+
+
+@injectable()
 class RejectionServiceContext(BaseServiceContext):
     """
     Rejection service-specific context.

@@ -1,14 +1,26 @@
 #!/bin/bash
 
+# Default user ID if not provided, allowing it to be overridden via arguments
+USER_ID="607d95f0-47ef-444c-89d2-d05f257d1265"
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --user-id) USER_ID="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
 # Generate pipeline ID for metrics tracking
 PIPELINE_ID=$(uuidgen)
 export PIPELINE_ID
+export USER_ID
 
-echo "🚀 Running UnHook Pipeline (ID: $PIPELINE_ID)..."
+echo "🚀 Running UnHook Pipeline (ID: $PIPELINE_ID) for User (ID: $USER_ID)..."
 
 # Run data collector service
 echo "Starting Data Collector Service..."
-./data_collector_service/.venv/bin/python -m data_collector_service.service
+./data_collector_service/.venv/bin/python -m data_collector_service.service --user-id "$USER_ID"
 
 # Run moderation (content rejection)
 echo "Running Content Moderation (Rejection)..."

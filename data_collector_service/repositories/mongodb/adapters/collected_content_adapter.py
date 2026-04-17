@@ -5,7 +5,7 @@ Adapter for converting between internal models and MongoDB models for collected 
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
     YouTubeVideoDetails,
 )
 from data_collector_service.models.user_collected_content import (

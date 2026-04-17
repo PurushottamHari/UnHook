@@ -5,10 +5,10 @@ MongoDB implementation of the UserCollectedContentRepository interface.
 from typing import List
 from pymongo import UpdateOne
 
-from data_collector_service.collectors.youtube.adapters.youtube_to_user_content_adapter import (
+from data_collector_service.services.collection.collectors.youtube.adapters.youtube_to_user_content_adapter import (
     YouTubeToUserContentAdapter,
 )
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
     YouTubeVideoDetails,
 )
 from data_collector_service.models.user_collected_content import (
@@ -29,14 +29,16 @@ from data_collector_service.repositories.mongodb.models.collected_content_db_mod
 from data_collector_service.repositories.user_collected_content_repository import (
     UserCollectedContentRepository,
 )
+from injector import inject
 
 
 class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
     """MongoDB implementation of user collected content repository."""
 
-    def __init__(self):
+    @inject
+    def __init__(self, mongodb: MongoDB):
         self.settings = get_mongodb_settings()
-        self.collection = MongoDB.get_database()[self.settings.COLLECTION_NAME]
+        self.collection = mongodb.get_database()[self.settings.COLLECTION_NAME]
         # Create indexes
         self.collection.create_index([("user_id", 1), ("external_id", 1)], unique=True)
 

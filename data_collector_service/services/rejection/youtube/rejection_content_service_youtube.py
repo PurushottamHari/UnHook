@@ -6,7 +6,7 @@ import copy
 from datetime import datetime
 from typing import List, Tuple
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
     YouTubeVideoDetails,
 )
 from data_collector_service.models.enums import ContentType
@@ -20,12 +20,23 @@ from user_service.models.user import User
 from .ai_agent import ContentModerator
 from .ai_agent.adaptors.input_adaptor import InputAdaptor
 from .ai_agent.models import ModerationOutput
+from ..service_context import RejectionServiceContext
+
+from injector import inject
+
+from data_collector_service.infra.dependency_injection.injectable import injectable
 
 
+@injectable()
 class RejectionContentServiceYoutube:
     """Service for handling YouTube content rejection."""
 
-    def __init__(self, moderator_agent: ContentModerator, service_context=None):
+    @inject
+    def __init__(
+        self,
+        moderator_agent: ContentModerator,
+        service_context: RejectionServiceContext = None,
+    ):
         """
         Initialize the service.
 

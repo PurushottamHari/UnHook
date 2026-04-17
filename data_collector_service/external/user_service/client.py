@@ -6,10 +6,16 @@ from data_collector_service.config.config import Config
 from user_service.models.user import User
 
 
+from data_collector_service.infra.dependency_injection.injectable import injectable
+from injector import inject
+
+
+@injectable()
 class UserServiceClient:
     """Client for interacting with the user service."""
 
-    def __init__(self, config: Optional[Config] = None):
+    @inject
+    def __init__(self, config: Config):
         if config is None:
             config = Config()
         self.base_url = config.user_service_url

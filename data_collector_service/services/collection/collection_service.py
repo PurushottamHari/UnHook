@@ -1,44 +1,46 @@
 from datetime import datetime
-from typing import Optional
+from injector import inject
 
-from data_collector_service.models.user_collected_content import ContentType
-from user_service.models.enums import Weekday
 from user_service.models.user import User
+from user_service.models.enums import Weekday
+
+from data_collector_service.exceptions.user_exception import user_exception
+from data_collector_service.external.user_service.client import UserServiceClient
+from data_collector_service.repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
+from data_collector_service.service_context import DataCollectorServiceContext
 
 from .collectors.youtube.discover import YouTubeDiscoverCollector
 from .collectors.youtube.static import YouTubeStaticCollector
-from .exceptions.user_exception import user_exception
-from .external.user_service.client import UserServiceClient
-from .repositories.mongodb.config.database import MongoDB
-from .repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
-from .service_context import DataCollectorServiceContext
+
+from data_collector_service.infra.dependency_injection.injectable import injectable
 
 
-class DataCollectorService:
+@injectable()
+class CollectionService:
     """Service responsible for orchestrating data collection for all users."""
 
-    def __init__(self, user_service_client: UserServiceClient):
+    @inject
+    def __init__(
+        self,
+        user_service_client: UserServiceClient,
+        service_context: DataCollectorServiceContext,
+        youtube_discover_collector: YouTubeDiscoverCollector,
+        youtube_static_collector: YouTubeStaticCollector,
+    ):
         """
-        Initialize the data collector service.
+        Initialize the collection service.
 
         Args:
             user_service_client: Client for interacting with the user service
+            service_context: Context for maintaining service state and metrics
         """
         self.user_service_client = user_service_client
-        # Initialize MongoDB connection
-        MongoDB.connect_to_database()
-        # Create MongoDB repository instance
-        user_repository = MongoDBUserCollectedContentRepository()
+        self.service_context = service_context
 
-        self.service_context = DataCollectorServiceContext()
-        self.youtube_discover_collector = YouTubeDiscoverCollector(
-            user_repository, self.service_context
-        )
-        self.youtube_static_collector = YouTubeStaticCollector(
-            user_repository, self.service_context
-        )
+        self.youtube_discover_collector = youtube_discover_collector
+        self.youtube_static_collector = youtube_static_collector
 
     def _should_collect_discover(self, user: User) -> bool:
         """
@@ -88,13 +90,3 @@ class DataCollectorService:
                     success=False, error_message=str(e)
                 )
             raise
-
-
-if __name__ == "__main__":
-    print("🚀 Starting Data Collector Service...")
-
-    user_service_client = UserServiceClient()
-    data_collector_service = DataCollectorService(user_service_client)
-    data_collector_service.collect_for_user(
-        user_id="607d95f0-47ef-444c-89d2-d05f257d1265"
-    )

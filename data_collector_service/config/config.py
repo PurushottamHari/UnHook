@@ -117,6 +117,28 @@ class Config:
         """Get proxy base URL."""
         return self._config_data.get("proxy", {}).get("base_url", "api.zyte.com:8011")
 
+    @property
+    def redis_host(self) -> str:
+        """Get Redis host."""
+        return self._config_data.get("redis", {}).get("host", "localhost")
+
+    @property
+    def redis_port(self) -> int:
+        """Get Redis port."""
+        return self._config_data.get("redis", {}).get("port", 6379)
+
+    @property
+    def redis_db(self) -> int:
+        """Get Redis database index."""
+        return self._config_data.get("redis", {}).get("db", 0)
+
+    @property
+    def messaging_command_topic(self) -> str:
+        """Get the main command topic for this service."""
+        return self._config_data.get("messaging", {}).get(
+            "command_topic", "data_collector.commands"
+        )
+
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""
         keys = key.split(".")

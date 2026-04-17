@@ -3,13 +3,13 @@ import logging
 from datetime import datetime
 from typing import Dict, List
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
     YouTubeVideoDetails,
 )
-from data_collector_service.collectors.youtube.tools.adapters.subtitle_adapter import (
+from data_collector_service.services.collection.collectors.youtube.tools.adapters.subtitle_adapter import (
     SubtitleAdapter,
 )
-from data_collector_service.collectors.youtube.tools.exceptions.youtube_video_key_data_missing import (
+from data_collector_service.services.collection.collectors.youtube.tools.exceptions.youtube_video_key_data_missing import (
     youtube_video_key_data_missing,
 )
 

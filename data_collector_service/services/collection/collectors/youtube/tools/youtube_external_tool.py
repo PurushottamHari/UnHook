@@ -1,21 +1,26 @@
 from datetime import datetime
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
     YouTubeVideoDetails,
 )
-from data_collector_service.collectors.youtube.tools.adapters.youtube_video_adapter import (
+from data_collector_service.services.collection.collectors.youtube.tools.adapters.youtube_video_adapter import (
     YouTubeVideoAdapter,
 )
-from data_collector_service.collectors.youtube.tools.clients.yt_dlp_client import (
+from data_collector_service.services.collection.collectors.youtube.tools.clients.yt_dlp_client import (
     YtDlpClient,
 )
 
+from data_collector_service.infra.dependency_injection.injectable import injectable
+from injector import inject
 
+
+@injectable()
 class YouTubeExternalTool:
     """External tool for interacting with YouTube API."""
 
-    def __init__(self):
-        self.yt_dlp_client = YtDlpClient()
+    @inject
+    def __init__(self, yt_dlp_client: YtDlpClient):
+        self.yt_dlp_client = yt_dlp_client
 
     def find_latest_videos(
         self, channel_name: str, max: int, use_proxy: bool = True

@@ -2,7 +2,7 @@ from typing import Dict, Optional
 
 import langcodes
 
-from data_collector_service.collectors.youtube.models.subtitles import (
+from data_collector_service.services.collection.collectors.youtube.models.subtitles import (
     SubtitleData,
     SubtitleInfo,
     Subtitles,

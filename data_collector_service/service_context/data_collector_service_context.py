@@ -12,6 +12,10 @@ from ..metrics_processor.data_collector_metrics_processor import (
 )
 
 
+from data_collector_service.infra.dependency_injection.injectable import injectable
+
+
+@injectable()
 class DataCollectorServiceContext(BaseServiceContext):
     """
     Data collector service-specific context.

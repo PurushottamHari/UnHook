@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
+from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
     YouTubeVideoDetails,
 )
 from data_collector_service.repositories.mongodb.adapters.subtitle_adapter import (

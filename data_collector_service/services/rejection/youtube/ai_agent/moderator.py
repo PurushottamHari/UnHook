@@ -11,6 +11,10 @@ from commons.ai import BaseAIClient, ModelConfig, ModelProvider
 from .models import ContentItem, ModerationInput, ModerationOutput
 
 
+from data_collector_service.infra.dependency_injection.injectable import injectable
+
+
+@injectable()
 class ContentModerator(BaseAIClient[ModerationOutput]):
     """AI agent for content moderation."""
 

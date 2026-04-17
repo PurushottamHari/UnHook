@@ -11,7 +11,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from data_collector_service.collectors.youtube.tools.youtube_external_tool import (
+from data_collector_service.services.collection.collectors.youtube.tools.youtube_external_tool import (
     YouTubeExternalTool,
 )
 
