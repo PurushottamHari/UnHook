@@ -12,7 +12,7 @@ proxy:
   base_url: "api.zyte.com:8011"
 
 redis:
-  host: "localhost"
+  host: "redis.railway.internal"
   port: 6379
   db: 0
 

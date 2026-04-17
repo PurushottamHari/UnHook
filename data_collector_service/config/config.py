@@ -40,11 +40,13 @@ class Config:
         Raises:
             ValueError: If environment is not 'local' or 'production'
         """
-        environment = os.getenv("environment", "local").lower()
+        environment = os.getenv("environment").lower()
 
         if environment == "local":
+            print(f"[Config] Loading local config")
             return config_dir / "local_config.yaml"
         elif environment == "production":
+            print(f"[Config] Loading production config")
             return config_dir / "prod_config.yaml"
         else:
             raise ValueError(
