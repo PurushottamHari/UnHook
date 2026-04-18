@@ -5,13 +5,10 @@ Utility for cleaning subtitles.
 import json
 import re
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
-from data_processing_service.models.youtube.subtitle_data import (
-    SubtitleData,
-    SubtitleMap,
-)
+from data_collector_service.collectors.youtube.models.youtube_video_details import \
+    YouTubeVideoDetails
+from data_processing_service.models.youtube.subtitle_data import (SubtitleData,
+                                                                  SubtitleMap)
 
 
 class SubtitleUtils:

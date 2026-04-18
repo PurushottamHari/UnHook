@@ -1,9 +1,8 @@
 from typing import List
 
 from data_processing_service.models.generated_content import GeneratedContent
-from data_processing_service.services.processing.youtube.categorize_content.ai_agent.models.input import (
-    CategorizationDataInput,
-)
+from data_processing_service.services.processing.youtube.categorize_content.ai_agent.models.input import \
+    CategorizationDataInput
 
 
 class CategorizationInputAdaptor:

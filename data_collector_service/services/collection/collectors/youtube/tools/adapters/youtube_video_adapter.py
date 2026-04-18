@@ -3,15 +3,12 @@ import logging
 from datetime import datetime
 from typing import Dict, List
 
-from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
-from data_collector_service.services.collection.collectors.youtube.tools.adapters.subtitle_adapter import (
-    SubtitleAdapter,
-)
-from data_collector_service.services.collection.collectors.youtube.tools.exceptions.youtube_video_key_data_missing import (
-    youtube_video_key_data_missing,
-)
+from data_collector_service.models.youtube.youtube_video_details import (
+    YouTubeVideoDetails, YouTubeVideoStatus)
+from data_collector_service.services.collection.collectors.youtube.tools.adapters.subtitle_adapter import \
+    SubtitleAdapter
+from data_collector_service.services.collection.collectors.youtube.tools.exceptions.youtube_video_key_data_missing import \
+    youtube_video_key_data_missing
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +60,8 @@ class YouTubeVideoAdapter:
             release_date=release_date,
             views=video_data.get("view_count", 0),
             thumbnail=thumbnail_url,
+            status=YouTubeVideoStatus.COLLECTED,
+            status_details=None,
         )
 
     @staticmethod

@@ -13,16 +13,14 @@ import pytz
 from data_collector_service.models.user_collected_content import ContentStatus
 from newspaper_service.external.user_service import UserServiceClient
 from newspaper_service.repositories.mongodb.config.database import MongoDB
-from newspaper_service.repositories.mongodb.config.settings import get_mongodb_settings
-from newspaper_service.repositories.mongodb.generated_content_repository import (
-    MongoDBGeneratedContentRepository,
-)
-from newspaper_service.repositories.mongodb.newspaper_repository import (
-    MongoDBNewspaperRepository,
-)
-from newspaper_service.repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
+from newspaper_service.repositories.mongodb.config.settings import \
+    get_mongodb_settings
+from newspaper_service.repositories.mongodb.generated_content_repository import \
+    MongoDBGeneratedContentRepository
+from newspaper_service.repositories.mongodb.newspaper_repository import \
+    MongoDBNewspaperRepository
+from newspaper_service.repositories.mongodb.user_collected_content_repository import \
+    MongoDBUserCollectedContentRepository
 from user_service.models.enums import Weekday
 
 
@@ -205,9 +203,8 @@ def update_newspaper_considered_list(
 
         # Convert filtered considered items to database format
         from newspaper_service.models import ConsideredContent
-        from newspaper_service.repositories.mongodb.adapters.newspaper_adapter import (
-            NewspaperAdapter,
-        )
+        from newspaper_service.repositories.mongodb.adapters.newspaper_adapter import \
+            NewspaperAdapter
 
         filtered_considered_db_items = []
         for item in filtered_considered_items:
@@ -322,10 +319,10 @@ def update_considered_content_to_accepted(newspaper_id: str, considered_items: l
         current_timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC).timestamp()
 
         # Convert considered items to database format with ACCEPTED status
-        from newspaper_service.models import ConsideredContent, ConsideredContentStatus
-        from newspaper_service.repositories.mongodb.adapters.newspaper_adapter import (
-            NewspaperAdapter,
-        )
+        from newspaper_service.models import (ConsideredContent,
+                                              ConsideredContentStatus)
+        from newspaper_service.repositories.mongodb.adapters.newspaper_adapter import \
+            NewspaperAdapter
 
         accepted_considered_db_items = []
         for item in considered_items:

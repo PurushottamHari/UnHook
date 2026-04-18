@@ -1,14 +1,10 @@
 from typing import Dict, Optional
 
-from data_collector_service.services.collection.collectors.youtube.models.subtitles import (
-    SubtitleData,
-    SubtitleInfo,
-    Subtitles,
-)
+from data_collector_service.models.youtube.subtitles import (SubtitleData,
+                                                             SubtitleInfo,
+                                                             Subtitles)
 from data_collector_service.repositories.mongodb.models.subtitle_db_model import (
-    SubtitleDB,
-    SubtitleInfoDB,
-)
+    SubtitleDB, SubtitleInfoDB)
 
 
 class SubtitleDBAdapter:

@@ -1,19 +1,19 @@
 import logging
 
+from injector import inject
+
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
+from data_collector_service.service_context import DataCollectorServiceContext
+from data_collector_service.services.collection.collectors.base_static import \
+    BaseStaticCollector
 from user_service.models.user import User
 
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
-from data_collector_service.service_context import DataCollectorServiceContext
-from data_collector_service.services.collection.collectors.base_static import (
-    BaseStaticCollector,
-)
-from .adapters.youtube_to_user_content_adapter import YouTubeToUserContentAdapter
+from .adapters.youtube_to_user_content_adapter import \
+    YouTubeToUserContentAdapter
 from .tools.youtube_external_tool import YouTubeExternalTool
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
-from injector import inject
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +96,9 @@ class YouTubeStaticCollector(BaseStaticCollector):
             user_collected_content = self.adapter.convert_batch(
                 enriched_uncollected_videos, user_id
             )
-            self.user_repository.add_collected_videos(user_collected_content, user_id)
+            self.user_repository.upsert_user_collected_content_batch(
+                user_collected_content
+            )
 
             print(
                 f"Added {len(user_collected_content)} out of considered {len(uncollected_video_ids)} videos for channel: {channel_name}"

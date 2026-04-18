@@ -5,7 +5,8 @@ Abstract base class for user collected content repository.
 from abc import ABC, abstractmethod
 from typing import List
 
-from data_collector_service.models.user_collected_content import UserCollectedContent
+from data_collector_service.models.user_collected_content import \
+    UserCollectedContent
 
 
 class UserCollectedContentRepository(ABC):
@@ -24,16 +25,6 @@ class UserCollectedContentRepository(ABC):
 
         Returns:
             List[str]: List of uncollected video IDs
-        """
-        pass
-
-    @abstractmethod
-    def add_collected_videos(self, videos: List[dict]) -> None:
-        """
-        Add collected videos to the user's history.
-
-        Args:
-            videos: List of collected video information
         """
         pass
 
@@ -59,13 +50,14 @@ class UserCollectedContentRepository(ABC):
         pass
 
     @abstractmethod
-    def update_user_collected_content_batch(
-        self, updated_user_collected_content_list: List[UserCollectedContent]
+    def upsert_user_collected_content_batch(
+        self, user_collected_content_list: List[UserCollectedContent]
     ) -> None:
         """
-        Batch update UserCollectedContent items.
+        Batch upsert UserCollectedContent items.
+        Matches by user_id and external_id.
 
         Args:
-            updated_user_collected_content_list: The updated list.
+            user_collected_content_list: The list of content to upsert.
         """
         pass

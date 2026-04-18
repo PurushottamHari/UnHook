@@ -4,20 +4,12 @@ Newspaper adapter for converting between domain and database models.
 
 from datetime import datetime, timezone
 
-from ....models import (
-    ConsideredContent,
-    ConsideredContentStatus,
-    ConsideredContentStatusDetail,
-    Newspaper,
-    NewspaperStatus,
-    StatusDetail,
-)
-from ..models.newspaper_db_model import (
-    ConsideredContentDBModel,
-    ConsideredContentStatusDetailDBModel,
-    NewspaperDBModel,
-    StatusDetailDBModel,
-)
+from ....models import (ConsideredContent, ConsideredContentStatus,
+                        ConsideredContentStatusDetail, Newspaper,
+                        NewspaperStatus, StatusDetail)
+from ..models.newspaper_db_model import (ConsideredContentDBModel,
+                                         ConsideredContentStatusDetailDBModel,
+                                         NewspaperDBModel, StatusDetailDBModel)
 
 
 class NewspaperAdapter:

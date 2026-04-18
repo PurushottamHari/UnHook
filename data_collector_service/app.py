@@ -1,7 +1,7 @@
 import asyncio
-from data_collector_service.infra.dependency_injection.registration import (
-    create_injector,
-)
+
+from data_collector_service.infra.dependency_injection.registration import \
+    create_injector
 from data_collector_service.messaging.messaging_handler import MessagingHandler
 
 

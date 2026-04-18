@@ -1,4 +1,5 @@
 from typing import List, Tuple, Type
+
 from injector import Scope, singleton
 
 # Global registry to store classes decorated with @injectable

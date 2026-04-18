@@ -6,25 +6,21 @@ import copy
 from datetime import datetime
 from typing import List, Tuple
 
-from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
+from injector import inject
+
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 from data_collector_service.models.enums import ContentType
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    UserCollectedContent,
-)
+    ContentStatus, ContentSubStatus, UserCollectedContent)
+from data_collector_service.models.youtube.youtube_video_details import \
+    YouTubeVideoDetails
 from user_service.models.user import User
 
+from ..service_context import RejectionServiceContext
 from .ai_agent import ContentModerator
 from .ai_agent.adaptors.input_adaptor import InputAdaptor
 from .ai_agent.models import ModerationOutput
-from ..service_context import RejectionServiceContext
-
-from injector import inject
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
 
 
 @injectable()
@@ -131,11 +127,10 @@ class RejectionContentServiceYoutube:
                 updated_processed_content.set_status(
                     ContentStatus.PROCESSING, "Moderation passed."
                 )
-                updated_processed_content.sub_status = (
-                    ContentSubStatus.MODERATION_PASSED
-                )
                 updated_processed_content.set_sub_status(
-                    ContentSubStatus.MODERATION_PASSED, "first moderation passed"
+                    ContentSubStatus.MODERATION_PASSED,
+                    "first moderation passed",
+                    increment_version=False,
                 )
                 final_moderated_content_list.append(updated_processed_content)
         return final_moderated_content_list

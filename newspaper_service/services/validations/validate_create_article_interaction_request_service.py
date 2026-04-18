@@ -7,12 +7,9 @@ from datetime import datetime
 from typing import Dict, Optional, Tuple
 
 from ...models.generated_content_interaction import (
-    GeneratedContentInteraction,
-    InteractionType,
-)
-from ...repositories.generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
+    GeneratedContentInteraction, InteractionType)
+from ...repositories.generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
 
 
 class ValidateCreateArticleInteractionRequestService:

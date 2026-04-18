@@ -1,13 +1,12 @@
 from typing import Optional
 
 import httpx
+from injector import inject
 
 from data_collector_service.config.config import Config
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 from user_service.models.user import User
-
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
-from injector import inject
 
 
 @injectable()

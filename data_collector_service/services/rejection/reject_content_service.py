@@ -5,25 +5,23 @@ Service for handling content rejection.
 import asyncio
 from typing import List
 
-from data_collector_service.models.enums import ContentType
-from .youtube.ai_agent.moderator import (
-    ContentModerator,
-)
-
-from data_collector_service.external.user_service.client import UserServiceClient
-from data_collector_service.repositories.mongodb.config.database import MongoDB
-from data_collector_service.repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
-from .service_context import RejectionServiceContext
-from .youtube.rejection_content_service_youtube import RejectionContentServiceYoutube
-
 from injector import inject
 
-from data_collector_service.infra.dependency_injection.injectable import injectable
+from data_collector_service.external.user_service.client import \
+    UserServiceClient
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
+from data_collector_service.models.enums import ContentType
+from data_collector_service.repositories.mongodb.config.database import MongoDB
+from data_collector_service.repositories.mongodb.user_collected_content_repository import \
+    MongoDBUserCollectedContentRepository
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
+
+from .service_context import RejectionServiceContext
+from .youtube.ai_agent.moderator import ContentModerator
+from .youtube.rejection_content_service_youtube import \
+    RejectionContentServiceYoutube
 
 
 @injectable()
@@ -122,7 +120,7 @@ class RejectContentService:
                         )
 
             if len(rejected_content) != 0:
-                self.user_content_repository.update_user_collected_content_batch(
+                self.user_content_repository.upsert_user_collected_content_batch(
                     rejected_content
                 )
 

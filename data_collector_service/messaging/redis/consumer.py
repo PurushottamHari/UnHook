@@ -1,12 +1,15 @@
 import asyncio
 import json
+import time
 from typing import Awaitable, Callable, Dict, List
-from injector import inject
 
 import redis.asyncio as redis
-from commons.messaging import MessageConsumer, Command, Event
+from injector import inject
+
+from commons.messaging import Command, Event, MessageConsumer
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import injectable
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 
 
 @injectable()
@@ -67,6 +70,7 @@ class RedisMessageConsumer(MessageConsumer):
             tasks.append(self._listen_for_events())
         if self.command_handlers:
             tasks.append(self._listen_for_commands())
+            tasks.append(self._process_scheduled_commands())
 
         if not tasks:
             print("⚠️ [Redis] No handlers registered. Consumer exiting.")
@@ -139,4 +143,45 @@ class RedisMessageConsumer(MessageConsumer):
                             )
             except Exception as e:
                 print(f"❌ [Redis] Error listening for commands: {e}")
+                await asyncio.sleep(1)
+
+    async def _process_scheduled_commands(self) -> None:
+        """
+        Poll scheduled keys for all registered command topics.
+        Move due commands from Sorted Sets to their respective active Lists.
+        """
+        queues = list(self.command_handlers.keys())
+        if not queues:
+            return
+
+        print(f"🕒 [Redis] Monitoring scheduled commands for queues: {queues}")
+
+        while self._running:
+            try:
+                now = time.time()
+
+                for topic in queues:
+                    scheduled_key = f"scheduled:{topic}"
+
+                    # Get items with score <= now
+                    due_items = await self.redis_client.zrange(
+                        scheduled_key, min=0, max=now, byscore=True
+                    )
+
+                    if due_items:
+                        for message_json in due_items:
+                            # Use ZREM to ensure atomicity (only one consumer/scheduler moves the item)
+                            if await self.redis_client.zrem(
+                                scheduled_key, message_json
+                            ):
+                                # Move to active queue
+                                await self.redis_client.lpush(topic, message_json)
+                                print(
+                                    f"🚀 [Redis] Scheduled command moved to active queue '{topic}'"
+                                )
+
+                # Polling interval
+                await asyncio.sleep(1)
+            except Exception as e:
+                print(f"❌ [Redis] Error processing scheduled commands: {e}")
                 await asyncio.sleep(1)

@@ -10,17 +10,15 @@ from pydantic import BaseModel
 from data_processing_service.models.generated_content import GeneratedContent
 
 from ...models.generated_content_interaction import GeneratedContentInteraction
-from ...models.generated_content_interaction_list import (
-    GeneratedContentInteractionListResponse,
-)
+from ...models.generated_content_interaction_list import \
+    GeneratedContentInteractionListResponse
 from ...models.generated_content_response import GeneratedContentResponse
-from ...services.generated_content_interaction_service import ContentInteractionService
+from ...services.generated_content_interaction_service import \
+    ContentInteractionService
 from ...services.generated_content_service import GeneratedContentService
-from ..dependencies import (
-    get_generated_content_interaction_service,
-    get_generated_content_service,
-    get_user_id_from_header,
-)
+from ..dependencies import (get_generated_content_interaction_service,
+                            get_generated_content_service,
+                            get_user_id_from_header)
 
 router = APIRouter(tags=["content-interactions"])
 

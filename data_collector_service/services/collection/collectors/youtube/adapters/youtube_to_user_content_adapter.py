@@ -1,16 +1,13 @@
 import uuid
 from typing import List
 
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 from data_collector_service.models.enums import ContentType
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    StatusDetail,
-    UserCollectedContent,
-)
-from data_collector_service.services.collection.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
-from data_collector_service.infra.dependency_injection.injectable import injectable
+    ContentStatus, StatusDetail, UserCollectedContent)
+from data_collector_service.models.youtube.youtube_video_details import \
+    YouTubeVideoDetails
 
 
 @injectable()
@@ -18,13 +15,17 @@ class YouTubeToUserContentAdapter:
     """Adapter to convert YouTube video details to user collected content."""
 
     @staticmethod
-    def convert(video: YouTubeVideoDetails, user_id: str) -> UserCollectedContent:
+    def convert(
+        video: YouTubeVideoDetails, user_id: str, include_data: bool = True
+    ) -> UserCollectedContent:
         """
         Convert a YouTube video to user collected content.
 
         Args:
             video: YouTubeVideoDetails object
             user_id: ID of the user
+            include_data: Whether to include the raw video data in the response.
+                          Defaults to True for backward compatibility.
 
         Returns:
             UserCollectedContent object
@@ -50,12 +51,12 @@ class YouTubeToUserContentAdapter:
                     reason="Video collected from YouTube",
                 )
             ],
-            data={ContentType.YOUTUBE_VIDEO: video},
+            data={ContentType.YOUTUBE_VIDEO: video} if include_data else {},
         )
 
     @staticmethod
     def convert_batch(
-        videos: List[YouTubeVideoDetails], user_id: str
+        videos: List[YouTubeVideoDetails], user_id: str, include_data: bool = True
     ) -> List[UserCollectedContent]:
         """
         Convert a list of YouTube videos to user collected content.
@@ -63,8 +64,12 @@ class YouTubeToUserContentAdapter:
         Args:
             videos: List of YouTubeVideoDetails objects
             user_id: ID of the user
+            include_data: Whether to include the raw video data in the response.
 
         Returns:
             List of UserCollectedContent objects
         """
-        return [YouTubeToUserContentAdapter.convert(video, user_id) for video in videos]
+        return [
+            YouTubeToUserContentAdapter.convert(video, user_id, include_data)
+            for video in videos
+        ]

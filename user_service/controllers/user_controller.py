@@ -4,8 +4,9 @@ User controller handling HTTP requests for user operations.
 
 from typing import Any, Dict
 
-from ..api.dependencies import get_user_service
 from fastapi import APIRouter, Depends, HTTPException
+
+from ..api.dependencies import get_user_service
 from ..models.user import User
 from ..services.user_service import UserService
 

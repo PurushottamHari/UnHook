@@ -9,11 +9,12 @@ from pprint import pprint
 from typing import Dict, List, Optional
 
 import yt_dlp
+from injector import inject
 from yt_dlp.networking.impersonate import ImpersonateTarget
 
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import injectable
-from injector import inject
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 
 logger = logging.getLogger(__name__)
 

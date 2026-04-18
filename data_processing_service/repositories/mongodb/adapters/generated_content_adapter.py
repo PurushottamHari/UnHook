@@ -7,18 +7,11 @@ from typing import Any, Dict, Optional
 
 from data_collector_service.models import ContentType
 from data_processing_service.models.generated_content import (
-    CategoryInfo,
-    GeneratedContent,
-    GeneratedContentStatus,
-    GeneratedData,
-    StatusDetail,
-)
+    CategoryInfo, GeneratedContent, GeneratedContentStatus, GeneratedData,
+    StatusDetail)
 from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
-    CategoryInfoDBModel,
-    GeneratedContentDBModel,
-    GeneratedDataDBModel,
-    StatusDetailDBModel,
-)
+    CategoryInfoDBModel, GeneratedContentDBModel, GeneratedDataDBModel,
+    StatusDetailDBModel)
 from user_service.models import CategoryName, ShelfLife
 
 

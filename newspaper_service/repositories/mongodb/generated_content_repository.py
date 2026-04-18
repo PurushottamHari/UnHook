@@ -5,18 +5,13 @@ MongoDB implementation of generated content repository.
 from typing import List
 
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-)
-from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
-    GeneratedContentAdapter,
-)
-from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
-    GeneratedContentDBModel,
-)
-from newspaper_service.repositories.generated_content_repository import (
-    GeneratedContentRepository,
-)
+    GeneratedContent, GeneratedContentStatus)
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
+    GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
+    GeneratedContentDBModel
+from newspaper_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
 from newspaper_service.repositories.mongodb.config.database import MongoDB
 from user_service.models.enums import CategoryName
 

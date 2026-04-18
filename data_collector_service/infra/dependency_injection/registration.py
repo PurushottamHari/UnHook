@@ -1,25 +1,33 @@
 import importlib
 import pkgutil
 from typing import List, Tuple, Type
-from injector import Binder, singleton, Scope, Module, provider, Injector
+
+from injector import Binder, Injector, Module, Scope, provider, singleton
+
 from data_collector_service.config.config import Config
-from data_collector_service.repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
 from data_collector_service.repositories.mongodb.config.database import MongoDB
+from data_collector_service.repositories.mongodb.user_collected_content_repository import \
+    MongoDBUserCollectedContentRepository
+from data_collector_service.repositories.mongodb.youtube_collected_content_repository import \
+    MongoDBYouTubeCollectedContentRepository
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
+from data_collector_service.repositories.youtube_collected_content_repository import \
+    YouTubeCollectedContentRepository
 
 from .injectable import _REGISTRY
 
 
 class DataCollectorModule(Module):
     def configure(self, binder: Binder) -> None:
-        # Repositories (Manual bindings for abstract interfaces)
         binder.bind(
             UserCollectedContentRepository,
             to=MongoDBUserCollectedContentRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            YouTubeCollectedContentRepository,
+            to=MongoDBYouTubeCollectedContentRepository,
             scope=singleton,
         )
 

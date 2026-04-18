@@ -1,19 +1,20 @@
-from commons.messaging import Command
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
-from data_collector_service.services.collection.start_user_collection_service import (
-    StartUserCollectionService,
-)
-from data_collector_service.services.rejection.reject_content_service import (
-    RejectContentService,
-)
 from injector import inject
 from pydantic import ValidationError
 
+from commons.messaging import Command
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 from data_collector_service.messaging.models.commands import (
-    StartUserCollectionCommand,
-    CollectYouTubeChannelForUserCommand,
-)
+    CollectYouTubeChannelForUserCommand, EnrichYouTubeVideoForUserCommand,
+    StartUserCollectionCommand)
+from data_collector_service.services.collection.start_user_collection_service import \
+    StartUserCollectionService
+from data_collector_service.services.collection.youtube.collect_youtube_content_service import \
+    CollectYouTubeContentService
+from data_collector_service.services.collection.youtube.enrich_youtube_video_content_service import \
+    EnrichYouTubeVideoContentService
+from data_collector_service.services.rejection.reject_content_service import \
+    RejectContentService
 
 
 @injectable()
@@ -24,10 +25,14 @@ class CommandRouter:
     def __init__(
         self,
         start_user_collection_service: StartUserCollectionService,
+        collect_youtube_content_service: CollectYouTubeContentService,
         reject_content_service: RejectContentService,
+        enrich_youtube_video_content_service: EnrichYouTubeVideoContentService,
     ):
         self.start_user_collection_service = start_user_collection_service
+        self.collect_youtube_content_service = collect_youtube_content_service
         self.reject_content_service = reject_content_service
+        self.enrich_youtube_video_content_service = enrich_youtube_video_content_service
 
     async def handle(self, command: Command):
         """Dispatches the command based on action_name and enforces strict typing."""
@@ -53,8 +58,28 @@ class CommandRouter:
                     )
                     print(f"🎬 [CommandRouter] Processing youtube channel collection")
 
+                    await self.collect_youtube_content_service.collect_channel(
+                        user_id=channel_command.payload.user_id,
+                        channel_id=channel_command.payload.channel_id,
+                        max_videos=channel_command.payload.max_videos,
+                    )
                     print(
-                        f"⚠️ [CommandRouter] Channel {channel_command.payload.channel_id} collection logic to be implemented"
+                        f"✅ [CommandRouter] Channel {channel_command.payload.channel_id} collection completed"
+                    )
+
+                case "enrich_youtube_video_for_user":
+                    # Cast and validate the granular video command
+                    video_command = EnrichYouTubeVideoForUserCommand.model_validate(
+                        command.model_dump()
+                    )
+                    await self.enrich_youtube_video_content_service.enrich_video(
+                        video_id=video_command.payload.video_id,
+                        user_id=video_command.payload.user_id,
+                        user_collected_content_id=video_command.payload.user_collected_content_id,
+                    )
+
+                    print(
+                        f"✅ [CommandRouter] Video {video_command.payload.video_id} enrichment completed"
                     )
 
                 case "reject_content":

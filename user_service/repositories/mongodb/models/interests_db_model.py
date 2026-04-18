@@ -4,8 +4,9 @@ MongoDB database models for user interests.
 
 from typing import List, Optional
 
-from ....models.enums import CategoryName, OutputType, Weekday
 from pydantic import BaseModel, Field
+
+from ....models.enums import CategoryName, OutputType, Weekday
 
 
 class InterestDBModel(BaseModel):

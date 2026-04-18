@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Any, Dict
 
 from commons.messaging.models import Command, Event
@@ -41,5 +42,19 @@ class MessageProducer(ABC):
         Args:
             topic: The destination topic/queue for the commands.
             commands: A list of fully constructed Command models.
+        """
+        pass
+
+    @abstractmethod
+    async def schedule_command(
+        self, topic: str, command: Command, schedule_at: datetime
+    ) -> None:
+        """
+        Schedule a command to be executed at a specific time.
+
+        Args:
+            topic: The destination topic/queue for the command.
+            command: The fully constructed Command model.
+            schedule_at: The time at which the command should be sent to the active queue.
         """
         pass

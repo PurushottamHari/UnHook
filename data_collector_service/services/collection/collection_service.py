@@ -1,20 +1,20 @@
 from datetime import datetime
+
 from injector import inject
 
-from user_service.models.user import User
-from user_service.models.enums import Weekday
-
 from data_collector_service.exceptions.user_exception import user_exception
-from data_collector_service.external.user_service.client import UserServiceClient
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
+from data_collector_service.external.user_service.client import \
+    UserServiceClient
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
 from data_collector_service.service_context import DataCollectorServiceContext
+from user_service.models.enums import Weekday
+from user_service.models.user import User
 
 from .collectors.youtube.discover import YouTubeDiscoverCollector
 from .collectors.youtube.static import YouTubeStaticCollector
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
 
 
 @injectable()

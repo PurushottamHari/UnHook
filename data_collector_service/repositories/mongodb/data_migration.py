@@ -11,24 +11,18 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from data_collector_service.services.collection.collectors.youtube.tools.youtube_external_tool import (
-    YouTubeExternalTool,
-)
-
 # Now import the modules after setting up the path
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
-    CollectedContentAdapter,
-)
-from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import (
-    YouTubeVideoDetailsAdapter,
-)
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
+    CollectedContentAdapter
+from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import \
+    YouTubeVideoDetailsAdapter
 from data_collector_service.repositories.mongodb.config.database import MongoDB
-from data_collector_service.repositories.mongodb.config.settings import (
-    get_mongodb_settings,
-)
-from data_collector_service.repositories.mongodb.models.youtube_video_details import (
-    YouTubeVideoDetailsDB,
-)
+from data_collector_service.repositories.mongodb.config.settings import \
+    get_mongodb_settings
+from data_collector_service.repositories.mongodb.models.youtube_collected_content_db_model import \
+    YouTubeCollectedContentDBModel
+from data_collector_service.services.collection.collectors.youtube.tools.youtube_external_tool import \
+    YouTubeExternalTool
 
 
 def migrate_timestamps():
@@ -183,7 +177,8 @@ def migrate_data_structure():
                     "likes_count": safe_int(video_data.get("likes_count")),
                 }
 
-                video_details = YouTubeVideoDetailsDB(**video_details_payload)
+                video_details_payload["id"] = video_data.get("video_id")
+                video_details = YouTubeCollectedContentDBModel(**video_details_payload)
 
                 new_data_field = {
                     "YOUTUBE_VIDEO": video_details.dict(
@@ -432,7 +427,7 @@ def migrate_enrich_subtitles():
         try:
             video_data_db_dict = doc["data"]["YOUTUBE_VIDEO"]
 
-            video_details_db = YouTubeVideoDetailsDB(**video_data_db_dict)
+            video_details_db = YouTubeCollectedContentDBModel(**video_data_db_dict)
             video_details_entity = YouTubeVideoDetailsAdapter.from_db_model(
                 video_details_db
             )

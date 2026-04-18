@@ -1,20 +1,22 @@
 import asyncio
 from typing import List
+
 from injector import inject
 
 from data_collector_service.config.config import Config
-from data_collector_service.messaging.redis.producer import RedisMessageProducer
-from data_collector_service.messaging.redis.consumer import RedisMessageConsumer
-from data_collector_service.messaging.routers.command_router import CommandRouter
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
+from data_collector_service.messaging.redis.consumer import \
+    RedisMessageConsumer
+from data_collector_service.messaging.redis.producer import \
+    RedisMessageProducer
+from data_collector_service.messaging.routers.command_router import \
+    CommandRouter
 from data_collector_service.messaging.routers.event_router import EventRouter
-from data_collector_service.services.collection.collection_service import (
-    CollectionService,
-)
-from data_collector_service.services.rejection.reject_content_service import (
-    RejectContentService,
-)
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
+from data_collector_service.services.collection.collection_service import \
+    CollectionService
+from data_collector_service.services.rejection.reject_content_service import \
+    RejectContentService
 
 
 @injectable()

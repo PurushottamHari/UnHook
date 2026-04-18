@@ -1,16 +1,18 @@
 import logging
-from injector import inject
 from datetime import datetime
 
-from user_service.models.enums import Weekday
-from data_collector_service.external.user_service.client import UserServiceClient
-from data_collector_service.messaging.redis.producer import RedisMessageProducer
-from data_collector_service.messaging.models.commands import (
-    CollectYouTubeChannelForUserCommand,
-    CollectYouTubeChannelForUserPayload,
-)
+from injector import inject
+
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import injectable
+from data_collector_service.external.user_service.client import \
+    UserServiceClient
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
+from data_collector_service.messaging.models.commands import (
+    CollectYouTubeChannelForUserCommand, CollectYouTubeChannelForUserPayload)
+from data_collector_service.messaging.redis.producer import \
+    RedisMessageProducer
+from user_service.models.enums import Weekday
 
 logger = logging.getLogger(__name__)
 

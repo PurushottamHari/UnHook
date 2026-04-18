@@ -2,11 +2,9 @@ from typing import Dict, Optional
 
 import langcodes
 
-from data_collector_service.services.collection.collectors.youtube.models.subtitles import (
-    SubtitleData,
-    SubtitleInfo,
-    Subtitles,
-)
+from data_collector_service.models.youtube.subtitles import (SubtitleData,
+                                                             SubtitleInfo,
+                                                             Subtitles)
 
 
 class SubtitleAdapter:

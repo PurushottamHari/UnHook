@@ -9,20 +9,15 @@ from uuid import uuid4
 from pymongo.errors import DuplicateKeyError
 
 from ...models.generated_content_interaction import (
-    GeneratedContentInteraction,
-    InteractionType,
-)
-from ..generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
-from .adapters.generated_content_interaction_adapter import (
-    GeneratedContentInteractionAdapter,
-)
+    GeneratedContentInteraction, InteractionType)
+from ..generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
+from .adapters.generated_content_interaction_adapter import \
+    GeneratedContentInteractionAdapter
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
-from .models.generated_content_interaction_db_model import (
-    GeneratedContentInteractionDBModel,
-)
+from .models.generated_content_interaction_db_model import \
+    GeneratedContentInteractionDBModel
 
 
 class MongoDBGeneratedContentInteractionRepository(

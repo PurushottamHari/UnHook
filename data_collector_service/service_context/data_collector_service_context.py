@@ -6,13 +6,11 @@ import os
 from typing import Optional
 
 from commons.service_context import BaseServiceContext
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 
-from ..metrics_processor.data_collector_metrics_processor import (
-    DataCollectorMetricsProcessor,
-)
-
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
+from ..metrics_processor.data_collector_metrics_processor import \
+    DataCollectorMetricsProcessor
 
 
 @injectable()

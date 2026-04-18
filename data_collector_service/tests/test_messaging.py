@@ -1,16 +1,16 @@
 import asyncio
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 from commons.messaging import Command, Event
-from data_collector_service.messaging.redis.producer import RedisMessageProducer
-from data_collector_service.messaging.redis.consumer import RedisMessageConsumer
 from data_collector_service.messaging.handlers import register_handlers
-from data_collector_service.services.collection.collection_service import (
-    CollectionService,
-)
-from data_collector_service.services.rejection.reject_content_service import (
-    RejectContentService,
-)
+from data_collector_service.messaging.redis.consumer import \
+    RedisMessageConsumer
+from data_collector_service.messaging.redis.producer import \
+    RedisMessageProducer
+from data_collector_service.services.collection.collection_service import \
+    CollectionService
+from data_collector_service.services.rejection.reject_content_service import \
+    RejectContentService
 
 
 async def run_messaging_test():

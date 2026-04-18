@@ -1,6 +1,8 @@
 from typing import Any, Dict
-from commons.messaging import Command
+
 from pydantic import BaseModel, Field
+
+from commons.messaging import Command
 
 
 class StartUserCollectionPayload(BaseModel):
@@ -30,4 +32,18 @@ class CollectYouTubeChannelForUserCommand(Command):
     target_service: str = "data_collector_service"
     payload: CollectYouTubeChannelForUserPayload = Field(
         ..., description="Details for channel collection"
+    )
+
+
+class EnrichYouTubeVideoForUserPayload(BaseModel):
+    user_id: str
+    video_id: str
+    user_collected_content_id: str
+
+
+class EnrichYouTubeVideoForUserCommand(Command):
+    action_name: str = "enrich_youtube_video_for_user"
+    target_service: str = "data_collector_service"
+    payload: EnrichYouTubeVideoForUserPayload = Field(
+        ..., description="Details for video enrichment"
     )

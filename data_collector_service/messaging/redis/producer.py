@@ -1,8 +1,12 @@
+from datetime import datetime
+
 import redis.asyncio as redis
 from injector import inject
-from commons.messaging import MessageProducer, Command, Event
+
+from commons.messaging import Command, Event, MessageProducer
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import injectable
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
 
 
 @injectable()
@@ -69,6 +73,28 @@ class RedisMessageProducer(MessageProducer):
         await self.redis_client.lpush(topic, *message_jsons)
         print(
             f"📤 [Redis] {len(commands)} commands batch sent to queue '{topic}': {[c.action_name for c in commands][:3]}..."
+        )
+
+    async def schedule_command(
+        self, topic: str, command: Command, schedule_at: datetime
+    ) -> None:
+        """
+        Schedule a command to be added to a Redis queue at a specific time.
+
+        Args:
+            topic: The destination queue topic.
+            command: The Command object to schedule.
+            schedule_at: The datetime at which to send the command.
+        """
+        message_json = command.model_dump_json()
+        timestamp = schedule_at.timestamp()
+
+        # We use a Sorted Set for scheduling: ZADD scheduled:{topic} {timestamp} {payload}
+        scheduled_key = f"scheduled:{topic}"
+        await self.redis_client.zadd(scheduled_key, {message_json: timestamp})
+
+        print(
+            f"⏰ [Redis] Command '{command.action_name}' scheduled for {schedule_at} on topic '{topic}'"
         )
 
     async def close(self) -> None:

@@ -6,30 +6,27 @@ from fastapi import Depends, Header, HTTPException
 from typing_extensions import Annotated
 
 from ..external.user_service import UserServiceClient
-from ..repositories.generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
-from ..repositories.generated_content_repository import GeneratedContentRepository
-from ..repositories.mongodb.generated_content_interaction_repository import (
-    MongoDBGeneratedContentInteractionRepository,
-)
-from ..repositories.mongodb.generated_content_repository import (
-    MongoDBGeneratedContentRepository,
-)
-from ..repositories.mongodb.newspaper_repository import MongoDBNewspaperRepository
-from ..repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
+from ..repositories.generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
+from ..repositories.generated_content_repository import \
+    GeneratedContentRepository
+from ..repositories.mongodb.generated_content_interaction_repository import \
+    MongoDBGeneratedContentInteractionRepository
+from ..repositories.mongodb.generated_content_repository import \
+    MongoDBGeneratedContentRepository
+from ..repositories.mongodb.newspaper_repository import \
+    MongoDBNewspaperRepository
+from ..repositories.mongodb.user_collected_content_repository import \
+    MongoDBUserCollectedContentRepository
 from ..repositories.newspaper_repository import NewspaperRepository
-from ..repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
-from ..services.generated_content_interaction_service import ContentInteractionService
+from ..repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
+from ..services.generated_content_interaction_service import \
+    ContentInteractionService
 from ..services.generated_content_service import GeneratedContentService
 from ..services.newspaper_service import NewspaperService
-from ..services.validations.validate_create_article_interaction_request_service import (
-    ValidateCreateArticleInteractionRequestService,
-)
+from ..services.validations.validate_create_article_interaction_request_service import \
+    ValidateCreateArticleInteractionRequestService
 
 
 async def get_generated_content_interaction_repository() -> (

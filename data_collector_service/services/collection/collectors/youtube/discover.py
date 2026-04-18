@@ -1,15 +1,13 @@
-from user_service.models.user import User
-
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
-from data_collector_service.service_context import DataCollectorServiceContext
-from data_collector_service.services.collection.collectors.base_discover import (
-    BaseDiscoverCollector,
-)
-
-from data_collector_service.infra.dependency_injection.injectable import injectable
 from injector import inject
+
+from data_collector_service.infra.dependency_injection.injectable import \
+    injectable
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
+from data_collector_service.service_context import DataCollectorServiceContext
+from data_collector_service.services.collection.collectors.base_discover import \
+    BaseDiscoverCollector
+from user_service.models.user import User
 
 
 @injectable()
