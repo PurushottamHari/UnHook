@@ -164,7 +164,7 @@ class RedisMessageConsumer(MessageConsumer):
 
                     # Get items with score <= now
                     due_items = await self.redis_client.zrange(
-                        scheduled_key, min=0, max=now, byscore=True
+                        scheduled_key, 0, now, byscore=True
                     )
 
                     if due_items:

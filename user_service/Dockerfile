@@ -36,10 +36,12 @@ COPY commons/ ./commons/
 WORKDIR /app/user_service
 RUN uv pip install --system hatchling
 
-# GITHUB_TOKEN is injected by Railway as a build-time variable
-ARG GITHUB_TOKEN
-RUN if [ -z "${GITHUB_TOKEN}" ]; then echo "ERROR: GITHUB_TOKEN build arg is required" && exit 1; fi && \
-    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
+# GITHUB_TOKEN is provided as a secret during build if needed
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
+    if [ -n "${GITHUB_TOKEN}" ]; then \
+        git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi && \
     uv pip install --system .
 
 # Create a non-root user

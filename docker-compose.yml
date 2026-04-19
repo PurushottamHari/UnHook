@@ -1,0 +1,88 @@
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - unhook-backend
+
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=purushottam
+      - MONGO_INITDB_ROOT_PASSWORD=test123
+    ports:
+      - "27017:27017"
+    networks:
+      - unhook-backend
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_URL=mongodb://purushottam:test123@mongodb:27017/
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    networks:
+      - unhook-backend
+    depends_on:
+      - mongodb
+
+  user_service:
+    build:
+      context: .
+      dockerfile: user_service/Dockerfile
+      secrets:
+        - GITHUB_TOKEN
+    image: user_service
+    container_name: user_service
+    env_file:
+      - .env
+    environment:
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+    ports:
+      - "8000:8000"
+    networks:
+      - unhook-backend
+    depends_on:
+      - mongodb
+
+  data_collector_service:
+    build:
+      context: .
+      dockerfile: data_collector_service/Dockerfile
+      secrets:
+        - GITHUB_TOKEN
+    image: data_collector_service
+    container_name: data_collector_service
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - USER_SERVICE_BASE_URL=http://user_service
+      - USER_SERVICE_PORT=8000
+    stdin_open: true
+    tty: true
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+      - mongodb
+      - user_service
+
+networks:
+  unhook-backend:
+    name: unhook-backend
+    driver: bridge
+
+secrets:
+  GITHUB_TOKEN:
+    environment: GITHUB_TOKEN

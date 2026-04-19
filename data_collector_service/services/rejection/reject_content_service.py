@@ -61,7 +61,7 @@ class RejectContentService:
         """
         try:
             # Get user object from user service
-            user = self.user_service_client.get_user(user_id)
+            user = await self.user_service_client.get_user(user_id)
 
             # Get unprocessed content for the user
             unprocessed_content_list = (

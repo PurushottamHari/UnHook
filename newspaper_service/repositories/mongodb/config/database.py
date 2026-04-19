@@ -23,7 +23,7 @@ class MongoDB:
                 raise RuntimeError(
                     "MongoDB connection string not configured. Set MONGODB_URI or MONGODB_URL."
                 )
-            client = MongoClient(connection_uri)
+            client = MongoClient(connection_uri, uuidRepresentation="standard")
             cls._db = client[settings.DATABASE_NAME]
         return cls._instance
 

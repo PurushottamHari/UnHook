@@ -17,7 +17,7 @@ class MongoDB:
     def connect_to_database(cls):
         """Create database connection."""
         settings = get_mongodb_settings()
-        cls.client = MongoClient(settings.MONGODB_URI)
+        cls.client = MongoClient(settings.MONGODB_URI, uuidRepresentation="standard")
         cls.db = cls.client[settings.DATABASE_NAME]
 
     @classmethod

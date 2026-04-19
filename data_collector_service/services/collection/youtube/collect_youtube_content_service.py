@@ -75,7 +75,7 @@ class CollectYouTubeContentService:
         )
 
         # Ensure user exists before proceeding
-        user = self.user_service_client.get_user(user_id)
+        user = await self.user_service_client.get_user(user_id)
         if not user:
             logger.error(
                 f"❌ [CollectYouTubeContentService] User {user_id} not found. Aborting collection for channel {channel_id}."
@@ -153,6 +153,7 @@ class CollectYouTubeContentService:
                 user_id=user_id,
                 video_id=user_content.external_id,
                 user_collected_content_id=user_content.id,
+                channel_name=channel_id,
             )
             command = EnrichYouTubeVideoForUserCommand(payload=payload)
             commands_to_send.append(command)

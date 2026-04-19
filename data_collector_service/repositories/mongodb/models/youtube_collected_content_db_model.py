@@ -23,7 +23,7 @@ class YouTubeCollectedContentDBModel(BaseModel):
     channel_id: Optional[str] = None
     channel_name: str
     views: int
-    description: str
+    description: Optional[str] = None
     thumbnail: str
     status: str
     status_details: List[YouTubeVideoStatusDetailDB]
@@ -35,7 +35,7 @@ class YouTubeCollectedContentDBModel(BaseModel):
     duration_in_seconds: Optional[int] = None
     comments_count: Optional[int] = None
     likes_count: Optional[int] = None
-    subtitles: Optional[SubtitleDB] = (None,)
+    subtitles: Optional[SubtitleDB] = None
     version: int = Field(default=1)
 
     class Config:

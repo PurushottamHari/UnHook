@@ -3,8 +3,7 @@ import logging
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging.aggregated_schedule.service import \
-    AggregatedScheduleService
+from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
@@ -53,7 +52,11 @@ class EnrichYouTubeVideoContentService:
         self.config = config
 
     async def enrich_video(
-        self, video_id: str, user_id: str, user_collected_content_id: str
+        self,
+        video_id: str,
+        user_id: str,
+        user_collected_content_id: str,
+        channel_name: str,
     ) -> None:
         """
         Enrich a YouTube video's metadata and update its status.
@@ -67,7 +70,7 @@ class EnrichYouTubeVideoContentService:
         )
 
         # Ensure user exists before proceeding
-        user = self.user_service_client.get_user(user_id)
+        user = await self.user_service_client.get_user(user_id)
         if not user:
             logger.error(
                 f"❌ [EnrichYouTubeVideoContentService] User {user_id} not found. Aborting enrichment for video {video_id}."
@@ -112,19 +115,10 @@ class EnrichYouTubeVideoContentService:
             logger.error(error_msg)
             raise ValueError(error_msg)
 
-        # Schedule aggregated rejection command
-        # This will batch rejections for the same user and channel and fire after 10 minutes
-        channel_id = enriched_video.channel_id
-
-        if not channel_id:
-            error_msg = f"❌ Channel ID is missing for video {video_id}. Aggregation cannot proceed."
-            logger.error(error_msg)
-            raise ValueError(error_msg)
-
-        keys = [user_id, channel_id]
+        keys = [user_id, channel_name]
 
         # Use the command's action name as the schedule name for consistency
-        schedule_name = ProcessYoutubeChannelRejectionAggregationCommand.action_name
+        schedule_name = ProcessYoutubeChannelRejectionAggregationCommand.ACTION_NAME
 
         schedule_data = await self.aggregated_schedule_service.get_active_schedule(
             schedule_name, keys
@@ -144,7 +138,7 @@ class EnrichYouTubeVideoContentService:
             business_command = ProcessYoutubeChannelRejectionAggregationCommand(
                 payload=ProcessYoutubeChannelRejectionAggregationPayload(
                     user_id=user_id,
-                    channel_id=channel_id,
+                    channel_name=channel_name,
                     user_collected_content_ids=[user_collected_content_id],
                 )
             )

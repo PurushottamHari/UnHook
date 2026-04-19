@@ -42,7 +42,7 @@ class CommandRouter(BaseCommandRouter):
         """Dispatches the command based on action_name and enforces strict typing."""
         try:
             match command.action_name:
-                case "start_user_collection":
+                case StartUserCollectionCommand.ACTION_NAME:
                     # Cast and validate the specific command model
                     start_command = StartUserCollectionCommand.model_validate(
                         command.model_dump()
@@ -53,7 +53,7 @@ class CommandRouter(BaseCommandRouter):
                     )
                     print(f"✅ [CommandRouter] {start_command.action_name} completed")
 
-                case "collect_youtube_channel_for_user":
+                case CollectYouTubeChannelForUserCommand.ACTION_NAME:
                     # Cast and validate the granular channel command
                     channel_command = (
                         CollectYouTubeChannelForUserCommand.model_validate(
@@ -71,15 +71,19 @@ class CommandRouter(BaseCommandRouter):
                         f"✅ [CommandRouter] Channel {channel_command.payload.channel_id} collection completed"
                     )
 
-                case "enrich_youtube_video_for_user":
+                case EnrichYouTubeVideoForUserCommand.ACTION_NAME:
                     # Cast and validate the granular video command
                     video_command = EnrichYouTubeVideoForUserCommand.model_validate(
                         command.model_dump()
                     )
+
+                    print(f"🎬 [CommandRouter] Processing youtube video enrichment")
+
                     await self.enrich_youtube_video_content_service.enrich_video(
                         video_id=video_command.payload.video_id,
                         user_id=video_command.payload.user_id,
                         user_collected_content_id=video_command.payload.user_collected_content_id,
+                        channel_name=video_command.payload.channel_name,
                     )
 
                     print(

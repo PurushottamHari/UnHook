@@ -137,9 +137,7 @@ class Config:
     @property
     def messaging_command_topic(self) -> str:
         """Get the main command topic for this service."""
-        return self._config_data.get("messaging", {}).get(
-            "command_topic", "data_collector.commands"
-        )
+        return f"{self.service_name}.commands"
 
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""

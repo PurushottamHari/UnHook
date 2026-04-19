@@ -1,11 +1,11 @@
 service:
-  service_name: "data-collector-service"
+  service_name: "data_collector_service"
   service_port: 8001
 
 external:
   user_service:
-    base_url: "https://unhook-production-0e0c.up.railway.app"
-    port: 443
+    base_url: "http://user_service"
+    port: 8000
     timeout: 120.0 # 2 minutes timeout
 
 proxy:
@@ -15,6 +15,3 @@ redis:
   host: "redis"
   port: 6379
   db: 0
-
-messaging:
-  command_topic: "data_collector.commands"

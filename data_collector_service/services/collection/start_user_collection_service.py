@@ -52,7 +52,7 @@ class StartUserCollectionService:
             user_id: The unique identifier of the user
         """
         try:
-            user = self.user_service_client.get_user(user_id)
+            user = await self.user_service_client.get_user(user_id)
             if not user:
                 logger.error(f"User {user_id} not found.")
                 return

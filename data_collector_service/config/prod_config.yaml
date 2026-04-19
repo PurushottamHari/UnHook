@@ -1,5 +1,5 @@
 service:
-  service_name: "data-collector-service"
+  service_name: "data_collector_service"
   service_port: 443
 
 external:
@@ -16,5 +16,3 @@ redis:
   port: 6379
   db: 0
 
-messaging:
-  command_topic: "data_collector.commands"

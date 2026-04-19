@@ -84,10 +84,6 @@ class YtDlpClient:
         # Set up proxy URL
         zyte_proxy_url = f"http://{zyte_api_key}:@{proxy_base_url}"
 
-        # Set proxy environment variables
-        os.environ["HTTP_PROXY"] = zyte_proxy_url
-        os.environ["HTTPS_PROXY"] = zyte_proxy_url
-
         # Add proxy-specific yt-dlp options
         opts.update(
             {
