@@ -2,10 +2,16 @@ import logging
 
 from injector import inject
 
+from commons.messaging.aggregated_schedule.service import \
+    AggregatedScheduleService
+from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
 from data_collector_service.infra.dependency_injection.injectable import \
     injectable
+from data_collector_service.messaging.models.aggregated_schedule_commands import (
+    ProcessYoutubeChannelRejectionAggregationCommand,
+    ProcessYoutubeChannelRejectionAggregationPayload)
 from data_collector_service.messaging.redis.producer import \
     RedisMessageProducer
 from data_collector_service.models.youtube.youtube_video_details import \
@@ -29,6 +35,8 @@ class EnrichYouTubeVideoContentService:
         youtube_tool: YouTubeExternalTool,
         message_producer: RedisMessageProducer,
         user_service_client: UserServiceClient,
+        aggregated_schedule_service: AggregatedScheduleService,
+        config: Config,
     ):
         """
         Initialize the enrichment service.
@@ -42,6 +50,8 @@ class EnrichYouTubeVideoContentService:
         self.youtube_tool = youtube_tool
         self.message_producer = message_producer
         self.user_service_client = user_service_client
+        self.aggregated_schedule_service = aggregated_schedule_service
+        self.config = config
 
     async def enrich_video(
         self, video_id: str, user_id: str, user_collected_content_id: str
@@ -74,21 +84,18 @@ class EnrichYouTubeVideoContentService:
 
         # Only proceed to fetch more data if status is collected
         # If status is enriched or subtitles_stored skip this step
-        # Any other status error out
         if video.status == YouTubeVideoStatus.COLLECTED:
             # Fetch data and enrich using YouTubeExternalTool
-            # The tool expects a list of YouTubeVideoDetails
             enriched_videos = self.youtube_tool.enrich_video_data_with_details([video])
             if not enriched_videos:
                 logger.warning(f"⚠️ No enrichment data found for video {video_id}")
+                # Todo: Puru this needs to be a retry or a dead letter queue scenario
                 return
             enriched_video = enriched_videos[0]
-            # update the youtube video details now with the enriched data to enriched
             enriched_video.set_status(
                 YouTubeVideoStatus.ENRICHED, "Video metadata enriched via external tool"
             )
             enriched_video.version += 1
-            # upsert to repository if something done
             self.youtube_repository.upsert_videos([enriched_video])
             logger.info(f"✅ Video {video_id} enriched and updated in repository")
 
@@ -99,17 +106,57 @@ class EnrichYouTubeVideoContentService:
             logger.info(
                 f"⏭️ Video {video_id} already has status '{video.status}'. Skipping enrichment."
             )
+            enriched_video = video
 
         else:
             error_msg = f"❌ Unexpected status '{video.status}' for video {video_id}. Expected '{YouTubeVideoStatus.COLLECTED}'"
             logger.error(error_msg)
             raise ValueError(error_msg)
 
-        # keep a section to generate a message for the next step (ill define it later)....keep the publisher injection ready though
-        # TODO: Implement next step command generation (e.g., subtitle extraction)
-        # payload = SomeNextStepPayload(video_id=video_id, user_id=user_id)
-        # command = SomeNextStepCommand(payload=payload)
-        # await self.message_producer.send_commands(topic, [command])
+        # Schedule aggregated rejection command
+        # This will batch rejections for the same user and channel and fire after 10 minutes
+        channel_id = enriched_video.channel_id
+
+        if not channel_id:
+            error_msg = f"❌ Channel ID is missing for video {video_id}. Aggregation cannot proceed."
+            logger.error(error_msg)
+            raise ValueError(error_msg)
+
+        keys = [user_id, channel_id]
+
+        # Use the command's action name as the schedule name for consistency
+        schedule_name = ProcessYoutubeChannelRejectionAggregationCommand.action_name
+
+        schedule_data = await self.aggregated_schedule_service.get_active_schedule(
+            schedule_name, keys
+        )
+
+        if schedule_data:
+            # Cast to the command directly and update it
+            command = ProcessYoutubeChannelRejectionAggregationCommand.model_validate(
+                schedule_data.payload
+            )
+            command.payload.user_collected_content_ids.append(user_collected_content_id)
+            await self.aggregated_schedule_service.update_scheduled_command(
+                schedule_data.id, command
+            )
+        else:
+            # Create the initial business command
+            business_command = ProcessYoutubeChannelRejectionAggregationCommand(
+                payload=ProcessYoutubeChannelRejectionAggregationPayload(
+                    user_id=user_id,
+                    channel_id=channel_id,
+                    user_collected_content_ids=[user_collected_content_id],
+                )
+            )
+
+            # Create new schedule using the specialized model
+            await self.aggregated_schedule_service.create_schedule(
+                keys=keys,
+                command=business_command,
+                delay_minutes=10,
+                topic=self.config.messaging_command_topic,
+            )
 
         logger.info(
             f"🚀 Video {video_id} enrichment workflow complete. Ready for next phase."

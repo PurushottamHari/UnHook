@@ -4,8 +4,14 @@ from typing import List, Tuple, Type
 
 from injector import Binder, Injector, Module, Scope, provider, singleton
 
+from commons.messaging.aggregated_schedule.repository import \
+    AggregatedScheduleRepository
+from commons.messaging.aggregated_schedule.service import \
+    AggregatedScheduleService
 from data_collector_service.config.config import Config
 from data_collector_service.repositories.mongodb.config.database import MongoDB
+from data_collector_service.repositories.mongodb.mongodb_aggregated_schedule_repository import \
+    MongoDBAggregatedScheduleRepository
 from data_collector_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
 from data_collector_service.repositories.mongodb.youtube_collected_content_repository import \
@@ -28,6 +34,16 @@ class DataCollectorModule(Module):
         binder.bind(
             YouTubeCollectedContentRepository,
             to=MongoDBYouTubeCollectedContentRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            AggregatedScheduleRepository,
+            to=MongoDBAggregatedScheduleRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            AggregatedScheduleService,
+            to=AggregatedScheduleService,
             scope=singleton,
         )
 
