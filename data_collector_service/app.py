@@ -1,16 +1,16 @@
 import asyncio
 
+from commons.messaging import BaseMessagingHandler
 from data_collector_service.infra.dependency_injection.registration import \
     create_injector
-from data_collector_service.messaging.messaging_handler import MessagingHandler
 
 
 async def main():
     # Initialize the DI container
     injector = create_injector()
 
-    # Get the MessagingHandler from the injector
-    messaging_handler = injector.get(MessagingHandler)
+    # Get the BaseMessagingHandler from the injector
+    messaging_handler = injector.get(BaseMessagingHandler)
 
     try:
         # Start the messaging orchestrator

@@ -2,7 +2,9 @@ from injector import inject
 from pydantic import ValidationError
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import Command
+from commons.messaging import BaseCommandRouter, Command
+from commons.messaging.aggregated_schedule.service import \
+    AggregatedScheduleService
 from data_collector_service.messaging.models.aggregated_schedule_commands import \
     ProcessYoutubeChannelRejectionAggregationCommand
 from data_collector_service.messaging.models.commands import (
@@ -19,7 +21,7 @@ from data_collector_service.services.rejection.reject_content_service import \
 
 
 @injectable()
-class CommandRouter:
+class CommandRouter(BaseCommandRouter):
     """Routes incoming commands to the appropriate service logic."""
 
     @inject
@@ -29,13 +31,15 @@ class CommandRouter:
         collect_youtube_content_service: CollectYouTubeContentService,
         reject_content_service: RejectContentService,
         enrich_youtube_video_content_service: EnrichYouTubeVideoContentService,
+        aggregated_schedule_service: AggregatedScheduleService,
     ):
+        super().__init__(aggregated_schedule_service)
         self.start_user_collection_service = start_user_collection_service
         self.collect_youtube_content_service = collect_youtube_content_service
         self.reject_content_service = reject_content_service
         self.enrich_youtube_video_content_service = enrich_youtube_video_content_service
 
-    async def handle(self, command: Command):
+    async def handle_domain_command(self, command: Command):
         """Dispatches the command based on action_name and enforces strict typing."""
         try:
             match command.action_name:
@@ -82,23 +86,6 @@ class CommandRouter:
                     print(
                         f"✅ [CommandRouter] Video {video_command.payload.video_id} enrichment completed"
                     )
-
-                # case "process_youtube_channel_rejection_aggregation":
-                #     # Cast and validate the granular video command
-                #     process_youtube_channel_rejection_aggregation_command = (
-                #         ProcessYoutubeChannelRejectionAggregationCommand.model_validate(
-                #             command.model_dump()
-                #         )
-                #     )
-                #     await self.enrich_youtube_video_content_service.enrich_video(
-                #         video_id=process_youtube_channel_rejection_aggregation_command.payload.video_id,
-                #         user_id=process_youtube_channel_rejection_aggregation_command.payload.user_id,
-                #         user_collected_content_id=process_youtube_channel_rejection_aggregation_command.payload.user_collected_content_id,
-                #     )
-
-                #     print(
-                #         f"✅ [CommandRouter] Video {process_youtube_channel_rejection_aggregation_command.payload.video_id} enrichment completed"
-                #     )
 
                 case "reject_content":
                     print(f"🎬 [CommandRouter] Starting reject_content command")

@@ -1,18 +1,18 @@
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import Event
+from commons.messaging import BaseEventRouter, Event
 
 
 @injectable()
-class EventRouter:
+class EventRouter(BaseEventRouter):
     """Routes incoming events to the appropriate service logic."""
 
     @inject
     def __init__(self):
         pass
 
-    async def handle(self, event: Event):
+    async def handle_domain_event(self, event: Event):
         """Dispatches the event based on event_type."""
         match event.event_type:
             # case "user_created":

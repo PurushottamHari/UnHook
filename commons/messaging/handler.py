@@ -1,35 +1,37 @@
-from abc import ABC, abstractmethod
-from typing import List
+from injector import inject
 
+from .aggregated_schedule.service import AggregatedScheduleService
+from .config import BaseMessagingConfig
 from .consumer import MessageConsumer
 from .producer import MessageProducer
 from .router import BaseCommandRouter, BaseEventRouter
 
 
-class BaseMessagingHandler(ABC):
+class BaseMessagingHandler:
     """
-    Abstract base class for orchestrating the messaging lifecycle.
+    Concrete engine for orchestrating the messaging lifecycle.
     Manages registration of routers and start/stop operations.
     """
 
+    @inject
     def __init__(
         self,
         consumer: MessageConsumer,
         producer: MessageProducer,
         command_router: BaseCommandRouter,
         event_router: BaseEventRouter,
-        service_name: str,
+        config: BaseMessagingConfig,
     ):
         self.consumer = consumer
         self.producer = producer
         self.command_router = command_router
         self.event_router = event_router
-        self.service_name = service_name
+        self.config = config
 
     def _register_handlers(self):
         """Setup routers and register them with the consumer."""
         # 1. Register Command Router
-        command_topic = f"{self.service_name}.commands"
+        command_topic = f"{self.config.service_name}.commands"
         self.consumer.register_command_handler(
             command_topic, self.command_router.handle
         )
@@ -38,7 +40,7 @@ class BaseMessagingHandler(ABC):
         )
 
         # 2. Register Event Router for each specified topic
-        event_topics = self.get_event_topics()
+        event_topics = self.config.event_topics
         for topic in event_topics:
             self.consumer.register_event_handler(topic, self.event_router.handle)
 
@@ -47,19 +49,14 @@ class BaseMessagingHandler(ABC):
                 f"🛠️ [BaseMessagingHandler] Event router registered for {len(event_topics)} topics: {event_topics}"
             )
 
-    @abstractmethod
-    def get_event_topics(self) -> List[str]:
-        """Must be implemented by subclasses to specify event topics to subscribe to."""
-        pass
-
     async def start(self):
         """Start the message consumer and handle lifecycle."""
         self._register_handlers()
-        print(f"🚀 Starting {self.service_name} messaging consumer...")
+        print(f"🚀 Starting {self.config.service_name} messaging consumer...")
         await self.consumer.start()
 
     async def stop(self):
         """Gracefully shutdown the producer and consumer."""
-        print(f"🛑 Stopping {self.service_name} messaging components...")
+        print(f"🛑 Stopping {self.config.service_name} messaging components...")
         await self.consumer.stop()
         await self.producer.close()

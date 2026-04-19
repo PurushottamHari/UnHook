@@ -6,11 +6,23 @@ from injector import Binder, Injector, Module, Scope, provider, singleton
 
 from commons.infra.dependency_injection.registration import \
     discover_and_register_injectables
+from commons.messaging import (BaseCommandRouter, BaseEventRouter,
+                               BaseMessagingConfig, MessageConsumer,
+                               MessageProducer)
 from commons.messaging.aggregated_schedule.repository import \
     AggregatedScheduleRepository
 from commons.messaging.aggregated_schedule.service import \
     AggregatedScheduleService
 from data_collector_service.config.config import Config
+from data_collector_service.messaging.config.messaging_config import \
+    MessagingConfig
+from data_collector_service.messaging.redis.consumer import \
+    RedisMessageConsumer
+from data_collector_service.messaging.redis.producer import \
+    RedisMessageProducer
+from data_collector_service.messaging.routers.command_router import \
+    CommandRouter
+from data_collector_service.messaging.routers.event_router import EventRouter
 from data_collector_service.repositories.mongodb.config.database import MongoDB
 from data_collector_service.repositories.mongodb.mongodb_aggregated_schedule_repository import \
     MongoDBAggregatedScheduleRepository
@@ -41,6 +53,13 @@ class DataCollectorModule(Module):
             to=MongoDBAggregatedScheduleRepository,
             scope=singleton,
         )
+
+        # Messaging Bindings
+        binder.bind(BaseMessagingConfig, to=MessagingConfig, scope=singleton)
+        binder.bind(MessageConsumer, to=RedisMessageConsumer, scope=singleton)
+        binder.bind(MessageProducer, to=RedisMessageProducer, scope=singleton)
+        binder.bind(BaseCommandRouter, to=CommandRouter, scope=singleton)
+        binder.bind(BaseEventRouter, to=EventRouter, scope=singleton)
 
         # Automatically discover and bind all classes decorated with @injectable
         discover_and_register_injectables(binder, "commons")

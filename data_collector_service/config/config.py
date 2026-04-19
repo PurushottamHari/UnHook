@@ -65,7 +65,7 @@ class Config:
     def service_name(self) -> str:
         """Get service name."""
         return self._config_data.get("service", {}).get(
-            "service_name", "data-collector-service"
+            "service_name", "data_collector_service"
         )
 
     @property

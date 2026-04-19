@@ -1,3 +1,4 @@
+from commons.messaging.config import BaseMessagingConfig
 from commons.messaging.consumer import MessageConsumer
 from commons.messaging.handler import BaseMessagingHandler
 from commons.messaging.models import BaseMessage, Command, Event
@@ -13,4 +14,5 @@ __all__ = [
     "BaseCommandRouter",
     "BaseEventRouter",
     "BaseMessagingHandler",
+    "BaseMessagingConfig",
 ]
