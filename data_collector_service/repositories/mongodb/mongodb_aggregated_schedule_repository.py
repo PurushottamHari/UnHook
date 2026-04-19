@@ -62,7 +62,30 @@ class MongoDBAggregatedScheduleRepository(AggregatedScheduleRepository):
         return schedule
 
     async def update_schedule(self, schedule: AggregatedSchedule) -> None:
+        # Use the version as it was before the domain logic incremented it for the query filter
+        # Wait, if the domain logic incremented it, then we should use version - 1 as the filter.
+        # Actually, it's cleaner if the service passes the version it read, but since we are inside the model,
+        # we can just assume the current version in the object is the NEW one.
+
+        new_version = schedule.version
+        old_version = new_version - 1
+
         db_model = AggregatedScheduleAdapter.to_db_model(schedule)
         doc = db_model.model_dump(by_alias=True)
 
-        self.collection.replace_one({"_id": schedule.id}, doc)
+        # Use optimistic locking: filter by ID and the version we read (before increment)
+        result = self.collection.replace_one(
+            {"_id": schedule.id, "version": old_version}, doc
+        )
+
+        if result.matched_count == 0:
+            # Restore version on failure so the caller knows it didn't advance
+            schedule.version = old_version
+            raise ValueError(
+                f"❌ Optimistic locking failed for AggregatedSchedule {schedule.id}: "
+                f"Version mismatch (expected {old_version}) or document deleted."
+            )
+
+        print(
+            f"✅ [MongoDB] Updated AggregatedSchedule {schedule.id} to version {schedule.version}"
+        )

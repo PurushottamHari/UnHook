@@ -8,8 +8,7 @@ from typing import List, Tuple
 
 from injector import inject
 
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.enums import ContentType
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, UserCollectedContent)

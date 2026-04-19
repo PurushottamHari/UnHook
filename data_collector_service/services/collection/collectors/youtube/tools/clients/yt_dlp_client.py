@@ -12,9 +12,8 @@ import yt_dlp
 from injector import inject
 from yt_dlp.networking.impersonate import ImpersonateTarget
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 
 logger = logging.getLogger(__name__)
 

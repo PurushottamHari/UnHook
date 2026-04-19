@@ -7,8 +7,7 @@ import os
 from typing import List
 
 from commons.ai import BaseAIClient, ModelConfig, ModelProvider
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
+from commons.infra.dependency_injection.injectable import injectable
 
 from .models import ContentItem, ModerationInput, ModerationOutput
 

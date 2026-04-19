@@ -3,10 +3,9 @@ from datetime import datetime
 import redis.asyncio as redis
 from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import Command, Event, MessageProducer
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 
 
 @injectable()

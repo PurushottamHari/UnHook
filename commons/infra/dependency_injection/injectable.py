@@ -19,3 +19,8 @@ def injectable(scope: Scope = singleton):
         return cls
 
     return decorator
+
+
+def get_registered_injectables() -> List[Tuple[Type, Scope]]:
+    """Returns the list of all registered injectable classes."""
+    return _REGISTRY

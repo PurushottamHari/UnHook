@@ -2,11 +2,10 @@ from datetime import datetime
 
 from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.exceptions.user_exception import user_exception
 from data_collector_service.external.user_service.client import \
     UserServiceClient
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 from data_collector_service.repositories.user_collected_content_repository import \
     UserCollectedContentRepository
 from data_collector_service.service_context import DataCollectorServiceContext

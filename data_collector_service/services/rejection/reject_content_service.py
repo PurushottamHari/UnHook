@@ -7,10 +7,9 @@ from typing import List
 
 from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.external.user_service.client import \
     UserServiceClient
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 from data_collector_service.models.enums import ContentType
 from data_collector_service.repositories.mongodb.config.database import MongoDB
 from data_collector_service.repositories.mongodb.user_collected_content_repository import \

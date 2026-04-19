@@ -2,13 +2,12 @@ import logging
 
 from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging.aggregated_schedule.service import \
     AggregatedScheduleService
 from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 from data_collector_service.messaging.models.aggregated_schedule_commands import (
     ProcessYoutubeChannelRejectionAggregationCommand,
     ProcessYoutubeChannelRejectionAggregationPayload)

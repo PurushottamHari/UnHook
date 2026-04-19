@@ -2,8 +2,7 @@ from datetime import datetime
 
 from injector import inject
 
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.youtube.youtube_video_details import \
     YouTubeVideoDetails
 from data_collector_service.services.collection.collectors.youtube.tools.adapters.youtube_video_adapter import \

@@ -1,8 +1,7 @@
 from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import Event
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 
 
 @injectable()

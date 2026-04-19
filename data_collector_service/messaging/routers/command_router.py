@@ -1,9 +1,10 @@
 from injector import inject
 from pydantic import ValidationError
 
+from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import Command
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
+from data_collector_service.messaging.models.aggregated_schedule_commands import \
+    ProcessYoutubeChannelRejectionAggregationCommand
 from data_collector_service.messaging.models.commands import (
     CollectYouTubeChannelForUserCommand, EnrichYouTubeVideoForUserCommand,
     StartUserCollectionCommand)
@@ -81,6 +82,23 @@ class CommandRouter:
                     print(
                         f"✅ [CommandRouter] Video {video_command.payload.video_id} enrichment completed"
                     )
+
+                # case "process_youtube_channel_rejection_aggregation":
+                #     # Cast and validate the granular video command
+                #     process_youtube_channel_rejection_aggregation_command = (
+                #         ProcessYoutubeChannelRejectionAggregationCommand.model_validate(
+                #             command.model_dump()
+                #         )
+                #     )
+                #     await self.enrich_youtube_video_content_service.enrich_video(
+                #         video_id=process_youtube_channel_rejection_aggregation_command.payload.video_id,
+                #         user_id=process_youtube_channel_rejection_aggregation_command.payload.user_id,
+                #         user_collected_content_id=process_youtube_channel_rejection_aggregation_command.payload.user_collected_content_id,
+                #     )
+
+                #     print(
+                #         f"✅ [CommandRouter] Video {process_youtube_channel_rejection_aggregation_command.payload.video_id} enrichment completed"
+                #     )
 
                 case "reject_content":
                     print(f"🎬 [CommandRouter] Starting reject_content command")

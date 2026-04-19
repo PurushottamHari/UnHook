@@ -3,9 +3,8 @@ from typing import List
 
 from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.config.config import Config
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
 from data_collector_service.messaging.redis.consumer import \
     RedisMessageConsumer
 from data_collector_service.messaging.redis.producer import \

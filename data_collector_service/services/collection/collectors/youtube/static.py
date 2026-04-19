@@ -2,8 +2,7 @@ import logging
 
 from injector import inject
 
-from data_collector_service.infra.dependency_injection.injectable import \
-    injectable
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.repositories.user_collected_content_repository import \
     UserCollectedContentRepository
 from data_collector_service.service_context import DataCollectorServiceContext

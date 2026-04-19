@@ -2,6 +2,9 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import Command, MessageProducer
 
 from .models import (AggregatedSchedule, AggregatedScheduleStatus,
@@ -12,9 +15,11 @@ from .repository import AggregatedScheduleRepository
 logger = logging.getLogger(__name__)
 
 
+@injectable()
 class AggregatedScheduleService:
     """Service for orchestrating aggregated scheduled commands."""
 
+    @inject
     def __init__(
         self, repository: AggregatedScheduleRepository, producer: MessageProducer
     ):
@@ -78,9 +83,56 @@ class AggregatedScheduleService:
             logger.error(f"❌ Cannot update schedule {schedule_id}: Not found.")
             return
 
-        schedule.payload = command.model_dump()
-        schedule.updated_at = datetime.utcnow()
-        await self.repository.update_schedule(schedule)
+        # Create a deep copy and apply updates explicitly
+        updated_schedule = schedule.model_copy(deep=True)
+        updated_schedule.payload = command.model_dump()
+        updated_schedule.version += 1
+        updated_schedule.updated_at = datetime.utcnow()
+
+        await self.repository.update_schedule(updated_schedule)
         logger.info(
-            f"📝 Updated business command for schedule: {schedule.name} | {schedule.id}"
+            f"📝 Updated business command for schedule: {updated_schedule.name} | {updated_schedule.id} (v{updated_schedule.version})"
         )
+
+    async def execute_schedule(self, schedule_id: str) -> None:
+        """
+        Execute an aggregated schedule:
+        1. Mark as processing
+        2. Publish the underlying business command
+        3. Mark as completed
+        """
+        schedule = await self.repository.get_by_id(schedule_id)
+        if not schedule:
+            logger.error(f"❌ Cannot execute schedule {schedule_id}: Not found.")
+            return
+
+        if schedule.status != AggregatedScheduleStatus.INITIALIZED:
+            logger.warning(
+                f"⚠️ Schedule {schedule_id} is already in state {schedule.status}. Skipping."
+            )
+            return
+
+        try:
+            # 1. Mark as processing
+            processing_schedule = schedule.model_copy(deep=True)
+            processing_schedule.status = AggregatedScheduleStatus.PROCESSING
+            processing_schedule.version += 1
+            processing_schedule.updated_at = datetime.utcnow()
+            await self.repository.update_schedule(processing_schedule)
+
+            # 2. Reconstruct and fire the original business command
+            original_command = Command.model_validate(processing_schedule.payload)
+            topic = f"{original_command.target_service}.commands"
+
+            logger.info(
+                f"Executing business command '{original_command.action_name}' for schedule {processing_schedule.id} on topic '{topic}'"
+            )
+            await self.producer.send_command(topic, original_command)
+
+            logger.info(
+                f"✅ Completed aggregated schedule: {processing_schedule.name} | {processing_schedule.id} (v{processing_schedule.version})"
+            )
+
+        except Exception as e:
+            logger.error(f"❌ Failed to execute schedule {schedule_id}: {e}")
+            raise
