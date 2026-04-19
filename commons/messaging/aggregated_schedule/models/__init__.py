@@ -1,9 +1,11 @@
 from .models import (AggregatedSchedule, AggregatedScheduleStatus,
-                     AggregatedStatusDetail, RunAggregatedSchedulePayload)
+                     AggregatedStatusDetail, RunAggregatedScheduleCommand,
+                     RunAggregatedSchedulePayload)
 
 __all__ = [
     "AggregatedSchedule",
     "AggregatedScheduleStatus",
     "AggregatedStatusDetail",
     "RunAggregatedSchedulePayload",
+    "RunAggregatedScheduleCommand",
 ]

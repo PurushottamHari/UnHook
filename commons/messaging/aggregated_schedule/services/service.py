@@ -5,7 +5,8 @@ from typing import Any, Callable, Dict, List
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import Command, MessageProducer
+from commons.messaging.models import Command
+from commons.messaging.producer import MessageProducer
 
 from ..models import (AggregatedSchedule, AggregatedScheduleStatus,
                       RunAggregatedScheduleCommand,

@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
-from commons.messaging import Command
+from commons.messaging.models import Command
 
 
 class AggregatedScheduleStatus(str, Enum):

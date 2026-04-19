@@ -1,6 +1,5 @@
 from injector import inject
 
-from .aggregated_schedule.service import AggregatedScheduleService
 from .config import BaseMessagingConfig
 from .consumer import MessageConsumer
 from .producer import MessageProducer
