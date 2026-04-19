@@ -9,10 +9,8 @@ from commons.infra.dependency_injection.registration import \
 from commons.messaging import (BaseCommandRouter, BaseEventRouter,
                                BaseMessagingConfig, MessageConsumer,
                                MessageProducer)
-from commons.messaging.aggregated_schedule.repository import \
-    AggregatedScheduleRepository
-from commons.messaging.aggregated_schedule.service import \
-    AggregatedScheduleService
+from commons.messaging.aggregated_schedule import (
+    AggregatedScheduleRepository, AggregatedScheduleService)
 from data_collector_service.config.config import Config
 from data_collector_service.messaging.config.messaging_config import \
     MessagingConfig

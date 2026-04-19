@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional
 
-from .models import AggregatedSchedule, AggregatedScheduleStatus
+from ..models import AggregatedSchedule, AggregatedScheduleStatus
 
 
 class AggregatedScheduleRepository(ABC):

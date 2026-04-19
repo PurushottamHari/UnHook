@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
-from commons.messaging.aggregated_schedule.models import \
-    RunAggregatedSchedulePayload
-from commons.messaging.aggregated_schedule.service import \
-    AggregatedScheduleService
+from commons.messaging.aggregated_schedule import (
+    AggregatedScheduleService, RunAggregatedSchedulePayload)
 from commons.messaging.models import Command, Event
 
 

@@ -3,8 +3,7 @@ from pydantic import ValidationError
 
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseCommandRouter, Command
-from commons.messaging.aggregated_schedule.service import \
-    AggregatedScheduleService
+from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.messaging.models.aggregated_schedule_commands import \
     ProcessYoutubeChannelRejectionAggregationCommand
 from data_collector_service.messaging.models.commands import (

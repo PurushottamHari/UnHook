@@ -7,10 +7,10 @@ from injector import inject
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import Command, MessageProducer
 
-from .models import (AggregatedSchedule, AggregatedScheduleStatus,
-                     RunAggregatedScheduleCommand,
-                     RunAggregatedSchedulePayload)
-from .repository import AggregatedScheduleRepository
+from ..models import (AggregatedSchedule, AggregatedScheduleStatus,
+                      RunAggregatedScheduleCommand,
+                      RunAggregatedSchedulePayload)
+from ..repository import AggregatedScheduleRepository
 
 logger = logging.getLogger(__name__)
 
