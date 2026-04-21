@@ -4,11 +4,10 @@ from pydantic import ValidationError
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseCommandRouter, Command
 from commons.messaging.aggregated_schedule import AggregatedScheduleService
-from data_collector_service.messaging.models.aggregated_schedule_commands import \
-    ProcessYoutubeChannelRejectionAggregationCommand
 from data_collector_service.messaging.models.commands import (
     CollectYouTubeChannelForUserCommand, EnrichYouTubeVideoForUserCommand,
-    StartUserCollectionCommand)
+    ProcessYoutubeChannelRejectionAggregationCommand,
+    StartUserCollectionCommand, SubmitModeratedContentForProcessingCommand)
 from data_collector_service.services.collection.start_user_collection_service import \
     StartUserCollectionService
 from data_collector_service.services.collection.youtube.collect_youtube_content_service import \
@@ -17,6 +16,8 @@ from data_collector_service.services.collection.youtube.enrich_youtube_video_con
     EnrichYouTubeVideoContentService
 from data_collector_service.services.rejection.reject_content_service import \
     RejectContentService
+from data_collector_service.services.rejection.youtube.process_youtube_channel_rejection_aggregation_service import \
+    ProcessYoutubeChannelRejectionAggregationService
 
 
 @injectable()
@@ -30,6 +31,7 @@ class CommandRouter(BaseCommandRouter):
         collect_youtube_content_service: CollectYouTubeContentService,
         reject_content_service: RejectContentService,
         enrich_youtube_video_content_service: EnrichYouTubeVideoContentService,
+        process_youtube_channel_rejection_aggregation_service: ProcessYoutubeChannelRejectionAggregationService,
         aggregated_schedule_service: AggregatedScheduleService,
     ):
         super().__init__(aggregated_schedule_service)
@@ -37,6 +39,9 @@ class CommandRouter(BaseCommandRouter):
         self.collect_youtube_content_service = collect_youtube_content_service
         self.reject_content_service = reject_content_service
         self.enrich_youtube_video_content_service = enrich_youtube_video_content_service
+        self.process_youtube_channel_rejection_aggregation_service = (
+            process_youtube_channel_rejection_aggregation_service
+        )
 
     async def handle_domain_command(self, command: Command):
         """Dispatches the command based on action_name and enforces strict typing."""
@@ -90,10 +95,38 @@ class CommandRouter(BaseCommandRouter):
                         f"✅ [CommandRouter] Video {video_command.payload.video_id} enrichment completed"
                     )
 
-                case "reject_content":
-                    print(f"🎬 [CommandRouter] Starting reject_content command")
-                    await self.reject_content_service.reject(command.payload["user_id"])
-                    print("✅ [CommandRouter] reject_content command completed")
+                case ProcessYoutubeChannelRejectionAggregationCommand.ACTION_NAME:
+                    # Cast and validate the granular channel command
+                    channel_command = (
+                        ProcessYoutubeChannelRejectionAggregationCommand.model_validate(
+                            command.model_dump()
+                        )
+                    )
+                    print(f"🎬 [CommandRouter] Processing youtube channel rejection")
+
+                    await self.process_youtube_channel_rejection_aggregation_service.process_channel(
+                        user_id=channel_command.payload.user_id,
+                        channel_name=channel_command.payload.channel_name,
+                        content_ids=channel_command.payload.user_collected_content_ids,
+                    )
+                    print(
+                        f"✅ [CommandRouter] Channel {channel_command.payload.channel_name} rejection processed"
+                    )
+
+                case SubmitModeratedContentForProcessingCommand.ACTION_NAME:
+                    # Cast and validate the granular channel command
+                    channel_command = (
+                        ProcessYoutubeChannelRejectionAggregationCommand.model_validate(
+                            command.model_dump()
+                        )
+                    )
+                    print(
+                        f"🎬 [CommandRouter] Processing submit moderated content for processing"
+                    )
+
+                    print(
+                        f"✅ [CommandRouter] Submit moderated content for processing completed"
+                    )
 
                 case _:
                     raise NotImplementedError(

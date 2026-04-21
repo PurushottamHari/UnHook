@@ -22,6 +22,7 @@ from .ai_agent.adaptors.input_adaptor import InputAdaptor
 from .ai_agent.models import ModerationOutput
 
 
+## DEPRECATED
 @injectable()
 class RejectionContentServiceYoutube:
     """Service for handling YouTube content rejection."""

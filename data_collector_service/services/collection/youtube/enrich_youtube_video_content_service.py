@@ -7,7 +7,8 @@ from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
-from data_collector_service.messaging.models.aggregated_schedule_commands import (
+from data_collector_service.messaging.models.commands import (
+    EnrichYouTubeVideoForUserCommand,
     ProcessYoutubeChannelRejectionAggregationCommand,
     ProcessYoutubeChannelRejectionAggregationPayload)
 from data_collector_service.messaging.redis.producer import \

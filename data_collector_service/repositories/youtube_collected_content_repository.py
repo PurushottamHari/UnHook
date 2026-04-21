@@ -32,6 +32,19 @@ class YouTubeCollectedContentRepository(ABC):
         pass
 
     @abstractmethod
+    def get_videos_by_ids(self, video_ids: List[str]) -> List[YouTubeVideoDetails]:
+        """
+        Retrieve multiple YouTube videos by their IDs.
+
+        Args:
+            video_ids: List of YouTube video IDs
+
+        Returns:
+            List[YouTubeVideoDetails]: List of matching video details
+        """
+        pass
+
+    @abstractmethod
     def filter_existing_videos(self, video_ids: List[str]) -> List[str]:
         """
         Get list of video IDs that haven't been added to the shared collection yet.

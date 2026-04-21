@@ -50,6 +50,19 @@ class UserCollectedContentRepository(ABC):
         pass
 
     @abstractmethod
+    def get_content_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
+        """
+        Get a list of user collected content by their IDs.
+
+        Args:
+            content_ids: List of content IDs to fetch.
+
+        Returns:
+            List[UserCollectedContent]: List of matching content.
+        """
+        pass
+
+    @abstractmethod
     def upsert_user_collected_content_batch(
         self, user_collected_content_list: List[UserCollectedContent]
     ) -> None:

@@ -95,6 +95,19 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             for doc in cursor
         ]
 
+    def get_content_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
+        """
+        Get list of content by IDs from MongoDB.
+        """
+        cursor = self.collection.find({"_id": {"$in": content_ids}})
+
+        return [
+            CollectedContentAdapter.to_user_collected_content(
+                CollectedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
     def upsert_user_collected_content_batch(
         self, user_collected_content_list: List[UserCollectedContent]
     ) -> None:

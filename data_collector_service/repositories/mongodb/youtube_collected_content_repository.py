@@ -62,6 +62,15 @@ class MongoDBYouTubeCollectedContentRepository(YouTubeCollectedContentRepository
         db_model = YouTubeCollectedContentDBModel(**doc)
         return YouTubeCollectedContentAdapter.from_db_model(db_model)
 
+    def get_videos_by_ids(self, video_ids: List[str]) -> List[YouTubeVideoDetails]:
+        """Retrieve multiple YouTube videos by their IDs."""
+        cursor = self.collection.find({"video_id": {"$in": video_ids}})
+        videos = []
+        for doc in cursor:
+            db_model = YouTubeCollectedContentDBModel(**doc)
+            videos.append(YouTubeCollectedContentAdapter.from_db_model(db_model))
+        return videos
+
     def filter_existing_videos(self, video_ids: List[str]) -> List[str]:
         """Get list of video IDs that haven't been added to the shared collection yet."""
         # Find all videos that are already in this shared collection
