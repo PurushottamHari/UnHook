@@ -139,6 +139,38 @@ class Config:
         """Get the main command topic for this service."""
         return f"{self.service_name}.commands"
 
+    # S3 / R2 Configuration
+    @property
+    def s3_access_key_id(self) -> str:
+        """Fetches S3 access key from environment variables. Required."""
+        val = os.getenv("R2_ACCESS_KEY_ID")
+        if not val:
+            raise ValueError("R2_ACCESS_KEY_ID environment variable is not set")
+        return val
+
+    @property
+    def s3_secret_access_key(self) -> str:
+        """Fetches S3 secret key from environment variables. Required."""
+        val = os.getenv("R2_SECRET_ACCESS_KEY")
+        if not val:
+            raise ValueError("R2_SECRET_ACCESS_KEY environment variable is not set")
+        return val
+
+    @property
+    def s3_account_id(self) -> str:
+        """Fetches R2 account ID from config."""
+        return self._config_data.get("s3").get("account_id")
+
+    @property
+    def s3_bucket_name(self) -> str:
+        """Fetches R2 bucket name from config."""
+        return self._config_data.get("s3").get("bucket_name")
+
+    @property
+    def s3_endpoint_url(self) -> str:
+        """Fetches S3 endpoint URL from config."""
+        return self._config_data.get("s3").get("endpoint_url")
+
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""
         keys = key.split(".")

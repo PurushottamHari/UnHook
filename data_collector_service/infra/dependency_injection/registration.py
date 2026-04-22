@@ -21,6 +21,10 @@ from data_collector_service.messaging.redis.producer import \
 from data_collector_service.messaging.routers.command_router import \
     CommandRouter
 from data_collector_service.messaging.routers.event_router import EventRouter
+from data_collector_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
+from data_collector_service.repositories.ephemeral.s3.youtube_content_ephemeral_repository import \
+    S3YoutubeContentEphemeralRepository
 from data_collector_service.repositories.mongodb.config.database import MongoDB
 from data_collector_service.repositories.mongodb.mongodb_aggregated_schedule_repository import \
     MongoDBAggregatedScheduleRepository
@@ -32,6 +36,8 @@ from data_collector_service.repositories.user_collected_content_repository impor
     UserCollectedContentRepository
 from data_collector_service.repositories.youtube_collected_content_repository import \
     YouTubeCollectedContentRepository
+from data_collector_service.repositories.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
 
 
 class DataCollectorModule(Module):
@@ -49,6 +55,11 @@ class DataCollectorModule(Module):
         binder.bind(
             AggregatedScheduleRepository,
             to=MongoDBAggregatedScheduleRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            YoutubeContentEphemeralRepository,
+            to=S3YoutubeContentEphemeralRepository,
             scope=singleton,
         )
 

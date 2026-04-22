@@ -18,6 +18,8 @@ from data_collector_service.services.rejection.reject_content_service import \
     RejectContentService
 from data_collector_service.services.rejection.youtube.process_youtube_channel_rejection_aggregation_service import \
     ProcessYoutubeChannelRejectionAggregationService
+from data_collector_service.services.submit.submit_for_processing_service import \
+    SubmitForProcessingService
 
 
 @injectable()
@@ -32,6 +34,7 @@ class CommandRouter(BaseCommandRouter):
         reject_content_service: RejectContentService,
         enrich_youtube_video_content_service: EnrichYouTubeVideoContentService,
         process_youtube_channel_rejection_aggregation_service: ProcessYoutubeChannelRejectionAggregationService,
+        submit_for_processing_service: SubmitForProcessingService,
         aggregated_schedule_service: AggregatedScheduleService,
     ):
         super().__init__(aggregated_schedule_service)
@@ -42,6 +45,7 @@ class CommandRouter(BaseCommandRouter):
         self.process_youtube_channel_rejection_aggregation_service = (
             process_youtube_channel_rejection_aggregation_service
         )
+        self.submit_for_processing_service = submit_for_processing_service
 
     async def handle_domain_command(self, command: Command):
         """Dispatches the command based on action_name and enforces strict typing."""
@@ -115,13 +119,18 @@ class CommandRouter(BaseCommandRouter):
 
                 case SubmitModeratedContentForProcessingCommand.ACTION_NAME:
                     # Cast and validate the granular channel command
-                    channel_command = (
-                        ProcessYoutubeChannelRejectionAggregationCommand.model_validate(
+                    submit_command = (
+                        SubmitModeratedContentForProcessingCommand.model_validate(
                             command.model_dump()
                         )
                     )
                     print(
                         f"🎬 [CommandRouter] Processing submit moderated content for processing"
+                    )
+
+                    await self.submit_for_processing_service.submit_for_processing(
+                        user_id=submit_command.payload.user_id,
+                        user_collected_content_id=submit_command.payload.user_collected_content_id,
                     )
 
                     print(

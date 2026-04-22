@@ -73,6 +73,7 @@ class YouTubeVideoDetails:
         reason: str = "",
     ):
         """Set the status of the video and add a detail entry."""
+        # NOTE: Do NOT increment version here.
         status_detail = YouTubeVideoStatusDetail(
             status=status, created_at=datetime.utcnow(), reason=reason
         )

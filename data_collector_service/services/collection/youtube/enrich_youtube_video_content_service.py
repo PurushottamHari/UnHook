@@ -148,7 +148,7 @@ class EnrichYouTubeVideoContentService:
             await self.aggregated_schedule_service.create_schedule(
                 keys=keys,
                 command=business_command,
-                delay_minutes=10,
+                delay_minutes=1,
                 topic=self.config.messaging_command_topic,
             )
 
