@@ -34,6 +34,34 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
             config=BotoConfig(signature_version="s3v4"),
             region_name="auto",  # Cloudflare R2 uses "auto"
         )
+        self._ensure_bucket_exists()
+
+    def _ensure_bucket_exists(self):
+        """
+        Checks if the bucket exists and creates it if it doesn't.
+        """
+        try:
+            self.s3_client.head_bucket(Bucket=self.bucket_name)
+        except Exception as e:
+            # Check if it's a 404 error
+            if (
+                hasattr(e, "response")
+                and e.response.get("Error", {}).get("Code") == "404"
+            ):
+                logger.info(f"Bucket {self.bucket_name} not found. Creating it...")
+                try:
+                    self.s3_client.create_bucket(Bucket=self.bucket_name)
+                    logger.info(f"Bucket {self.bucket_name} created successfully.")
+                except Exception as create_error:
+                    logger.error(
+                        f"Failed to create bucket {self.bucket_name}: {create_error}"
+                    )
+                    raise
+            else:
+                logger.error(f"Error checking bucket {self.bucket_name}: {e}")
+                # We don't necessarily want to crash if we can't check, but usually it's a fatal error
+                # unless it's a transient network issue. For now, let's raise.
+                raise
 
     def _generate_s3_key(
         self,
