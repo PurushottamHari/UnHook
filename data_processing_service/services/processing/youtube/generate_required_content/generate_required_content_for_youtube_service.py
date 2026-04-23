@@ -12,8 +12,6 @@ from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.models.user_collected_content import (
     ContentSubStatus, ContentType, UserCollectedContent)
-from data_collector_service.services.collection.collectors.youtube.tools.utils.subtitle_utils import \
-    SubtitleUtils
 from data_processing_service.config.config import Config
 from data_processing_service.messaging.models.commands import (
     CategorizeGeneratedYoutubeContentAggregationCommand,
@@ -28,6 +26,8 @@ from data_processing_service.repositories.youtube_collected_content_repository i
     YouTubeCollectedContentRepository
 from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import \
     RequiredContentGenerator
+from data_processing_service.services.processing.youtube.utils.subtitle_utils import \
+    SubtitleUtils
 from user_service.models import OutputType
 
 
@@ -53,7 +53,7 @@ class GenerateRequiredContentForYoutubeService:
             youtube_collected_content_repository: Repository for raw YouTube video details
             youtube_content_ephemeral_repository: Repository for ephemeral subtitle storage
             required_content_generator_agent: AI agent for content generation
-            subtitle_utils: Utility for subtitle selection (imported from data_collector_service)
+            subtitle_utils: Utility for subtitle selection (local implementation)
         """
         self.generated_content_repository = generated_content_repository
         self.youtube_collected_content_repository = youtube_collected_content_repository

@@ -1,8 +1,8 @@
 from typing import List, Optional
 
+from data_collector_service.models.youtube.subtitle_models import SubtitleMap
 from data_collector_service.models.youtube.youtube_video_details import \
     YouTubeVideoDetails
-from data_processing_service.models.youtube.subtitle_data import SubtitleMap
 from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.models.input import (
     ContentDataInput, SubtitleDataInput)
 

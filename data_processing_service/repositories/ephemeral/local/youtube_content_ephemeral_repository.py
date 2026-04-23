@@ -3,8 +3,8 @@ import os
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from data_processing_service.models.youtube.subtitle_data import (SubtitleData,
-                                                                  SubtitleMap)
+from data_collector_service.models.youtube.subtitle_models import (
+    SubtitleData, SubtitleMap)
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
     YoutubeContentEphemeralRepository
 

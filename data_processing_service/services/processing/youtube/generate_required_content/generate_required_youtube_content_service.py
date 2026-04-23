@@ -13,14 +13,14 @@ from injector import inject
 from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, ContentType)
+from data_collector_service.models.youtube.subtitle_models import (
+    SubtitleData, SubtitleMap)
 from data_collector_service.models.youtube.youtube_video_details import \
     YouTubeVideoDetails
 from data_processing_service.external.user_service.client import \
     UserServiceClient
 from data_processing_service.models.generated_content import (
     GeneratedContent, GeneratedContentStatus, StatusDetail)
-from data_processing_service.models.youtube.subtitle_data import (SubtitleData,
-                                                                  SubtitleMap)
 from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
     LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
