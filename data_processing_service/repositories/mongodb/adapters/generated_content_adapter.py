@@ -63,6 +63,7 @@ class GeneratedContentAdapter:
             status=content.status,
             status_details=status_details_db,
             category=category_db,
+            version=content.version,
         )
 
     @staticmethod
@@ -112,6 +113,7 @@ class GeneratedContentAdapter:
             status=GeneratedContentStatus(db_model.status),
             status_details=status_details,
             category=category,
+            version=db_model.version,
         )
 
     @staticmethod

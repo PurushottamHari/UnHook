@@ -35,6 +35,21 @@ services:
     depends_on:
       - mongodb
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"    # MinIO API
+      - "9001:9001"    # MinIO Console (Visual Layer)
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - unhook-backend
+
   user_service:
     build:
       context: .
@@ -69,6 +84,7 @@ services:
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
       - USER_SERVICE_BASE_URL=http://user_service
       - USER_SERVICE_PORT=8000
+      - S3_ENDPOINT_URL=http://minio:9000
     stdin_open: true
     tty: true
     networks:
@@ -77,11 +93,43 @@ services:
       - redis
       - mongodb
       - user_service
+      - minio
+
+  data_processing_service:
+    build:
+      context: .
+      dockerfile: data_processing_service/Dockerfile
+      secrets:
+        - GITHUB_TOKEN
+    image: data_processing_service
+    container_name: data_processing_service
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=redis
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - USER_SERVICE_BASE_URL=http://user_service
+      - USER_SERVICE_PORT=8000
+      - S3_ENDPOINT_URL=http://minio:9000
+      - R2_ACCESS_KEY_ID=minioadmin
+      - R2_SECRET_ACCESS_KEY=minioadmin
+    stdin_open: true
+    tty: true
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+      - mongodb
+      - user_service
+      - minio
 
 networks:
   unhook-backend:
     name: unhook-backend
     driver: bridge
+
+volumes:
+  minio_data:
 
 secrets:
   GITHUB_TOKEN:

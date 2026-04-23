@@ -3,7 +3,7 @@ Abstract base class for user content repository.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -28,6 +28,22 @@ class UserContentRepository(ABC):
 
         Returns:
             List[Dict]: List of unprocessed content items
+        """
+        pass
+
+    @abstractmethod
+    def get_user_collected_content_by_id(
+        self, user_id: str, content_id: str
+    ) -> Optional[UserCollectedContent]:
+        """
+        Get a single user collected content item by its ID.
+
+        Args:
+            user_id: The ID of the user
+            content_id: The ID of the content item
+
+        Returns:
+            Optional[UserCollectedContent]: The content item or None if not found
         """
         pass
 
@@ -72,6 +88,13 @@ class UserContentRepository(ABC):
         self,
         status: GeneratedContentStatus,
         content_type: ContentType,
+    ) -> List[GeneratedContent]:
+        pass
+
+    @abstractmethod
+    def get_generated_content_by_ids(
+        self,
+        content_ids: List[str],
     ) -> List[GeneratedContent]:
         pass
 

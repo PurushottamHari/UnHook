@@ -13,14 +13,16 @@ dependencies = [
     "motor>=3.0.0",
     "pymongo>=4.0.0",
     "python-dotenv>=0.19.0",
-    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service",
-    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",
-    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons",
+    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=data_collector_service",
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=user_service",
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=commons",
     "requests",
     "curl-cffi",
     "black>=23.0.0",
     "isort>=5.12.0",
-    "PyYAML>=6.0.0"  # Required for YAML configuration files
+    "PyYAML>=6.0.0",  # Required for YAML configuration files
+    "redis>=5.0.0",
+    "injector>=0.21.0"
 ]
 
 [tool.black]

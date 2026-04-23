@@ -40,6 +40,7 @@ class GeneratedContentDBModel(BaseModel):
     status: str
     status_details: list[StatusDetailDBModel]
     category: Optional[CategoryInfoDBModel] = None
+    version: int = 1
 
     class Config:
         populate_by_name = True

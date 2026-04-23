@@ -8,11 +8,13 @@ import os
 import uuid
 from datetime import datetime
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import \
-    YouTubeVideoDetails
-from data_collector_service.models import ContentType
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, ContentType)
+from data_collector_service.models.youtube.youtube_video_details import \
+    YouTubeVideoDetails
 from data_processing_service.external.user_service.client import \
     UserServiceClient
 from data_processing_service.models.generated_content import (
@@ -41,23 +43,30 @@ from user_service.models import OutputType
 from user_service.models.user import User
 
 
+@injectable()
 class GenerateRequiredYoutubeContentService:
     """Service for generating required YouTube content for users."""
 
+    @inject
     def __init__(
         self,
         user_content_repository: UserContentRepository,
         youtube_content_ephemeral_repository: YoutubeContentEphemeralRepository,
+        user_service_client: UserServiceClient,
+        required_content_generator_agent: RequiredContentGenerator,
     ):
         """
-        Initialize the service with a user content repository.
+        Initialize the service with dependencies.
         Args:
             user_content_repository: Repository for managing user content data
+            youtube_content_ephemeral_repository: Repository for ephemeral subtitle storage
+            user_service_client: Client for user service
+            required_content_generator_agent: AI agent for content generation
         """
         self.user_content_repository = user_content_repository
-        self.user_service_client = UserServiceClient()
+        self.user_service_client = user_service_client
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
-        self.required_content_generator_agent = RequiredContentGenerator()
+        self.required_content_generator_agent = required_content_generator_agent
         self.subtitle_utils = SubtitleUtils()
         self.logger = logging.getLogger(__name__)
 
@@ -75,7 +84,7 @@ class GenerateRequiredYoutubeContentService:
         """
         try:
             # Fetch the user
-            user = self.user_service_client.get_user(user_id)
+            user = await self.user_service_client.get_user(user_id)
             if not user:
                 self.logger.error(f"User not found: {user_id}")
                 return

@@ -2,8 +2,11 @@ import json
 import logging
 import os
 
+from injector import inject
+
 from commons.ai import BaseAIClient, ModelConfig, ModelProvider
-from data_collector_service.collectors.youtube.models.youtube_video_details import \
+from commons.infra.dependency_injection.injectable import injectable
+from data_collector_service.models.youtube.youtube_video_details import \
     YouTubeVideoDetails
 from data_processing_service.models.generated_content import GeneratedData
 from data_processing_service.models.youtube.subtitle_data import SubtitleMap
@@ -14,12 +17,14 @@ from .models.input import ContentDataInput
 from .models.output import ContentDataOutput
 
 
+@injectable()
 class RequiredContentGenerator(BaseAIClient[ContentDataOutput]):
     """AI agent for content generation."""
 
     # Static variable to track chunked mode
     _is_chunked_mode = False
 
+    @inject
     def __init__(self):
         model_config = ModelConfig.create_deepseek_config(
             model_name="deepseek-chat", temperature=0.5

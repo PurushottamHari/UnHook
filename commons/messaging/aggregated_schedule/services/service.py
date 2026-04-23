@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 class AggregatedScheduleService:
     """Service for orchestrating aggregated scheduled commands."""
 
+    GLOBAL_KEY: str = "global"
+
     @inject
     def __init__(
         self, repository: AggregatedScheduleRepository, producer: MessageProducer

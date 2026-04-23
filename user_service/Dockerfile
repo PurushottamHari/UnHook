@@ -30,7 +30,6 @@ ENV PATH="/uv/bin:${PATH}"
 
 # Copy user_service directory
 COPY user_service/ ./user_service/
-COPY commons/ ./commons/
 
 # Change to user_service directory and install Python dependencies
 WORKDIR /app/user_service
@@ -40,7 +39,7 @@ RUN uv pip install --system hatchling
 RUN --mount=type=secret,id=GITHUB_TOKEN \
     GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
     if [ -n "${GITHUB_TOKEN}" ]; then \
-        git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
     fi && \
     uv pip install --system .
 

@@ -2,10 +2,12 @@
 MongoDB implementation of user content repository.
 """
 
-from typing import List
+from typing import List, Optional
 
+from injector import inject
 from pymongo import UpdateOne
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
 from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
@@ -16,25 +18,31 @@ from data_processing_service.models.generated_content import (
     GeneratedContent, GeneratedContentStatus)
 from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
     GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
 from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
     GeneratedContentDBModel
+from data_processing_service.repositories.mongodb.utils.optimistic_locking import \
+    create_optimistic_locking_update_op
 
 from ..user_content_repository import UserContentRepository
 
 
+@injectable()
 class MongoDBUserContentRepository(UserContentRepository):
     """MongoDB implementation of user content repository."""
 
-    def __init__(self, database):
+    @inject
+    def __init__(self, mongodb: MongoDB):
         """
         Initialize the repository.
 
         Args:
-            database: MongoDB database instance
+            mongodb: MongoDB connection manager
         """
-        self.database = database
-        self.collected_content_collection = database.collected_content
-        self.generated_content_collection = database.generated_content
+        self.database = mongodb.get_database()
+        self.collected_content_collection = self.database.collected_content
+        self.generated_content_collection = self.database.generated_content
         # Ensure unique index on external_id in generated_content collection
         self.generated_content_collection.create_index("external_id", unique=True)
 
@@ -60,6 +68,27 @@ class MongoDBUserContentRepository(UserContentRepository):
             )
             for doc in cursor
         ]
+
+    def get_user_collected_content_by_id(
+        self, user_id: str, content_id: str
+    ) -> Optional[UserCollectedContent]:
+        """
+        Get a single user collected content item by its ID.
+        Args:
+            user_id: The ID of the user
+            content_id: The ID of the content item
+        Returns:
+            Optional[UserCollectedContent]: The content item or None if not found
+        """
+        doc = self.collected_content_collection.find_one(
+            {"_id": content_id, "user_id": str(user_id)}
+        )
+        if not doc:
+            return None
+
+        return CollectedContentAdapter.to_user_collected_content(
+            CollectedContentDBModel(**doc)
+        )
 
     def update_user_collected_content(
         self, updated_user_collected_content: UserCollectedContent
@@ -199,6 +228,25 @@ class MongoDBUserContentRepository(UserContentRepository):
             for doc in cursor
         ]
 
+    def get_generated_content_by_ids(
+        self,
+        content_ids: List[str],
+    ) -> List[GeneratedContent]:
+        """
+        Get list of generated content with the given IDs.
+        Args:
+            content_ids: The IDs of the generated content to filter by
+        Returns:
+            List[GeneratedContent]: List of generated content items
+        """
+        cursor = self.generated_content_collection.find({"_id": {"$in": content_ids}})
+        return [
+            GeneratedContentAdapter.from_generated_content_db_model(
+                GeneratedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
     def get_generated_content_by_user_collected_content_status(
         self,
         user_id: str,
@@ -275,7 +323,14 @@ class MongoDBUserContentRepository(UserContentRepository):
             db_model = GeneratedContentAdapter.to_generated_content_db_model(content)
             update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
             _id = update_dict.pop("_id")
-            operations.append(UpdateOne({"_id": _id}, {"$set": update_dict}))
+            # Use the optimistic locking utility
+            operations.append(
+                create_optimistic_locking_update_op(
+                    filter_query={"_id": _id},
+                    update_dict=update_dict,
+                    version=content.version,
+                )
+            )
         if operations:
             self.generated_content_collection.bulk_write(operations)
 

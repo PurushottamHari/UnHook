@@ -3,11 +3,10 @@ Abstract base class for youtube content ephemeral storage.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
 
-from data_collector_service.models.user_collected_content import (
-    ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
-from data_processing_service.models.youtube.subtitle_data import SubtitleData
+from data_collector_service.models.youtube.subtitle_models import SubtitleData
+from data_collector_service.repositories.youtube_content_ephemeral_repository import \
+    SubtitleFileType
 
 
 class YoutubeContentEphemeralRepository(ABC):
