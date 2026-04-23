@@ -335,7 +335,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices#8ea01b6605d86ed752070b85bccbfda0db268226" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices#bf240cd3e991d77e1b3a0a1587c055bd67e31f67" }
 dependencies = [
     { name = "injector" },
     { name = "langchain-core" },
@@ -1601,7 +1601,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices#8ea01b6605d86ed752070b85bccbfda0db268226" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices#bf240cd3e991d77e1b3a0a1587c055bd67e31f67" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },

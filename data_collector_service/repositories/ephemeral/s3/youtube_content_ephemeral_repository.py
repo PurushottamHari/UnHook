@@ -31,7 +31,9 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
             endpoint_url=config.s3_endpoint_url,
             aws_access_key_id=config.s3_access_key_id,
             aws_secret_access_key=config.s3_secret_access_key,
-            config=BotoConfig(signature_version="s3v4"),
+            config=BotoConfig(
+                signature_version="s3v4", s3={"addressing_style": "path"}
+            ),
             region_name="auto",  # Cloudflare R2 uses "auto"
         )
         self._ensure_bucket_exists()
@@ -43,24 +45,34 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         try:
             self.s3_client.head_bucket(Bucket=self.bucket_name)
         except Exception as e:
-            # Check if it's a 404 error
-            if (
-                hasattr(e, "response")
-                and e.response.get("Error", {}).get("Code") == "404"
-            ):
-                logger.info(f"Bucket {self.bucket_name} not found. Creating it...")
+            error_code = ""
+            if hasattr(e, "response"):
+                error_code = str(e.response.get("Error", {}).get("Code", ""))
+
+            # 404: Not Found
+            # 400: Bad Request (sometimes returned by S3-compatible APIs if addressing is weird)
+            if error_code in ["404", "400"]:
+                logger.info(
+                    f"Bucket {self.bucket_name} not found or inaccessible (code {error_code}). Creating it..."
+                )
                 try:
                     self.s3_client.create_bucket(Bucket=self.bucket_name)
                     logger.info(f"Bucket {self.bucket_name} created successfully.")
                 except Exception as create_error:
-                    logger.error(
-                        f"Failed to create bucket {self.bucket_name}: {create_error}"
-                    )
-                    raise
+                    # Check if it failed because it already exists (race condition or false positive on 400)
+                    error_msg = str(create_error)
+                    if (
+                        "BucketAlreadyOwnedByYou" in error_msg
+                        or "BucketAlreadyExists" in error_msg
+                    ):
+                        logger.info(f"Bucket {self.bucket_name} already exists.")
+                    else:
+                        logger.error(
+                            f"Failed to create bucket {self.bucket_name}: {create_error}"
+                        )
+                        raise
             else:
                 logger.error(f"Error checking bucket {self.bucket_name}: {e}")
-                # We don't necessarily want to crash if we can't check, but usually it's a fatal error
-                # unless it's a transient network issue. For now, let's raise.
                 raise
 
     def _generate_s3_key(

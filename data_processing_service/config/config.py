@@ -74,17 +74,18 @@ class Config:
     @property
     def user_service_base_url(self) -> str:
         """Get user service base URL."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("base_url", "http://localhost")
-        )
+        return os.getenv("USER_SERVICE_BASE_URL") or self._config_data.get(
+            "external", {}
+        ).get("user_service", {}).get("base_url", "http://localhost")
 
     @property
     def user_service_port(self) -> int:
         """Get user service port."""
+        env_port = os.getenv("USER_SERVICE_PORT")
         return (
-            self._config_data.get("external", {})
+            int(env_port)
+            if env_port
+            else self._config_data.get("external", {})
             .get("user_service", {})
             .get("port", 8000)
         )
@@ -115,17 +116,27 @@ class Config:
     @property
     def redis_host(self) -> str:
         """Get Redis host."""
-        return self._config_data.get("redis", {}).get("host", "localhost")
+        return os.getenv("REDIS_HOST") or self._config_data.get("redis", {}).get(
+            "host", "localhost"
+        )
 
     @property
     def redis_port(self) -> int:
         """Get Redis port."""
-        return self._config_data.get("redis", {}).get("port", 6379)
+        env_port = os.getenv("REDIS_PORT")
+        return (
+            int(env_port)
+            if env_port
+            else self._config_data.get("redis", {}).get("port", 6379)
+        )
 
     @property
     def redis_db(self) -> int:
         """Get Redis database index."""
-        return self._config_data.get("redis", {}).get("db", 0)
+        env_db = os.getenv("REDIS_DB")
+        return (
+            int(env_db) if env_db else self._config_data.get("redis", {}).get("db", 0)
+        )
 
     @property
     def messaging_command_topic(self) -> str:
@@ -156,26 +167,17 @@ class Config:
 
     @property
     def s3_bucket_name(self) -> str:
-        """Fetches R2 bucket name from config."""
-        return self._config_data.get("s3").get("bucket_name")
+        """Fetches S3 bucket name from environment or config."""
+        return os.getenv("S3_BUCKET_NAME") or self._config_data.get("s3").get(
+            "bucket_name"
+        )
 
     @property
     def s3_endpoint_url(self) -> str:
-        """Fetches S3 endpoint URL from config."""
-        return self._config_data.get("s3").get("endpoint_url")
-
-    def get(self, key: str, default=None):
-        """Get configuration value by key using dot notation."""
-        keys = key.split(".")
-        value = self._config_data
-
-        for k in keys:
-            if isinstance(value, dict) and k in value:
-                value = value[k]
-            else:
-                return default
-
-        return value
+        """Fetches S3 endpoint URL from environment or config."""
+        return os.getenv("S3_ENDPOINT_URL") or self._config_data.get("s3").get(
+            "endpoint_url"
+        )
 
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""
