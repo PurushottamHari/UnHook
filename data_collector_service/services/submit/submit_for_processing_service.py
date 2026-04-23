@@ -4,6 +4,10 @@ from typing import Optional
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
+from commons.messaging import MessageProducer
+from commons.messaging.contracts.commands.data_processing_service.models import (
+    StartDataProcessingForUserCollectedContentCommand,
+    StartDataProcessingForUserCollectedContentPayload)
 from data_collector_service.external.user_service.client import \
     UserServiceClient
 from data_collector_service.models.user_collected_content import (
@@ -26,12 +30,14 @@ class SubmitForProcessingService:
         user_service_client: UserServiceClient,
         user_content_repository: UserCollectedContentRepository,
         submit_youtube_content_for_processing_service: SubmitYoutubeContentForProcessingService,
+        message_producer: MessageProducer,
     ):
         self.user_service_client = user_service_client
         self.user_content_repository = user_content_repository
         self.submit_youtube_content_for_processing_service = (
             submit_youtube_content_for_processing_service
         )
+        self.message_producer = message_producer
 
     async def submit_for_processing(
         self, user_id: str, user_collected_content_id: str
@@ -91,7 +97,19 @@ class SubmitForProcessingService:
             logger.error(f"❌ [SubmitForProcessingService] {error_msg}")
             raise ValueError(error_msg)
 
-        # 4. Finally: Add skeleton code to publish a new command (commented out)
-        print(
-            "Submitted successfully to data processing service! for user {user_id} and content {user_collected_content_id}"
+        # 4. Publish command to Start Data Processing Service
+        payload = StartDataProcessingForUserCollectedContentPayload(
+            user_id=user_id,
+            user_collected_content_id=user_collected_content_id,
+        )
+        command = StartDataProcessingForUserCollectedContentCommand(payload=payload)
+
+        # We need the topic. For now, we can hardcode or get from config if available.
+        # Usually it's data_processing_service.commands
+        await self.message_producer.publish(
+            topic="data_processing_service.commands", message=command
+        )
+
+        logger.info(
+            f"✅ [SubmitForProcessingService] Submitted content {user_collected_content_id} to data_processing_service"
         )

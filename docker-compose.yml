@@ -50,6 +50,21 @@ services:
     networks:
       - unhook-backend
 
+  createbuckets:
+    image: minio/mc
+    container_name: minio-mc
+    depends_on:
+      - minio
+    networks:
+      - unhook-backend
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb myminio/unhook-ephemeral;
+      /usr/bin/mc anonymous set public myminio/unhook-ephemeral;
+      exit 0;
+      "
+
   user_service:
     build:
       context: .
@@ -93,7 +108,7 @@ services:
       - redis
       - mongodb
       - user_service
-      - minio
+      - createbuckets
 
   data_processing_service:
     build:
@@ -121,7 +136,7 @@ services:
       - redis
       - mongodb
       - user_service
-      - minio
+      - createbuckets
 
 networks:
   unhook-backend:

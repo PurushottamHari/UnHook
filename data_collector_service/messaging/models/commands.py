@@ -3,21 +3,23 @@ from typing import Any, ClassVar, Dict, List
 from pydantic import BaseModel, Field
 
 from commons.messaging import Command
+from commons.messaging.contracts.commands.data_collector_service.models import (
+    StartUserCollectionCommand, StartUserCollectionPayload)
 
 
-class StartUserCollectionPayload(BaseModel):
+class EnrichYouTubeVideoForUserPayload(BaseModel):
     user_id: str
+    video_id: str
+    user_collected_content_id: str
+    channel_name: str
 
 
-class StartUserCollectionCommand(Command):
-    """Initial command to trigger collection for all sources of a user."""
-
-    ACTION_NAME: ClassVar[str] = "start_user_collection"
-
+class EnrichYouTubeVideoForUserCommand(Command):
+    ACTION_NAME: ClassVar[str] = "enrich_youtube_video_for_user"
     action_name: str = ACTION_NAME
     target_service: str = "data_collector_service"
-    payload: StartUserCollectionPayload = Field(
-        ..., description="Details for user collection start"
+    payload: EnrichYouTubeVideoForUserPayload = Field(
+        ..., description="Details for video enrichment"
     )
 
 
@@ -36,23 +38,6 @@ class CollectYouTubeChannelForUserCommand(Command):
     target_service: str = "data_collector_service"
     payload: CollectYouTubeChannelForUserPayload = Field(
         ..., description="Details for channel collection"
-    )
-
-
-class EnrichYouTubeVideoForUserPayload(BaseModel):
-    user_id: str
-    video_id: str
-    user_collected_content_id: str
-    channel_name: str
-
-
-class EnrichYouTubeVideoForUserCommand(Command):
-    ACTION_NAME: ClassVar[str] = "enrich_youtube_video_for_user"
-
-    action_name: str = ACTION_NAME
-    target_service: str = "data_collector_service"
-    payload: EnrichYouTubeVideoForUserPayload = Field(
-        ..., description="Details for video enrichment"
     )
 
 
