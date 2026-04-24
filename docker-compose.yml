@@ -72,6 +72,7 @@ services:
       - .env
     environment:
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - environment=local
     ports:
       - "8000:8000"
     networks:
@@ -97,6 +98,7 @@ services:
       - S3_ENDPOINT_URL=http://minio:9000
       - R2_ACCESS_KEY_ID=minioadmin
       - R2_SECRET_ACCESS_KEY=minioadmin
+      - environment=local
     stdin_open: true
     tty: true
     networks:
@@ -124,6 +126,7 @@ services:
       - S3_ENDPOINT_URL=http://minio:9000
       - R2_ACCESS_KEY_ID=minioadmin
       - R2_SECRET_ACCESS_KEY=minioadmin
+      - environment=local
     stdin_open: true
     tty: true
     networks:
