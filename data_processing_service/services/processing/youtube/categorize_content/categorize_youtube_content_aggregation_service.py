@@ -8,7 +8,9 @@ from commons.messaging import MessageProducer
 from data_processing_service.config import Config
 from data_processing_service.messaging.models.commands import (
     CategorizeGeneratedYoutubeContentAggregationCommand,
-    CategorizeGeneratedYoutubeContentAggregationPayload)
+    CategorizeGeneratedYoutubeContentAggregationPayload,
+    GenerateCompleteYoutubeContentCommand,
+    GenerateCompleteYoutubeContentPayload)
 from data_processing_service.models.generated_content import \
     GeneratedContentStatus
 from data_processing_service.repositories.user_content_repository import \
@@ -85,9 +87,12 @@ class CategorizeYoutubeContentAggregationService:
                     content.version += 1
                     updated_list.append(content)
 
-                    # 3. Create follow-up command (defined later)
-                    # Placeholder: Create follow-up commands here when defined
-                    # self.logger.info(f"TODO: Create follow-up command for generated content ID: {content.id}")
+                    followup_command = GenerateCompleteYoutubeContentCommand(
+                        payload=GenerateCompleteYoutubeContentPayload(
+                            generated_content_id=content.id
+                        )
+                    )
+                    commands_to_publish.append(followup_command)
 
                 # 4. Batch update in repository
                 if updated_list:

@@ -70,7 +70,7 @@ class GenerateCompleteContentForYoutubeService:
 
         content = generated_content_list[0]
 
-        if content.type != ContentType.YOUTUBE_VIDEO:
+        if content.content_type != ContentType.YOUTUBE_VIDEO:
             self.logger.error(
                 f"Generated content with ID {generated_content_id} is not a YouTube video."
             )
