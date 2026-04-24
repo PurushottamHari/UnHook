@@ -13,6 +13,11 @@ services:
     container_name: redisinsight
     ports:
       - "5540:5540"
+    environment:
+      - RI_ACCEPT_TERMS_AND_CONDITIONS=true
+      - RI_REDIS_HOST=redis
+      - RI_REDIS_PORT=6379
+      - RI_REDIS_ALIAS=Unhook-Redis
     networks:
       - unhook-backend
     depends_on:
