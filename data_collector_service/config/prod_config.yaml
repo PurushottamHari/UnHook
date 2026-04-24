@@ -20,3 +20,15 @@ s3:
   account_id: "3a16fd5fe268c9357783c8e2a1ecf1e2"
   bucket_name: "unhook-ephemeral"
   endpoint_url: "https://3a16fd5fe268c9357783c8e2a1ecf1e2.r2.cloudflarestorage.com"
+
+messaging:
+  commands:
+    data_collection_service:
+      topic: "data_collector_service.commands"
+    data_processing_service:
+      topic: "data_processing_service.commands"
+  events:
+    data_processing_service:
+      topic: "data_processing_service.events"
+    data_collection_service:
+      topic: "data_collection_service.events"

@@ -46,5 +46,6 @@ class Event(BaseMessage):
     Broadcasted to any interested consumers.
     """
 
+    topic: str = Field(..., description="The topic/channel for this event")
     source_service: str = Field(..., description="The service that emitted this event")
     event_type: str = Field(..., description="The type/name of the event that occurred")

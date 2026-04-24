@@ -8,6 +8,7 @@ from commons.messaging import MessageProducer
 from commons.messaging.contracts.commands.data_processing_service.models import (
     StartDataProcessingForUserCollectedContentCommand,
     StartDataProcessingForUserCollectedContentPayload)
+from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
 from data_collector_service.models.user_collected_content import (
@@ -31,6 +32,7 @@ class SubmitForProcessingService:
         user_content_repository: UserCollectedContentRepository,
         submit_youtube_content_for_processing_service: SubmitYoutubeContentForProcessingService,
         message_producer: MessageProducer,
+        config: Config,
     ):
         self.user_service_client = user_service_client
         self.user_content_repository = user_content_repository
@@ -38,6 +40,7 @@ class SubmitForProcessingService:
             submit_youtube_content_for_processing_service
         )
         self.message_producer = message_producer
+        self.config = config
 
     async def submit_for_processing(
         self, user_id: str, user_collected_content_id: str
@@ -104,10 +107,8 @@ class SubmitForProcessingService:
         )
         command = StartDataProcessingForUserCollectedContentCommand(payload=payload)
 
-        # We need the topic. For now, we can hardcode or get from config if available.
-        # Usually it's data_processing_service.commands
-        await self.message_producer.publish(
-            topic="data_processing_service.commands", message=command
+        await self.message_producer.send_command(
+            topic=self.config.data_processing_service_topic, command=command
         )
 
         logger.info(

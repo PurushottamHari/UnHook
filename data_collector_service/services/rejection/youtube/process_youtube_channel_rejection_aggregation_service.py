@@ -215,7 +215,7 @@ class ProcessYoutubeChannelRejectionAggregationService:
         # 6. Batch Fire Publish Service
         if commands_to_send:
             await self.message_producer.send_commands(
-                self.config.messaging_command_topic, commands_to_send
+                self.config.data_collection_service_topic, commands_to_send
             )
             print(
                 f"🚀 [ProcessYoutubeChannelRejectionAggregationService] Published {len(commands_to_send)} commands."

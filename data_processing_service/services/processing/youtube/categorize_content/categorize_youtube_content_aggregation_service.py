@@ -5,6 +5,7 @@ from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import MessageProducer
+from data_processing_service.config import Config
 from data_processing_service.messaging.models.commands import (
     CategorizeGeneratedYoutubeContentAggregationCommand,
     CategorizeGeneratedYoutubeContentAggregationPayload)
@@ -26,6 +27,7 @@ class CategorizeYoutubeContentAggregationService:
         user_content_repository: UserContentRepository,
         categorization_agent: CategorizationAgent,
         message_producer: MessageProducer,
+        config: Config,
     ):
         """
         Initialize the service with dependencies.
@@ -33,6 +35,7 @@ class CategorizeYoutubeContentAggregationService:
         self.user_content_repository = user_content_repository
         self.categorization_agent = categorization_agent
         self.message_producer = message_producer
+        self.config = config
         self.logger = logging.getLogger(__name__)
 
     async def categorize_batch(self, generated_content_ids: List[str]) -> None:
@@ -112,11 +115,10 @@ class CategorizeYoutubeContentAggregationService:
 
         # 6. Publish all commands in the list
         if commands_to_publish:
-            # In a real scenario, the topic might be configurable or derived from command.target_service
-            # Using data_processing_service.commands as the default topic for this service's commands
             for cmd in commands_to_publish:
-                topic = f"{cmd.target_service}.commands"
-                await self.message_producer.send_command(topic, cmd)
+                await self.message_producer.send_command(
+                    self.config.data_processing_service_topic, cmd
+                )
                 self.logger.info(
-                    f"📤 [CategorizeYoutubeContentAggregationService] Published command '{cmd.action_name}' to topic '{topic}'"
+                    f"📤 [CategorizeYoutubeContentAggregationService] Published command '{cmd.action_name}' to topic '{self.config.data_processing_service_topic}'"
                 )

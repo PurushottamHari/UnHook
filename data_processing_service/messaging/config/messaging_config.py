@@ -2,7 +2,7 @@ from typing import List
 
 from injector import inject
 
-from commons.messaging import BaseMessagingConfig
+from commons.messaging import BaseMessagingConfig, Event
 from data_processing_service.config.config import Config
 
 
@@ -16,9 +16,8 @@ class MessagingConfig(BaseMessagingConfig):
         return self._config.service_name
 
     @property
-    def event_topics(self) -> List[str]:
-        # Return any topics this service should listen to
-        # Example: return ["data_collector_service.events"]
+    def interested_events(self) -> List[Event]:
+        # Return any events this service should listen to
         return []
 
     # Extra properties for internal use if needed

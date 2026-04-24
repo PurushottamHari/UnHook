@@ -191,7 +191,7 @@ class GenerateRequiredContentForYoutubeService:
                 keys=keys,
                 command=business_command,
                 delay_minutes=5,
-                topic=self.config.messaging_command_topic,
+                topic=self.config.data_processing_service_topic,
             )
 
         self.logger.info(

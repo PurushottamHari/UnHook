@@ -20,3 +20,17 @@ class CategorizeGeneratedYoutubeContentAggregationCommand(Command):
     payload: CategorizeGeneratedYoutubeContentAggregationPayload = Field(
         ..., description="Details for categorizing generated youtube content"
     )
+
+
+class GenerateCompleteYoutubeContentPayload(BaseModel):
+    generated_content_id: str
+
+
+class GenerateCompleteYoutubeContentCommand(Command):
+    ACTION_NAME: ClassVar[str] = "generate_complete_youtube_content"
+
+    action_name: str = ACTION_NAME
+    target_service: str = "data_processing_service"
+    payload: GenerateCompleteYoutubeContentPayload = Field(
+        ..., description="Details for generating complete youtube content"
+    )

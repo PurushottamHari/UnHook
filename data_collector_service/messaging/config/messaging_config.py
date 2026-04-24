@@ -3,7 +3,10 @@ from typing import List
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import BaseMessagingConfig
+from commons.messaging import BaseMessagingConfig, Event
+from commons.messaging.contracts.events.data_processing_service.models import (
+    GeneratedYoutubeContentArticleReadyEvent,
+    GeneratedYoutubeContentArticleReadyPayload)
 from data_collector_service.config.config import Config
 
 
@@ -11,7 +14,6 @@ from data_collector_service.config.config import Config
 class MessagingConfig(BaseMessagingConfig):
     """
     Implementation of BaseMessagingConfig for data_collector_service.
-    Delegates to the main service Config.
     """
 
     @inject
@@ -23,6 +25,13 @@ class MessagingConfig(BaseMessagingConfig):
         return self._config.service_name
 
     @property
-    def event_topics(self) -> List[str]:
-        # You can also hardcode these here if they are purely messaging-level
-        return self._config.get("messaging.event_topics", [])
+    def interested_events(self) -> List[Event]:
+        return [
+            GeneratedYoutubeContentArticleReadyEvent(
+                payload=GeneratedYoutubeContentArticleReadyPayload(
+                    user_id="junk",
+                    generated_content_id="junk",
+                    external_id="junk",
+                )
+            )
+        ]

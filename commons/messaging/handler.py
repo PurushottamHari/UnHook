@@ -38,14 +38,12 @@ class BaseMessagingHandler:
             f"🛠️ [BaseMessagingHandler] Command router registered to: {command_topic}"
         )
 
-        # 2. Register Event Router for each specified topic
-        event_topics = self.config.event_topics
-        for topic in event_topics:
-            self.consumer.register_event_handler(topic, self.event_router.handle)
-
-        if event_topics:
+        # 2. Register Event Router for each specified interested event
+        interested_events = self.config.interested_events
+        for event in interested_events:
+            self.consumer.register_event_handler(event.topic, self.event_router.handle)
             print(
-                f"🛠️ [BaseMessagingHandler] Event router registered for {len(event_topics)} topics: {event_topics}"
+                f"🛠️ [BaseMessagingHandler] Event router registered to: {event.topic}"
             )
 
     async def start(self):

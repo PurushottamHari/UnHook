@@ -146,7 +146,7 @@ class CollectYouTubeContentService:
 
         # Todo: Puru Existing bug which is that if the previous upsert passes but the commands being sent out fail, we would need to still send out the commands in the retry.
         # The solve for this is to filter out the user collected content in collected status as well and resend the commands.
-        command_topic = self.config.messaging_command_topic
+        command_topic = self.config.data_collection_service_topic
         commands_to_send = []
         for user_content in user_content_list:
             payload = EnrichYouTubeVideoForUserPayload(

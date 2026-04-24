@@ -8,6 +8,16 @@ services:
     networks:
       - unhook-backend
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+
   mongodb:
     image: mongodb/mongodb-community-server:latest
     container_name: mongodb
@@ -85,6 +95,8 @@ services:
       - USER_SERVICE_BASE_URL=http://user_service
       - USER_SERVICE_PORT=8000
       - S3_ENDPOINT_URL=http://minio:9000
+      - R2_ACCESS_KEY_ID=minioadmin
+      - R2_SECRET_ACCESS_KEY=minioadmin
     stdin_open: true
     tty: true
     networks:

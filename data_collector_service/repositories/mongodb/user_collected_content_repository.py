@@ -2,7 +2,7 @@
 MongoDB implementation of the UserCollectedContentRepository interface.
 """
 
-from typing import List
+from typing import List, Optional
 
 from injector import inject
 from pymongo import UpdateOne
@@ -107,6 +107,19 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             )
             for doc in cursor
         ]
+
+    def get_content_by_external_id(
+        self, user_id: str, external_id: str
+    ) -> Optional[UserCollectedContent]:
+        """
+        Get a user collected content by user ID and external ID from MongoDB.
+        """
+        doc = self.collection.find_one({"user_id": user_id, "external_id": external_id})
+        if not doc:
+            return None
+
+        db_model = CollectedContentDBModel(**doc)
+        return CollectedContentAdapter.to_user_collected_content(db_model)
 
     def upsert_user_collected_content_batch(
         self, user_collected_content_list: List[UserCollectedContent]

@@ -62,7 +62,7 @@ class StartUserCollectionService:
                 return
 
             youtube_config = user.manual_configs.youtube
-            command_topic = self.config.messaging_command_topic
+            command_topic = self.config.data_collection_service_topic
             commands_to_send = []
 
             # 1. Handle Discover Collection if applicable

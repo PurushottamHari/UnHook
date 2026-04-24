@@ -10,7 +10,12 @@ import yaml
 
 
 class Config:
-    """Configuration class for data collector service."""
+    """
+    Configuration class for data collector service.
+
+    NOTE: Prefer a single source of truth for configuration (either Env or Config)
+    to maintain debuggability. Avoid multiple fallbacks (e.g., os.getenv() or config).
+    """
 
     def __init__(self, config_path: Optional[str] = None):
         """
@@ -170,6 +175,26 @@ class Config:
     def s3_endpoint_url(self) -> str:
         """Fetches S3 endpoint URL from config."""
         return self._config_data.get("s3").get("endpoint_url")
+
+    @property
+    def data_collection_service_topic(self) -> str:
+        """Get the command topic for the data collection service."""
+        return self.get("messaging.commands.data_collection_service.topic")
+
+    @property
+    def data_processing_service_topic(self) -> str:
+        """Get the command topic for the data processing service."""
+        return self.get("messaging.commands.data_processing_service.topic")
+
+    @property
+    def data_collector_service_events_topic(self) -> str:
+        """Get the event topic for the data collector service."""
+        return self.get("messaging.events.data_collection_service.topic")
+
+    @property
+    def data_processing_service_events_topic(self) -> str:
+        """Get the event topic for the data processing service."""
+        return self.get("messaging.events.data_processing_service.topic")
 
     def get(self, key: str, default=None):
         """Get configuration value by key using dot notation."""

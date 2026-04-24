@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+from .models import Event
+
 
 class BaseMessagingConfig(ABC):
     """
@@ -16,6 +18,6 @@ class BaseMessagingConfig(ABC):
 
     @property
     @abstractmethod
-    def event_topics(self) -> List[str]:
-        """The list of event topics this service should subscribe to."""
+    def interested_events(self) -> List[Event]:
+        """The list of events this service should subscribe to."""
         pass
