@@ -1,6 +1,8 @@
 import asyncio
 import json
+import socket
 import time
+from enum import Enum
 from typing import Awaitable, Callable, Dict, List
 
 import redis.asyncio as redis
@@ -11,23 +13,24 @@ from commons.messaging import Command, Event, MessageConsumer
 from data_collector_service.config.config import Config
 
 
+class MessageType(Enum):
+    EVENT = "events"
+    COMMAND = "commands"
+
+
 @injectable()
 class RedisMessageConsumer(MessageConsumer):
     """
     Redis implementation of the MessageConsumer abstraction.
-    Listens to Redis channels for events and Redis lists for commands.
+    Uses Redis Streams for persistent messaging and Consumer Groups for reliability.
     """
 
     @inject
     def __init__(self, config: Config):
         """
         Initialize the Redis consumer.
-
-        Args:
-            host: Redis host
-            port: Redis port
-            db: Redis database index
         """
+        self.config = config
         self.host = config.redis_host
         self.port = config.redis_port
         self.db = config.redis_db
@@ -43,33 +46,53 @@ class RedisMessageConsumer(MessageConsumer):
     def register_event_handler(
         self, topic: str, handler: Callable[[Event], Awaitable[None]]
     ) -> None:
-        """Register an async handler for a specific event topic (channel)."""
+        """Register an async handler for a specific event stream."""
         if topic not in self.event_handlers:
             self.event_handlers[topic] = []
         self.event_handlers[topic].append(handler)
-        print(f"✅ [Redis] Registered event handler for topic '{topic}'")
+        print(f"✅ [Redis] Registered event handler for stream '{topic}'")
 
     def register_command_handler(
         self, topic: str, handler: Callable[[Command], Awaitable[None]]
     ) -> None:
-        """Register an async handler for a specific command topic (queue)."""
+        """Register an async handler for a specific command stream."""
         if topic not in self.command_handlers:
             self.command_handlers[topic] = []
         self.command_handlers[topic].append(handler)
-        print(f"✅ [Redis] Registered command handler for topic '{topic}'")
+        print(f"✅ [Redis] Registered command handler for stream '{topic}'")
 
     async def start(self) -> None:
         """Start the Redis consumer loop."""
         self._running = True
-        print(f"🚀 [Redis] Consumer starting on {self.host}:{self.port}...")
+        print(
+            f"🚀 [Redis] Parallel Stream Consumer starting on {self.host}:{self.port}..."
+        )
 
-        # Create tasks for events and commands
+        # Create tasks for streams and scheduling
         tasks = []
+        group_name = self.config.service_name
+        consumer_name = f"{group_name}_{socket.gethostname()}"
+
         if self.event_handlers:
-            tasks.append(self._listen_for_events())
+            tasks.append(
+                self._listen_for_type(
+                    MessageType.EVENT,
+                    list(self.event_handlers.keys()),
+                    group_name,
+                    consumer_name,
+                )
+            )
         if self.command_handlers:
-            tasks.append(self._listen_for_commands())
-            tasks.append(self._process_scheduled_commands())
+            tasks.append(
+                self._listen_for_type(
+                    MessageType.COMMAND,
+                    list(self.command_handlers.keys()),
+                    group_name,
+                    consumer_name,
+                )
+            )
+
+        tasks.append(self._process_scheduled_commands())
 
         if not tasks:
             print("⚠️ [Redis] No handlers registered. Consumer exiting.")
@@ -83,77 +106,146 @@ class RedisMessageConsumer(MessageConsumer):
         await self.redis_client.close()
         print("🛑 [Redis] Consumer stopped.")
 
-    async def _listen_for_events(self) -> None:
-        """Listen for events using Pub/Sub."""
-        pubsub = self.redis_client.pubsub()
-        topics = list(self.event_handlers.keys())
-        await pubsub.subscribe(*topics)
-        print(f"📻 [Redis] Subscribed to event topics: {topics}")
+    async def _setup_stream(self, topic: str, group_name: str):
+        """Idempotently create the consumer group and stream."""
+        try:
+            # MKSTREAM creates the stream if it doesn't exist
+            # ID='0' means the group will start from the beginning of the stream
+            await self.redis_client.xgroup_create(
+                topic, group_name, id="0", mkstream=True
+            )
+            print(
+                f"📦 [Redis] Created consumer group '{group_name}' for stream '{topic}'"
+            )
+        except redis.exceptions.ResponseError as e:
+            if "BUSYGROUP" not in str(e):
+                print(f"❌ [Redis] Error creating group for '{topic}': {e}")
+                raise e
 
+    async def _listen_for_type(
+        self,
+        message_type: MessageType,
+        topics: List[str],
+        group_name: str,
+        consumer_name: str,
+    ) -> None:
+        """General loop to listen for a specific set of topics (Events or Commands)."""
+        for topic in topics:
+            await self._setup_stream(topic, group_name)
+
+        # Start background claiming task for these topics
+        asyncio.create_task(self._periodic_claim(topics, group_name, consumer_name))
+
+        print(f"📥 [Redis] Listening to {message_type.value}: {topics}")
+
+        processing_pending = True
         while self._running:
             try:
-                message = await pubsub.get_message(
-                    ignore_subscribe_messages=True, timeout=1.0
+                current_id = "0" if processing_pending else ">"
+                streams = {topic: current_id for topic in topics}
+
+                results = await self.redis_client.xreadgroup(
+                    group_name, consumer_name, streams, count=10, block=2000
                 )
-                if message and message["type"] == "message":
-                    topic = message["channel"]
-                    data = json.loads(message["data"])
-                    event = Event(**data)
 
-                    # Process events (broadcast to all registered handlers for this topic)
-                    handlers = self.event_handlers.get(topic, [])
-                    for handler in handlers:
-                        try:
-                            await handler(event)
-                        except Exception as e:
-                            print(
-                                f"❌ [Redis] Error in event handler for topic '{topic}': {e}"
+                if not results:
+                    if processing_pending:
+                        processing_pending = False
+                    continue
+
+                for stream_name, messages in results:
+                    for message_id, data in messages:
+                        # Process each message sequentially to preserve ordering
+                        payload_json = data["payload"]
+                        if message_type == MessageType.EVENT:
+                            await self._handle_event_task(
+                                stream_name, group_name, message_id, payload_json
                             )
+                        else:
+                            await self._handle_command_task(
+                                stream_name, group_name, message_id, payload_json
+                            )
+
             except Exception as e:
-                print(f"❌ [Redis] Error listening for events: {e}")
+                print(f"❌ [Redis] Error in {message_type.value} listener loop: {e}")
                 await asyncio.sleep(1)
 
-    async def _listen_for_commands(self) -> None:
-        """Listen for commands using BRPOP (blocking list pop)."""
-        queues = list(self.command_handlers.keys())
-        print(f"📥 [Redis] Listening for commands on queues: {queues}")
+    async def _handle_event_task(
+        self, stream_name: str, group_name: str, message_id: str, payload_json: str
+    ) -> None:
+        """Task to process a single event and acknowledge it."""
+        try:
+            event_dict = json.loads(payload_json)
+            event = Event(**event_dict)
+            for handler in self.event_handlers.get(stream_name, []):
+                await handler(event)
 
+            await self.redis_client.xack(stream_name, group_name, message_id)
+        except Exception as e:
+            print(
+                f"❌ [Redis] Error processing event {message_id} from {stream_name}: {e}"
+            )
+
+    async def _handle_command_task(
+        self, stream_name: str, group_name: str, message_id: str, payload_json: str
+    ) -> None:
+        """Task to process a single command and acknowledge it."""
+        try:
+            cmd_dict = json.loads(payload_json)
+            command = Command(**cmd_dict)
+            for handler in self.command_handlers.get(stream_name, []):
+                await handler(command)
+
+            await self.redis_client.xack(stream_name, group_name, message_id)
+        except Exception as e:
+            print(
+                f"❌ [Redis] Error processing command {message_id} from {stream_name}: {e}"
+            )
+
+    async def _periodic_claim(
+        self, topics: List[str], group_name: str, consumer_name: str
+    ) -> None:
+        """Periodically check for and claim stale messages from other consumers."""
         while self._running:
             try:
-                # BRPOP returns (queue_name, data)
-                result = await self.redis_client.brpop(queues, timeout=1)
-                if result:
-                    queue_name, data = result
-                    data_dict = json.loads(data)
-                    command = Command(**data_dict)
-
-                    print(
-                        f"📥 [Redis] Received command '{command.action_name}' from queue '{queue_name}'"
-                    )
-
-                    # Process command handlers sequentially as requested
-                    handlers = self.command_handlers.get(queue_name, [])
-                    for handler in handlers:
-                        try:
-                            await handler(command)
-                        except Exception as e:
-                            print(
-                                f"❌ [Redis] Error in command handler for queue '{queue_name}': {e}"
-                            )
+                await asyncio.sleep(300)  # Check every 5 minutes
+                for topic in topics:
+                    await self._claim_stale_messages(topic, group_name, consumer_name)
             except Exception as e:
-                print(f"❌ [Redis] Error listening for commands: {e}")
-                await asyncio.sleep(1)
+                print(f"❌ [Redis] Error in periodic claim task: {e}")
+
+    async def _claim_stale_messages(
+        self, topic: str, group_name: str, consumer_name: str
+    ) -> None:
+        """Reclaim messages idle for > 10 minutes from other consumers."""
+        min_idle_time = 600000
+        try:
+            pending = await self.redis_client.xpending_range(
+                topic, group_name, "-", "+", 50, idle=min_idle_time
+            )
+            if not pending:
+                return
+
+            message_ids = [p["message_id"] for p in pending]
+            claimed = await self.redis_client.xclaim(
+                topic, group_name, consumer_name, min_idle_time, *message_ids
+            )
+
+            if claimed:
+                print(
+                    f"🛠️ [Redis] Reclaimed {len(claimed)} stale messages on stream '{topic}'"
+                )
+
+        except Exception as e:
+            print(f"❌ [Redis] Error claiming stale messages for {topic}: {e}")
 
     async def _process_scheduled_commands(self) -> None:
-        """
-        Poll scheduled keys for all registered command topics.
-        Move due commands from Sorted Sets to their respective active Lists.
-        """
+        """Poll scheduled keys and move due commands to their respective Streams."""
         queues = list(self.command_handlers.keys())
         if not queues:
             return
 
-        print(f"🕒 [Redis] Monitoring scheduled commands for queues: {queues}")
+        print(f"🕒 [Redis] Monitoring scheduled commands for streams: {queues}")
 
         while self._running:
             try:
@@ -169,18 +261,16 @@ class RedisMessageConsumer(MessageConsumer):
 
                     if due_items:
                         for message_json in due_items:
-                            # Use ZREM to ensure atomicity (only one consumer/scheduler moves the item)
                             if await self.redis_client.zrem(
                                 scheduled_key, message_json
                             ):
-                                # Move to active queue
-                                await self.redis_client.lpush(topic, message_json)
-                                print(
-                                    f"🚀 [Redis] Scheduled command moved to active queue '{topic}'"
+                                await self.redis_client.xadd(
+                                    topic, {"payload": message_json}
                                 )
-
-                # Polling interval
+                                print(
+                                    f"🚀 [Redis] Scheduled command moved to stream '{topic}'"
+                                )
                 await asyncio.sleep(1)
             except Exception as e:
-                print(f"❌ [Redis] Error processing scheduled commands: {e}")
+                print(f"❌ [Redis] Error in scheduler: {e}")
                 await asyncio.sleep(1)

@@ -34,54 +34,58 @@ class RedisMessageProducer(MessageProducer):
 
     async def publish_event(self, topic: str, event: Event) -> None:
         """
-        Publish an event to a Redis channel.
+        Publish an event to a Redis Stream.
 
         Args:
-            topic: The Redis channel to publish to
+            topic: The Redis Stream key to publish to
             event: The Event object to publish
         """
         message_json = event.model_dump_json()
-        await self.redis_client.publish(topic, message_json)
-        print(f"📡 [Redis] Event published to topic '{topic}': {event.event_type}")
+        await self.redis_client.xadd(topic, {"payload": message_json})
+        print(f"📡 [Redis] Event published to stream '{topic}': {event.event_type}")
 
     async def send_command(self, topic: str, command: Command) -> None:
         """
-        Send a command to a Redis list (queue).
+        Send a command to a Redis Stream.
 
         Args:
-            topic: The Redis list key to push the command to
+            topic: The Redis Stream key to send the command to
             command: The Command object to send
         """
         message_json = command.model_dump_json()
-        await self.redis_client.lpush(topic, message_json)
-        print(f"📤 [Redis] Command sent to queue '{topic}': {command.action_name}")
+        await self.redis_client.xadd(topic, {"payload": message_json})
+        print(f"📤 [Redis] Command sent to stream '{topic}': {command.action_name}")
 
     async def send_commands(self, topic: str, commands: list[Command]) -> None:
         """
-        Send multiple commands to a Redis list (queue) in one batch.
+        Send multiple commands to a Redis Stream in one batch using a pipeline.
 
         Args:
-            topic: The Redis list key to push the commands to
+            topic: The Redis Stream key to send the commands to
             commands: A list of Command objects to send
         """
         if not commands:
             return
 
-        message_jsons = [command.model_dump_json() for command in commands]
-        # LPUSH supports multiple values: LPUSH key value1 value2 ...
-        await self.redis_client.lpush(topic, *message_jsons)
+        async with self.redis_client.pipeline() as pipe:
+            for command in commands:
+                message_json = command.model_dump_json()
+                pipe.xadd(topic, {"payload": message_json})
+            await pipe.execute()
+
         print(
-            f"📤 [Redis] {len(commands)} commands batch sent to queue '{topic}': {[c.action_name for c in commands][:3]}..."
+            f"📤 [Redis] {len(commands)} commands batch sent to stream '{topic}': {[c.action_name for c in commands][:3]}..."
         )
 
     async def schedule_command(
         self, topic: str, command: Command, schedule_at: datetime
     ) -> None:
         """
-        Schedule a command to be added to a Redis queue at a specific time.
+        Schedule a command to be added to a Redis Stream at a specific time.
+        Uses a Sorted Set for timing; the consumer moves it to the Stream when due.
 
         Args:
-            topic: The destination queue topic.
+            topic: The destination stream topic.
             command: The Command object to schedule.
             schedule_at: The datetime at which to send the command.
         """
