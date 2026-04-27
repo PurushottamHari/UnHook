@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict
 
-from commons.messaging.models import Command, Event
+from commons.messaging.models import BaseMessage, Command, Event
 
 
 class MessageProducer(ABC):
@@ -13,48 +13,70 @@ class MessageProducer(ABC):
     """
 
     @abstractmethod
-    async def publish_event(self, topic: str, event: Event) -> None:
+    async def publish_event(self, event: Event) -> None:
         """
-        Publish an event to a topic.
+        Publish an event.
+        Uses event.topic for routing.
 
         Args:
-            topic: The destination topic (or channel/exchange depending on broker).
             event: The fully constructed Event model.
         """
         pass
 
     @abstractmethod
-    async def send_command(self, topic: str, command: Command) -> None:
+    async def send_command(self, command: Command) -> None:
         """
         Send a command to a specific service's topic or queue.
+        Uses command.topic for routing.
 
         Args:
-            topic: The destination topic/queue for the command.
             command: The fully constructed Command model.
         """
         pass
 
     @abstractmethod
-    async def send_commands(self, topic: str, commands: list[Command]) -> None:
+    async def send_commands(self, commands: list[Command]) -> None:
         """
-        Send multiple commands to a specific service's topic or queue in batch.
+        Send multiple commands in batch.
+        Uses command.topic for each command's routing.
 
         Args:
-            topic: The destination topic/queue for the commands.
             commands: A list of fully constructed Command models.
         """
         pass
 
     @abstractmethod
-    async def schedule_command(
-        self, topic: str, command: Command, schedule_at: datetime
-    ) -> None:
+    async def schedule_command(self, command: Command, schedule_at: datetime) -> None:
         """
         Schedule a command to be executed at a specific time.
+        Uses command.topic for routing.
 
         Args:
-            topic: The destination topic/queue for the command.
             command: The fully constructed Command model.
             schedule_at: The time at which the command should be sent to the active queue.
+        """
+        pass
+
+    @abstractmethod
+    async def schedule_message(self, message: BaseMessage, delay_ms: int) -> None:
+        """
+        Schedule a message to be processed after a specific delay.
+        Uses message.topic for routing.
+        """
+        pass
+
+    @abstractmethod
+    async def send_to_dlq(
+        self, service_name: str, message: BaseMessage, reason: str
+    ) -> None:
+        """
+        Send a message to the Dead Letter Queue.
+        """
+        pass
+
+    @abstractmethod
+    async def close(self) -> None:
+        """
+        Close the producer connection.
         """
         pass

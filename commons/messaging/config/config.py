@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from .models import Event
+from ..models import Event
 
 
 class BaseMessagingConfig(ABC):

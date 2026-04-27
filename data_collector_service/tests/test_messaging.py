@@ -2,6 +2,7 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock
 
 from commons.messaging import Command, Event
+from data_collector_service.config.config import Config
 from data_collector_service.messaging.handlers import register_handlers
 from data_collector_service.messaging.redis.consumer import \
     RedisMessageConsumer
@@ -28,8 +29,13 @@ async def run_messaging_test():
     mock_rejection.reject = AsyncMock()
 
     # 2. Setup producer and consumer
-    producer = RedisMessageProducer(host=host, port=port, db=db)
-    consumer = RedisMessageConsumer(host=host, port=port, db=db)
+    config = Config()
+    config.redis_host = host
+    config.redis_port = port
+    config.redis_db = db
+
+    producer = RedisMessageProducer(config=config)
+    consumer = RedisMessageConsumer(config=config)
 
     # 3. Register handlers
     register_handlers(consumer, mock_collector, mock_rejection)
@@ -43,14 +49,15 @@ async def run_messaging_test():
         command_topic = "data_collector.commands"
         user_id = "test-user-123"
 
-        # 5. Send a collect_data command
+        # 5. Send a collect_data command (Topic is now set via validator or explicitly)
         command = Command(
-            target_service="data-collector-service",
+            topic="data_collector.commands",
+            target_service="data_collector",
             action_name="collect_data",
             payload={"user_id": user_id},
         )
-        print(f"🚀 [Test] Sending 'collect_data' to {command_topic}")
-        await producer.send_command(command_topic, command)
+        print(f"🚀 [Test] Sending 'collect_data' (Topic: {command.topic})")
+        await producer.send_command(command)
 
         # 6. Wait for processing
         await asyncio.sleep(1.0)
@@ -61,12 +68,13 @@ async def run_messaging_test():
 
         # 8. Send a reject_content command
         reject_command = Command(
-            target_service="data_collector_service",
+            topic="data_collector.commands",
+            target_service="data_collector",
             action_name="reject_content",
             payload={"user_id": user_id},
         )
-        print(f"🚀 [Test] Sending 'reject_content' to {command_topic}")
-        await producer.send_command(command_topic, reject_command)
+        print(f"🚀 [Test] Sending 'reject_content' (Topic: {reject_command.topic})")
+        await producer.send_command(reject_command)
 
         # 9. Wait for processing
         await asyncio.sleep(1.0)

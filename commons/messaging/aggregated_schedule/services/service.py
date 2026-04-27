@@ -41,7 +41,6 @@ class AggregatedScheduleService:
         keys: List[str],
         command: Command,
         delay_minutes: int,
-        topic: str,
     ) -> AggregatedSchedule:
         """
         Create a new aggregated schedule and schedule its command.
@@ -50,7 +49,6 @@ class AggregatedScheduleService:
             keys: List of strings to form the unique aggregation key
             command: The business command to be aggregated and eventually executed
             delay_minutes: Delay before the command fires
-            topic: Redis/Messaging topic for the command
         """
         name = command.action_name
         aggregation_key = ":".join(sorted(keys))
@@ -70,10 +68,10 @@ class AggregatedScheduleService:
         trigger_command = RunAggregatedScheduleCommand(
             payload=RunAggregatedSchedulePayload(schedule_id=created_schedule.id)
         )
-        await self.producer.schedule_command(topic, trigger_command, scheduled_at)
+        await self.producer.schedule_command(trigger_command, scheduled_at)
 
         logger.info(
-            f"🚀 Scheduled trigger '{trigger_command.action_name}' for {scheduled_at} on topic '{topic}' (Schedule ID: {created_schedule.id})"
+            f"🚀 Scheduled trigger '{trigger_command.action_name}' for {scheduled_at} on topic '{trigger_command.topic}' (Schedule ID: {created_schedule.id})"
         )
         return created_schedule
 
@@ -130,7 +128,7 @@ class AggregatedScheduleService:
             logger.info(
                 f"Executing business command '{original_command.action_name}' for schedule {processing_schedule.id} on topic '{topic}'"
             )
-            await self.producer.send_command(topic, original_command)
+            await self.producer.send_command(original_command)
 
             logger.info(
                 f"✅ Completed aggregated schedule: {processing_schedule.name} | {processing_schedule.id} (v{processing_schedule.version})"

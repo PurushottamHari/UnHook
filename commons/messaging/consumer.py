@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Awaitable, Callable
 
-from commons.messaging.models import Command, Event
+from commons.messaging.models import BaseMessage, Command, Event
 
 
 class MessageConsumer(ABC):
@@ -51,5 +51,13 @@ class MessageConsumer(ABC):
         """
         Gracefully stop the consumer, closing connections and finishing
         currently processing messages.
+        """
+        pass
+
+    @abstractmethod
+    async def acknowledge(self, message: BaseMessage) -> None:
+        """
+        Acknowledge a message as processed.
+        Uses the metadata attached to the message to identify it in the broker.
         """
         pass

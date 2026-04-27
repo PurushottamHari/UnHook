@@ -32,7 +32,6 @@ class SubmitForProcessingService:
         user_content_repository: UserCollectedContentRepository,
         submit_youtube_content_for_processing_service: SubmitYoutubeContentForProcessingService,
         message_producer: MessageProducer,
-        config: Config,
     ):
         self.user_service_client = user_service_client
         self.user_content_repository = user_content_repository
@@ -40,7 +39,6 @@ class SubmitForProcessingService:
             submit_youtube_content_for_processing_service
         )
         self.message_producer = message_producer
-        self.config = config
 
     async def submit_for_processing(
         self, user_id: str, user_collected_content_id: str
@@ -107,9 +105,7 @@ class SubmitForProcessingService:
         )
         command = StartDataProcessingForUserCollectedContentCommand(payload=payload)
 
-        await self.message_producer.send_command(
-            topic=self.config.data_processing_service_topic, command=command
-        )
+        await self.message_producer.send_command(command=command)
 
         logger.info(
             f"✅ [SubmitForProcessingService] Submitted content {user_collected_content_id} to data_processing_service"

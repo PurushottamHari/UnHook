@@ -121,9 +121,7 @@ class CategorizeYoutubeContentAggregationService:
         # 6. Publish all commands in the list
         if commands_to_publish:
             for cmd in commands_to_publish:
-                await self.message_producer.send_command(
-                    self.config.data_processing_service_topic, cmd
-                )
+                await self.message_producer.send_command(cmd)
                 self.logger.info(
                     f"📤 [CategorizeYoutubeContentAggregationService] Published command '{cmd.action_name}' to topic '{self.config.data_processing_service_topic}'"
                 )

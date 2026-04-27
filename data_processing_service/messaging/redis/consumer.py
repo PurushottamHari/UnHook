@@ -9,7 +9,7 @@ import redis.asyncio as redis
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import Command, Event, MessageConsumer
+from commons.messaging import BaseMessage, Command, Event, MessageConsumer
 from data_processing_service.config.config import Config
 
 
@@ -41,6 +41,7 @@ class RedisMessageConsumer(MessageConsumer):
         self.command_handlers: Dict[str, List[Callable[[Command], Awaitable[None]]]] = (
             {}
         )
+        self.group_name = config.service_name
         self._running = False
 
     def register_event_handler(
@@ -106,6 +107,18 @@ class RedisMessageConsumer(MessageConsumer):
         await self.redis_client.close()
         print("🛑 [Redis] Consumer stopped.")
 
+    async def acknowledge(self, message: BaseMessage) -> None:
+        """Acknowledge a message in Redis Streams."""
+        broker_id = message.metadata.get("broker_id")
+        topic = message.topic
+        if broker_id and topic:
+            try:
+                await self.redis_client.xack(topic, self.group_name, broker_id)
+            except Exception as e:
+                print(
+                    f"⚠️ [Redis] Failed to acknowledge message {broker_id} on {topic}: {e}"
+                )
+
     async def _setup_stream(self, topic: str, group_name: str):
         """Idempotently create the consumer group and stream."""
         try:
@@ -148,7 +161,10 @@ class RedisMessageConsumer(MessageConsumer):
                     group_name, consumer_name, streams, count=10, block=2000
                 )
 
-                if not results:
+                # Check total messages across all streams
+                total_messages = sum(len(msgs) for _, msgs in results) if results else 0
+
+                if total_messages == 0:
                     if processing_pending:
                         processing_pending = False
                     continue
@@ -158,48 +174,46 @@ class RedisMessageConsumer(MessageConsumer):
                         # Process each message sequentially to preserve ordering
                         payload_json = data["payload"]
                         if message_type == MessageType.EVENT:
-                            await self._handle_event_task(
-                                stream_name, group_name, message_id, payload_json
-                            )
+                            await self._handle_event_task(message_id, payload_json)
                         else:
-                            await self._handle_command_task(
-                                stream_name, group_name, message_id, payload_json
-                            )
+                            await self._handle_command_task(message_id, payload_json)
 
             except Exception as e:
                 print(f"❌ [Redis] Error in {message_type.value} listener loop: {e}")
                 await asyncio.sleep(1)
 
-    async def _handle_event_task(
-        self, stream_name: str, group_name: str, message_id: str, payload_json: str
-    ) -> None:
-        """Task to process a single event and acknowledge it."""
+    async def _handle_event_task(self, message_id: str, payload_json: str) -> None:
+        """Task to process a single event."""
         try:
             event_dict = json.loads(payload_json)
             event = Event(**event_dict)
-            for handler in self.event_handlers.get(stream_name, []):
+
+            # Tag metadata for acknowledgment and retries
+            event.metadata["broker_id"] = message_id
+
+            for handler in self.event_handlers.get(event.topic, []):
                 await handler(event)
 
-            await self.redis_client.xack(stream_name, group_name, message_id)
         except Exception as e:
             print(
-                f"❌ [Redis] Error processing event {message_id} from {stream_name}: {e}"
+                f"❌ [Redis] Error processing event {message_id} from {event.topic}: {e}"
             )
 
-    async def _handle_command_task(
-        self, stream_name: str, group_name: str, message_id: str, payload_json: str
-    ) -> None:
-        """Task to process a single command and acknowledge it."""
+    async def _handle_command_task(self, message_id: str, payload_json: str) -> None:
+        """Task to process a single command."""
         try:
             cmd_dict = json.loads(payload_json)
             command = Command(**cmd_dict)
-            for handler in self.command_handlers.get(stream_name, []):
+
+            # Tag metadata for acknowledgment and retries
+            command.metadata["broker_id"] = message_id
+
+            for handler in self.command_handlers.get(command.topic, []):
                 await handler(command)
 
-            await self.redis_client.xack(stream_name, group_name, message_id)
         except Exception as e:
             print(
-                f"❌ [Redis] Error processing command {message_id} from {stream_name}: {e}"
+                f"❌ [Redis] Error processing command {message_id} from {command.topic}: {e}"
             )
 
     async def _periodic_claim(

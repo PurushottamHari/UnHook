@@ -44,7 +44,6 @@ class GenerateRequiredContentForYoutubeService:
         required_content_generator_agent: RequiredContentGenerator,
         subtitle_utils: SubtitleUtils,
         aggregated_schedule_service: AggregatedScheduleService,
-        config: Config,
     ):
         """
         Initialize the service with dependencies.
@@ -61,7 +60,6 @@ class GenerateRequiredContentForYoutubeService:
         self.required_content_generator_agent = required_content_generator_agent
         self.subtitle_utils = subtitle_utils
         self.aggregated_schedule_service = aggregated_schedule_service
-        self.config = config
         self.logger = logging.getLogger(__name__)
 
     async def generate_required_content(
@@ -191,7 +189,6 @@ class GenerateRequiredContentForYoutubeService:
                 keys=keys,
                 command=business_command,
                 delay_minutes=5,
-                topic=self.config.data_processing_service_topic,
             )
 
         self.logger.info(

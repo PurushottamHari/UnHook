@@ -39,7 +39,6 @@ class GenerateCompleteContentForYoutubeService:
         complete_content_generator: CompleteContentGenerator,
         youtube_collected_content_repository: YouTubeCollectedContentRepository,
         message_producer: MessageProducer,
-        config: Config,
     ):
         self.user_content_repository = user_content_repository
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
@@ -47,7 +46,6 @@ class GenerateCompleteContentForYoutubeService:
         self.complete_content_generator = complete_content_generator
         self.youtube_collected_content_repository = youtube_collected_content_repository
         self.message_producer = message_producer
-        self.config = config
         self.logger = logging.getLogger(__name__)
 
     async def generate_for_content(self, generated_content_id: str) -> None:
@@ -178,9 +176,7 @@ class GenerateCompleteContentForYoutubeService:
             )
         )
 
-        await self.message_producer.publish_event(
-            generation_complete_event.topic, generation_complete_event
-        )
+        await self.message_producer.publish_event(generation_complete_event)
         self.logger.info(
             f"📤 Published GeneratedYoutubeContentArticleReadyEvent for {generated_content_id}"
         )

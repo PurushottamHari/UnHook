@@ -1,8 +1,27 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
+
+
+class MessageAttempt(BaseModel):
+    """
+    Metadata about a single processing attempt.
+    """
+
+    attempted_at: datetime = Field(default_factory=datetime.utcnow)
+    failed_error_code: str | None = None
+    failed_error_message: str | None = None
+
+
+class MessageContext(BaseModel):
+    """
+    Context for tracking retries and processing history.
+    """
+
+    retry_count: int = 0
+    attempts: List[MessageAttempt] = Field(default_factory=list)
 
 
 class BaseMessage(BaseModel):
@@ -21,6 +40,15 @@ class BaseMessage(BaseModel):
         default=None,
         description="Identifier to trace a sequence of messages across services",
     )
+    context: MessageContext = Field(
+        default_factory=MessageContext, description="Retry and attempt context"
+    )
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict,
+        exclude=True,
+        description="Broker-specific metadata (not serialized)",
+    )
+    topic: str = Field(..., description="The topic/channel this message belongs to")
     payload: Dict[str, Any] = Field(
         default_factory=dict, description="The core data of the message"
     )
@@ -46,6 +74,5 @@ class Event(BaseMessage):
     Broadcasted to any interested consumers.
     """
 
-    topic: str = Field(..., description="The topic/channel for this event")
     source_service: str = Field(..., description="The service that emitted this event")
     event_type: str = Field(..., description="The type/name of the event that occurred")
