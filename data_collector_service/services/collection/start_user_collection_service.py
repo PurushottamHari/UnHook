@@ -4,7 +4,6 @@ from datetime import datetime
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging.exceptions import RescheduleMessageException
 from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
@@ -64,12 +63,6 @@ class StartUserCollectionService:
 
             youtube_config = user.manual_configs.youtube
             commands_to_send = []
-
-            raise RescheduleMessageException(
-                delay_ms=300,
-                max_retries=5,
-                message="Yo this be a test yo...does it go to DLQ?",
-            )
 
             # 1. Handle Discover Collection if applicable
             if self._should_collect_discover(user):
