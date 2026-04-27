@@ -87,7 +87,7 @@ class BaseMessagingHandler:
             max_retries = exception.max_retries
         else:
             # Standard delays: 2m, 10m, 15m
-            delays_ms = [120000, 600000, 900000]
+            delays_ms = [10000, 10000, 10000]
             if current_retry_count < len(delays_ms):
                 delay_ms = delays_ms[current_retry_count]
 
