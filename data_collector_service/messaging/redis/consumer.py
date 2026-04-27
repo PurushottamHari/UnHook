@@ -196,9 +196,8 @@ class RedisMessageConsumer(MessageConsumer):
                 await handler(event)
 
         except Exception as e:
-            print(
-                f"❌ [Redis] Error processing event {message_id} from {event.topic}: {e}"
-            )
+            topic = event.topic if "event" in locals() else "unknown"
+            print(f"❌ [Redis] Error processing event {message_id} from {topic}: {e}")
 
     async def _handle_command_task(self, message_id: str, payload_json: str) -> None:
         """Task to process a single command."""
@@ -213,9 +212,8 @@ class RedisMessageConsumer(MessageConsumer):
                 await handler(command)
 
         except Exception as e:
-            print(
-                f"❌ [Redis] Error processing command {message_id} from {command.topic}: {e}"
-            )
+            topic = command.topic if "command" in locals() else "unknown"
+            print(f"❌ [Redis] Error processing command {message_id} from {topic}: {e}")
 
     async def _periodic_claim(
         self, topics: List[str], group_name: str, consumer_name: str
@@ -242,6 +240,9 @@ class RedisMessageConsumer(MessageConsumer):
                 return
 
             message_ids = [p["message_id"] for p in pending]
+            if not message_ids:
+                return
+
             claimed = await self.redis_client.xclaim(
                 topic, group_name, consumer_name, min_idle_time, *message_ids
             )
