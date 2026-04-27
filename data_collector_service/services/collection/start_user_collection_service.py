@@ -4,7 +4,7 @@ from datetime import datetime
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging.exceptions.reschedule import RescheduleMessageException
+from commons.messaging.exceptions import RescheduleMessageException
 from data_collector_service.config.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
