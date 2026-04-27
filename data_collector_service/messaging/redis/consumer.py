@@ -244,7 +244,7 @@ class RedisMessageConsumer(MessageConsumer):
                 return
 
             claimed = await self.redis_client.xclaim(
-                topic, group_name, consumer_name, min_idle_time, *message_ids
+                topic, group_name, consumer_name, min_idle_time, message_ids
             )
 
             if claimed:
