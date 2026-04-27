@@ -1,3 +1,3 @@
-from .reschedule import RescheduleCommandException
+from .reschedule import RescheduleMessageException
 
-__all__ = ["RescheduleCommandException"]
+__all__ = ["RescheduleMessageException"]

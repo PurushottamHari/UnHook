@@ -1,4 +1,4 @@
-class RescheduleCommandException(Exception):
+class RescheduleMessageException(Exception):
     """
     Exception thrown to explicitly request a command to be rescheduled.
     """

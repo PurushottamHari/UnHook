@@ -1,8 +1,8 @@
 import time
 from datetime import datetime
 
-import redis.asyncio as redis
 from injector import inject
+from redis import asyncio as aioredis
 
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseMessage, Command, Event, MessageProducer
@@ -26,7 +26,7 @@ class RedisMessageProducer(MessageProducer):
             port: Redis port
             db: Redis database index
         """
-        self.redis_client = redis.Redis(
+        self.redis_client = aioredis.Redis(
             host=config.redis_host,
             port=config.redis_port,
             db=config.redis_db,

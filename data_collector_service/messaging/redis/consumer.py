@@ -5,8 +5,9 @@ import time
 from enum import Enum
 from typing import Awaitable, Callable, Dict, List
 
-import redis.asyncio as redis
 from injector import inject
+from redis import asyncio as aioredis
+from redis.exceptions import ResponseError
 
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseMessage, Command, Event, MessageConsumer
@@ -34,7 +35,7 @@ class RedisMessageConsumer(MessageConsumer):
         self.host = config.redis_host
         self.port = config.redis_port
         self.db = config.redis_db
-        self.redis_client = redis.Redis(
+        self.redis_client = aioredis.Redis(
             host=self.host, port=self.port, db=self.db, decode_responses=True
         )
         self.event_handlers: Dict[str, List[Callable[[Event], Awaitable[None]]]] = {}
@@ -130,7 +131,7 @@ class RedisMessageConsumer(MessageConsumer):
             print(
                 f"📦 [Redis] Created consumer group '{group_name}' for stream '{topic}'"
             )
-        except redis.exceptions.ResponseError as e:
+        except ResponseError as e:
             if "BUSYGROUP" not in str(e):
                 print(f"❌ [Redis] Error creating group for '{topic}': {e}")
                 raise e
