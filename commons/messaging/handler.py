@@ -4,7 +4,7 @@ from injector import inject
 
 from .config import BaseMessagingConfig
 from .consumer import MessageConsumer
-from .exceptions import RescheduleCommandException
+from .exceptions import RescheduleMessageException
 from .models import MessageAttempt
 from .producer import MessageProducer
 from .router import BaseCommandRouter, BaseEventRouter
@@ -82,7 +82,7 @@ class BaseMessagingHandler:
         max_retries = 3  # Default: 4 attempts total (0, 1, 2, 3)
         delay_ms = 0
 
-        if isinstance(exception, RescheduleCommandException):
+        if isinstance(exception, RescheduleMessageException):
             delay_ms = exception.delay_ms
             max_retries = exception.max_retries
         else:
