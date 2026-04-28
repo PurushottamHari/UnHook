@@ -90,7 +90,7 @@ class TransitionUserCollectedContentStatusToProcessedService:
             )
         )
 
-        await self.message_producer.publish_event(ready_event.topic, ready_event)
+        await self.message_producer.publish_event(ready_event)
         logger.info(
             f"📤 Published UserCollectedContentReadyToBeUsedEvent for {content_clone.id}"
         )
