@@ -4,7 +4,6 @@ from typing import List
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
-from data_collector_service.config import Config
 from data_collector_service.external.user_service.client import \
     UserServiceClient
 from data_collector_service.messaging.models.commands import (
@@ -37,7 +36,6 @@ class CollectYouTubeContentService:
         youtube_tool: YouTubeExternalTool,
         adapter: YouTubeToUserContentAdapter,
         message_producer: RedisMessageProducer,
-        config: Config,
         user_service_client: UserServiceClient,
     ):
         """
@@ -56,7 +54,6 @@ class CollectYouTubeContentService:
         self.youtube_tool = youtube_tool
         self.adapter = adapter
         self.message_producer = message_producer
-        self.config = config
         self.user_service_client = user_service_client
 
     async def collect_channel(
@@ -146,7 +143,6 @@ class CollectYouTubeContentService:
 
         # Todo: Puru Existing bug which is that if the previous upsert passes but the commands being sent out fail, we would need to still send out the commands in the retry.
         # The solve for this is to filter out the user collected content in collected status as well and resend the commands.
-        command_topic = self.config.data_collection_service_topic
         commands_to_send = []
         for user_content in user_content_list:
             payload = EnrichYouTubeVideoForUserPayload(
@@ -159,7 +155,7 @@ class CollectYouTubeContentService:
             commands_to_send.append(command)
 
         if commands_to_send:
-            await self.message_producer.send_commands(command_topic, commands_to_send)
+            await self.message_producer.send_commands(commands_to_send)
             logger.info(
                 f"✅ Enqueued {len(commands_to_send)} collection commands for user {user_id}"
             )

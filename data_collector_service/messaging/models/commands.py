@@ -18,6 +18,7 @@ class EnrichYouTubeVideoForUserCommand(Command):
     ACTION_NAME: ClassVar[str] = "enrich_youtube_video_for_user"
     action_name: str = ACTION_NAME
     target_service: str = "data_collector_service"
+    topic: str = "data_collector_service.commands"
     payload: EnrichYouTubeVideoForUserPayload = Field(
         ..., description="Details for video enrichment"
     )
@@ -36,6 +37,7 @@ class CollectYouTubeChannelForUserCommand(Command):
 
     action_name: str = ACTION_NAME
     target_service: str = "data_collector_service"
+    topic: str = "data_collector_service.commands"
     payload: CollectYouTubeChannelForUserPayload = Field(
         ..., description="Details for channel collection"
     )
@@ -58,6 +60,7 @@ class ProcessYoutubeChannelRejectionAggregationCommand(Command):
 
     action_name: str = ACTION_NAME
     target_service: str = "data_collector_service"
+    topic: str = "data_collector_service.commands"
     payload: ProcessYoutubeChannelRejectionAggregationPayload = Field(
         ..., description="Details for the YouTube channel rejection aggregation"
     )
@@ -72,6 +75,7 @@ class SubmitModeratedContentForProcessingCommand(Command):
     ACTION_NAME: ClassVar[str] = "submit_moderated_content_for_processing"
     action_name: str = ACTION_NAME
     target_service: str = "data_collector_service"
+    topic: str = "data_collector_service.commands"
     payload: SubmitModeratedContentForProcessingPayload = Field(
         ..., description="Details for submitting moderated content for processing"
     )

@@ -26,47 +26,40 @@ class SubtitleAdapter:
         if not manual_subtitles_raw and not automatic_subtitles_raw:
             return None
 
-        target_languages = {"en", "hi"}
-
         manual_subtitle_data = SubtitleData()
         if manual_subtitles_raw:
             for lang, subs in manual_subtitles_raw.items():
                 try:
-                    language_code = langcodes.get(lang).language
-                    if language_code in target_languages:
-                        if subs and isinstance(subs, list):
-                            sub_info_map = {
-                                sub["ext"]: sub["url"]
-                                for sub in subs
-                                if sub.get("ext") and sub.get("url")
-                            }
-                            if sub_info_map:
-                                manual_subtitle_data[language_code] = (
-                                    SubtitleInfo.from_dict(sub_info_map)
-                                )
-                except (ValueError, langcodes.exceptions.LanguageTagError):
-                    # Invalid language code, skip it
+                    if subs and isinstance(subs, list):
+                        sub_info_map = {
+                            sub["ext"]: sub["url"]
+                            for sub in subs
+                            if sub.get("ext") and sub.get("url")
+                        }
+                        if sub_info_map:
+                            # Use the ORIGINAL language code (e.g. en-CA, fr, de, etc.)
+                            manual_subtitle_data[lang] = SubtitleInfo.from_dict(
+                                sub_info_map
+                            )
+                except Exception as e:
                     print("Invalid language code?: " + lang)
-                    pass
 
         automatic_subtitle_data = SubtitleData()
         if automatic_subtitles_raw:
             for lang, subs in automatic_subtitles_raw.items():
                 try:
-                    language_code = langcodes.get(lang).language
-                    if language_code in target_languages:
-                        if subs and isinstance(subs, list):
-                            sub_info_map = {
-                                sub["ext"]: sub["url"]
-                                for sub in subs
-                                if sub.get("ext") and sub.get("url")
-                            }
-                            if sub_info_map:
-                                automatic_subtitle_data[language_code] = (
-                                    SubtitleInfo.from_dict(sub_info_map)
-                                )
-                except (ValueError, langcodes.exceptions.LanguageTagError):
-                    # Invalid language code, skip it
+                    if subs and isinstance(subs, list):
+                        sub_info_map = {
+                            sub["ext"]: sub["url"]
+                            for sub in subs
+                            if sub.get("ext") and sub.get("url")
+                        }
+                        if sub_info_map:
+                            # Use the ORIGINAL language code
+                            automatic_subtitle_data[lang] = SubtitleInfo.from_dict(
+                                sub_info_map
+                            )
+                except Exception as e:
                     pass
 
         if not manual_subtitle_data and not automatic_subtitle_data:

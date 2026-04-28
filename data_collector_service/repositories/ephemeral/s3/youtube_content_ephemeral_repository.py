@@ -100,6 +100,11 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         """
         Stores the downloaded subtitles in S3.
         """
+        if subtitles is None:
+            raise ValueError(
+                f"Cannot store None subtitles for video {video_id} (Type: {subtitle_type}, Language: {language}, Ext: {extension})"
+            )
+
         key = self._generate_s3_key(
             video_id, subtitle_type, extension, SubtitleFileType.DOWNLOADED, language
         )
@@ -121,6 +126,11 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         """
         Stores the cleaned subtitles in S3.
         """
+        if subtitles is None:
+            raise ValueError(
+                f"Cannot store None clean subtitles for video {video_id} (Type: {subtitle_type}, Language: {language}, Ext: {extension})"
+            )
+
         key = self._generate_s3_key(
             video_id, subtitle_type, extension, SubtitleFileType.CLEAN, language
         )

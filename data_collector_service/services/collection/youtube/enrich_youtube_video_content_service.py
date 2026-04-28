@@ -146,10 +146,7 @@ class EnrichYouTubeVideoContentService:
 
             # Create new schedule using the specialized model
             await self.aggregated_schedule_service.create_schedule(
-                keys=keys,
-                command=business_command,
-                delay_minutes=5,
-                topic=self.config.data_collection_service_topic,
+                keys=keys, command=business_command, delay_minutes=5
             )
 
         logger.info(

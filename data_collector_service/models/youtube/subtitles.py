@@ -18,8 +18,6 @@ class SubtitleData(UserDict[str, SubtitleInfo]):
     """Model for a collection of subtitles for various languages."""
 
     def __setitem__(self, key: str, value: SubtitleInfo):
-        if not langcodes.tag_is_valid(key):
-            raise ValueError(f"'{key}' is not a valid language code.")
         super().__setitem__(key, value)
 
     @classmethod

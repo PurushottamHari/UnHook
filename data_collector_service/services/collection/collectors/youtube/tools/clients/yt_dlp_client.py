@@ -248,7 +248,7 @@ class YtDlpClient:
         for attempt in range(1, max_retries + 1):
             try:
                 with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
-                    wait_time = random.uniform(4, 8)
+                    wait_time = random.uniform(1, 3)
                     print(f"Waiting {wait_time:.2f} seconds before download...")
                     time.sleep(wait_time)
                     ydl.download([video_url])

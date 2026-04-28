@@ -52,6 +52,11 @@ class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         """
         Stores the downloaded subtitles for a video.
         """
+        if subtitles is None:
+            raise ValueError(
+                f"Cannot store None subtitles for video {video_id} (Type: {subtitle_type}, Language: {language}, Ext: {extension})"
+            )
+
         file_path = self._generate_subtitle_file_path(
             video_id, subtitle_type, extension, "downloaded_subtitle", language
         )
@@ -71,6 +76,11 @@ class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         """
         Stores the cleaned subtitles for a video.
         """
+        if subtitles is None:
+            raise ValueError(
+                f"Cannot store None clean subtitles for video {video_id} (Type: {subtitle_type}, Language: {language}, Ext: {extension})"
+            )
+
         file_path = self._generate_subtitle_file_path(
             video_id, subtitle_type, extension, "clean_subtitles", language
         )

@@ -46,42 +46,92 @@ class SubtitleUtils:
             )
             return False
 
-        video_language = video_details.language or "en"
-        language_priority = [video_language]
-        if video_language != "en":
-            language_priority.append("en")
-        if video_language != "hi":
-            language_priority.append("hi")
+        candidates = self._get_candidates(video_details)
+        if not candidates:
+            logger.warning(
+                f"No valid subtitle candidates found in metadata for video {video_details.video_id}"
+            )
+            return False
 
-        # Try manual then automatic
-        for subtitle_type in ["manual", "automatic"]:
-            subs_dict = getattr(video_details.subtitles, subtitle_type)
-            if not subs_dict:
+        # Try candidates (max 5)
+        for i, (sub_type, lang, fmt) in enumerate(candidates[:5]):
+            logger.info(
+                f"Attempting subtitle download {i+1}/5: {sub_type} | {lang} | {fmt} for {video_details.video_id}"
+            )
+            try:
+                subtitle_content = self.youtube_tool.download_subtitles(
+                    video_details.video_id, lang, fmt, sub_type
+                )
+
+                if subtitle_content is None:
+                    logger.warning(
+                        f"Download returned None for {sub_type} | {lang} | {fmt}. Trying next candidate."
+                    )
+                    continue
+
+                self.ephemeral_repository.store_subtitles(
+                    video_id=video_details.video_id,
+                    subtitles=subtitle_content,
+                    extension=fmt,
+                    subtitle_type=sub_type,
+                    language=lang,
+                )
+                return True
+            except Exception as e:
+                logger.error(
+                    f"Error downloading {sub_type} subtitles ({lang}, {fmt}) for {video_details.video_id}: {e}"
+                )
                 continue
 
-            for lang in language_priority:
-                if subs_dict.get(lang):
-                    lang_data = subs_dict.get(lang)
-                    for ext in self.SUBTITLE_PRIORITY_LIST:
-                        if lang_data.get(ext):
-                            try:
-                                subtitle_content = self.youtube_tool.download_subtitles(
-                                    video_details.video_id, lang, ext, subtitle_type
-                                )
-                                self.ephemeral_repository.store_subtitles(
-                                    video_id=video_details.video_id,
-                                    subtitles=subtitle_content,
-                                    extension=ext,
-                                    subtitle_type=subtitle_type,
-                                    language=lang,
-                                )
-                                return True
-                            except Exception as e:
-                                logger.error(
-                                    f"Error downloading {subtitle_type} subtitles ({lang}, {ext}): {e}"
-                                )
-                                continue
-        return False
+        raise RuntimeError(
+            f"Failed to download any subtitles for video {video_details.video_id} after trying {min(5, len(candidates))} candidates."
+        )
+
+    def _get_candidates(
+        self, video_details: YouTubeVideoDetails
+    ) -> List[tuple[str, str, str]]:
+        """
+        Generates a prioritized list of subtitle candidates based on enriched metadata.
+        Returns a list of tuples: (sub_type, language, format)
+        """
+        candidates = []
+        # Target languages: Video's specific language first, then generic English
+        target_langs = [video_details.language or "en", "en"]
+        fmt_priority = ["json3", "vtt", "srt"]
+
+        for sub_type, subs_map in [
+            ("manual", video_details.subtitles.manual),
+            ("automatic", video_details.subtitles.automatic),
+        ]:
+            if not subs_map:
+                continue
+
+            # Priority 1: Exact matches or prefix matches for target languages
+            for target in target_langs:
+                for actual_lang in subs_map.keys():
+                    if actual_lang.lower().startswith(target.lower()):
+                        for fmt in fmt_priority:
+                            if subs_map[actual_lang].get(fmt):
+                                candidates.append((sub_type, actual_lang, fmt))
+
+            # Priority 2: Fallback (Anything else available, in the order yt-dlp returned it)
+            for actual_lang in subs_map.keys():
+                if not any(
+                    actual_lang.lower().startswith(t.lower()) for t in target_langs
+                ):
+                    for fmt in fmt_priority:
+                        if subs_map[actual_lang].get(fmt):
+                            candidates.append((sub_type, actual_lang, fmt))
+
+        # Deduplicate while preserving order
+        seen = set()
+        unique_candidates = []
+        for candidate in candidates:
+            if candidate not in seen:
+                seen.add(candidate)
+                unique_candidates.append(candidate)
+
+        return unique_candidates
 
     def clean_and_store_subtitles(self, video_details: YouTubeVideoDetails) -> bool:
         """Cleans and stores subtitles for a video."""
