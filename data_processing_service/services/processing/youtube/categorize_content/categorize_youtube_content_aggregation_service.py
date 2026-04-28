@@ -80,36 +80,36 @@ class CategorizeYoutubeContentAggregationService:
                 )
                 raise ValueError(f"Could not find contents for IDs: {missing_ids}")
 
-                # Categorize using AI agent
-                categorized_batch = await self.categorization_agent.categorize_content(
-                    generated_content_list
+            # Categorize using AI agent
+            categorized_batch = await self.categorization_agent.categorize_content(
+                generated_content_list
+            )
+
+            updated_list = []
+            for content in categorized_batch:
+                # Update status and increment version for optimistic locking
+                content.set_status(
+                    GeneratedContentStatus.CATEGORIZATION_COMPLETED,
+                    "Categorization Complete.",
                 )
+                content.version += 1
+                updated_list.append(content)
 
-                updated_list = []
-                for content in categorized_batch:
-                    # Update status and increment version for optimistic locking
-                    content.set_status(
-                        GeneratedContentStatus.CATEGORIZATION_COMPLETED,
-                        "Categorization Complete.",
+                followup_command = GenerateCompleteYoutubeContentCommand(
+                    payload=GenerateCompleteYoutubeContentPayload(
+                        generated_content_id=content.id
                     )
-                    content.version += 1
-                    updated_list.append(content)
+                )
+                commands_to_publish.append(followup_command)
 
-                    followup_command = GenerateCompleteYoutubeContentCommand(
-                        payload=GenerateCompleteYoutubeContentPayload(
-                            generated_content_id=content.id
-                        )
-                    )
-                    commands_to_publish.append(followup_command)
-
-                # Batch update in repository
-                if updated_list:
-                    self.user_content_repository.update_generated_content_batch(
-                        updated_list
-                    )
-                    self.logger.info(
-                        f"✅ [CategorizeYoutubeContentAggregationService] Successfully updated batch of {len(updated_list)} items."
-                    )
+            # Batch update in repository
+            if updated_list:
+                self.user_content_repository.update_generated_content_batch(
+                    updated_list
+                )
+                self.logger.info(
+                    f"✅ [CategorizeYoutubeContentAggregationService] Successfully updated batch of {len(updated_list)} items."
+                )
 
         except Exception as e:
             self.logger.error(
@@ -119,6 +119,9 @@ class CategorizeYoutubeContentAggregationService:
 
         # If there are remaining IDs, create a new aggregation command
         if remaining_ids:
+            self.logger.info(
+                f"🔄 [CategorizeYoutubeContentAggregationService] Rescheduling {len(remaining_ids)} items."
+            )
             reschedule_command = CategorizeGeneratedYoutubeContentAggregationCommand(
                 payload=CategorizeGeneratedYoutubeContentAggregationPayload(
                     generated_content_ids=remaining_ids
@@ -133,3 +136,7 @@ class CategorizeYoutubeContentAggregationService:
                 self.logger.info(
                     f"📤 [CategorizeYoutubeContentAggregationService] Published command '{cmd.action_name}' to topic '{self.config.data_processing_service_topic}'"
                 )
+        else:
+            self.logger.info(
+                f"[CategorizeYoutubeContentAggregationService] No commands to publish."
+            )
