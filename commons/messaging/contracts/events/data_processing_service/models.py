@@ -22,7 +22,7 @@ class GeneratedYoutubeContentArticleReadyEvent(Event):
 
     EVENT_TYPE: ClassVar[str] = "generated_youtube_content_article_ready"
 
-    topic: str = "data_processing_service.events"
+    topic: str = "data_processing_service:events"
     event_type: str = EVENT_TYPE
     source_service: str = "data_processing_service"
     payload: GeneratedYoutubeContentArticleReadyPayload = Field(

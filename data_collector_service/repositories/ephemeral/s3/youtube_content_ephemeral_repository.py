@@ -7,7 +7,7 @@ from injector import inject
 from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.config.config import Config
 from data_collector_service.models.youtube.subtitle_models import (
-    SubtitleData, SubtitleMap)
+    DownloadedSubtitleData, DownloadedSubtitleMap, SubtitleData, SubtitleMap)
 from data_collector_service.repositories.youtube_content_ephemeral_repository import (
     SubtitleFileType, YoutubeContentEphemeralRepository)
 
@@ -237,7 +237,9 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
                         subtitle_type = parts[2]
                         # language is part of the filename: {language}.{extension}
                         filename = parts[3]
-                        language = filename.split(".")[0]
+                        if "." not in filename:
+                            continue
+                        language = filename.rsplit(".", 1)[0]
 
                         response = self.s3_client.get_object(
                             Bucket=self.bucket_name, Key=key
@@ -255,3 +257,46 @@ class S3YoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         return SubtitleData(
             automatic=automatic_subtitle_maps, manual=manual_subtitle_maps
         )
+
+    def list_downloaded_subtitles(self, video_id: str) -> DownloadedSubtitleData:
+        """
+        Lists all downloaded subtitles for a video from S3.
+        """
+        automatic_maps = []
+        manual_maps = []
+        prefix = f"{video_id}/{SubtitleFileType.DOWNLOADED.value}/"
+        paginator = self.s3_client.get_paginator("list_objects_v2")
+
+        for page in paginator.paginate(Bucket=self.bucket_name, Prefix=prefix):
+            if "Contents" in page:
+                for obj in page["Contents"]:
+                    key = obj["Key"]
+                    # Key format: {video_id}/{file_type}/{subtitle_type}/{language}.{extension}
+                    parts = key.split("/")
+                    if len(parts) >= 4:
+                        subtitle_type = parts[2]
+                        filename = parts[3]
+                        if "." not in filename:
+                            continue
+                        language, extension = filename.rsplit(".", 1)
+
+                        response = self.s3_client.get_object(
+                            Bucket=self.bucket_name, Key=key
+                        )
+                        content = response["Body"].read().decode("utf-8")
+
+                        sub_map = DownloadedSubtitleMap(
+                            subtitle=content,
+                            language=language,
+                            extension=extension,
+                        )
+                        if subtitle_type == "automatic":
+                            automatic_maps.append(sub_map)
+                        elif subtitle_type == "manual":
+                            manual_maps.append(sub_map)
+                        else:
+                            logger.error(f"Unknown subtitle type: {subtitle_type}")
+                            raise RuntimeError(
+                                f"Unknown subtitle type: {subtitle_type}"
+                            )
+        return DownloadedSubtitleData(automatic=automatic_maps, manual=manual_maps)

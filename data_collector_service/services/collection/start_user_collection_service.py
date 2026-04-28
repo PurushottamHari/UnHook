@@ -55,11 +55,11 @@ class StartUserCollectionService:
             user = await self.user_service_client.get_user(user_id)
             if not user:
                 logger.error(f"User {user_id} not found.")
-                return
+                raise ValueError(f"User {user_id} not found.")
 
             if not getattr(user.manual_configs, "youtube", None):
                 logger.info(f"No YouTube configuration found for user {user_id}")
-                return
+                raise ValueError(f"No YouTube configuration found for user {user_id}")
 
             youtube_config = user.manual_configs.youtube
             commands_to_send = []

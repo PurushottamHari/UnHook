@@ -123,7 +123,7 @@ class AggregatedScheduleService:
 
             # 2. Reconstruct and fire the original business command
             original_command = Command.model_validate(processing_schedule.payload)
-            topic = f"{original_command.target_service}.commands"
+            topic = f"{original_command.target_service}:commands"
 
             logger.info(
                 f"Executing business command '{original_command.action_name}' for schedule {processing_schedule.id} on topic '{topic}'"

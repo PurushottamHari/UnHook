@@ -246,11 +246,13 @@ class YtDlpClient:
         max_retries = 3
         last_exception = None
         for attempt in range(1, max_retries + 1):
+            if attempt > 1:
+                wait_time = random.uniform(1, 3)
+                logger.info(f"Waiting {wait_time:.2f} seconds before retry...")
+                time.sleep(wait_time)
+
             try:
                 with yt_dlp.YoutubeDL(subtitle_opts) as ydl:
-                    wait_time = random.uniform(1, 3)
-                    print(f"Waiting {wait_time:.2f} seconds before download...")
-                    time.sleep(wait_time)
                     ydl.download([video_url])
 
                 # Extract video_id from URL if not already available
@@ -299,12 +301,12 @@ class YtDlpClient:
                 )
                 return None
             except Exception as e:
-                print(
+                logger.error(
                     f"[Attempt {attempt}] Error downloading subtitles for {video_url}: {str(e)}"
                 )
                 last_exception = e
         # If all retries failed
-        print(
+        logger.error(
             f"All {max_retries} attempts failed for downloading subtitles for {video_url}."
         )
         raise Exception(

@@ -3,6 +3,7 @@ Service for handling content rejection.
 """
 
 import asyncio
+import logging
 from typing import List
 
 from injector import inject
@@ -21,6 +22,8 @@ from .service_context import RejectionServiceContext
 from .youtube.ai_agent.moderator import ContentModerator
 from .youtube.rejection_content_service_youtube import \
     RejectionContentServiceYoutube
+
+logger = logging.getLogger(__name__)
 
 
 @injectable()
@@ -62,6 +65,9 @@ class RejectContentService:
         try:
             # Get user object from user service
             user = await self.user_service_client.get_user(user_id)
+            if not user:
+                logger.error(f"User {user_id} not found.")
+                raise ValueError(f"User {user_id} not found.")
 
             # Get unprocessed content for the user
             unprocessed_content_list = (

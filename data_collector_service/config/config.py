@@ -142,7 +142,7 @@ class Config:
     @property
     def messaging_command_topic(self) -> str:
         """Get the main command topic for this service."""
-        return f"{self.service_name}.commands"
+        return f"{self.service_name}:commands"
 
     # S3 / R2 Configuration
     @property
@@ -177,9 +177,9 @@ class Config:
         return self._config_data.get("s3").get("endpoint_url")
 
     @property
-    def data_collection_service_topic(self) -> str:
+    def data_collector_service_topic(self) -> str:
         """Get the command topic for the data collection service."""
-        return self.get("messaging.commands.data_collection_service.topic")
+        return self.get("messaging.commands.data_collector_service.topic")
 
     @property
     def data_processing_service_topic(self) -> str:
@@ -189,7 +189,7 @@ class Config:
     @property
     def data_collector_service_events_topic(self) -> str:
         """Get the event topic for the data collector service."""
-        return self.get("messaging.events.data_collection_service.topic")
+        return self.get("messaging.events.data_collector_service.topic")
 
     @property
     def data_processing_service_events_topic(self) -> str:

@@ -20,15 +20,12 @@ s3:
 
 messaging:
   commands:
-    data_collection_service:
-      topic: "data_collector_service.commands"
+    data_collector_service:
+      topic: "data_collector_service:commands"
     data_processing_service:
-      topic: "data_processing_service.commands"
+      topic: "data_processing_service:commands"
   events:
     data_processing_service:
-      topic: "data_processing_service.events"
-    data_collection_service:
-      topic: "data_collection_service.events"
-  events:
-    data_processing_service:
-      topic: "data_processing_service.events"
+      topic: "data_processing_service:events"
+    data_collector_service:
+      topic: "data_collector_service:events"

@@ -22,7 +22,7 @@ class UserCollectedContentReadyToBeUsedEvent(Event):
 
     EVENT_TYPE: ClassVar[str] = "user_collected_content_ready_to_be_used"
 
-    topic: str = "data_collection_service.events"
+    topic: str = "data_collector_service:events"
     event_type: str = EVENT_TYPE
     source_service: str = "data_collector_service"
     payload: UserCollectedContentReadyToUsedPayload = Field(

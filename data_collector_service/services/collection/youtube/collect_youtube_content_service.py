@@ -77,7 +77,7 @@ class CollectYouTubeContentService:
             logger.error(
                 f"❌ [CollectYouTubeContentService] User {user_id} not found. Aborting collection for channel {channel_id}."
             )
-            return
+            raise ValueError(f"User {user_id} not found.")
 
         # Todo: Puru Have a global config which makes sure that one channel search is not bombarded unneccessarily
 

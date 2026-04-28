@@ -14,7 +14,7 @@ class StartDataProcessingForUserCollectedContentCommand(Command):
     ACTION_NAME: ClassVar[str] = "start_data_processing_for_user_collected_content"
     action_name: str = ACTION_NAME
     target_service: str = "data_processing_service"
-    topic: str = "data_processing_service.commands"
+    topic: str = "data_processing_service:commands"
     payload: StartDataProcessingForUserCollectedContentPayload = Field(
         ...,
         description="Details for starting data processing for user collected content",

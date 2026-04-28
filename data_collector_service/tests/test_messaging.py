@@ -46,13 +46,13 @@ async def run_messaging_test():
 
     try:
         # Unified command topic used by the service
-        command_topic = "data_collector.commands"
+        command_topic = "data_collector_service:commands"
         user_id = "test-user-123"
 
         # 5. Send a collect_data command (Topic is now set via validator or explicitly)
         command = Command(
-            topic="data_collector.commands",
-            target_service="data_collector",
+            topic="data_collector_service:commands",
+            target_service="data_collector_service",
             action_name="collect_data",
             payload={"user_id": user_id},
         )
@@ -68,8 +68,8 @@ async def run_messaging_test():
 
         # 8. Send a reject_content command
         reject_command = Command(
-            topic="data_collector.commands",
-            target_service="data_collector",
+            topic="data_collector_service:commands",
+            target_service="data_collector_service",
             action_name="reject_content",
             payload={"user_id": user_id},
         )

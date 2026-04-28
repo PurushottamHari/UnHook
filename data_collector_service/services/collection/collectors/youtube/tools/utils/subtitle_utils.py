@@ -34,7 +34,6 @@ class SubtitleUtils:
     ):
         self.youtube_tool = youtube_tool
         self.ephemeral_repository = ephemeral_repository
-        self.SUBTITLE_PRIORITY_LIST = ["srt", "vtt", "json3"]
 
     def download_and_store_subtitles(self, video_details: YouTubeVideoDetails) -> bool:
         """Downloads and stores subtitles for a video."""
@@ -134,47 +133,56 @@ class SubtitleUtils:
         return unique_candidates
 
     def clean_and_store_subtitles(self, video_details: YouTubeVideoDetails) -> bool:
-        """Cleans and stores subtitles for a video."""
-        generated_clean_subtitles = False
+        """
+        Cleans and stores subtitles for a video.
+        It discovers all downloaded subtitles, sorts them by priority,
+        and attempts to clean them one by one until one succeeds.
+        """
         video_id = video_details.video_id
+        downloaded_data = self.ephemeral_repository.list_downloaded_subtitles(video_id)
 
-        for lan in ["en", "hi"]:
-            for subtitle_type in ["automatic", "manual"]:
-                for ext in self.SUBTITLE_PRIORITY_LIST:
-                    if self.ephemeral_repository.check_if_downloaded_subtitle_file_exists(
-                        video_id=video_id,
-                        subtitle_type=subtitle_type,
-                        extension=ext,
-                        language=lan,
-                    ):
-                        subtitle_content = (
-                            self.ephemeral_repository.get_downloaded_subtitle_file_data(
-                                video_id=video_id,
-                                subtitle_type=subtitle_type,
-                                extension=ext,
-                                language=lan,
-                            )
+        if not downloaded_data.manual and not downloaded_data.automatic:
+            logger.warning(f"No downloaded subtitles found for video {video_id}")
+            return False
+
+        # Extension priority: json3 > vtt > srt
+        fmt_priority = {"json3": 0, "vtt": 1, "srt": 2}
+
+        # Try manual first, then automatic
+        for subtitle_type, subs_list in [
+            ("manual", downloaded_data.manual),
+            ("automatic", downloaded_data.automatic),
+        ]:
+            if not subs_list:
+                continue
+
+            # Sort by extension priority
+            subs_list.sort(key=lambda x: fmt_priority.get(x.extension, 99))
+
+            for sub in subs_list:
+                try:
+                    cleaned_subtitles = self.clean_subtitles(
+                        sub.subtitle, sub.extension
+                    )
+                    if cleaned_subtitles and cleaned_subtitles.strip():
+                        self.ephemeral_repository.store_clean_subtitles(
+                            video_id=video_id,
+                            subtitles=cleaned_subtitles,
+                            language=sub.language,
+                            subtitle_type=subtitle_type,
+                            extension=sub.extension,
                         )
-                        if subtitle_content:
-                            try:
-                                cleaned_subtitles = self.clean_subtitles(
-                                    subtitle_content, ext
-                                )
-                                if cleaned_subtitles and cleaned_subtitles.strip():
-                                    self.ephemeral_repository.store_clean_subtitles(
-                                        video_id=video_id,
-                                        subtitles=cleaned_subtitles,
-                                        language=lan,
-                                        subtitle_type=subtitle_type,
-                                        extension=ext,
-                                    )
-                                    generated_clean_subtitles = True
-                            except Exception as e:
-                                logger.error(
-                                    f"Error cleaning subtitles for {video_id}: {e}"
-                                )
-                                continue
-        return generated_clean_subtitles
+                        logger.info(
+                            f"Successfully cleaned and stored {subtitle_type} {sub.language} subtitles ({sub.extension}) for {video_id}"
+                        )
+                        return True
+                except Exception as e:
+                    logger.error(
+                        f"Error cleaning {subtitle_type} {sub.language} subtitles ({sub.extension}) for {video_id}: {e}"
+                    )
+                    continue
+
+        return False
 
     def clean_subtitles(self, subtitle_content: str, extension: str) -> str:
         """

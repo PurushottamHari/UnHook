@@ -34,7 +34,7 @@ class BaseMessagingHandler:
     def _register_handlers(self):
         """Setup routers and register them with the consumer."""
         # 1. Register Command Router
-        command_topic = f"{self.config.service_name}.commands"
+        command_topic = f"{self.config.service_name}:commands"
         self.consumer.register_command_handler(
             command_topic, self._wrap_handler(self.command_router.handle)
         )

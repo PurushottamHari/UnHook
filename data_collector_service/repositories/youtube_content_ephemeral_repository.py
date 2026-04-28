@@ -6,7 +6,8 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import List
 
-from data_collector_service.models.youtube.subtitle_models import SubtitleData
+from data_collector_service.models.youtube.subtitle_models import (
+    DownloadedSubtitleData, SubtitleData)
 
 
 class SubtitleFileType(str, Enum):
@@ -71,4 +72,8 @@ class YoutubeContentEphemeralRepository(ABC):
 
     @abstractmethod
     def get_all_clean_subtitle_file_data(self, video_id: str) -> SubtitleData:
+        pass
+
+    @abstractmethod
+    def list_downloaded_subtitles(self, video_id: str) -> DownloadedSubtitleData:
         pass

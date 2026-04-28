@@ -1,4 +1,5 @@
 import copy
+import logging
 from datetime import datetime
 from typing import List, Tuple
 
@@ -26,6 +27,8 @@ from data_collector_service.repositories.youtube_collected_content_repository im
 from .ai_agent import ContentModerator
 from .ai_agent.adaptors.input_adaptor import InputAdaptor
 from .rejection_content_service_youtube import get_content_by_video_id
+
+logger = logging.getLogger(__name__)
 
 
 @injectable()
@@ -78,17 +81,20 @@ class ProcessYoutubeChannelRejectionAggregationService:
         # 1. Fetch User and Content Objects
         user = await self.user_service_client.get_user(user_id)
         if not user:
-            print(
-                f"❌ [ProcessYoutubeChannelRejectionAggregationService] User {user_id} not found. Aborting."
-            )
-            return
+            logger.error(f"User {user_id} not found.")
+            raise ValueError(f"User {user_id} not found.")
+
+        if len(content_ids) == 0:
+            logger.warning(f"No content IDs provided for user {user_id}")
+            raise ValueError(f"No content IDs provided for user {user_id}")
 
         contents = self.content_repository.get_content_by_ids(content_ids)
-        if not contents:
-            print(
-                f"⚠️ [ProcessYoutubeChannelRejectionAggregationService] No contents found for IDs: {content_ids}"
+        if len(contents) != len(content_ids):
+            missing_ids = list(set(content_ids) - {content.id for content in contents})
+            logger.error(
+                f"❌ [ProcessYoutubeChannelRejectionAggregationService] Could not find contents for IDs: {missing_ids}"
             )
-            return
+            raise ValueError(f"Could not find contents for IDs: {missing_ids}")
 
         # 2. Partition Content
         collected = [c for c in contents if c.status == ContentStatus.COLLECTED]

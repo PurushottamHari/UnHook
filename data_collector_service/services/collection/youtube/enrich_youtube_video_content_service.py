@@ -76,7 +76,7 @@ class EnrichYouTubeVideoContentService:
             logger.error(
                 f"❌ [EnrichYouTubeVideoContentService] User {user_id} not found. Aborting enrichment for video {video_id}."
             )
-            return
+            raise ValueError(f"User {user_id} not found.")
 
         # fetch the youtube video details with the id
         try:
@@ -91,9 +91,8 @@ class EnrichYouTubeVideoContentService:
             # Fetch data and enrich using YouTubeExternalTool
             enriched_videos = self.youtube_tool.enrich_video_data_with_details([video])
             if not enriched_videos:
-                logger.warning(f"⚠️ No enrichment data found for video {video_id}")
-                # Todo: Puru this needs to be a retry or a dead letter queue scenario
-                return
+                logger.error(f"No enrichment data found for video {video_id}")
+                raise ValueError(f"No enrichment data found for video {video_id}")
             enriched_video = enriched_videos[0]
             enriched_video.set_status(
                 YouTubeVideoStatus.ENRICHED, "Video metadata enriched via external tool"

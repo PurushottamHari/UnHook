@@ -18,6 +18,8 @@ from data_processing_service.repositories.user_content_repository import \
 from data_processing_service.services.processing.youtube.categorize_content.ai_agent.categorization_agent import \
     CategorizationAgent
 
+logger = logging.getLogger(__name__)
+
 
 @injectable()
 class CategorizeYoutubeContentAggregationService:
@@ -47,7 +49,8 @@ class CategorizeYoutubeContentAggregationService:
         Remaining IDs are published as a new aggregation command.
         """
         if not generated_content_ids:
-            return
+            logger.warning(f"No generated content IDs provided.")
+            raise ValueError(f"No generated content IDs provided.")
 
         # 1. Filter the batch: take first 8 for processing
         processing_ids = generated_content_ids[:8]
@@ -67,12 +70,17 @@ class CategorizeYoutubeContentAggregationService:
                 )
             )
 
-            if not generated_content_list:
-                self.logger.warning(
-                    f"⚠️ [CategorizeYoutubeContentAggregationService] No generated content found for IDs: {processing_ids}"
+            if len(generated_content_list) != len(processing_ids):
+                missing_ids = list(
+                    set(processing_ids)
+                    - {content.id for content in generated_content_list}
                 )
-            else:
-                # 2. Categorize using AI agent
+                self.logger.error(
+                    f"❌ [CategorizeYoutubeContentAggregationService] Could not find contents for IDs: {missing_ids}"
+                )
+                raise ValueError(f"Could not find contents for IDs: {missing_ids}")
+
+                # Categorize using AI agent
                 categorized_batch = await self.categorization_agent.categorize_content(
                     generated_content_list
                 )
@@ -94,7 +102,7 @@ class CategorizeYoutubeContentAggregationService:
                     )
                     commands_to_publish.append(followup_command)
 
-                # 4. Batch update in repository
+                # Batch update in repository
                 if updated_list:
                     self.user_content_repository.update_generated_content_batch(
                         updated_list
@@ -109,7 +117,7 @@ class CategorizeYoutubeContentAggregationService:
             )
             raise
 
-        # 5. If there are remaining IDs, create a new aggregation command
+        # If there are remaining IDs, create a new aggregation command
         if remaining_ids:
             reschedule_command = CategorizeGeneratedYoutubeContentAggregationCommand(
                 payload=CategorizeGeneratedYoutubeContentAggregationPayload(
@@ -118,7 +126,7 @@ class CategorizeYoutubeContentAggregationService:
             )
             commands_to_publish.append(reschedule_command)
 
-        # 6. Publish all commands in the list
+        # Publish all commands in the list
         if commands_to_publish:
             for cmd in commands_to_publish:
                 await self.message_producer.send_command(cmd)

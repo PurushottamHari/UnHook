@@ -2,7 +2,7 @@ import os
 
 from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.youtube.subtitle_models import (
-    SubtitleData, SubtitleMap)
+    DownloadedSubtitleData, DownloadedSubtitleMap, SubtitleData, SubtitleMap)
 from data_collector_service.repositories.youtube_content_ephemeral_repository import \
     YoutubeContentEphemeralRepository
 
@@ -144,30 +144,35 @@ class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         """
         Checks for the existence of subtitle files, deleting any that are empty.
         """
-        found_valid_file = False
         video_path = os.path.join(self.subtitles_dir, video_id)
         if not os.path.isdir(video_path):
             return False
 
-        for subtitle_type in ["automatic", "manual"]:
+        # file_type is either "downloaded_subtitle" or "clean_subtitles"
+        # The structure is: subtitles_dir/video_id/subtitle_type/language/extension/filename
+        # Wait, the current implementation assumes subtitle_type is at the second level?
+        # Actually, let's look at _generate_subtitle_file_path:
+        # base_dir / video_id / subtitle_type / language / extension / f"{base_filename}.{extension}"
+
+        found_valid_file = False
+        for subtitle_type in os.listdir(video_path):
             type_path = os.path.join(video_path, subtitle_type)
             if not os.path.isdir(type_path):
                 continue
-            for language in ["en", "hi"]:
+            for language in os.listdir(type_path):
                 lang_path = os.path.join(type_path, language)
                 if not os.path.isdir(lang_path):
                     continue
                 for extension in os.listdir(lang_path):
                     ext_path = os.path.join(lang_path, extension)
-                    if os.path.isdir(ext_path):
-                        file_path = self._generate_subtitle_file_path(
-                            video_id, subtitle_type, extension, base_filename, language
-                        )
-                        if os.path.isfile(file_path):
-                            if os.path.getsize(file_path) > 0:
-                                found_valid_file = True
-                            else:
-                                os.remove(file_path)
+                    if not os.path.isdir(ext_path):
+                        continue
+                    file_path = os.path.join(ext_path, f"{base_filename}.{extension}")
+                    if os.path.isfile(file_path):
+                        if os.path.getsize(file_path) > 0:
+                            found_valid_file = True
+                        else:
+                            os.remove(file_path)
         return found_valid_file
 
     def check_if_downloaded_subtitle_file_exists(
@@ -190,36 +195,73 @@ class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
         automatic_subtitle_maps = []
         manual_subtitle_maps = []
 
-        for subtitle_type in ["automatic", "manual"]:
-            for language in ["en", "hi"]:
-                type_lang_path = os.path.join(
-                    self.subtitles_dir, video_id, subtitle_type, language
-                )
-                if os.path.isdir(type_lang_path):
-                    for extension in os.listdir(type_lang_path):
-                        ext_path = os.path.join(type_lang_path, extension)
-                        if os.path.isdir(ext_path):
-                            file_path = self._generate_subtitle_file_path(
-                                video_id,
-                                subtitle_type,
-                                extension,
-                                "clean_subtitles",
-                                language,
-                            )
-                            if (
-                                os.path.isfile(file_path)
-                                and os.path.getsize(file_path) > 0
-                            ):
-                                with open(file_path, "r", encoding="utf-8") as f:
-                                    subtitle_content = f.read()
-                                sub_map = SubtitleMap(
-                                    language=language, subtitle=subtitle_content
-                                )
-                                if subtitle_type == "automatic":
-                                    automatic_subtitle_maps.append(sub_map)
-                                else:
-                                    manual_subtitle_maps.append(sub_map)
+        video_path = os.path.join(self.subtitles_dir, video_id)
+        if not os.path.isdir(video_path):
+            return SubtitleData(automatic=[], manual=[])
+
+        for subtitle_type in os.listdir(video_path):
+            if subtitle_type not in ["automatic", "manual"]:
+                continue
+            type_path = os.path.join(video_path, subtitle_type)
+            for language in os.listdir(type_path):
+                lang_path = os.path.join(type_path, language)
+                if not os.path.isdir(lang_path):
+                    continue
+                for extension in os.listdir(lang_path):
+                    ext_path = os.path.join(lang_path, extension)
+                    if not os.path.isdir(ext_path):
+                        continue
+                    file_path = os.path.join(ext_path, f"clean_subtitles.{extension}")
+                    if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            subtitle_content = f.read()
+                        sub_map = SubtitleMap(
+                            language=language, subtitle=subtitle_content
+                        )
+                        if subtitle_type == "automatic":
+                            automatic_subtitle_maps.append(sub_map)
+                        else:
+                            manual_subtitle_maps.append(sub_map)
 
         return SubtitleData(
             automatic=automatic_subtitle_maps, manual=manual_subtitle_maps
         )
+
+    def list_downloaded_subtitles(self, video_id: str) -> DownloadedSubtitleData:
+        """
+        Lists all downloaded subtitles for a video by walking the directory structure.
+        """
+        automatic_maps = []
+        manual_maps = []
+        video_path = os.path.join(self.subtitles_dir, video_id)
+        if not os.path.isdir(video_path):
+            return DownloadedSubtitleData(automatic=[], manual=[])
+
+        for subtitle_type in os.listdir(video_path):
+            if subtitle_type not in ["automatic", "manual"]:
+                continue
+            type_path = os.path.join(video_path, subtitle_type)
+            for language in os.listdir(type_path):
+                lang_path = os.path.join(type_path, language)
+                if not os.path.isdir(lang_path):
+                    continue
+                for extension in os.listdir(lang_path):
+                    ext_path = os.path.join(lang_path, extension)
+                    if not os.path.isdir(ext_path):
+                        continue
+                    file_path = os.path.join(
+                        ext_path, f"downloaded_subtitle.{extension}"
+                    )
+                    if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            content = f.read()
+                        sub_map = DownloadedSubtitleMap(
+                            subtitle=content,
+                            language=language,
+                            extension=extension,
+                        )
+                        if subtitle_type == "automatic":
+                            automatic_maps.append(sub_map)
+                        else:
+                            manual_maps.append(sub_map)
+        return DownloadedSubtitleData(automatic=automatic_maps, manual=manual_maps)

@@ -17,7 +17,7 @@ class CategorizeGeneratedYoutubeContentAggregationCommand(Command):
 
     action_name: str = ACTION_NAME
     target_service: str = "data_processing_service"
-    topic: str = "data_processing_service.commands"
+    topic: str = "data_processing_service:commands"
     payload: CategorizeGeneratedYoutubeContentAggregationPayload = Field(
         ..., description="Details for categorizing generated youtube content"
     )
@@ -32,7 +32,7 @@ class GenerateCompleteYoutubeContentCommand(Command):
 
     action_name: str = ACTION_NAME
     target_service: str = "data_processing_service"
-    topic: str = "data_processing_service.commands"
+    topic: str = "data_processing_service:commands"
     payload: GenerateCompleteYoutubeContentPayload = Field(
         ..., description="Details for generating complete youtube content"
     )

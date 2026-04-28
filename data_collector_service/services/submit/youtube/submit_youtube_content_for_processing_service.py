@@ -37,7 +37,7 @@ class SubmitYoutubeContentForProcessingService:
             video_details = self.youtube_repository.get_video_by_id(video_id)
         except ValueError as e:
             logger.error(f"Video {video_id} not found in repository: {e}")
-            return
+            raise
 
         if not video_details:
             logger.error(f"❌ No YouTube video details found for video {video_id}")
@@ -62,9 +62,8 @@ class SubmitYoutubeContentForProcessingService:
             logger.info(f"Downloading subtitles for video {video_id}")
             success = self.subtitle_utils.download_and_store_subtitles(video_details)
             if not success:
-                logger.warning(f"Failed to download subtitles for video {video_id}")
-                # Todo: Puru this a deadletter queue and retry logic usecase for the messaging pipeline
-                return
+                logger.error(f"Failed to download subtitles for video {video_id}")
+                raise ValueError(f"Failed to download subtitles for video {video_id}")
 
         # 2. Clean and store subtitles if not already present
         if not self.subtitle_utils.ephemeral_repository.do_any_clean_subtitles_exist_for_video(
@@ -73,10 +72,12 @@ class SubmitYoutubeContentForProcessingService:
             logger.info(f"Cleaning subtitles for video {video_id}")
             success = self.subtitle_utils.clean_and_store_subtitles(video_details)
             if not success:
-                logger.warning(
+                logger.error(
                     f"Failed to clean and store subtitles for video {video_id}"
                 )
-                return
+                raise ValueError(
+                    f"Failed to clean and store subtitles for video {video_id}"
+                )
 
         # 3. Update YouTube video status in repository
         video_details.set_status(
