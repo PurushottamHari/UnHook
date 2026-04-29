@@ -94,7 +94,7 @@ class RedisMessageConsumer(MessageConsumer):
                 )
             )
 
-        tasks.append(self._process_scheduled_commands())
+        tasks.append(self._process_scheduled_messages())
 
         if not tasks:
             print("⚠️ [Redis] No handlers registered. Consumer exiting.")
@@ -255,13 +255,14 @@ class RedisMessageConsumer(MessageConsumer):
         except Exception as e:
             print(f"❌ [Redis] Error claiming stale messages for {topic}: {e}")
 
-    async def _process_scheduled_commands(self) -> None:
-        """Poll scheduled keys and move due commands to their respective Streams."""
-        queues = list(self.command_handlers.keys())
+    async def _process_scheduled_messages(self) -> None:
+        """Poll scheduled keys and move due items (commands or events) to their respective Streams."""
+        # We monitor all topics that this service is registered to handle
+        queues = list(self.command_handlers.keys()) + list(self.event_handlers.keys())
         if not queues:
             return
 
-        print(f"🕒 [Redis] Monitoring scheduled commands for streams: {queues}")
+        print(f"🕒 [Redis] Monitoring scheduled messages for streams: {queues}")
 
         while self._running:
             try:
@@ -284,7 +285,7 @@ class RedisMessageConsumer(MessageConsumer):
                                     topic, {"payload": message_json}
                                 )
                                 print(
-                                    f"🚀 [Redis] Scheduled command moved to stream '{topic}'"
+                                    f"🚀 [Redis] Scheduled message moved to stream '{topic}'"
                                 )
                 await asyncio.sleep(1)
             except Exception as e:
