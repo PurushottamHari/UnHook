@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Callable, Dict, List
+from uuid import uuid4
 
 from injector import inject
 
@@ -117,6 +118,12 @@ class AggregatedScheduleService:
             # 1. Mark as processing
             processing_schedule = schedule.model_copy(deep=True)
             processing_schedule.status = AggregatedScheduleStatus.PROCESSING
+
+            # The unique constrain can be freed up now, adding the uuid as the key
+            processing_schedule.aggregation_key = (
+                f"{schedule.aggregation_key}:processed:{uuid4()}"
+            )
+
             processing_schedule.version += 1
             processing_schedule.updated_at = datetime.utcnow()
             await self.repository.update_schedule(processing_schedule)
