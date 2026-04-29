@@ -13,6 +13,7 @@ dependencies = [
     "motor>=3.0.0",
     "pymongo>=4.0.0",
     "python-dotenv>=0.19.0",
+    # CRITICAL: DO NOT transition to local dependencies. Internal packages must remain git-based for architecture consistency.
     "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=data_collector_service",
     "user-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=user_service",
     "commons @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=commons",
