@@ -1,5 +1,5 @@
 # Stage 1: Base - Common setup and dependencies
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \

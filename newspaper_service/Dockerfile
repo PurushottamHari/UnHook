@@ -1,5 +1,5 @@
 # Stage 1: Base - Common setup and dependencies
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -47,7 +47,7 @@ RUN useradd --create-home --shell /bin/bash app \
 USER app
 
 # Stage 2: API - Specific to the FastAPI application
-FROM base as api
+FROM base AS api
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
@@ -56,6 +56,6 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 CMD ["uv", "run", "uvicorn", "newspaper_service.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # Stage 3: Worker - Specific to the messaging consumer
-FROM base as worker
+FROM base AS worker
 # Default command to run the worker using uv run
 CMD ["uv", "run", "python", "-m", "newspaper_service.app"]
