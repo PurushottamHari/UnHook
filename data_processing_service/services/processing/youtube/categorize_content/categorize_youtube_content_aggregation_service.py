@@ -13,8 +13,8 @@ from data_processing_service.messaging.models.commands import (
     GenerateCompleteYoutubeContentPayload)
 from data_processing_service.models.generated_content import \
     GeneratedContentStatus
-from data_processing_service.repositories.user_content_repository import \
-    UserContentRepository
+from data_processing_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
 from data_processing_service.services.processing.youtube.categorize_content.ai_agent.categorization_agent import \
     CategorizationAgent
 
@@ -28,7 +28,7 @@ class CategorizeYoutubeContentAggregationService:
     @inject
     def __init__(
         self,
-        user_content_repository: UserContentRepository,
+        generated_content_repository: GeneratedContentRepository,
         categorization_agent: CategorizationAgent,
         message_producer: MessageProducer,
         config: Config,
@@ -36,7 +36,7 @@ class CategorizeYoutubeContentAggregationService:
         """
         Initialize the service with dependencies.
         """
-        self.user_content_repository = user_content_repository
+        self.generated_content_repository = generated_content_repository
         self.categorization_agent = categorization_agent
         self.message_producer = message_producer
         self.config = config
@@ -65,7 +65,7 @@ class CategorizeYoutubeContentAggregationService:
         try:
             # Fetch generated content objects
             generated_content_list = (
-                self.user_content_repository.get_generated_content_by_ids(
+                self.generated_content_repository.get_generated_content_by_ids(
                     processing_ids
                 )
             )
@@ -104,7 +104,7 @@ class CategorizeYoutubeContentAggregationService:
 
             # Batch update in repository
             if updated_list:
-                self.user_content_repository.update_generated_content_batch(
+                self.generated_content_repository.update_generated_content_batch(
                     updated_list
                 )
                 self.logger.info(

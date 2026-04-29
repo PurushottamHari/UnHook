@@ -25,6 +25,8 @@ from data_processing_service.repositories.ephemeral.local.youtube_content_epheme
     LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
     YoutubeContentEphemeralRepository
+from data_processing_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
 from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
 from data_processing_service.repositories.mongodb.user_content_repository import \
@@ -51,6 +53,7 @@ class GenerateRequiredYoutubeContentService:
     def __init__(
         self,
         user_content_repository: UserContentRepository,
+        generated_content_repository: GeneratedContentRepository,
         youtube_content_ephemeral_repository: YoutubeContentEphemeralRepository,
         user_service_client: UserServiceClient,
         required_content_generator_agent: RequiredContentGenerator,
@@ -64,6 +67,7 @@ class GenerateRequiredYoutubeContentService:
             required_content_generator_agent: AI agent for content generation
         """
         self.user_content_repository = user_content_repository
+        self.generated_content_repository = generated_content_repository
         self.user_service_client = user_service_client
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
         self.required_content_generator_agent = required_content_generator_agent
@@ -166,7 +170,7 @@ class GenerateRequiredYoutubeContentService:
                     )
 
                     # Make the database write
-                    self.user_content_repository.add_generated_content(
+                    self.generated_content_repository.add_generated_content(
                         generated_content=generated_content
                     )
                     print(

@@ -80,45 +80,6 @@ class UserContentRepository(ABC):
         pass
 
     @abstractmethod
-    def add_generated_content(self, generated_content: GeneratedContent):
-        pass
-
-    @abstractmethod
-    def get_generated_content(
-        self,
-        status: GeneratedContentStatus,
-        content_type: ContentType,
-    ) -> List[GeneratedContent]:
-        pass
-
-    @abstractmethod
-    def get_generated_content_by_ids(
-        self,
-        content_ids: List[str],
-    ) -> List[GeneratedContent]:
-        pass
-
-    @abstractmethod
-    def get_generated_content_by_user_collected_content_status(
-        self,
-        user_id: str,
-        status: GeneratedContentStatus,
-        content_type: ContentType,
-        user_collected_content_status: ContentStatus,
-    ) -> List[GeneratedContent]:
-        pass
-
-    @abstractmethod
-    def update_generated_content(self, updated_generated_content: GeneratedContent):
-        pass
-
-    @abstractmethod
-    def update_generated_content_batch(
-        self, updated_generated_content_list: List[GeneratedContent]
-    ):
-        pass
-
-    @abstractmethod
     def get_user_collected_content_by_external_ids(
         self, external_ids: List[str]
     ) -> List[UserCollectedContent]:

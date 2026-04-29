@@ -10,8 +10,8 @@ from data_processing_service.models.generated_content import \
     GeneratedContentStatus
 from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
-from data_processing_service.repositories.mongodb.user_content_repository import \
-    MongoDBUserContentRepository
+from data_processing_service.repositories.mongodb.generated_content_repository import \
+    MongoDBGeneratedContentRepository
 from data_processing_service.service_context import \
     DataProcessingServiceContext
 from data_processing_service.services.processing.youtube.categorize_content.ai_agent.categorization_agent import \
@@ -27,9 +27,9 @@ class CategorizeYoutubeContentService:
         # Initialize MongoDB connection if not already connected
         if MongoDB.db is None:
             MongoDB.connect_to_database()
-        # Create MongoDB user content repository
-        self.user_content_repository = MongoDBUserContentRepository(
-            MongoDB.get_database()
+        # Create MongoDB generated content repository
+        self.generated_content_repository = MongoDBGeneratedContentRepository(
+            mongodb=MongoDB
         )
         self.logger = logging.getLogger(__name__)
         self.categorization_agent = CategorizationAgent()
@@ -46,9 +46,11 @@ class CategorizeYoutubeContentService:
         Categorize using the AI agent, deep clone, update timestamp, and set status.
         """
         try:
-            generated_content_list = self.user_content_repository.get_generated_content(
-                status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
-                content_type=ContentType.YOUTUBE_VIDEO,
+            generated_content_list = (
+                self.generated_content_repository.get_generated_content(
+                    status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
+                    content_type=ContentType.YOUTUBE_VIDEO,
+                )
             )
             print(
                 f"Found {len(generated_content_list)} generated content items with status REQUIRED_CONTENT_GENERATED"
@@ -92,7 +94,7 @@ class CategorizeYoutubeContentService:
 
                         updated_generated_content_list.append(cloned)
                     # Persist the updated batch
-                    self.user_content_repository.update_generated_content_batch(
+                    self.generated_content_repository.update_generated_content_batch(
                         updated_generated_content_list
                     )
                 except Exception as e:

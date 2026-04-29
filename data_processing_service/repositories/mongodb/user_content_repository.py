@@ -2,6 +2,7 @@
 MongoDB implementation of user content repository.
 """
 
+import logging
 from typing import List, Optional
 
 from injector import inject
@@ -14,14 +15,11 @@ from data_collector_service.repositories.mongodb.adapters.collected_content_adap
     CollectedContentAdapter
 from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
     CollectedContentDBModel
-from data_processing_service.models.generated_content import (
-    GeneratedContent, GeneratedContentStatus)
+from data_processing_service.models.generated_content import GeneratedContent
 from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
     GeneratedContentAdapter
 from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
-from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
-    GeneratedContentDBModel
 from data_processing_service.repositories.mongodb.utils.optimistic_locking import \
     create_optimistic_locking_update_op
 
@@ -45,6 +43,7 @@ class MongoDBUserContentRepository(UserContentRepository):
         self.generated_content_collection = self.database.generated_content
         # Ensure unique index on external_id in generated_content collection
         self.generated_content_collection.create_index("external_id", unique=True)
+        self.logger = logging.getLogger(__name__)
 
     def get_unprocessed_content_for_user(
         self, user_id: str
@@ -104,9 +103,21 @@ class MongoDBUserContentRepository(UserContentRepository):
         update_dict = db_model.dict(by_alias=True, exclude_unset=True)
         # Mongodb does not allow _id to be passed even if same
         _id = update_dict.pop("_id")
-        self.collected_content_collection.update_one(
-            {"_id": _id}, {"$set": update_dict}
+
+        # Use the optimistic locking utility
+        op = create_optimistic_locking_update_op(
+            filter_query={"_id": _id},
+            update_dict=update_dict,
+            version=updated_user_collected_content.version,
         )
+
+        result = self.collected_content_collection.bulk_write([op])
+
+        if result.matched_count == 0 and updated_user_collected_content.version > 1:
+            raise ValueError(
+                f"Optimistic lock failure for UserCollectedContent with id {_id}. "
+                f"Expected version {updated_user_collected_content.version - 1} not found."
+            )
 
     def update_user_collected_content_batch(
         self, updated_user_collected_content_list: List[UserCollectedContent]
@@ -122,9 +133,25 @@ class MongoDBUserContentRepository(UserContentRepository):
             update_dict = db_model.dict(by_alias=True, exclude_unset=True)
             # Mongodb does not allow _id to be passed even if same
             _id = update_dict.pop("_id")
-            operations.append(UpdateOne({"_id": _id}, {"$set": update_dict}))
+            # Use the optimistic locking utility
+            operations.append(
+                create_optimistic_locking_update_op(
+                    filter_query={"_id": _id},
+                    update_dict=update_dict,
+                    version=content.version,
+                )
+            )
         if operations:
-            self.collected_content_collection.bulk_write(operations)
+            result = self.collected_content_collection.bulk_write(operations)
+            if result.matched_count < len(operations):
+                # This check is slightly loose as it doesn't tell which one failed,
+                # but it ensures we know if something went wrong.
+                # Only check if versions are > 1
+                if any(c.version > 1 for c in updated_user_collected_content_list):
+                    self.logger.warning(
+                        f"Optimistic lock failure detected in batch update. "
+                        f"Matched {result.matched_count} out of {len(operations)}."
+                    )
 
     def get_user_collected_content(
         self,
@@ -191,149 +218,6 @@ class MongoDBUserContentRepository(UserContentRepository):
             for doc in cursor
         ]
 
-    def add_generated_content(self, generated_content: GeneratedContent):
-        generated_content_db_model = (
-            GeneratedContentAdapter.to_generated_content_db_model(
-                content=generated_content
-            )
-        )
-        # Insert the generated content into the generated_content_collection
-        self.generated_content_collection.insert_one(
-            generated_content_db_model.model_dump(by_alias=True)
-        )
-
-    def get_generated_content(
-        self,
-        status: GeneratedContentStatus,
-        content_type: ContentType,
-    ) -> List[GeneratedContent]:
-        """
-        Get list of generated content with the given status and content_type.
-        Args:
-            status: The status of the generated content to filter by
-            content_type: The content type to filter by
-        Returns:
-            List[GeneratedContent]: List of generated content items
-        """
-        cursor = self.generated_content_collection.find(
-            {
-                "status": status,
-                "content_type": content_type,
-            }
-        )
-        return [
-            GeneratedContentAdapter.from_generated_content_db_model(
-                GeneratedContentDBModel(**doc)
-            )
-            for doc in cursor
-        ]
-
-    def get_generated_content_by_ids(
-        self,
-        content_ids: List[str],
-    ) -> List[GeneratedContent]:
-        """
-        Get list of generated content with the given IDs.
-        Args:
-            content_ids: The IDs of the generated content to filter by
-        Returns:
-            List[GeneratedContent]: List of generated content items
-        """
-        cursor = self.generated_content_collection.find({"_id": {"$in": content_ids}})
-        return [
-            GeneratedContentAdapter.from_generated_content_db_model(
-                GeneratedContentDBModel(**doc)
-            )
-            for doc in cursor
-        ]
-
-    def get_generated_content_by_user_collected_content_status(
-        self,
-        user_id: str,
-        status: GeneratedContentStatus,
-        content_type: ContentType,
-        user_collected_content_status: ContentStatus,
-    ) -> List[GeneratedContent]:
-        """
-        Get list of generated content with the given status and content_type,
-        filtered by the status of the associated user collected content for a specific user.
-        """
-        pipeline = [
-            {
-                "$match": {
-                    "status": status,
-                    "content_type": content_type,
-                }
-            },
-            {
-                "$lookup": {
-                    "from": "collected_content",
-                    "localField": "external_id",
-                    "foreignField": "external_id",
-                    "as": "collected_docs",
-                }
-            },
-            {
-                "$match": {
-                    "collected_docs": {
-                        "$elemMatch": {
-                            "user_id": str(user_id),
-                            "status": user_collected_content_status,
-                        }
-                    }
-                }
-            },
-            {"$project": {"collected_docs": 0}},
-        ]
-
-        cursor = self.generated_content_collection.aggregate(pipeline)
-
-        return [
-            GeneratedContentAdapter.from_generated_content_db_model(
-                GeneratedContentDBModel(**doc)
-            )
-            for doc in cursor
-        ]
-
-    def update_generated_content(self, updated_generated_content: GeneratedContent):
-        """
-        Update a single GeneratedContent item in MongoDB.
-        Args:
-            updated_generated_content: The GeneratedContent object to update
-        """
-        db_model = GeneratedContentAdapter.to_generated_content_db_model(
-            updated_generated_content
-        )
-        update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
-        _id = update_dict.pop("_id")
-        self.generated_content_collection.update_one(
-            {"_id": _id}, {"$set": update_dict}
-        )
-
-    def update_generated_content_batch(
-        self, updated_generated_content_list: List[GeneratedContent]
-    ):
-        """
-        Update a batch of GeneratedContent items in MongoDB.
-        Args:
-            updated_generated_content_list: List of GeneratedContent objects to update
-        """
-        operations = []
-        for content in updated_generated_content_list:
-            db_model = GeneratedContentAdapter.to_generated_content_db_model(content)
-            update_dict = db_model.model_dump(by_alias=True, exclude_unset=True)
-            _id = update_dict.pop("_id")
-            # Use the optimistic locking utility
-            operations.append(
-                create_optimistic_locking_update_op(
-                    filter_query={"_id": _id},
-                    update_dict=update_dict,
-                    version=content.version,
-                )
-            )
-        if operations:
-            self.generated_content_collection.bulk_write(operations)
-
     def get_user_collected_content_by_external_ids(
         self, external_ids: List[str]
     ) -> List[UserCollectedContent]:
@@ -386,16 +270,33 @@ class MongoDBUserContentRepository(UserContentRepository):
         # Execute both updates in a single transaction
         with self.database.client.start_session() as session:
             with session.start_transaction():
-                # Update user collected content
-                self.collected_content_collection.update_one(
-                    {"_id": user_content_id},
+                # Update user collected content with optimistic locking
+                user_content_query = {"_id": user_content_id}
+                if user_collected_content.version > 1:
+                    user_content_query["version"] = user_collected_content.version - 1
+
+                result_user = self.collected_content_collection.update_one(
+                    user_content_query,
                     {"$set": user_content_update_dict},
                     session=session,
                 )
 
-                # Update generated content
-                self.generated_content_collection.update_one(
-                    {"_id": generated_content_id},
+                # Update generated content with optimistic locking
+                generated_content_query = {"_id": generated_content_id}
+                if generated_content.version > 1:
+                    generated_content_query["version"] = generated_content.version - 1
+
+                result_gen = self.generated_content_collection.update_one(
+                    generated_content_query,
                     {"$set": generated_content_update_dict},
                     session=session,
                 )
+
+                if (
+                    result_user.matched_count == 0
+                    and user_collected_content.version > 1
+                ) or (result_gen.matched_count == 0 and generated_content.version > 1):
+                    # The transaction will automatically rollback when an exception is raised
+                    raise ValueError(
+                        "Optimistic lock failure during transactional update of UserCollectedContent and GeneratedContent."
+                    )

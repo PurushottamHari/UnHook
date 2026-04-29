@@ -303,14 +303,14 @@ async def test_generation():
         LocalYoutubeContentEphemeralRepository
     from data_processing_service.repositories.mongodb.config.database import \
         MongoDB
-    from data_processing_service.repositories.mongodb.user_content_repository import \
-        MongoDBUserContentRepository
+    from data_processing_service.repositories.mongodb.generated_content_repository import \
+        MongoDBGeneratedContentRepository
     from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
         SubtitleUtils
 
     # Hardcoded generated content ID for testing
     generated_content_id = (
-        "c79f9fd9-ab1a-4197-a7bd-b3a64c261260"  # Replace with your actual ID
+        "3d71203b-d10f-4886-a5cc-9c600f917578"  # Replace with your actual ID
     )
 
     try:

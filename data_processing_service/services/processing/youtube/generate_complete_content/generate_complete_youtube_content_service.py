@@ -11,6 +11,8 @@ from data_processing_service.repositories.ephemeral.local.youtube_content_epheme
     LocalYoutubeContentEphemeralRepository
 from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
+from data_processing_service.repositories.mongodb.generated_content_repository import \
+    MongoDBGeneratedContentRepository
 from data_processing_service.repositories.mongodb.user_content_repository import \
     MongoDBUserContentRepository
 from data_processing_service.service_context import \
@@ -32,9 +34,9 @@ class GenerateCompleteYoutubeContentService:
         # Initialize MongoDB connection if not already connected
         if MongoDB.db is None:
             MongoDB.connect_to_database()
-        # Create MongoDB user content repository
-        self.user_content_repository = MongoDBUserContentRepository(
-            MongoDB.get_database()
+        self.user_content_repository = MongoDBUserContentRepository(mongodb=MongoDB)
+        self.generated_content_repository = MongoDBGeneratedContentRepository(
+            mongodb=MongoDB
         )
         self.youtube_content_ephemeral_repository = (
             LocalYoutubeContentEphemeralRepository()
@@ -55,7 +57,7 @@ class GenerateCompleteYoutubeContentService:
         The processing logic for each entry is to be implemented.
         """
         try:
-            generated_content_list = self.user_content_repository.get_generated_content_by_user_collected_content_status(
+            generated_content_list = self.generated_content_repository.get_generated_content_by_user_collected_content_status(
                 # Todo: Puru hardcoded user id, remove this when building that feature
                 user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
                 status=GeneratedContentStatus.CATEGORIZATION_COMPLETED,

@@ -14,6 +14,8 @@ from data_processing_service.models.generated_content import (
     GeneratedContent, GeneratedContentStatus)
 from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
     YoutubeContentEphemeralRepository
+from data_processing_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
 from data_processing_service.repositories.user_content_repository import \
     UserContentRepository
 from data_processing_service.repositories.youtube_collected_content_repository import \
@@ -34,6 +36,7 @@ class GenerateCompleteContentForYoutubeService:
     def __init__(
         self,
         user_content_repository: UserContentRepository,
+        generated_content_repository: GeneratedContentRepository,
         youtube_content_ephemeral_repository: YoutubeContentEphemeralRepository,
         subtitle_utils: SubtitleUtils,
         complete_content_generator: CompleteContentGenerator,
@@ -41,6 +44,7 @@ class GenerateCompleteContentForYoutubeService:
         message_producer: MessageProducer,
     ):
         self.user_content_repository = user_content_repository
+        self.generated_content_repository = generated_content_repository
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
         self.subtitle_utils = subtitle_utils
         self.complete_content_generator = complete_content_generator
@@ -54,7 +58,7 @@ class GenerateCompleteContentForYoutubeService:
         """
         # Fetch generated content
         generated_content_list = (
-            self.user_content_repository.get_generated_content_by_ids(
+            self.generated_content_repository.get_generated_content_by_ids(
                 [generated_content_id]
             )
         )
@@ -132,7 +136,7 @@ class GenerateCompleteContentForYoutubeService:
             )
 
             # Make an update generated content repo call
-            self.user_content_repository.update_generated_content(
+            self.generated_content_repository.update_generated_content(
                 generated_content_clone
             )
             self.logger.info(
