@@ -5,6 +5,9 @@ Service for handling generated content business logic.
 import logging
 from typing import Optional, Tuple
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import \
     UserCollectedContent
 from data_processing_service.models.generated_content import GeneratedContent
@@ -22,9 +25,11 @@ from ..repositories.user_collected_content_repository import \
     UserCollectedContentRepository
 
 
+@injectable()
 class GeneratedContentService:
     """Service for handling generated content business logic."""
 
+    @inject
     def __init__(
         self,
         generated_content_repository: GeneratedContentRepository,

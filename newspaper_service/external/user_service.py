@@ -6,15 +6,19 @@ import logging
 from typing import Dict, List, Optional
 
 import httpx
+from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from newspaper_service.config.config import Config
 from user_service.models.user import User
 
 
+@injectable()
 class UserServiceClient:
     """Client for communicating with the user service."""
 
-    def __init__(self, config: Optional[Config] = None):
+    @inject
+    def __init__(self, config: Config):
         if config is None:
             config = Config()
         self.base_url = config.user_service_url

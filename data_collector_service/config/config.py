@@ -13,8 +13,9 @@ class Config:
     """
     Configuration class for data collector service.
 
-    NOTE: Prefer a single source of truth for configuration (either Env or Config)
-    to maintain debuggability. Avoid multiple fallbacks (e.g., os.getenv() or config).
+    CRITICAL PHILOSOPHY: Never use fallbacks or default values for configuration.
+    If a configuration key is missing, the service MUST fail fast and raise an error
+    on startup to avoid unpredictable behavior in different environments.
     """
 
     def __init__(self, config_path: Optional[str] = None):
@@ -35,23 +36,12 @@ class Config:
     def _get_config_path(self, config_dir: Path) -> Path:
         """
         Get the appropriate config file path based on environment variable.
-
-        Args:
-            config_dir: Directory containing config files
-
-        Returns:
-            Path to the appropriate config file
-
-        Raises:
-            ValueError: If environment is not 'local' or 'production'
         """
-        environment = os.getenv("environment").lower()
+        environment = os.getenv("environment", "local").lower()
 
         if environment == "local":
-            print(f"[Config] Loading local config")
             return config_dir / "local_config.yaml"
         elif environment == "production":
-            print(f"[Config] Loading production config")
             return config_dir / "prod_config.yaml"
         else:
             raise ValueError(
@@ -66,35 +56,51 @@ class Config:
         with open(self.config_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
 
+    def get(self, key: str):
+        """
+        Get configuration value by key using dot notation.
+
+        Raises:
+            ValueError: If the key is missing from the configuration.
+        """
+        keys = key.split(".")
+        value = self._config_data
+
+        for k in keys:
+            if isinstance(value, dict) and k in value:
+                value = value[k]
+            else:
+                raise ValueError(
+                    f"CRITICAL CONFIGURATION ERROR: Key '{key}' is missing in {self.config_path}. "
+                    "Service cannot start without all required configurations."
+                )
+
+        if value is None:
+            raise ValueError(
+                f"CRITICAL CONFIGURATION ERROR: Key '{key}' is defined but has no value in {self.config_path}."
+            )
+
+        return value
+
     @property
     def service_name(self) -> str:
         """Get service name."""
-        return self._config_data.get("service", {}).get(
-            "service_name", "data_collector_service"
-        )
+        return self.get("service.service_name")
 
     @property
     def service_port(self) -> int:
         """Get service port."""
-        return self._config_data.get("service", {}).get("service_port", 8001)
+        return self.get("service.service_port")
 
     @property
     def user_service_base_url(self) -> str:
         """Get user service base URL."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("base_url", "http://localhost")
-        )
+        return self.get("external.user_service.base_url")
 
     @property
     def user_service_port(self) -> int:
         """Get user service port."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("port", 8000)
-        )
+        return self.get("external.user_service.port")
 
     @property
     def user_service_url(self) -> str:
@@ -113,31 +119,27 @@ class Config:
     @property
     def user_service_timeout(self) -> float:
         """Get user service timeout in seconds."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("timeout", 120.0)  # Default 2 minutes
-        )
+        return self.get("external.user_service.timeout")
 
     @property
     def proxy_base_url(self) -> str:
         """Get proxy base URL."""
-        return self._config_data.get("proxy", {}).get("base_url", "api.zyte.com:8011")
+        return self.get("proxy.base_url")
 
     @property
     def redis_host(self) -> str:
         """Get Redis host."""
-        return self._config_data.get("redis", {}).get("host", "localhost")
+        return self.get("redis.host")
 
     @property
     def redis_port(self) -> int:
         """Get Redis port."""
-        return self._config_data.get("redis", {}).get("port", 6379)
+        return self.get("redis.port")
 
     @property
     def redis_db(self) -> int:
         """Get Redis database index."""
-        return self._config_data.get("redis", {}).get("db", 0)
+        return self.get("redis.db")
 
     @property
     def messaging_command_topic(self) -> str:
@@ -164,17 +166,17 @@ class Config:
     @property
     def s3_account_id(self) -> str:
         """Fetches R2 account ID from config."""
-        return self._config_data.get("s3").get("account_id")
+        return self.get("s3.account_id")
 
     @property
     def s3_bucket_name(self) -> str:
         """Fetches R2 bucket name from config."""
-        return self._config_data.get("s3").get("bucket_name")
+        return self.get("s3.bucket_name")
 
     @property
     def s3_endpoint_url(self) -> str:
         """Fetches S3 endpoint URL from config."""
-        return self._config_data.get("s3").get("endpoint_url")
+        return self.get("s3.endpoint_url")
 
     @property
     def data_collector_service_topic(self) -> str:
@@ -195,16 +197,3 @@ class Config:
     def data_processing_service_events_topic(self) -> str:
         """Get the event topic for the data processing service."""
         return self.get("messaging.events.data_processing_service.topic")
-
-    def get(self, key: str, default=None):
-        """Get configuration value by key using dot notation."""
-        keys = key.split(".")
-        value = self._config_data
-
-        for k in keys:
-            if isinstance(value, dict) and k in value:
-                value = value[k]
-            else:
-                return default
-
-        return value

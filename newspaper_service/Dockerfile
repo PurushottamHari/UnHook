@@ -1,12 +1,12 @@
-# Use Python 3.11 slim image as base
-FROM python:3.11-slim
+# Stage 1: Base - Common setup and dependencies
+FROM python:3.11-slim as base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    PATH="/uv/bin:${PATH}"
 
 # Set work directory
 WORKDIR /app
@@ -23,37 +23,39 @@ RUN apt-get update \
 
 # Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
-ENV PATH="/uv/bin:${PATH}"
 
-# Copy newspaper_service directory (commons is fetched via Git dependency)
-COPY newspaper_service/ ./newspaper_service/
-
-# Change to newspaper_service directory and install Python dependencies
+# Copy dependency files first for caching
+COPY newspaper_service/pyproject.toml newspaper_service/uv.lock ./newspaper_service/
 WORKDIR /app/newspaper_service
-RUN uv pip install --system hatchling
 
-# GITHUB_TOKEN is injected by Railway as a build-time variable
-ARG GITHUB_TOKEN
-RUN if [ -z "${GITHUB_TOKEN}" ]; then echo "ERROR: GITHUB_TOKEN build arg is required" && exit 1; fi && \
+# Install Python dependencies using Docker Secrets for GITHUB_TOKEN
+# We use uv sync --frozen --no-install-project to cache dependencies
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    uv pip install --system .
+    uv sync --frozen --no-install-project
+
+# Copy the rest of the application code
+COPY newspaper_service/ ./
+
+# Install the project itself
+RUN uv sync --frozen
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Set working directory to /app (parent directory) so relative imports work correctly
-WORKDIR /app
-
-# Expose the port (Railway will set PORT env var)
+# Stage 2: API - Specific to the FastAPI application
+FROM base as api
 EXPOSE 8000
-
-# Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Default command to run the FastAPI application
-# Run from /app directory using full module path: newspaper_service.api.app
-# Railway sets PORT env var, but uvicorn defaults to 8000 if not set
-CMD uvicorn newspaper_service.api.app:app --host 0.0.0.0 --port ${PORT:-8000}
+# Default command to run the FastAPI application using uv run
+CMD ["uv", "run", "uvicorn", "newspaper_service.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Stage 3: Worker - Specific to the messaging consumer
+FROM base as worker
+# Default command to run the worker using uv run
+CMD ["uv", "run", "python", "-m", "newspaper_service.app"]

@@ -4,6 +4,9 @@ MongoDB implementation of generated content repository.
 
 from typing import List
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from data_processing_service.models.generated_content import (
     GeneratedContent, GeneratedContentStatus)
 from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
@@ -16,20 +19,19 @@ from newspaper_service.repositories.mongodb.config.database import MongoDB
 from user_service.models.enums import CategoryName
 
 
+@injectable()
 class MongoDBGeneratedContentRepository(GeneratedContentRepository):
     """MongoDB implementation of generated content repository."""
 
-    def __init__(self, database=None):
+    @inject
+    def __init__(self, mongodb: MongoDB):
         """
         Initialize the repository.
 
         Args:
-            database: MongoDB database instance (optional, will use default if not provided)
+            mongodb: MongoDB connection manager
         """
-        if database is None:
-            self.database = MongoDB.get_database()
-        else:
-            self.database = database
+        self.database = mongodb.get_database()
 
         self.generated_content_collection = self.database.generated_content
 

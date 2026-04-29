@@ -4,7 +4,7 @@ service:
 
 external:
   user_service:
-    base_url: "http://user_service"
+    base_url: "http://user_api"
     port: 8000
     timeout: 120.0 # 2 minutes timeout
 
@@ -24,7 +24,7 @@ messaging:
       topic: "data_collector_service:commands"
     data_processing_service:
       topic: "data_processing_service:commands"
- 
+
   events:
     data_processing_service:
       topic: "data_processing_service:events"

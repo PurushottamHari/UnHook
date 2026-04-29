@@ -7,6 +7,9 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import HTTPException
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 
 from ..external.user_service import UserServiceClient
 from ..models.newspaper import Newspaper
@@ -15,9 +18,11 @@ from ..models.newspaper_response import NewspaperResponse
 from ..repositories.newspaper_repository import NewspaperRepository
 
 
+@injectable()
 class NewspaperService:
     """Service for handling newspaper business logic."""
 
+    @inject
     def __init__(
         self,
         newspaper_repository: NewspaperRepository,

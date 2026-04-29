@@ -6,6 +6,9 @@ import logging
 from datetime import datetime, timezone
 from typing import List, Optional
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import \
     UserCollectedContent
 
@@ -18,9 +21,11 @@ from .config.settings import get_mongodb_settings
 from .models.newspaper_db_model import NewspaperDBModel
 
 
+@injectable()
 class MongoDBNewspaperRepository(NewspaperRepository):
     """MongoDB implementation of newspaper repository."""
 
+    @inject
     def __init__(
         self, user_collected_content_repository: UserCollectedContentRepository
     ):

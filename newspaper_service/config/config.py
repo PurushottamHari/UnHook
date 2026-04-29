@@ -8,9 +8,18 @@ from typing import Optional
 
 import yaml
 
+from commons.infra.dependency_injection.injectable import injectable
 
+
+@injectable()
 class Config:
-    """Configuration class for newspaper service."""
+    """
+    Configuration class for newspaper service.
+
+    CRITICAL PHILOSOPHY: Never use fallbacks or default values for configuration.
+    If a configuration key is missing, the service MUST fail fast and raise an error
+    on startup to avoid unpredictable behavior in different environments.
+    """
 
     def __init__(self, config_path: Optional[str] = None):
         """
@@ -30,15 +39,6 @@ class Config:
     def _get_config_path(self, config_dir: Path) -> Path:
         """
         Get the appropriate config file path based on environment variable.
-
-        Args:
-            config_dir: Directory containing config files
-
-        Returns:
-            Path to the appropriate config file
-
-        Raises:
-            ValueError: If environment is not 'local' or 'production'
         """
         environment = os.getenv("environment", "local").lower()
 
@@ -59,35 +59,51 @@ class Config:
         with open(self.config_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
 
+    def get(self, key: str):
+        """
+        Get configuration value by key using dot notation.
+
+        Raises:
+            ValueError: If the key is missing from the configuration.
+        """
+        keys = key.split(".")
+        value = self._config_data
+
+        for k in keys:
+            if isinstance(value, dict) and k in value:
+                value = value[k]
+            else:
+                raise ValueError(
+                    f"CRITICAL CONFIGURATION ERROR: Key '{key}' is missing in {self.config_path}. "
+                    "Service cannot start without all required configurations."
+                )
+
+        if value is None:
+            raise ValueError(
+                f"CRITICAL CONFIGURATION ERROR: Key '{key}' is defined but has no value in {self.config_path}."
+            )
+
+        return value
+
     @property
     def service_name(self) -> str:
         """Get service name."""
-        return self._config_data.get("service", {}).get(
-            "service_name", "newspaper-service"
-        )
+        return self.get("service.service_name")
 
     @property
     def service_port(self) -> int:
         """Get service port."""
-        return self._config_data.get("service", {}).get("service_port", 8003)
+        return self.get("service.service_port")
 
     @property
     def user_service_base_url(self) -> str:
         """Get user service base URL."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("base_url", "http://localhost")
-        )
+        return self.get("external.user_service.base_url")
 
     @property
     def user_service_port(self) -> int:
         """Get user service port."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("port", 8000)
-        )
+        return self.get("external.user_service.port")
 
     @property
     def user_service_url(self) -> str:
@@ -106,21 +122,64 @@ class Config:
     @property
     def user_service_timeout(self) -> float:
         """Get user service timeout in seconds."""
-        return (
-            self._config_data.get("external", {})
-            .get("user_service", {})
-            .get("timeout", 120.0)  # Default 2 minutes
-        )
+        return self.get("external.user_service.timeout")
 
-    def get(self, key: str, default=None):
-        """Get configuration value by key using dot notation."""
-        keys = key.split(".")
-        value = self._config_data
+    @property
+    def redis_host(self) -> str:
+        """Get Redis host."""
+        return self.get("redis.host")
 
-        for k in keys:
-            if isinstance(value, dict) and k in value:
-                value = value[k]
-            else:
-                return default
+    @property
+    def redis_port(self) -> int:
+        """Get Redis port."""
+        return self.get("redis.port")
 
-        return value
+    @property
+    def redis_db(self) -> int:
+        """Get Redis database index."""
+        return self.get("redis.db")
+
+    @property
+    def s3_account_id(self) -> str:
+        """Get S3 account ID."""
+        return self.get("s3.account_id")
+
+    @property
+    def s3_bucket_name(self) -> str:
+        """Get S3 bucket name."""
+        return self.get("s3.bucket_name")
+
+    @property
+    def s3_endpoint_url(self) -> str:
+        """Get S3 endpoint URL."""
+        return self.get("s3.endpoint_url")
+
+    @property
+    def messaging_command_topic(self) -> str:
+        """Get the main command topic for this service."""
+        return self.get("messaging.commands.newspaper_service.topic")
+
+    @property
+    def messaging_event_topic(self) -> str:
+        """Get the main event topic for this service."""
+        return self.get("messaging.events.newspaper_service.topic")
+
+    @property
+    def data_collector_service_topic(self) -> str:
+        """Get the command topic for the data collection service."""
+        return self.get("messaging.commands.data_collector_service.topic")
+
+    @property
+    def data_processing_service_topic(self) -> str:
+        """Get the command topic for the data processing service."""
+        return self.get("messaging.commands.data_processing_service.topic")
+
+    @property
+    def data_collector_service_events_topic(self) -> str:
+        """Get the event topic for the data collector service."""
+        return self.get("messaging.events.data_collector_service.topic")
+
+    @property
+    def data_processing_service_events_topic(self) -> str:
+        """Get the event topic for the data processing service."""
+        return self.get("messaging.events.data_processing_service.topic")

@@ -7,6 +7,10 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import uuid4
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
+
 from ..external.user_service import UserServiceClient
 from ..models.generated_content_interaction import (
     GeneratedContentInteraction, InteractionStatus, InteractionType)
@@ -21,9 +25,11 @@ from .validations.validate_create_article_interaction_request_service import \
     ValidateCreateArticleInteractionRequestService
 
 
+@injectable()
 class ContentInteractionService:
     """Service for handling content interaction business logic."""
 
+    @inject
     def __init__(
         self,
         interaction_repository: GeneratedContentInteractionRepository,

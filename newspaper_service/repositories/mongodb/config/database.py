@@ -2,13 +2,21 @@
 MongoDB database connection configuration.
 """
 
+from injector import inject
 from pymongo import MongoClient
+
+from commons.infra.dependency_injection.injectable import injectable
 
 from .settings import get_mongodb_settings
 
 
+@injectable()
 class MongoDB:
     """MongoDB connection manager."""
+
+    @inject
+    def __init__(self):
+        pass
 
     _instance = None
     _db = None

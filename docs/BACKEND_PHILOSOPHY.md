@@ -94,11 +94,15 @@ async def handle(self, command: Command):
 ---
 
 ## ⚙️ Configuration Management
-Config is environment-based and stored in YAML files.
+Config is environment-based, stored in YAML files, and follows a **Fail-Fast** approach.
 
-*   **Location**: `config/local_config.yaml` and `config/prod_config.yaml`.
-*   **Loading**: Controlled by the `environment` environment variable (`local` vs `production`).
-*   **Validation**: Handled by a typed `Config` class.
+### Key Rules:
+1.  **No Fallbacks**: Never use default values or "safe" fallbacks in the `Config` class. If a key is missing from the YAML, the service MUST raise a `ValueError` or `KeyError` and stop execution immediately.
+2.  **Environment Isolation**: Configurations are loaded from `config/local_config.yaml` or `config/prod_config.yaml` based on the `environment` environment variable.
+3.  **Strict Typing**: Configuration properties should be explicitly typed (e.g., `: int`, `: str`) to catch type mismatches at startup.
+
+> [!CAUTION]
+> Hardcoding default values (like `host: "localhost"`) in the Python code is strictly forbidden. This leads to "silent failures" where a service connects to the wrong resource because of a typo in the config file.
 
 ---
 

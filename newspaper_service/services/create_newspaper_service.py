@@ -10,7 +10,9 @@ from typing import List, Tuple
 from uuid import uuid4
 
 import pytz
+from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentType, UserCollectedContent)
 from newspaper_service.external.user_service import UserServiceClient
@@ -32,20 +34,23 @@ from newspaper_service.services.metrics_processor.newspaper_metrics_processor im
 from user_service.models.enums import CategoryName, Weekday
 
 
+@injectable()
 class CreateNewspaperService:
     """Main service for newspaper creation and management."""
 
+    @inject
     def __init__(
         self,
         newspaper_repository: NewspaperRepository,
         user_collected_content_repository: UserCollectedContentRepository,
         generated_content_repository: GeneratedContentRepository,
+        user_service_client: UserServiceClient,
     ):
         self.newspaper_repository = newspaper_repository
         self.user_collected_content_repository = user_collected_content_repository
         self.generated_content_repository = generated_content_repository
         self.logger = logging.getLogger(__name__)
-        self.user_service_client = UserServiceClient()
+        self.user_service_client = user_service_client
 
         # Initialize service context and metrics processor
         self.service_context = NewspaperServiceContext(NewspaperMetricsProcessor)
