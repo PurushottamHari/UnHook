@@ -13,6 +13,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+async def run_local_commands(injector):
+    from commons.messaging import BaseCommandRouter, Command
+
+    command_router = injector.get(BaseCommandRouter)
+    await command_router.handle_domain_command(
+        Command(
+            message_id="c07d6a1c-ca57-4b38-b497-23a8ec658ea6",
+            target_service="newspaper_service",
+            action_name="start_collation_for_newspaper",
+            payload={
+                "newspaper_id": "116132ad-33c9-4b78-8ea8-cba4ba099185",
+                "user_id": "602d4252-414d-46ba-95bd-e74eaadef767",
+            },
+            topic="newspaper_service:commands",
+        )
+    )
+    return
+
+
 async def main():
     logger.info("🚀 Starting Newspaper Service...")
 
@@ -21,6 +40,7 @@ async def main():
 
     # Get the BaseMessagingHandler from the injector
     messaging_handler = injector.get(BaseMessagingHandler)
+    # await run_local_commands(injector)
 
     try:
         # Start the messaging orchestrator

@@ -36,19 +36,19 @@ class CreateNewspaperForUserService:
             f"Checking for existing newspaper for user {user_id} for today"
         )
 
-        # 1. Determine "today" (UTC 00:00:00)
+        # Determine "today" (UTC 00:00:00)
         today = datetime.now(timezone.utc).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
 
-        # 2. Check if newspaper exists for today
+        # Check if newspaper exists for today
         newspaper = self.newspaper_repository.get_by_user_and_date(user_id, today)
 
         if not newspaper:
             self.logger.info(
                 f"No newspaper found for user {user_id} for {today}. Creating new one."
             )
-            # 3. Create new NewspaperV2 if it doesn't exist
+            # Create new NewspaperV2 if it doesn't exist
             newspaper = NewspaperV2(
                 id=str(uuid4()),
                 user_id=user_id,
@@ -60,14 +60,14 @@ class CreateNewspaperForUserService:
                 NewspaperStatus.COLLATING, "Starting newspaper collation"
             )
 
-            # 4. Save to repository
+            # Save to repository
             self.newspaper_repository.upsert(newspaper)
         else:
             self.logger.info(
                 f"Found existing newspaper {newspaper.id} for user {user_id} for {today}."
             )
 
-        # 5. Publish command (ALWAYS sent regardless of whether it was just created or already existed)
+        # Publish command (ALWAYS sent regardless of whether it was just created or already existed)
         self.logger.info(
             f"Publishing StartCollationForNewspaperCommand for newspaper {newspaper.id}"
         )

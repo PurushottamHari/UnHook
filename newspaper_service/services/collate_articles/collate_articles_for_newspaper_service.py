@@ -119,6 +119,7 @@ class CollateArticlesForNewspaperService:
 
             events.append(
                 ContentAddedToNewspaperEvent(
+                    topic="newspaper_service:events",
                     payload=ContentAddedToNewspaperPayload(
                         newspaper_id=newspaper_id,
                         linked_id=candidate.linked_id,
