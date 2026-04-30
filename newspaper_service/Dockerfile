@@ -1,3 +1,6 @@
+# Define which service to build (api or worker)
+ARG SERVICE_TYPE=api
+
 # Stage 1: Base - Common setup and dependencies
 FROM python:3.11-slim AS base
 
@@ -28,8 +31,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
 COPY newspaper_service/pyproject.toml ./newspaper_service/
 WORKDIR /app/newspaper_service
 
-# Install Python dependencies using Docker Secrets for GITHUB_TOKEN
-# We use uv sync --no-install-project to cache dependencies
+# Install Python dependencies using Build Args for GITHUB_TOKEN
 ARG GITHUB_TOKEN
 RUN if [ -n "$GITHUB_TOKEN" ]; then \
     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
@@ -53,11 +55,11 @@ FROM base AS api
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
-
-# Default command to run the FastAPI application using uv run
 CMD ["uv", "run", "uvicorn", "newspaper_service.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # Stage 3: Worker - Specific to the messaging consumer
 FROM base AS worker
-# Default command to run the worker using uv run
 CMD ["uv", "run", "python", "-m", "newspaper_service.app"]
+
+# Final Stage: Uses the SERVICE_TYPE argument to select the final build
+FROM ${SERVICE_TYPE}
