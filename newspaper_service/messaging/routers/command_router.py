@@ -31,7 +31,7 @@ class CommandRouter(BaseCommandRouter):
     async def handle_domain_command(self, command: Command):
         try:
             match command.action_name:
-                case CreateNewspaperForUserCommand.action_name:
+                case CreateNewspaperForUserCommand.ACTION_NAME:
                     print("🚀 Handling CreateNewspaperForUserCommand")
                     typed_command = CreateNewspaperForUserCommand(
                         **command.model_dump()
@@ -40,7 +40,7 @@ class CommandRouter(BaseCommandRouter):
                         user_id=typed_command.payload.user_id,
                     )
                     print("✅ Handled CreateNewspaperForUserCommand")
-                case StartCollationForNewspaperCommand.action_name:
+                case StartCollationForNewspaperCommand.ACTION_NAME:
                     print("🚀 Handling StartCollationForNewspaperCommand")
                     typed_collation_command = StartCollationForNewspaperCommand(
                         **command.model_dump()
