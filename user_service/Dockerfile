@@ -25,7 +25,7 @@ RUN apt-get update \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
 
 # Copy dependency files first for caching
-COPY user_service/pyproject.toml user_service/uv.lock ./user_service/
+COPY user_service/pyproject.toml ./user_service/
 WORKDIR /app/user_service
 
 # Install Python dependencies using Docker Secrets for GITHUB_TOKEN
@@ -34,13 +34,13 @@ RUN --mount=type=secret,id=GITHUB_TOKEN \
     if [ -n "${GITHUB_TOKEN}" ]; then \
         git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
     fi && \
-    uv sync --frozen --no-install-project
+    uv sync --no-install-project
 
 # Copy the rest of the application code
 COPY user_service/ ./
 
 # Install the project itself
-RUN uv sync --frozen
+RUN uv sync
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \

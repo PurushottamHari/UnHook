@@ -59,8 +59,6 @@ class RunAggregatedScheduleCommand(Command):
     """Generic command to trigger an aggregated schedule."""
 
     action_name: str = "run_aggregated_schedule"
-    target_service: str = "data_collector_service"
-    topic: str = "data_collector_service:commands"
     payload: RunAggregatedSchedulePayload = Field(
         ..., description="Details for the aggregated schedule trigger"
     )

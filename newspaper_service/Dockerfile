@@ -25,21 +25,21 @@ RUN apt-get update \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
 
 # Copy dependency files first for caching
-COPY newspaper_service/pyproject.toml newspaper_service/uv.lock ./newspaper_service/
+COPY newspaper_service/pyproject.toml ./newspaper_service/
 WORKDIR /app/newspaper_service
 
 # Install Python dependencies using Docker Secrets for GITHUB_TOKEN
-# We use uv sync --frozen --no-install-project to cache dependencies
+# We use uv sync --no-install-project to cache dependencies
 RUN --mount=type=secret,id=GITHUB_TOKEN \
     GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    uv sync --frozen --no-install-project
+    uv sync --no-install-project
 
 # Copy the rest of the application code
 COPY newspaper_service/ ./
 
 # Install the project itself
-RUN uv sync --frozen
+RUN uv sync
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \

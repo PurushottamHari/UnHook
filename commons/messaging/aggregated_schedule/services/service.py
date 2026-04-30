@@ -67,7 +67,9 @@ class AggregatedScheduleService:
 
         # Schedule the generic trigger command
         trigger_command = RunAggregatedScheduleCommand(
-            payload=RunAggregatedSchedulePayload(schedule_id=created_schedule.id)
+            target_service=command.target_service,
+            topic=command.topic,
+            payload=RunAggregatedSchedulePayload(schedule_id=created_schedule.id),
         )
         await self.producer.schedule_command(trigger_command, scheduled_at)
 

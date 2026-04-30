@@ -347,7 +347,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices#f1b3b2748a258aefdc532b0bb13d125ea24fc289" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices#baa4e676ed92b6eec7620e78d976f55f8e779208" }
 dependencies = [
     { name = "injector" },
     { name = "langchain-core" },
@@ -384,7 +384,7 @@ wheels = [
 [[package]]
 name = "data-collector-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=setupAyncPipelineForServices#f1b3b2748a258aefdc532b0bb13d125ea24fc289" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=setupAyncPipelineForServices#baa4e676ed92b6eec7620e78d976f55f8e779208" }
 dependencies = [
     { name = "black" },
     { name = "boto3" },
@@ -408,7 +408,7 @@ dependencies = [
 [[package]]
 name = "data-processing-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service&rev=setupAyncPipelineForServices#f1b3b2748a258aefdc532b0bb13d125ea24fc289" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_processing_service&rev=setupAyncPipelineForServices#baa4e676ed92b6eec7620e78d976f55f8e779208" }
 dependencies = [
     { name = "black" },
     { name = "commons" },
@@ -1726,7 +1726,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices#f1b3b2748a258aefdc532b0bb13d125ea24fc289" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices#baa4e676ed92b6eec7620e78d976f55f8e779208" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },

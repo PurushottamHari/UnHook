@@ -24,20 +24,20 @@ RUN apt-get update \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
 
 # Copy dependency files first for caching
-COPY data_processing_service/pyproject.toml data_processing_service/uv.lock ./data_processing_service/
+COPY data_processing_service/pyproject.toml ./data_processing_service/
 WORKDIR /app/data_processing_service
 
 # Install Python dependencies using Docker Secrets for GITHUB_TOKEN
 RUN --mount=type=secret,id=GITHUB_TOKEN \
     GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    uv sync --frozen --no-install-project
+    uv sync --no-install-project
 
 # Copy the rest of the application code
 COPY data_processing_service ./
 
 # Install the project itself
-RUN uv sync --frozen
+RUN uv sync
 
 # Create a non-root user
 RUN useradd --create-home --shell /bin/bash app \
