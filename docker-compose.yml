@@ -77,6 +77,7 @@ services:
       - .env
     environment:
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - REDIS_URL=redis://redis:6379/0
       - environment=local
     ports:
       - "8000:8000"
@@ -96,7 +97,7 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis:6379/0
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
       - USER_SERVICE_BASE_URL=http://user_service_api
       - USER_SERVICE_PORT=8000
@@ -124,7 +125,7 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis:6379/0
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
       - USER_SERVICE_BASE_URL=http://user_service_api
       - USER_SERVICE_PORT=8000
@@ -153,7 +154,7 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis:6379/0
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
       - USER_SERVICE_BASE_URL=http://user_service_api
       - USER_SERVICE_PORT=8000
@@ -180,7 +181,7 @@ services:
     env_file:
       - .env
     environment:
-      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis:6379/0
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
       - USER_SERVICE_BASE_URL=http://user_service_api
       - USER_SERVICE_PORT=8000

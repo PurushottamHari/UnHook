@@ -122,19 +122,14 @@ class Config:
         return self.get("external.user_service.timeout")
 
     @property
-    def redis_host(self) -> str:
-        """Get Redis host."""
-        return self.get("redis.host")
-
-    @property
-    def redis_port(self) -> int:
-        """Get Redis port."""
-        return self.get("redis.port")
-
-    @property
-    def redis_db(self) -> int:
-        """Get Redis database index."""
-        return self.get("redis.db")
+    def redis_url(self) -> str:
+        """Get Redis URL, prioritizing environment variable."""
+        env_url = os.getenv("REDIS_URL")
+        if env_url:
+            return env_url
+        raise ValueError(
+            "CRITICAL CONFIGURATION ERROR: REDIS_URL environment variable is not set. Service cannot start without Redis."
+        )
 
     @property
     def messaging_command_topic(self) -> str:

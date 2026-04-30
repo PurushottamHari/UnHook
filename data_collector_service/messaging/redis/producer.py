@@ -26,12 +26,7 @@ class RedisMessageProducer(MessageProducer):
             port: Redis port
             db: Redis database index
         """
-        self.redis_client = aioredis.Redis(
-            host=config.redis_host,
-            port=config.redis_port,
-            db=config.redis_db,
-            decode_responses=True,
-        )
+        self.redis_client = aioredis.from_url(config.redis_url, decode_responses=True)
 
     async def publish_event(self, event: Event) -> None:
         """

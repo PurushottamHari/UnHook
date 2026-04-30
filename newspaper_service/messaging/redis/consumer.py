@@ -24,12 +24,7 @@ class RedisMessageConsumer(MessageConsumer):
     @inject
     def __init__(self, config: Config):
         self.config = config
-        self.host = config.redis_host
-        self.port = config.redis_port
-        self.db = config.redis_db
-        self.redis_client = aioredis.Redis(
-            host=self.host, port=self.port, db=self.db, decode_responses=True
-        )
+        self.redis_client = aioredis.from_url(config.redis_url, decode_responses=True)
         self.event_handlers: Dict[str, List[Callable[[Event], Awaitable[None]]]] = {}
         self.command_handlers: Dict[str, List[Callable[[Command], Awaitable[None]]]] = (
             {}
@@ -56,7 +51,7 @@ class RedisMessageConsumer(MessageConsumer):
     async def start(self) -> None:
         self._running = True
         print(
-            f"🚀 [Redis] Parallel Stream Consumer starting on {self.host}:{self.port}..."
+            f"🚀 [Redis] Parallel Stream Consumer starting on {self.config.redis_url}..."
         )
         tasks = []
         group_name = self.config.service_name
