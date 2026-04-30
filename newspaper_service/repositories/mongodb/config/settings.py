@@ -25,6 +25,7 @@ class DatabaseSettings(BaseSettings):
     GENERATED_CONTENT_INTERACTION_COLLECTION_NAME: str = (
         "generated_content_interactions"
     )
+    NEWSPAPER_ARTICLE_CANDIDATE_COLLECTION_NAME: str = "newspaper_article_candidate"
 
     class Config:
         env_file = ENV_FILE_PATH

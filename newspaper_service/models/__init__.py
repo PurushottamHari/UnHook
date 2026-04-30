@@ -11,7 +11,12 @@ from .generated_content_list import GeneratedContentListResponse
 from .newspaper import (ConsideredContent, ConsideredContentStatus,
                         ConsideredContentStatusDetail, Newspaper,
                         NewspaperStatus, StatusDetail)
+from .newspaper_article_candidate import (CandidateLinks, CandidateSource,
+                                          CandidateStatus,
+                                          CandidateStatusDetail, CandidateType,
+                                          NewspaperArticleCandidate)
 from .newspaper_list import NewspaperListData, NewspaperListResponse
+from .newspaper_v2 import NewspaperV2
 
 __all__ = [
     "NewspaperStatus",
@@ -28,4 +33,11 @@ __all__ = [
     "GeneratedContentListResponse",
     "NewspaperListData",
     "NewspaperListResponse",
+    "CandidateStatus",
+    "CandidateStatusDetail",
+    "CandidateLinks",
+    "CandidateSource",
+    "CandidateType",
+    "NewspaperArticleCandidate",
+    "NewspaperV2",
 ]

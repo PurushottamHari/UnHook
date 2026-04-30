@@ -24,12 +24,20 @@ from newspaper_service.repositories.mongodb.generated_content_repository import 
     MongoDBGeneratedContentRepository
 from newspaper_service.repositories.mongodb.mongodb_aggregated_schedule_repository import \
     MongoDBAggregatedScheduleRepository
+from newspaper_service.repositories.mongodb.newspaper_article_candidate_repository import \
+    MongoDBNewspaperArticleCandidateRepository
 from newspaper_service.repositories.mongodb.newspaper_repository import \
     MongoDBNewspaperRepository
+from newspaper_service.repositories.mongodb.newspaper_v2_repository import \
+    MongoDBNewspaperV2Repository
 from newspaper_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
+from newspaper_service.repositories.newspaper_article_candidate_repository import \
+    NewspaperArticleCandidateRepository
 from newspaper_service.repositories.newspaper_repository import \
     NewspaperRepository
+from newspaper_service.repositories.newspaper_v2_repository import \
+    NewspaperV2Repository
 from newspaper_service.repositories.user_collected_content_repository import \
     UserCollectedContentRepository
 
@@ -40,6 +48,11 @@ class NewspaperModule(Module):
         binder.bind(
             NewspaperRepository,
             to=MongoDBNewspaperRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            NewspaperV2Repository,
+            to=MongoDBNewspaperV2Repository,
             scope=singleton,
         )
         binder.bind(
@@ -60,6 +73,11 @@ class NewspaperModule(Module):
         binder.bind(
             AggregatedScheduleRepository,
             to=MongoDBAggregatedScheduleRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            NewspaperArticleCandidateRepository,
+            to=MongoDBNewspaperArticleCandidateRepository,
             scope=singleton,
         )
 

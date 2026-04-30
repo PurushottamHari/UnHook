@@ -24,6 +24,17 @@ class MessageProducer(ABC):
         pass
 
     @abstractmethod
+    async def publish_events(self, events: list[Event]) -> None:
+        """
+        Publish multiple events in batch.
+        Uses event.topic for each event's routing.
+
+        Args:
+            events: A list of fully constructed Event models.
+        """
+        pass
+
+    @abstractmethod
     async def send_command(self, command: Command) -> None:
         """
         Send a command to a specific service's topic or queue.

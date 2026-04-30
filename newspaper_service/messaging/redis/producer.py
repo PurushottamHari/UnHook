@@ -27,6 +27,16 @@ class RedisMessageProducer(MessageProducer):
             f"📡 [Redis] Event published to stream '{event.topic}': {event.event_type}"
         )
 
+    async def publish_events(self, events: list[Event]) -> None:
+        if not events:
+            return
+        async with self.redis_client.pipeline() as pipe:
+            for event in events:
+                message_json = event.model_dump_json()
+                pipe.xadd(event.topic, {"payload": message_json})
+            await pipe.execute()
+        print(f"📡 [Redis] {len(events)} events batch published.")
+
     async def send_command(self, command: Command) -> None:
         message_json = command.model_dump_json()
         await self.redis_client.xadd(command.topic, {"payload": message_json})
