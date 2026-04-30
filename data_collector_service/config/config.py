@@ -94,18 +94,23 @@ class Config:
 
     @property
     def user_service_base_url(self) -> str:
-        """Get user service base URL, prioritizing environment variable."""
-        return os.getenv(
-            "USER_SERVICE_BASE_URL", self.get("external.user_service.base_url")
-        )
+        """Get user service base URL from environment variable. Mandatory."""
+        val = os.getenv("USER_SERVICE_BASE_URL")
+        if not val:
+            raise ValueError(
+                "CRITICAL CONFIGURATION ERROR: USER_SERVICE_BASE_URL environment variable is not set."
+            )
+        return val
 
     @property
     def user_service_port(self) -> int:
-        """Get user service port, prioritizing environment variable."""
-        env_port = os.getenv("USER_SERVICE_PORT")
-        if env_port:
-            return int(env_port)
-        return self.get("external.user_service.port")
+        """Get user service port from environment variable. Mandatory."""
+        val = os.getenv("USER_SERVICE_PORT")
+        if not val:
+            raise ValueError(
+                "CRITICAL CONFIGURATION ERROR: USER_SERVICE_PORT environment variable is not set."
+            )
+        return int(val)
 
     @property
     def user_service_url(self) -> str:
