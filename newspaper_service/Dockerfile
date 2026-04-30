@@ -30,10 +30,12 @@ WORKDIR /app/newspaper_service
 
 # Install Python dependencies using Docker Secrets for GITHUB_TOKEN
 # We use uv sync --no-install-project to cache dependencies
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
-    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    uv sync --no-install-project
+ARG GITHUB_TOKEN
+RUN if [ -n "$GITHUB_TOKEN" ]; then \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi && \
+    uv sync --no-install-project && \
+    git config --global --unset url."https://github.com/".insteadOf || true
 
 # Copy the rest of the application code
 COPY newspaper_service/ ./

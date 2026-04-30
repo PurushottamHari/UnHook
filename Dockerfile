@@ -34,9 +34,10 @@ ENV PATH="/uv/bin:${PATH}"
 RUN uv pip install --system hatchling
 
 # Configure git to use the GITHUB_TOKEN for private dependencies securely
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
-    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+ARG GITHUB_TOKEN
+RUN if [ -n "$GITHUB_TOKEN" ]; then \
+    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi
 
 # Copy all services and commons
 COPY commons/ ./commons/
@@ -47,12 +48,12 @@ COPY newspaper_service/ ./newspaper_service/
 
 # Create venvs and install dependencies for each service
 # Note: Keeping git dependencies as requested by the user
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    for service in user_service data_collector_service data_processing_service newspaper_service; do \
+RUN for service in user_service data_collector_service data_processing_service newspaper_service; do \
         echo "Setting up venv for $service..." && \
         uv venv --clear $service/.venv && \
         uv pip install -e ./$service --python ./$service/.venv/bin/python; \
-    done
+    done && \
+    git config --global --unset url."https://github.com/".insteadOf || true
 
 # Copy essential runner scripts and configuration
 COPY run_unhook_pipeline.sh ./run_unhook_pipeline.sh
