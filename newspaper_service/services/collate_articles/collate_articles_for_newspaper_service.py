@@ -124,7 +124,7 @@ class CollateArticlesForNewspaperService:
                         newspaper_id=newspaper_id,
                         linked_id=candidate.linked_id,
                         links=links_payload,
-                    )
+                    ),
                 )
             )
 
