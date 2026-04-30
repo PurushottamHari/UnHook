@@ -23,7 +23,7 @@ class MongoDBNewspaperV2Repository(NewspaperV2Repository):
     def __init__(self):
         self.settings = get_mongodb_settings()
         self.database = MongoDB.get_database()
-        self.collection = self.database[self.settings.NEWSPAPER_COLLECTION_NAME]
+        self.collection = self.database[self.settings.NEWSPAPER_V2_COLLECTION_NAME]
         self.logger = logging.getLogger(__name__)
 
     def upsert(self, newspaper: NewspaperV2) -> NewspaperV2:
