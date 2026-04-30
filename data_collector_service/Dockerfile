@@ -28,11 +28,15 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uv/bin/
 COPY data_collector_service/pyproject.toml ./data_collector_service/
 WORKDIR /app/data_collector_service
 
-# Install Python dependencies using Docker Secrets for GITHUB_TOKEN
-RUN --mount=type=secret,id=GITHUB_TOKEN \
-    GITHUB_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) && \
-    git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && \
-    uv sync --no-install-project
+# Install Python dependencies using GITHUB_TOKEN as build argument
+ARG GITHUB_TOKEN
+RUN if [ -n "$GITHUB_TOKEN" ]; then \
+        git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi && \
+    uv sync --no-install-project && \
+    if [ -n "$GITHUB_TOKEN" ]; then \
+        git config --global --unset url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"; \
+    fi
 
 # Copy the rest of the application code
 COPY data_collector_service ./

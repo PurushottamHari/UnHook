@@ -9,7 +9,7 @@ external:
     timeout: 120.0 # 2 minutes timeout
 
 redis:
-  host: "redis"
+  host: "redis.railway.internal"
   port: 6379
   db: 0
 
