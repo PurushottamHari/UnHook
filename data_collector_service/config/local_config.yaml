@@ -4,8 +4,6 @@ service:
 
 external:
   user_service:
-    base_url: "http://user_service_api"
-    port: 8000
     timeout: 120.0 # 2 minutes timeout
 
 proxy:

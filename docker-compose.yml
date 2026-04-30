@@ -69,8 +69,8 @@ services:
     build:
       context: .
       dockerfile: user_service/Dockerfile
-      secrets:
-        - GITHUB_TOKEN
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     image: user_service
     container_name: user_service_api
     env_file:
@@ -90,8 +90,8 @@ services:
     build:
       context: .
       dockerfile: data_collector_service/Dockerfile
-      secrets:
-        - GITHUB_TOKEN
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     image: data_collector_service
     container_name: data_collector_service_worker
     env_file:
@@ -118,8 +118,8 @@ services:
     build:
       context: .
       dockerfile: data_processing_service/Dockerfile
-      secrets:
-        - GITHUB_TOKEN
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
     image: data_processing_service
     container_name: data_processing_service_worker
     env_file:
@@ -146,9 +146,9 @@ services:
     build:
       context: .
       dockerfile: newspaper_service/Dockerfile
-      target: api
-      secrets:
-        - GITHUB_TOKEN
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - SERVICE_TYPE=api
     image: newspaper_service_api
     container_name: newspaper_api
     env_file:
@@ -173,9 +173,9 @@ services:
     build:
       context: .
       dockerfile: newspaper_service/Dockerfile
-      target: worker
-      secrets:
-        - GITHUB_TOKEN
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - SERVICE_TYPE=worker
     image: newspaper_service_worker
     container_name: newspaper_worker
     env_file:
@@ -201,6 +201,3 @@ networks:
 volumes:
   minio_data:
 
-secrets:
-  GITHUB_TOKEN:
-    environment: GITHUB_TOKEN

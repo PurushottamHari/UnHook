@@ -94,12 +94,17 @@ class Config:
 
     @property
     def user_service_base_url(self) -> str:
-        """Get user service base URL."""
-        return self.get("external.user_service.base_url")
+        """Get user service base URL, prioritizing environment variable."""
+        return os.getenv(
+            "USER_SERVICE_BASE_URL", self.get("external.user_service.base_url")
+        )
 
     @property
     def user_service_port(self) -> int:
-        """Get user service port."""
+        """Get user service port, prioritizing environment variable."""
+        env_port = os.getenv("USER_SERVICE_PORT")
+        if env_port:
+            return int(env_port)
         return self.get("external.user_service.port")
 
     @property
