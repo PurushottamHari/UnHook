@@ -75,6 +75,6 @@ class CreateNewspaperForUserService:
             newspaper_id=newspaper.id, user_id=user_id
         )
         command = StartCollationForNewspaperCommand(payload=payload)
-        await self.message_producer.publish_command(command)
+        await self.message_producer.send_command(command)
 
         return newspaper
