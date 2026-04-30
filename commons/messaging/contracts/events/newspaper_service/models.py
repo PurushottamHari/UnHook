@@ -27,6 +27,7 @@ class ContentAddedToNewspaperEvent(Event):
     EVENT_TYPE: ClassVar[str] = "CONTENT_ADDED_TO_NEWSPAPER"
 
     event_type: str = EVENT_TYPE
+    source_service: str = "newspaper_service"
     topic: str = "newspaper_service:events"
     payload: ContentAddedToNewspaperPayload = Field(
         ..., description="Details of the content added to the newspaper"
