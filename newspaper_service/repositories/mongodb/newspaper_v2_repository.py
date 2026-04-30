@@ -49,13 +49,9 @@ class MongoDBNewspaperV2Repository(NewspaperV2Repository):
             )
 
             # Execute update
-            result = self.collection.update_one(
-                filter=update_op._filter,
-                update=update_op._update,
-                upsert=update_op._upsert,
-            )
+            result = self.collection.bulk_write([update_op])
 
-            if result.matched_count == 0 and result.upserted_id is None:
+            if result.matched_count == 0 and result.upserted_count == 0:
                 self.logger.error(
                     f"Optimistic lock failure for NewspaperV2 {newspaper_id}. Version: {current_version}"
                 )
