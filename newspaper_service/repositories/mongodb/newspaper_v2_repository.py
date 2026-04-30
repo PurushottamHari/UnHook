@@ -35,35 +35,28 @@ class MongoDBNewspaperV2Repository(NewspaperV2Repository):
 
             newspaper_id = update_data.pop("_id")
 
-            # Increment version for the next save
-            current_version = newspaper.version
-            next_version = current_version + 1
-            update_data["version"] = next_version
-
             # Create optimistic locking update operation
             update_op = create_optimistic_locking_update_op(
                 filter_query={"_id": newspaper_id},
                 update_dict=update_data,
-                version=next_version,
+                version=newspaper.version,
                 id_for_insert=newspaper_id,
             )
 
             # Execute update
             result = self.collection.bulk_write([update_op])
 
-            if result.matched_count == 0 and result.upserted_count == 0:
+            if result.matched_count == 0 and newspaper.version > 1:
                 self.logger.error(
-                    f"Optimistic lock failure for NewspaperV2 {newspaper_id}. Version: {current_version}"
+                    f"Optimistic lock failure for NewspaperV2 {newspaper_id}. "
+                    f"Expected version {newspaper.version - 1} not found."
                 )
-                raise RuntimeError(
+                raise ValueError(
                     f"Optimistic lock failure for NewspaperV2 {newspaper_id}"
                 )
 
-            # Update domain model version
-            newspaper.version = next_version
-
             self.logger.info(
-                f"Upserted NewspaperV2 with ID: {newspaper_id}, New Version: {next_version}"
+                f"Upserted NewspaperV2 with ID: {newspaper_id}, Version: {newspaper.version}"
             )
             return newspaper
         except Exception as e:
