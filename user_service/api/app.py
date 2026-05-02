@@ -2,6 +2,8 @@
 FastAPI application setup.
 """
 
+import os
+
 from fastapi import FastAPI
 
 from ..controllers.user_controller import router as user_router
@@ -24,6 +26,7 @@ async def health_check():
 @app.on_event("startup")
 async def startup_db_client():
     """Initialize database connection on startup."""
+    print("PORT FROM ENV:", os.environ.get("PORT"))
     await MongoDB.connect_to_database()
     collection = MongoDB.get_database()["users"]
     # Create a unique index on the email field
