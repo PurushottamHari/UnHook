@@ -92,7 +92,11 @@ class Config:
 
     @property
     def service_port(self) -> int:
-        """Get service port."""
+        """Get service port, prioritizing PORT environment variable."""
+        env_port = os.getenv("PORT")
+        if env_port:
+            print("PORT FROM ENV:", env_port)
+            return int(env_port)
         return self.get("service.service_port")
 
     @property

@@ -61,4 +61,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
 # Default command to run the FastAPI application using uv run --no-sync
-CMD ["uv", "run", "--no-sync", "uvicorn", "user_service.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "--no-sync", "python", "-m", "user_service.api.app"]
