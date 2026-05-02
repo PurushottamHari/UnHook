@@ -23,7 +23,8 @@ dependencies = [
     "isort>=5.12.0",
     "PyYAML>=6.0.0",  # Required for YAML configuration files
     "redis>=5.0.0",
-    "injector>=0.21.0"
+    "injector>=0.21.0",
+    "httpx>=0.24.0"
 ]
 
 [tool.black]

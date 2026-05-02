@@ -24,6 +24,22 @@ class UserServiceClient:
         self.base_url = config.user_service_url
         self.timeout = config.user_service_timeout
         self.logger = logging.getLogger(__name__)
+        self._verify_connectivity()
+
+    def _verify_connectivity(self):
+        """Verify connectivity to the user service on startup."""
+        try:
+            with httpx.Client(timeout=5.0) as client:
+                response = client.get(f"{self.base_url}/health")
+                if response.status_code != 200:
+                    raise Exception(
+                        f"User service health check failed with status {response.status_code}"
+                    )
+            self.logger.info(f"✅ [UserServiceClient] Connected to {self.base_url}")
+        except Exception as e:
+            self.logger.error(
+                f"❌ [UserServiceClient] Failed to connect to {self.base_url}: {e}"
+            )
 
     def get_user(self, user_id: str) -> Optional[User]:
         try:

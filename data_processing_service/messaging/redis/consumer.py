@@ -60,6 +60,15 @@ class RedisMessageConsumer(MessageConsumer):
 
     async def start(self) -> None:
         """Start the Redis consumer loop."""
+        # Verify connection first
+        try:
+            await self.redis_client.ping()
+            print(f"✅ [Redis] Connected successfully to {self.config.redis_url}")
+        except Exception as e:
+            raise Exception(
+                f"❌ [Redis] Connection failed to {self.config.redis_url}: {e}"
+            )
+
         self._running = True
         print(
             f"🚀 [Redis] Parallel Stream Consumer starting on {self.config.redis_url}..."

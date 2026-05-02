@@ -33,6 +33,12 @@ class MongoDB:
                 )
             client = MongoClient(connection_uri, uuidRepresentation="standard")
             cls._db = client[settings.DATABASE_NAME]
+            # Verify connection
+            try:
+                client.admin.command("ping")
+                print("✅ [MongoDB] Connected successfully")
+            except Exception as e:
+                print(f"❌ [MongoDB] Connection failed: {e}")
         return cls._instance
 
     @classmethod

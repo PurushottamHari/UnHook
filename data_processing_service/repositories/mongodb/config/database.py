@@ -19,6 +19,12 @@ class MongoDB:
         settings = get_mongodb_settings()
         cls.client = MongoClient(settings.MONGODB_URI, uuidRepresentation="standard")
         cls.db = cls.client[settings.DATABASE_NAME]
+        # Verify connection
+        try:
+            cls.client.admin.command("ping")
+            print("✅ [MongoDB] Connected successfully")
+        except Exception as e:
+            raise Exception(f"❌ [MongoDB] Connection failed: {e}")
 
     @classmethod
     def close_database_connection(cls):

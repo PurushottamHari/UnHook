@@ -90,72 +90,72 @@ class GenerateRequiredContentForYoutubeService:
                 content_type=ContentType.YOUTUBE_VIDEO,
             )
         )
+
         if existing_generated_content:
-            raise ValueError(
-                f"Generated content already exists for external_id: {user_collected_content.external_id}"
+            self.logger.info(
+                f"⏩ Generated content already exists for external_id: {user_collected_content.external_id}. Skipping generation."
             )
-
-        # Fetch YouTube details
-        youtube_video_details = (
-            self.youtube_collected_content_repository.get_video_by_id(
-                video_id=user_collected_content.external_id
-            )
-        )
-        if not youtube_video_details:
-            raise ValueError(
-                f"YouTube details not found for video_id: {user_collected_content.external_id}"
-            )
-
-        # Fetch subtitle data
-        subtitle_data = (
-            self.youtube_content_ephemeral_repository.get_all_clean_subtitle_file_data(
-                video_id=user_collected_content.external_id
-            )
-        )
-
-        # Select best subtitle
-        selected_subtitle = self.subtitle_utils.select_best_subtitle(
-            subtitle_data, youtube_video_details
-        )
-
-        # Generate required content using AI Agent
-        generated_data = (
-            await self.required_content_generator_agent.generate_required_content(
-                youtube_video_details=youtube_video_details,
-                subtitle_map=selected_subtitle,
-            )
-        )
-
-        # Create a generated content model
-        generated_content_id = str(uuid.uuid4())
-        generated_content = GeneratedContent(
-            id=generated_content_id,
-            external_id=user_collected_content.external_id,
-            content_type=ContentType.YOUTUBE_VIDEO,
-            generated={
-                OutputType.VERY_SHORT: generated_data[OutputType.VERY_SHORT],
-                OutputType.SHORT: generated_data[OutputType.SHORT],
-            },
-            status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
-            status_details=[
-                StatusDetail(
-                    status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
-                    created_at=datetime.utcnow(),
-                    reason="Initial generation from automated flow.",
+            generated_content_id = existing_generated_content.id
+        else:
+            # Fetch YouTube details
+            youtube_video_details = (
+                self.youtube_collected_content_repository.get_video_by_id(
+                    video_id=user_collected_content.external_id
                 )
-            ],
-            content_generated_at=youtube_video_details.release_date,
-        )
+            )
+            if not youtube_video_details:
+                raise ValueError(
+                    f"YouTube details not found for video_id: {user_collected_content.external_id}"
+                )
 
-        # Save to repository
-        self.generated_content_repository.add_generated_content(
-            generated_content=generated_content
-        )
+            # Fetch subtitle data
+            subtitle_data = self.youtube_content_ephemeral_repository.get_all_clean_subtitle_file_data(
+                video_id=user_collected_content.external_id
+            )
 
-        self.logger.info(
-            f"✅ Successfully generated required content for {user_collected_content.external_id}. "
-            f"GeneratedContent ID: {generated_content_id}"
-        )
+            # Select best subtitle
+            selected_subtitle = self.subtitle_utils.select_best_subtitle(
+                subtitle_data, youtube_video_details
+            )
+
+            # Generate required content using AI Agent
+            generated_data = (
+                await self.required_content_generator_agent.generate_required_content(
+                    youtube_video_details=youtube_video_details,
+                    subtitle_map=selected_subtitle,
+                )
+            )
+
+            # Create a generated content model
+            generated_content_id = str(uuid.uuid4())
+            generated_content = GeneratedContent(
+                id=generated_content_id,
+                external_id=user_collected_content.external_id,
+                content_type=ContentType.YOUTUBE_VIDEO,
+                generated={
+                    OutputType.VERY_SHORT: generated_data[OutputType.VERY_SHORT],
+                    OutputType.SHORT: generated_data[OutputType.SHORT],
+                },
+                status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
+                status_details=[
+                    StatusDetail(
+                        status=GeneratedContentStatus.REQUIRED_CONTENT_GENERATED,
+                        created_at=datetime.utcnow(),
+                        reason="Initial generation from automated flow.",
+                    )
+                ],
+                content_generated_at=youtube_video_details.release_date,
+            )
+
+            # Save to repository
+            self.generated_content_repository.add_generated_content(
+                generated_content=generated_content
+            )
+
+            self.logger.info(
+                f"✅ Successfully generated required content for {user_collected_content.external_id}. "
+                f"GeneratedContent ID: {generated_content_id}"
+            )
 
         # Aggregate CategorizeGeneratedYoutubeContentCommand
         keys = [AggregatedScheduleService.GLOBAL_KEY]
