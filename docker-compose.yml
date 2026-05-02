@@ -79,6 +79,7 @@ services:
       - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
       - REDIS_URL=redis://redis:6379/0
       - environment=local
+      - PORT=8000
     ports:
       - "8000:8000"
     networks:
