@@ -5,8 +5,8 @@ Abstract base class for user collected content repository.
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from data_collector_service.models.user_collected_content import \
-    UserCollectedContent
+from data_collector_service.models.user_collected_content import (
+    ContentStatus, UserCollectedContent)
 
 
 class UserCollectedContentRepository(ABC):
