@@ -14,9 +14,9 @@ dependencies = [
     "pymongo>=4.0.0",
     "python-dotenv>=0.19.0",
     # CRITICAL: DO NOT transition to local dependencies. Internal packages must remain git-based for architecture consistency.
-    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=data_collector_service",
-    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=user_service",
-    "commons @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=commons",
+    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git@c031c0a053087da3fa5d312702fd63e0392cba4c#subdirectory=data_collector_service",
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@c031c0a053087da3fa5d312702fd63e0392cba4c#subdirectory=user_service",
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git@c031c0a053087da3fa5d312702fd63e0392cba4c#subdirectory=commons",
     "requests",
     "curl-cffi",
     "black>=23.0.0",
