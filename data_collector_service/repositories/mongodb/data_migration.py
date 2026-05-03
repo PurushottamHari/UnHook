@@ -12,6 +12,8 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 # Now import the modules after setting up the path
+from data_collector_service.models.youtube.youtube_video_details import (
+    YouTubeVideoDetails, YouTubeVideoStatus)
 from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
     CollectedContentAdapter
 from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import \
@@ -613,6 +615,104 @@ def migrate_add_content_created_at():
     print("Database connection closed.")
 
 
+
+def migrate_youtube_data_to_new_collection():
+    """
+    Migration script to move YouTube data from UserCollectedContent.data 
+    to the new YouTubeVideoDetails collection.
+    """
+    print("Starting data migration for YouTube collection...")
+
+    # Connect to MongoDB
+    MongoDB.connect_to_database()
+    db = MongoDB.get_database()
+    settings = get_mongodb_settings()
+    
+    old_collection = db[settings.COLLECTION_NAME] # collected_content
+    new_collection = db[settings.YOUTUBE_COLLECTION_NAME] # youtube_collected_content
+
+    print(f"Migrating from '{settings.COLLECTION_NAME}' to '{settings.YOUTUBE_COLLECTION_NAME}'")
+
+    # Find all documents that have YouTube data in any format
+    documents = list(old_collection.find({
+        "$or": [
+            {"data.video_id": {"$exists": True}},
+            {"data.YOUTUBE_VIDEO": {"$exists": True}}
+        ]
+    }))
+    print(f"Found {len(documents)} potential documents to migrate.")
+
+    migrated_count = 0
+    for doc in documents:
+        data = doc.get("data", {})
+        video_data = None
+        
+        # Case 1: Intermediate format (already wrapped in YOUTUBE_VIDEO)
+        if "YOUTUBE_VIDEO" in data:
+            video_data = data["YOUTUBE_VIDEO"]
+        # Case 2: Legacy format (direct fields in data)
+        elif "video_id" in data:
+            video_data = data
+
+        if video_data:
+            try:
+                def safe_int(value, default=0):
+                    try:
+                        return int(value) if value is not None else default
+                    except (ValueError, TypeError):
+                        return default
+
+                def parse_date(date_val):
+                    if not date_val:
+                        return None
+                    if isinstance(date_val, (int, float)):
+                        return datetime.fromtimestamp(date_val)
+                    if isinstance(date_val, str):
+                        try:
+                            return datetime.fromisoformat(date_val.replace("Z", "+00:00"))
+                        except ValueError:
+                            return None
+                    return None
+
+                # Create YouTubeVideoDetails entity
+                video_details = YouTubeVideoDetails(
+                    video_id=video_data.get("video_id"),
+                    title=video_data.get("title"),
+                    channel_name=video_data.get("channel_name", "Unknown"),
+                    channel_id=video_data.get("channel_id"),
+                    views=safe_int(video_data.get("views")),
+                    description=video_data.get("description", ""),
+                    thumbnail=video_data.get("thumbnail", ""),
+                    status=YouTubeVideoStatus.COLLECTED,
+                    release_date=parse_date(video_data.get("release_date")),
+                    created_at=parse_date(video_data.get("created_at")) or datetime.utcnow(),
+                    tags=video_data.get("tags", []),
+                    categories=video_data.get("categories", []),
+                    language=video_data.get("language"),
+                    duration_in_seconds=safe_int(video_data.get("duration_in_seconds")),
+                    comments_count=safe_int(video_data.get("comments_count")),
+                    likes_count=safe_int(video_data.get("likes_count")),
+                )
+                
+                # Convert to DB model
+                db_model = YouTubeVideoDetailsAdapter.to_db_model(video_details)
+                
+                # Upsert into new collection
+                new_collection.update_one(
+                    {"video_id": video_details.video_id},
+                    {"$set": db_model.dict(by_alias=True)},
+                    upsert=True
+                )
+                migrated_count += 1
+                if migrated_count % 10 == 0:
+                    print(f"Migrated {migrated_count} videos...")
+            except Exception as e:
+                print(f"Error migrating doc {doc.get('_id')}: {e}")
+
+    print(f"Migration complete. {migrated_count} YouTube entries created/updated in '{settings.YOUTUBE_COLLECTION_NAME}'.")
+    MongoDB.close_database_connection()
+
+
 if __name__ == "__main__":
     # migrate_timestamps()
     # migrate_status_details_timestamps()
@@ -621,4 +721,5 @@ if __name__ == "__main__":
     # migrate_enrich_subtitles()
     # migrate_delete_subtitles()
     # migrate_add_missing_sub_status()
-    migrate_add_content_created_at()
+    # migrate_add_content_created_at()
+    migrate_youtube_data_to_new_collection()
