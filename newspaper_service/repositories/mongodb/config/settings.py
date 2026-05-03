@@ -27,6 +27,7 @@ class DatabaseSettings(BaseSettings):
         "generated_content_interactions"
     )
     NEWSPAPER_ARTICLE_CANDIDATE_COLLECTION_NAME: str = "newspaper_article_candidate"
+    YOUTUBE_COLLECTED_CONTENT_COLLECTION_NAME: str = "youtube_collected_content"
 
     class Config:
         env_file = ENV_FILE_PATH

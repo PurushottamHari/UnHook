@@ -50,7 +50,7 @@ class YouTubeToUserContentAdapter:
                     reason="Video collected from YouTube",
                 )
             ],
-            data={ContentType.YOUTUBE_VIDEO: video} if include_data else {},
+            data={},
         )
 
     @staticmethod

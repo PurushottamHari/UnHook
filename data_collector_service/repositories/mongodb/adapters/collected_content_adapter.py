@@ -46,24 +46,8 @@ class CollectedContentAdapter:
             for detail in content.status_details
         ]
 
+        # The data field is deprecated. The actual data is now in the separate raw collection linked by external_id.
         data_db_model = {}
-        if content.content_type == ContentType.YOUTUBE_VIDEO:
-            video_details = content.data.get(ContentType.YOUTUBE_VIDEO)
-            if video_details:
-                if isinstance(video_details, YouTubeVideoDetails):
-                    data_db_model[ContentType.YOUTUBE_VIDEO] = (
-                        YouTubeVideoDetailsAdapter.to_db_model(video_details)
-                    )
-                else:
-                    raise TypeError(
-                        f"Expected YouTubeVideoDetails, but got {type(video_details)}"
-                    )
-            else:
-                # If no data is provided, we still store it as an empty entry for the content type
-                # The actual data is now in the separate raw collection linked by external_id
-                data_db_model[ContentType.YOUTUBE_VIDEO] = {}
-        else:
-            raise TypeError(f"Not implemented Content Type: {content.content_type}")
 
         # Handle sub_status and sub_status_details if present
         sub_status = content.sub_status if hasattr(content, "sub_status") else None
@@ -115,21 +99,8 @@ class CollectedContentAdapter:
             for detail in db_model.status_details
         ]
 
+        # The data field is deprecated. Specialized repositories should be used instead.
         data: Dict[str, Any] = {}
-        if db_model.content_type == ContentType.YOUTUBE_VIDEO:
-            video_details_db_data = db_model.data.get(ContentType.YOUTUBE_VIDEO)
-            if video_details_db_data:
-                video_details_db = YouTubeCollectedContentDBModel(
-                    **video_details_db_data
-                )
-                video_details = YouTubeVideoDetailsAdapter.from_db_model(
-                    video_details_db
-                )
-                data = {ContentType.YOUTUBE_VIDEO: video_details}
-            else:
-                data = {ContentType.YOUTUBE_VIDEO: None}
-        else:
-            raise TypeError(f"Not implemented Content Type: {db_model.content_type}")
 
         # Handle sub_status and sub_status_details
         sub_status = getattr(db_model, "sub_status", None)
