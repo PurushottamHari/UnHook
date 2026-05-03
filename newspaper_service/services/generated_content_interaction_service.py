@@ -84,7 +84,7 @@ class ContentInteractionService:
             )
 
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise ValueError(f"User not found: {user_id}")
 
@@ -206,7 +206,7 @@ class ContentInteractionService:
             ValueError: If user not found, content not found, or interaction_type is invalid
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise ValueError(f"User not found: {user_id}")
 
@@ -304,7 +304,7 @@ class ContentInteractionService:
             raise ValueError("page_limit cannot exceed 10")
 
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise ValueError(f"User not found: {user_id}")
 

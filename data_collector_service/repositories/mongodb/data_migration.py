@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import datetime
 
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 
 # Add the project root to the Python path
 # This is a bit of a hack, a more robust solution would be to have a proper package structure
@@ -615,10 +615,9 @@ def migrate_add_content_created_at():
     print("Database connection closed.")
 
 
-
 def migrate_youtube_data_to_new_collection():
     """
-    Migration script to move YouTube data from UserCollectedContent.data 
+    Migration script to move YouTube data from UserCollectedContent.data
     to the new YouTubeVideoDetails collection.
     """
     print("Starting data migration for YouTube collection...")
@@ -627,26 +626,35 @@ def migrate_youtube_data_to_new_collection():
     MongoDB.connect_to_database()
     db = MongoDB.get_database()
     settings = get_mongodb_settings()
-    
-    old_collection = db[settings.COLLECTION_NAME] # collected_content
-    new_collection = db[settings.YOUTUBE_COLLECTION_NAME] # youtube_collected_content
 
-    print(f"Migrating from '{settings.COLLECTION_NAME}' to '{settings.YOUTUBE_COLLECTION_NAME}'")
+    old_collection = db[settings.COLLECTION_NAME]  # collected_content
+    new_collection = db[settings.YOUTUBE_COLLECTION_NAME]  # youtube_collected_content
+
+    print(
+        f"Migrating from '{settings.COLLECTION_NAME}' to '{settings.YOUTUBE_COLLECTION_NAME}'"
+    )
 
     # Find all documents that have YouTube data in any format
-    documents = list(old_collection.find({
-        "$or": [
-            {"data.video_id": {"$exists": True}},
-            {"data.YOUTUBE_VIDEO": {"$exists": True}}
-        ]
-    }))
+    documents = list(
+        old_collection.find(
+            {
+                "$or": [
+                    {"data.video_id": {"$exists": True}},
+                    {"data.YOUTUBE_VIDEO": {"$exists": True}},
+                ]
+            }
+        )
+    )
     print(f"Found {len(documents)} potential documents to migrate.")
 
     migrated_count = 0
+    batch_size = 500
+    bulk_ops = []
+
     for doc in documents:
         data = doc.get("data", {})
         video_data = None
-        
+
         # Case 1: Intermediate format (already wrapped in YOUTUBE_VIDEO)
         if "YOUTUBE_VIDEO" in data:
             video_data = data["YOUTUBE_VIDEO"]
@@ -656,6 +664,7 @@ def migrate_youtube_data_to_new_collection():
 
         if video_data:
             try:
+
                 def safe_int(value, default=0):
                     try:
                         return int(value) if value is not None else default
@@ -669,7 +678,9 @@ def migrate_youtube_data_to_new_collection():
                         return datetime.fromtimestamp(date_val)
                     if isinstance(date_val, str):
                         try:
-                            return datetime.fromisoformat(date_val.replace("Z", "+00:00"))
+                            return datetime.fromisoformat(
+                                date_val.replace("Z", "+00:00")
+                            )
                         except ValueError:
                             return None
                     return None
@@ -685,7 +696,8 @@ def migrate_youtube_data_to_new_collection():
                     thumbnail=video_data.get("thumbnail", ""),
                     status=YouTubeVideoStatus.COLLECTED,
                     release_date=parse_date(video_data.get("release_date")),
-                    created_at=parse_date(video_data.get("created_at")) or datetime.utcnow(),
+                    created_at=parse_date(video_data.get("created_at"))
+                    or datetime.utcnow(),
                     tags=video_data.get("tags", []),
                     categories=video_data.get("categories", []),
                     language=video_data.get("language"),
@@ -693,23 +705,37 @@ def migrate_youtube_data_to_new_collection():
                     comments_count=safe_int(video_data.get("comments_count")),
                     likes_count=safe_int(video_data.get("likes_count")),
                 )
-                
+
                 # Convert to DB model
                 db_model = YouTubeVideoDetailsAdapter.to_db_model(video_details)
-                
-                # Upsert into new collection
-                new_collection.update_one(
-                    {"video_id": video_details.video_id},
-                    {"$set": db_model.dict(by_alias=True)},
-                    upsert=True
-                )
-                migrated_count += 1
-                if migrated_count % 10 == 0:
-                    print(f"Migrated {migrated_count} videos...")
-            except Exception as e:
-                print(f"Error migrating doc {doc.get('_id')}: {e}")
 
-    print(f"Migration complete. {migrated_count} YouTube entries created/updated in '{settings.YOUTUBE_COLLECTION_NAME}'.")
+                # Create bulk operation
+                bulk_ops.append(
+                    UpdateOne(
+                        {"video_id": video_details.video_id},
+                        {"$set": db_model.model_dump(by_alias=True, exclude_none=True)},
+                        upsert=True,
+                    )
+                )
+
+                if len(bulk_ops) >= batch_size:
+                    new_collection.bulk_write(bulk_ops)
+                    migrated_count += len(bulk_ops)
+                    print(f"Migrated {migrated_count} videos...")
+                    bulk_ops = []
+
+            except Exception as e:
+                print(f"Error processing doc {doc.get('_id')}: {e}")
+
+    # Final bulk write for remaining items
+    if bulk_ops:
+        new_collection.bulk_write(bulk_ops)
+        migrated_count += len(bulk_ops)
+        print(f"Migrated {migrated_count} videos...")
+
+    print(
+        f"Migration complete. {migrated_count} YouTube entries created/updated in '{settings.YOUTUBE_COLLECTION_NAME}'."
+    )
     MongoDB.close_database_connection()
 
 

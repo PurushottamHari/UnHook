@@ -104,7 +104,7 @@ class GeneratedContentService:
             ValueError: If newspaper not found, user not found, or page_limit exceeds maximum
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise ValueError(f"User not found: {user_id}")
         # Validate page_limit

@@ -54,7 +54,7 @@ class NewspaperService:
             HTTPException: If user not found, newspaper not found, or doesn't belong to user
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise HTTPException(status_code=404, detail=f"User not found: {user_id}")
 
@@ -95,7 +95,7 @@ class NewspaperService:
             ValueError: If page_limit exceeds maximum or date format is invalid
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise HTTPException(status_code=404, detail=f"User not found: {user_id}")
 

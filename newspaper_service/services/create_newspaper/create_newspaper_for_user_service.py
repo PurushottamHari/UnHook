@@ -7,6 +7,7 @@ from injector import inject
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import MessageProducer
 
+from ...external.user_service import UserServiceClient
 from ...messaging.models.commands import (StartCollationForNewspaperCommand,
                                           StartCollationForNewspaperPayload)
 from ...models import NewspaperStatus, NewspaperV2
@@ -22,9 +23,11 @@ class CreateNewspaperForUserService:
         self,
         newspaper_repository: NewspaperV2Repository,
         message_producer: MessageProducer,
+        user_service_client: UserServiceClient,
     ):
         self.newspaper_repository = newspaper_repository
         self.message_producer = message_producer
+        self.user_service_client = user_service_client
         self.logger = logging.getLogger(__name__)
 
     async def execute(self, user_id: str) -> NewspaperV2:
@@ -35,6 +38,11 @@ class CreateNewspaperForUserService:
         self.logger.info(
             f"Checking for existing newspaper for user {user_id} for today"
         )
+
+        # Validate user exists before proceeding
+        user = await self.user_service_client.get_user(user_id)
+        if not user:
+            raise ValueError(f"User {user_id} not found. Cannot create newspaper.")
 
         # Determine "today" (UTC 00:00:00)
         today = datetime.now(timezone.utc).replace(

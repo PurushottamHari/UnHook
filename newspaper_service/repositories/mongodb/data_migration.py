@@ -24,7 +24,9 @@ from newspaper_service.repositories.mongodb.user_collected_content_repository im
 from user_service.models.enums import Weekday
 
 
-def filter_newspaper_considered_items_by_weekday(newspaper_id: str, for_date: datetime):
+async def filter_newspaper_considered_items_by_weekday(
+    newspaper_id: str, for_date: datetime
+):
     """
     Migration script to fetch a newspaper by ID and date, then filter the considered items
     using weekday logic from create_newspaper_service.py.
@@ -73,7 +75,7 @@ def filter_newspaper_considered_items_by_weekday(newspaper_id: str, for_date: da
             return
 
         # Fetch user to get interests
-        user = user_service_client.get_user(newspaper.user_id)
+        user = await user_service_client.get_user(newspaper.user_id)
         if not user:
             print(f"User not found: {newspaper.user_id}")
             return

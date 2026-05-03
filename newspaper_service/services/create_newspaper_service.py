@@ -75,7 +75,9 @@ class CreateNewspaperService:
             newspaper = self._get_or_create_newspaper(user_id, for_date)
 
             # Step 2: Get candidates that need to be considered
-            new_candidates = self._get_new_candidates(user_id, for_date, newspaper)
+            new_candidates = await self._get_new_candidates(
+                user_id, for_date, newspaper
+            )
 
             # Record total content considered
             if self.metrics_processor:
@@ -202,12 +204,12 @@ class CreateNewspaperService:
         newspaper.set_status(NewspaperStatus.COLLATING, "Starting collation")
         return newspaper
 
-    def _get_new_candidates(
+    async def _get_new_candidates(
         self, user_id: str, for_date: datetime, newspaper: Newspaper
     ) -> List[UserCollectedContent]:
         """Get candidates that need to be considered (not already in newspaper)."""
         # Fetch user to determine interests
-        user = self.user_service_client.get_user(user_id)
+        user = await self.user_service_client.get_user(user_id)
         if not user:
             raise RuntimeError(f"User not found: {user_id}")
 

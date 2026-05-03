@@ -41,10 +41,11 @@ class UserServiceClient:
                 f"❌ [UserServiceClient] Failed to connect to {self.base_url}: {e}"
             )
 
-    def get_user(self, user_id: str) -> Optional[User]:
+    async def get_user(self, user_id: str) -> Optional[User]:
+        """Fetch user data from the user service asynchronously."""
         try:
-            with httpx.Client(timeout=self.timeout) as client:
-                response = client.get(
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                response = await client.get(
                     f"{self.base_url}/users/{user_id}",
                     headers={"accept": "application/json"},
                 )
@@ -55,6 +56,13 @@ class UserServiceClient:
                 response.raise_for_status()
                 return User(**response.json())
 
-        except (ValueError, httpx.HTTPError):
-            # Handle invalid UUID format or HTTP errors
+        except httpx.HTTPError as e:
+            self.logger.error(
+                f"❌ [UserServiceClient] HTTP error fetching user {user_id}: {e}"
+            )
+            return None
+        except Exception as e:
+            self.logger.error(
+                f"❌ [UserServiceClient] Unexpected error fetching user {user_id}: {e}"
+            )
             return None

@@ -67,7 +67,7 @@ class CollateArticlesForNewspaperService:
             )
 
         # Get user preferences for filtering
-        user = self.user_service_client.get_user(user_id)
+        user = await self.user_service_client.get_user(user_id)
         if not user:
             raise ValueError(f"User {user_id} not found")
 
