@@ -37,6 +37,9 @@ class UserServiceClient:
             logger.error(
                 f"❌ [UserServiceClient] Failed to connect to {self.base_url}: {e}"
             )
+            raise Exception(
+                f"❌ [UserServiceClient] Failed to connect to {self.base_url}: {e}"
+            )
 
     async def get_user(self, user_id: str) -> Optional[User]:
         """
