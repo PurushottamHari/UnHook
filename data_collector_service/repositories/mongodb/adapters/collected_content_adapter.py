@@ -46,7 +46,6 @@ class CollectedContentAdapter:
             for detail in content.status_details
         ]
 
-        # The data field is deprecated. The actual data is now in the separate raw collection linked by external_id.
         data_db_model = {}
 
         # Handle sub_status and sub_status_details if present
@@ -99,7 +98,6 @@ class CollectedContentAdapter:
             for detail in db_model.status_details
         ]
 
-        # The data field is deprecated. Specialized repositories should be used instead.
         data: Dict[str, Any] = {}
 
         # Handle sub_status and sub_status_details
