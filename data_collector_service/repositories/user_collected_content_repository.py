@@ -3,7 +3,7 @@ Abstract base class for user collected content repository.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from data_collector_service.models.user_collected_content import \
     UserCollectedContent
@@ -59,6 +59,38 @@ class UserCollectedContentRepository(ABC):
 
         Returns:
             List[UserCollectedContent]: List of matching content.
+        """
+        pass
+
+    @abstractmethod
+    def get_content_by_external_id_and_status(
+        self, external_id: str, status: ContentStatus
+    ) -> List[UserCollectedContent]:
+        """
+        Get a list of user collected content by external ID and status.
+
+        Args:
+            external_id: The external ID of the content.
+            status: The status to filter by.
+
+        Returns:
+            List[UserCollectedContent]: List of matching content.
+        """
+        pass
+
+    @abstractmethod
+    def get_content_by_external_id(
+        self, user_id: str, external_id: str
+    ) -> Optional[UserCollectedContent]:
+        """
+        Get a user collected content by user ID and external ID.
+
+        Args:
+            user_id: The ID of the user.
+            external_id: The external ID of the content.
+
+        Returns:
+            Optional[UserCollectedContent]: The matching content or None.
         """
         pass
 

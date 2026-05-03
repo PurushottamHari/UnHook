@@ -37,7 +37,7 @@ class EventRouter(BaseEventRouter):
                 )
 
                 await self.transition_service.transition_to_processed(
-                    user_id=payload.user_id, external_id=payload.external_id
+                    external_id=payload.external_id
                 )
                 print(
                     "✅ Consumed event ",

@@ -155,26 +155,9 @@ class GenerateCompleteContentForYoutubeService:
                 f"Invalid status {content.status} for {generated_content_id}"
             )
 
-        # At the end, publish an event signifying that the article has been generated
-        # Fetch user_id from UserCollectedContent to include in the event
-        user_collected_content_list = (
-            self.user_content_repository.get_user_collected_content_by_external_ids(
-                [content.external_id]
-            )
-        )
-        if not user_collected_content_list:
-            self.logger.error(
-                f"User collected content for external ID {content.external_id} not found."
-            )
-            raise ValueError(
-                f"User collected content for external ID {content.external_id} not found."
-            )
-        user_id = user_collected_content_list[0].user_id
-
         # Draft and publish the event
         generation_complete_event = GeneratedYoutubeContentArticleReadyEvent(
             payload=GeneratedYoutubeContentArticleReadyPayload(
-                user_id=user_id,
                 generated_content_id=generated_content_id,
                 external_id=content.external_id,
             )

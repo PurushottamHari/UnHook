@@ -8,7 +8,6 @@ from commons.messaging.models import Event
 class GeneratedYoutubeContentArticleReadyPayload(BaseModel):
     """Payload for the YouTube content article generated event."""
 
-    user_id: str = Field(..., description="The ID of the user")
     generated_content_id: str = Field(
         ..., description="The ID of the generated content"
     )

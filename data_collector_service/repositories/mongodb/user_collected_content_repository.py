@@ -108,6 +108,21 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
             for doc in cursor
         ]
 
+    def get_content_by_external_id_and_status(
+        self, external_id: str, status: ContentStatus
+    ) -> List[UserCollectedContent]:
+        """
+        Get a list of user collected content by external ID and status from MongoDB.
+        """
+        cursor = self.collection.find({"external_id": external_id, "status": status})
+
+        return [
+            CollectedContentAdapter.to_user_collected_content(
+                CollectedContentDBModel(**doc)
+            )
+            for doc in cursor
+        ]
+
     def get_content_by_external_id(
         self, user_id: str, external_id: str
     ) -> Optional[UserCollectedContent]:

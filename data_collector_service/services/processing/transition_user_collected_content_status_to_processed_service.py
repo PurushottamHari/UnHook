@@ -31,26 +31,36 @@ class TransitionUserCollectedContentStatusToProcessedService:
         self.message_producer = message_producer
         self.config = config
 
-    async def transition_to_processed(self, user_id: str, external_id: str) -> None:
+    async def transition_to_processed(
+        self, external_id: str, user_id: str = None
+    ) -> None:
         """
-        Transition user collected content status to PROCESSED.
+        Transition all user collected content for a given external_id to PROCESSED.
         """
         logger.info(
-            f"🔄 Transitioning content {external_id} for user {user_id} to PROCESSED"
+            f"🔄 Transitioning all content for external_id {external_id} to PROCESSED"
         )
 
-        # 1. Fetch user collected content
-        content = self.user_content_repository.get_content_by_external_id(
-            user_id, external_id
+        # 1. Fetch all user collected content in PROCESSING status for this external_id
+        contents_to_process = (
+            self.user_content_repository.get_content_by_external_id_and_status(
+                external_id, ContentStatus.PROCESSING
+            )
         )
-        if not content:
-            error_msg = f"User collected content for external ID {external_id} and user {user_id} not found"
-            logger.error(f"❌ {error_msg}")
-            raise ValueError(error_msg)
 
-        # 2. Check status
-        if content.status == ContentStatus.PROCESSING:
-            logger.info(f"Processing content in status {content.status}: {content.id}")
+        if not contents_to_process:
+            logger.info(
+                f"⏭️ No content in PROCESSING status found for external_id {external_id}. Ignoring."
+            )
+            return
+
+        processed_contents = []
+        events_to_publish = []
+
+        for content in contents_to_process:
+            logger.info(
+                f"Processing content {content.id} for user {content.user_id} in status {content.status}"
+            )
 
             # Deep copy as requested
             content_clone = deepcopy(content)
@@ -60,37 +70,30 @@ class TransitionUserCollectedContentStatusToProcessedService:
             )
             content_clone.version += 1
 
-            # Update repository
+            processed_contents.append(content_clone)
+
+            # Prepare event
+            ready_event = UserCollectedContentReadyToBeUsedEvent(
+                payload=UserCollectedContentReadyToUsedPayload(
+                    user_id=content_clone.user_id,
+                    user_collected_content_id=content_clone.id,
+                    external_id=external_id,
+                )
+            )
+            events_to_publish.append(ready_event)
+
+        # 2. Update repository in batch
+        if processed_contents:
             self.user_content_repository.upsert_user_collected_content_batch(
-                [content_clone]
+                processed_contents
             )
             logger.info(
-                f"✅ Content {content_clone.id} moved to PROCESSED status (version {content_clone.version})"
+                f"✅ Successfully transitioned {len(processed_contents)} content items to PROCESSED status"
             )
 
-        elif content.status == ContentStatus.PROCESSED:
+        # 3. Raise events in one shot
+        if events_to_publish:
+            await self.message_producer.publish_events(events_to_publish)
             logger.info(
-                f"⏭️ Content {content.id} is already in PROCESSED status. Ignoring."
+                f"📤 Published {len(events_to_publish)} UserCollectedContentReadyToBeUsedEvent(s) in one shot"
             )
-
-        else:
-            error_msg = (
-                f"Cannot transition content in status {content.status} to PROCESSED. "
-                "Expected PROCESSING or PROCESSED."
-            )
-            logger.error(f"❌ {error_msg}")
-            raise ValueError(error_msg)
-
-        # Raise event
-        ready_event = UserCollectedContentReadyToBeUsedEvent(
-            payload=UserCollectedContentReadyToUsedPayload(
-                user_id=user_id,
-                user_collected_content_id=content_clone.id,
-                external_id=external_id,
-            )
-        )
-
-        await self.message_producer.publish_event(ready_event)
-        logger.info(
-            f"📤 Published UserCollectedContentReadyToBeUsedEvent for {content_clone.id}"
-        )
