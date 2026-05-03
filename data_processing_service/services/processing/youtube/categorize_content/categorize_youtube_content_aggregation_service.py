@@ -53,8 +53,10 @@ class CategorizeYoutubeContentAggregationService:
             raise ValueError(f"No generated content IDs provided.")
 
         # 1. Filter the batch: take first 8 for processing
-        processing_ids = generated_content_ids[:8]
-        remaining_ids = generated_content_ids[8:]
+        # Remove duplicates while preserving order
+        unique_ids = list(dict.fromkeys(generated_content_ids))
+        processing_ids = unique_ids[:8]
+        remaining_ids = unique_ids[8:]
 
         self.logger.info(
             f"🚀 [CategorizeYoutubeContentAggregationService] Processing {len(processing_ids)} items. {len(remaining_ids)} remaining."
@@ -75,41 +77,69 @@ class CategorizeYoutubeContentAggregationService:
                     set(processing_ids)
                     - {content.id for content in generated_content_list}
                 )
-                self.logger.error(
-                    f"❌ [CategorizeYoutubeContentAggregationService] Could not find contents for IDs: {missing_ids}"
-                )
-                raise ValueError(f"Could not find contents for IDs: {missing_ids}")
+                if missing_ids:
+                    self.logger.error(
+                        f"❌ [CategorizeYoutubeContentAggregationService] Could not find contents for IDs: {missing_ids}"
+                    )
+                    raise ValueError(f"Could not find contents for IDs: {missing_ids}")
+                else:
+                    self.logger.warning(
+                        f"⚠️ [CategorizeYoutubeContentAggregationService] Length mismatch but no missing IDs. Processing {len(generated_content_list)} unique items."
+                    )
 
-            # Categorize using AI agent
-            categorized_batch = await self.categorization_agent.categorize_content(
-                generated_content_list
-            )
+            # Separate content based on status
+            to_categorize = []
+            already_categorized = []
 
-            updated_list = []
-            for content in categorized_batch:
-                # Update status and increment version for optimistic locking
-                content.set_status(
+            for content in generated_content_list:
+                if content.status == GeneratedContentStatus.REQUIRED_CONTENT_GENERATED:
+                    to_categorize.append(content)
+                elif content.status in [
                     GeneratedContentStatus.CATEGORIZATION_COMPLETED,
-                    "Categorization Complete.",
-                )
-                content.version += 1
-                updated_list.append(content)
+                    GeneratedContentStatus.ARTICLE_GENERATED,
+                ]:
+                    already_categorized.append(content)
+                else:
+                    self.logger.error(
+                        f"❌ [CategorizeYoutubeContentAggregationService] Invalid status {content.status} for content {content.id}"
+                    )
+                    raise ValueError(
+                        f"Invalid status {content.status} for content {content.id}"
+                    )
 
+            # 1. Process items that need categorization
+            if to_categorize:
+                categorized_batch = await self.categorization_agent.categorize_content(
+                    to_categorize
+                )
+
+                updated_list = []
+                for content in categorized_batch:
+                    # Update status and increment version for optimistic locking
+                    content.set_status(
+                        GeneratedContentStatus.CATEGORIZATION_COMPLETED,
+                        "Categorization Complete.",
+                    )
+                    content.version += 1
+                    updated_list.append(content)
+
+                # Batch update in repository
+                if updated_list:
+                    self.generated_content_repository.update_generated_content_batch(
+                        updated_list
+                    )
+                    self.logger.info(
+                        f"✅ [CategorizeYoutubeContentAggregationService] Successfully updated batch of {len(updated_list)} items."
+                    )
+
+            # 2. Add follow-up commands for ALL items in the current processing batch
+            for content in generated_content_list:
                 followup_command = GenerateCompleteYoutubeContentCommand(
                     payload=GenerateCompleteYoutubeContentPayload(
                         generated_content_id=content.id
                     )
                 )
                 commands_to_publish.append(followup_command)
-
-            # Batch update in repository
-            if updated_list:
-                self.generated_content_repository.update_generated_content_batch(
-                    updated_list
-                )
-                self.logger.info(
-                    f"✅ [CategorizeYoutubeContentAggregationService] Successfully updated batch of {len(updated_list)} items."
-                )
 
         except Exception as e:
             self.logger.error(

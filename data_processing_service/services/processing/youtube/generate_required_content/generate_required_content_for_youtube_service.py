@@ -172,10 +172,16 @@ class GenerateRequiredContentForYoutubeService:
                     schedule_data.payload
                 )
             )
-            command.payload.generated_content_ids.append(generated_content_id)
-            await self.aggregated_schedule_service.update_scheduled_command(
-                schedule_data.id, command
-            )
+            # Only append if the ID is not already in the list
+            if generated_content_id not in command.payload.generated_content_ids:
+                command.payload.generated_content_ids.append(generated_content_id)
+                await self.aggregated_schedule_service.update_scheduled_command(
+                    schedule_data.id, command
+                )
+            else:
+                self.logger.info(
+                    f"⏩ [GenerateRequiredContentForYoutubeService] ID {generated_content_id} is already in the aggregation schedule. Skipping append."
+                )
         else:
             # Create the initial business command
             business_command = CategorizeGeneratedYoutubeContentAggregationCommand(
