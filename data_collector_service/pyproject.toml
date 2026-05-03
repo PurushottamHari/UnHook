@@ -17,8 +17,8 @@ dependencies = [
     "httpx>=0.24.0",  # Required for HTTP client operations
     "langcodes>=3.3.0", # Required for language code validation
     # CRITICAL: DO NOT transition to local dependencies. Internal packages must remain git-based for architecture consistency.
-    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@c031c0a053087da3fa5d312702fd63e0392cba4c#subdirectory=user_service",
-    "commons @ git+https://github.com/PurushottamHari/UnHook.git@c031c0a053087da3fa5d312702fd63e0392cba4c#subdirectory=commons",
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=user_service",
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=commons",
     "curl-cffi",
     "black>=23.0.0",
     "isort>=5.12.0",

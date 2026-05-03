@@ -335,7 +335,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=c031c0a053087da3fa5d312702fd63e0392cba4c#c031c0a053087da3fa5d312702fd63e0392cba4c" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices#48ee1a2c6346db93efa78dc1f2585f8ab14b9b67" }
 dependencies = [
     { name = "injector" },
     { name = "langchain-core" },
@@ -397,7 +397,7 @@ dependencies = [
 requires-dist = [
     { name = "black", specifier = ">=23.0.0" },
     { name = "boto3", specifier = ">=1.26.0" },
-    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=c031c0a053087da3fa5d312702fd63e0392cba4c" },
+    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices" },
     { name = "curl-cffi" },
     { name = "httpx", specifier = ">=0.24.0" },
     { name = "injector", specifier = ">=0.21.0" },
@@ -410,7 +410,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=0.19.0" },
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "redis", specifier = ">=5.0.0" },
-    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=c031c0a053087da3fa5d312702fd63e0392cba4c" },
+    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices" },
     { name = "yt-dlp", extras = ["curl-cffi"] },
 ]
 
@@ -1614,7 +1614,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=c031c0a053087da3fa5d312702fd63e0392cba4c#c031c0a053087da3fa5d312702fd63e0392cba4c" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices#48ee1a2c6346db93efa78dc1f2585f8ab14b9b67" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },
