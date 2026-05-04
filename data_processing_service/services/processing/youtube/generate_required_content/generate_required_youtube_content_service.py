@@ -8,69 +8,69 @@ import os
 import uuid
 from datetime import datetime
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
-from data_collector_service.models import ContentType
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-)
-from data_processing_service.external.user_service.client import UserServiceClient
+    ContentStatus, ContentSubStatus, ContentType)
+from data_collector_service.models.youtube.subtitle_models import (
+    SubtitleData, SubtitleMap)
+from data_collector_service.models.youtube.youtube_video_details import \
+    YouTubeVideoDetails
+from data_processing_service.external.user_service.client import \
+    UserServiceClient
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-    StatusDetail,
-)
-from data_processing_service.models.youtube.subtitle_data import (
-    SubtitleData,
-    SubtitleMap,
-)
-from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import (
-    LocalYoutubeContentEphemeralRepository,
-)
-from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import (
-    YoutubeContentEphemeralRepository,
-)
-from data_processing_service.repositories.mongodb.config.database import MongoDB
-from data_processing_service.repositories.mongodb.user_content_repository import (
-    MongoDBUserContentRepository,
-)
-from data_processing_service.repositories.user_content_repository import (
-    UserContentRepository,
-)
-from data_processing_service.service_context import DataProcessingServiceContext
-from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import (
-    RequiredContentGenerator,
-)
-from data_processing_service.services.processing.youtube.generate_required_content.metrics_processor.generate_required_content_metrics_processor import (
-    GenerateRequiredContentMetricsProcessor,
-)
-from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import (
-    SubtitleUtils,
-)
+    GeneratedContent, GeneratedContentStatus, StatusDetail)
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
+from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
+from data_processing_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.user_content_repository import \
+    MongoDBUserContentRepository
+from data_processing_service.repositories.user_content_repository import \
+    UserContentRepository
+from data_processing_service.service_context import \
+    DataProcessingServiceContext
+from data_processing_service.services.processing.youtube.generate_required_content.ai_agent.required_content_generator import \
+    RequiredContentGenerator
+from data_processing_service.services.processing.youtube.generate_required_content.metrics_processor.generate_required_content_metrics_processor import \
+    GenerateRequiredContentMetricsProcessor
+from data_processing_service.services.processing.youtube.process_moderated_content.subtitles.utils.subtitle_utils import \
+    SubtitleUtils
 from user_service.models import OutputType
 from user_service.models.user import User
 
 
+@injectable()
 class GenerateRequiredYoutubeContentService:
     """Service for generating required YouTube content for users."""
 
+    @inject
     def __init__(
         self,
         user_content_repository: UserContentRepository,
+        generated_content_repository: GeneratedContentRepository,
         youtube_content_ephemeral_repository: YoutubeContentEphemeralRepository,
+        user_service_client: UserServiceClient,
+        required_content_generator_agent: RequiredContentGenerator,
     ):
         """
-        Initialize the service with a user content repository.
+        Initialize the service with dependencies.
         Args:
             user_content_repository: Repository for managing user content data
+            youtube_content_ephemeral_repository: Repository for ephemeral subtitle storage
+            user_service_client: Client for user service
+            required_content_generator_agent: AI agent for content generation
         """
         self.user_content_repository = user_content_repository
-        self.user_service_client = UserServiceClient()
+        self.generated_content_repository = generated_content_repository
+        self.user_service_client = user_service_client
         self.youtube_content_ephemeral_repository = youtube_content_ephemeral_repository
-        self.required_content_generator_agent = RequiredContentGenerator()
+        self.required_content_generator_agent = required_content_generator_agent
         self.subtitle_utils = SubtitleUtils()
         self.logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class GenerateRequiredYoutubeContentService:
         """
         try:
             # Fetch the user
-            user = self.user_service_client.get_user(user_id)
+            user = await self.user_service_client.get_user(user_id)
             if not user:
                 self.logger.error(f"User not found: {user_id}")
                 return
@@ -170,7 +170,7 @@ class GenerateRequiredYoutubeContentService:
                     )
 
                     # Make the database write
-                    self.user_content_repository.add_generated_content(
+                    self.generated_content_repository.add_generated_content(
                         generated_content=generated_content
                     )
                     print(

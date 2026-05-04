@@ -22,9 +22,12 @@ class DatabaseSettings(BaseSettings):
     DATABASE_NAME: str = "youtube_newspaper"
     USER_COLLECTED_CONTENT_COLLECTION_NAME: str = "collected_content"
     NEWSPAPER_COLLECTION_NAME: str = "newspapers"
+    NEWSPAPER_V2_COLLECTION_NAME: str = "newspaper_v2"
     GENERATED_CONTENT_INTERACTION_COLLECTION_NAME: str = (
         "generated_content_interactions"
     )
+    NEWSPAPER_ARTICLE_CANDIDATE_COLLECTION_NAME: str = "newspaper_article_candidate"
+    YOUTUBE_COLLECTED_CONTENT_COLLECTION_NAME: str = "youtube_collected_content"
 
     class Config:
         env_file = ENV_FILE_PATH

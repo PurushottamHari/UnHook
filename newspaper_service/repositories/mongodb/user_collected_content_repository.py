@@ -5,30 +5,30 @@ MongoDB implementation of UserCollectedContentRepository.
 from datetime import datetime, timezone
 from typing import Any, List, Optional
 
+from injector import inject
 from pymongo import UpdateOne
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    UserCollectedContent,
-)
-from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import (
-    CollectedContentAdapter,
-)
-from data_collector_service.repositories.mongodb.models.collected_content_db_model import (
-    CollectedContentDBModel,
-)
+    ContentStatus, UserCollectedContent)
+from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
+    CollectedContentAdapter
+from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
+    CollectedContentDBModel
 
 from ..user_collected_content_repository import UserCollectedContentRepository
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
 
 
+@injectable()
 class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
     """MongoDB implementation of user collected content repository."""
 
-    def __init__(self):
+    @inject
+    def __init__(self, mongodb: MongoDB):
         self.settings = get_mongodb_settings()
-        self.collection = MongoDB.get_database()[
+        self.collection = mongodb.get_database()[
             self.settings.USER_COLLECTED_CONTENT_COLLECTION_NAME
         ]
 

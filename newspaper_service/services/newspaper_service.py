@@ -7,6 +7,9 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import HTTPException
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 
 from ..external.user_service import UserServiceClient
 from ..models.newspaper import Newspaper
@@ -15,9 +18,11 @@ from ..models.newspaper_response import NewspaperResponse
 from ..repositories.newspaper_repository import NewspaperRepository
 
 
+@injectable()
 class NewspaperService:
     """Service for handling newspaper business logic."""
 
+    @inject
     def __init__(
         self,
         newspaper_repository: NewspaperRepository,
@@ -49,7 +54,7 @@ class NewspaperService:
             HTTPException: If user not found, newspaper not found, or doesn't belong to user
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise HTTPException(status_code=404, detail=f"User not found: {user_id}")
 
@@ -90,7 +95,7 @@ class NewspaperService:
             ValueError: If page_limit exceeds maximum or date format is invalid
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise HTTPException(status_code=404, detail=f"User not found: {user_id}")
 

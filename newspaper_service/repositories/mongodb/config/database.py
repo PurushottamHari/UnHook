@@ -2,13 +2,21 @@
 MongoDB database connection configuration.
 """
 
+from injector import inject
 from pymongo import MongoClient
+
+from commons.infra.dependency_injection.injectable import injectable
 
 from .settings import get_mongodb_settings
 
 
+@injectable()
 class MongoDB:
     """MongoDB connection manager."""
+
+    @inject
+    def __init__(self):
+        pass
 
     _instance = None
     _db = None
@@ -23,8 +31,14 @@ class MongoDB:
                 raise RuntimeError(
                     "MongoDB connection string not configured. Set MONGODB_URI or MONGODB_URL."
                 )
-            client = MongoClient(connection_uri)
+            client = MongoClient(connection_uri, uuidRepresentation="standard")
             cls._db = client[settings.DATABASE_NAME]
+            # Verify connection
+            try:
+                client.admin.command("ping")
+                print("✅ [MongoDB] Connected successfully")
+            except Exception as e:
+                print(f"❌ [MongoDB] Connection failed: {e}")
         return cls._instance
 
     @classmethod

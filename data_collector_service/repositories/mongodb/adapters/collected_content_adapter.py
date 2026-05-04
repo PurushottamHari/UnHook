@@ -5,28 +5,19 @@ Adapter for converting between internal models and MongoDB models for collected 
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from data_collector_service.collectors.youtube.models.youtube_video_details import (
-    YouTubeVideoDetails,
-)
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentType,
-    StatusDetail,
-    SubStatusDetail,
-    UserCollectedContent,
-)
-from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import (
-    YouTubeVideoDetailsAdapter,
-)
-from data_collector_service.repositories.mongodb.models.youtube_video_details import (
-    YouTubeVideoDetailsDB,
-)
+    ContentStatus, ContentType, StatusDetail, SubStatusDetail,
+    UserCollectedContent)
+from data_collector_service.models.youtube.youtube_video_details import \
+    YouTubeVideoDetails
+from data_collector_service.repositories.mongodb.adapters.youtube_video_details_adapter import \
+    YouTubeVideoDetailsAdapter
+from data_collector_service.repositories.mongodb.models.youtube_collected_content_db_model import \
+    YouTubeCollectedContentDBModel
 
-from ..models.collected_content_db_model import (
-    CollectedContentDBModel,
-    StatusDetails,
-    SubStatusDetails,
-)
+from ..models.collected_content_db_model import (CollectedContentDBModel,
+                                                 StatusDetails,
+                                                 SubStatusDetails)
 
 
 class CollectedContentAdapter:
@@ -56,18 +47,6 @@ class CollectedContentAdapter:
         ]
 
         data_db_model = {}
-        if content.content_type == ContentType.YOUTUBE_VIDEO:
-            video_details = content.data.get(ContentType.YOUTUBE_VIDEO)
-            if isinstance(video_details, YouTubeVideoDetails):
-                data_db_model[ContentType.YOUTUBE_VIDEO] = (
-                    YouTubeVideoDetailsAdapter.to_db_model(video_details)
-                )
-            else:
-                raise TypeError(
-                    f"Expected YouTubeVideoDetails, but got {type(video_details)}"
-                )
-        else:
-            raise TypeError(f"Npt implemented Content Type: {content.content_type}")
 
         # Handle sub_status and sub_status_details if present
         sub_status = content.sub_status if hasattr(content, "sub_status") else None
@@ -99,6 +78,7 @@ class CollectedContentAdapter:
             status_details=status_details,
             sub_status=sub_status,
             sub_status_details=sub_status_details,
+            version=content.version,
             data=data_db_model,
         )
 
@@ -118,17 +98,7 @@ class CollectedContentAdapter:
             for detail in db_model.status_details
         ]
 
-        data: Dict[str, Any]
-        if db_model.content_type == ContentType.YOUTUBE_VIDEO:
-            video_details_db_data = db_model.data.get(ContentType.YOUTUBE_VIDEO)
-            if not video_details_db_data:
-                raise ValueError("YouTube video data not found in db_model")
-
-            video_details_db = YouTubeVideoDetailsDB(**video_details_db_data)
-            video_details = YouTubeVideoDetailsAdapter.from_db_model(video_details_db)
-            data = {ContentType.YOUTUBE_VIDEO: video_details}
-        else:
-            raise TypeError(f"Npt implemented Content Type: {db_model.content_type}")
+        data: Dict[str, Any] = {}
 
         # Handle sub_status and sub_status_details
         sub_status = getattr(db_model, "sub_status", None)
@@ -157,6 +127,7 @@ class CollectedContentAdapter:
             data=data,
             sub_status=sub_status,
             sub_status_details=sub_status_details,
+            version=db_model.version,
             created_at=CollectedContentAdapter._float_to_datetime(db_model.created_at),
             updated_at=CollectedContentAdapter._float_to_datetime(db_model.updated_at),
             content_created_at=CollectedContentAdapter._float_to_datetime(

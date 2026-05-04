@@ -5,28 +5,31 @@ Service for handling generated content business logic.
 import logging
 from typing import Optional, Tuple
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
+from data_collector_service.models.user_collected_content import \
+    UserCollectedContent
 from data_processing_service.models.generated_content import GeneratedContent
-from data_collector_service.models.user_collected_content import UserCollectedContent
 
 from ..external.user_service import UserServiceClient
-from ..models.generated_content_list import (
-    GeneratedContentListData,
-    GeneratedContentListResponse,
-    GeneratedContentWithInteractions,
-)
-from ..repositories.generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
-from ..repositories.generated_content_repository import GeneratedContentRepository
+from ..models.generated_content_list import (GeneratedContentListData,
+                                             GeneratedContentListResponse,
+                                             GeneratedContentWithInteractions)
+from ..repositories.generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
+from ..repositories.generated_content_repository import \
+    GeneratedContentRepository
 from ..repositories.newspaper_repository import NewspaperRepository
-from ..repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
+from ..repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
 
 
+@injectable()
 class GeneratedContentService:
     """Service for handling generated content business logic."""
 
+    @inject
     def __init__(
         self,
         generated_content_repository: GeneratedContentRepository,
@@ -101,7 +104,7 @@ class GeneratedContentService:
             ValueError: If newspaper not found, user not found, or page_limit exceeds maximum
         """
         # Validate user exists
-        user = self._user_service_client.get_user(user_id)
+        user = await self._user_service_client.get_user(user_id)
         if not user:
             raise ValueError(f"User not found: {user_id}")
         # Validate page_limit

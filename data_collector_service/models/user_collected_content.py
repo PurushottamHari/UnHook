@@ -9,6 +9,7 @@ from .enums import ContentType
 class ContentStatus(str, Enum):
     COLLECTED = "COLLECTED"
     PROCESSING = "PROCESSING"
+    ACCEPTED = "ACCEPTED"
     PROCESSED = "PROCESSED"
     USED = "USED"
     REJECTED = "REJECTED"
@@ -43,14 +44,20 @@ class UserCollectedContent:
     output_type: str
     status: ContentStatus
     status_details: List[StatusDetail]
-    data: Dict[str, any]  # Content_Type: {Object}
+    data: Dict[
+        str, any
+    ]  # [DEPRECATED] DO NOT USE for youtube data. Use specialized repositories instead.
     sub_status: Optional[ContentSubStatus] = None
     sub_status_details: List[SubStatusDetail] = field(default_factory=list)
+    version: int = 1
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
     content_created_at: datetime = field(default_factory=datetime.utcnow)
 
     def set_status(self, status: ContentStatus, reason: str = ""):
+        # NOTE: Do NOT increment version here. Version should be incremented manually
+        # in the service to avoid multiple increments if multiple status changes
+        # are performed in a single transaction/logical operation.
         status_detail = StatusDetail(
             status=status, created_at=datetime.utcnow(), reason=reason
         )
@@ -59,6 +66,7 @@ class UserCollectedContent:
         self.updated_at = datetime.utcnow()
 
     def set_sub_status(self, sub_status: ContentSubStatus, reason: str = ""):
+        # NOTE: Do NOT increment version here.
         status_detail = SubStatusDetail(
             sub_status=sub_status, created_at=datetime.utcnow(), reason=reason
         )

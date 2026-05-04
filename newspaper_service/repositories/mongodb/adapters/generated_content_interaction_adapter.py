@@ -6,15 +6,10 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from ....models.generated_content_interaction import (
-    GeneratedContentInteraction,
-    InteractionStatus,
-    InteractionType,
-    InteractionTypeDetail,
-)
+    GeneratedContentInteraction, InteractionStatus, InteractionType,
+    InteractionTypeDetail)
 from ..models.generated_content_interaction_db_model import (
-    GeneratedContentInteractionDBModel,
-    InteractionTypeDetailDBModel,
-)
+    GeneratedContentInteractionDBModel, InteractionTypeDetailDBModel)
 
 
 class GeneratedContentInteractionAdapter:

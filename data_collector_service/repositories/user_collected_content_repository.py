@@ -3,9 +3,10 @@ Abstract base class for user collected content repository.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
-from data_collector_service.models.user_collected_content import UserCollectedContent
+from data_collector_service.models.user_collected_content import (
+    ContentStatus, UserCollectedContent)
 
 
 class UserCollectedContentRepository(ABC):
@@ -24,16 +25,6 @@ class UserCollectedContentRepository(ABC):
 
         Returns:
             List[str]: List of uncollected video IDs
-        """
-        pass
-
-    @abstractmethod
-    def add_collected_videos(self, videos: List[dict]) -> None:
-        """
-        Add collected videos to the user's history.
-
-        Args:
-            videos: List of collected video information
         """
         pass
 
@@ -59,13 +50,59 @@ class UserCollectedContentRepository(ABC):
         pass
 
     @abstractmethod
-    def update_user_collected_content_batch(
-        self, updated_user_collected_content_list: List[UserCollectedContent]
-    ) -> None:
+    def get_content_by_ids(self, content_ids: List[str]) -> List[UserCollectedContent]:
         """
-        Batch update UserCollectedContent items.
+        Get a list of user collected content by their IDs.
 
         Args:
-            updated_user_collected_content_list: The updated list.
+            content_ids: List of content IDs to fetch.
+
+        Returns:
+            List[UserCollectedContent]: List of matching content.
+        """
+        pass
+
+    @abstractmethod
+    def get_content_by_external_id_and_status(
+        self, external_id: str, status: ContentStatus
+    ) -> List[UserCollectedContent]:
+        """
+        Get a list of user collected content by external ID and status.
+
+        Args:
+            external_id: The external ID of the content.
+            status: The status to filter by.
+
+        Returns:
+            List[UserCollectedContent]: List of matching content.
+        """
+        pass
+
+    @abstractmethod
+    def get_content_by_external_id(
+        self, user_id: str, external_id: str
+    ) -> Optional[UserCollectedContent]:
+        """
+        Get a user collected content by user ID and external ID.
+
+        Args:
+            user_id: The ID of the user.
+            external_id: The external ID of the content.
+
+        Returns:
+            Optional[UserCollectedContent]: The matching content or None.
+        """
+        pass
+
+    @abstractmethod
+    def upsert_user_collected_content_batch(
+        self, user_collected_content_list: List[UserCollectedContent]
+    ) -> None:
+        """
+        Batch upsert UserCollectedContent items.
+        Matches by user_id and external_id.
+
+        Args:
+            user_collected_content_list: The list of content to upsert.
         """
         pass

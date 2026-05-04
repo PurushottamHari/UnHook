@@ -3,6 +3,7 @@ Dependency injection setup for the API.
 """
 
 from fastapi import Depends
+
 from ..repositories.mongodb import MongoDBUserRepository
 from ..services.user_service import UserService
 

@@ -5,13 +5,14 @@ Data collector service-specific context.
 import os
 from typing import Optional
 
+from commons.infra.dependency_injection.injectable import injectable
 from commons.service_context import BaseServiceContext
 
-from ..metrics_processor.data_collector_metrics_processor import (
-    DataCollectorMetricsProcessor,
-)
+from ..metrics_processor.data_collector_metrics_processor import \
+    DataCollectorMetricsProcessor
 
 
+@injectable()
 class DataCollectorServiceContext(BaseServiceContext):
     """
     Data collector service-specific context.

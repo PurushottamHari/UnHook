@@ -34,6 +34,7 @@ class CollectedContentDBModel(BaseModel):
     status_details: List[StatusDetails]
     sub_status: Optional[str] = None
     sub_status_details: List[SubStatusDetails] = []
+    version: int = Field(default=1)
     data: Dict[str, Any]
 
     class Config:

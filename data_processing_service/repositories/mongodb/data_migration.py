@@ -8,23 +8,20 @@ if project_root not in sys.path:
 from datetime import datetime, timezone
 
 from data_collector_service.models.user_collected_content import ContentStatus
-from data_collector_service.repositories.mongodb.config.database import (
-    MongoDB as CollectorMongoDB,
-)
-from data_collector_service.repositories.mongodb.config.settings import (
-    get_mongodb_settings,
-)
-from data_processing_service.models.generated_content import GeneratedContentStatus
-from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import (
-    LocalYoutubeContentEphemeralRepository,
-)
-from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
-    GeneratedContentAdapter,
-)
-from data_processing_service.repositories.mongodb.config.database import MongoDB
-from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
-    GeneratedContentDBModel,
-)
+from data_collector_service.repositories.mongodb.config.database import \
+    MongoDB as CollectorMongoDB
+from data_collector_service.repositories.mongodb.config.settings import \
+    get_mongodb_settings
+from data_processing_service.models.generated_content import \
+    GeneratedContentStatus
+from data_processing_service.repositories.ephemeral.local.youtube_content_ephemeral_repository import \
+    LocalYoutubeContentEphemeralRepository
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
+    GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
+    GeneratedContentDBModel
 from data_processing_service.utils.content_utils import calculate_reading_time
 from user_service.models import OutputType
 

@@ -1,9 +1,30 @@
 service:
-  service_name: "newspaper-service"
+  service_name: "newspaper_service"
   service_port: 8003
 
 external:
   user_service:
-    base_url: "https://unhook-production-0e0c.up.railway.app"
-    port: 443
     timeout: 120.0 # 2 minutes timeout
+
+
+s3:
+  account_id: "minioadmin"
+  bucket_name: "unhook-ephemeral"
+  endpoint_url: "http://minio:9000"
+
+messaging:
+  commands:
+    data_collector_service:
+      topic: "data_collector_service:commands"
+    data_processing_service:
+      topic: "data_processing_service:commands"
+    newspaper_service:
+      topic: "newspaper_service:commands"
+
+  events:
+    data_processing_service:
+      topic: "data_processing_service:events"
+    data_collector_service:
+      topic: "data_collector_service:events"
+    newspaper_service:
+      topic: "newspaper_service:events"

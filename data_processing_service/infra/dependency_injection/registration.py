@@ -1,0 +1,104 @@
+import importlib
+import pkgutil
+from typing import List, Tuple, Type
+
+from injector import Binder, Injector, Module, Scope, provider, singleton
+
+from commons.infra.dependency_injection.registration import \
+    discover_and_register_injectables
+from commons.messaging import (BaseCommandRouter, BaseEventRouter,
+                               BaseMessagingConfig, MessageConsumer,
+                               MessageProducer)
+from commons.messaging.aggregated_schedule.repository import \
+    AggregatedScheduleRepository
+from data_processing_service.config.config import Config
+from data_processing_service.messaging.config.messaging_config import \
+    MessagingConfig
+from data_processing_service.messaging.redis.consumer import \
+    RedisMessageConsumer
+from data_processing_service.messaging.redis.producer import \
+    RedisMessageProducer
+from data_processing_service.messaging.routers.command_router import \
+    CommandRouter
+from data_processing_service.messaging.routers.event_router import EventRouter
+from data_processing_service.repositories.ephemeral.s3.youtube_content_ephemeral_repository import \
+    S3YoutubeContentEphemeralRepository
+from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
+from data_processing_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
+from data_processing_service.repositories.mongodb.config.database import \
+    MongoDB
+from data_processing_service.repositories.mongodb.generated_content_repository import \
+    MongoDBGeneratedContentRepository
+from data_processing_service.repositories.mongodb.mongodb_aggregated_schedule_repository import \
+    MongoDBAggregatedScheduleRepository
+from data_processing_service.repositories.mongodb.user_content_repository import \
+    MongoDBUserContentRepository
+from data_processing_service.repositories.mongodb.youtube_collected_content_repository import \
+    MongoDBYouTubeCollectedContentRepository
+from data_processing_service.repositories.user_content_repository import \
+    UserContentRepository
+from data_processing_service.repositories.youtube_collected_content_repository import \
+    YouTubeCollectedContentRepository
+
+
+class DataProcessingModule(Module):
+    def configure(self, binder: Binder) -> None:
+        binder.bind(
+            UserContentRepository,
+            to=MongoDBUserContentRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            YoutubeContentEphemeralRepository,
+            to=S3YoutubeContentEphemeralRepository,
+            scope=singleton,
+        )
+
+        binder.bind(
+            AggregatedScheduleRepository,
+            to=MongoDBAggregatedScheduleRepository,
+            scope=singleton,
+        )
+
+        # Messaging Bindings
+        binder.bind(BaseMessagingConfig, to=MessagingConfig, scope=singleton)
+        binder.bind(MessageConsumer, to=RedisMessageConsumer, scope=singleton)
+        binder.bind(MessageProducer, to=RedisMessageProducer, scope=singleton)
+        binder.bind(BaseCommandRouter, to=CommandRouter, scope=singleton)
+        binder.bind(BaseEventRouter, to=EventRouter, scope=singleton)
+
+        binder.bind(
+            YouTubeCollectedContentRepository,
+            to=MongoDBYouTubeCollectedContentRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            GeneratedContentRepository,
+            to=MongoDBGeneratedContentRepository,
+            scope=singleton,
+        )
+
+        # Automatically discover and bind all classes decorated with @injectable
+        discover_and_register_injectables(binder, "commons")
+        discover_and_register_injectables(binder, "data_processing_service")
+
+    @provider
+    @singleton
+    def provide_config(self) -> Config:
+        return Config()
+
+    @provider
+    @singleton
+    def provide_mongodb(self) -> MongoDB:
+        """
+        Provides a MongoDB instance, ensuring connection is established.
+        """
+        if MongoDB.db is None:
+            MongoDB.connect_to_database()
+        return MongoDB()
+
+
+def create_injector() -> Injector:
+    return Injector([DataProcessingModule()])

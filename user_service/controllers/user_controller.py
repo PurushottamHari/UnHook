@@ -1,13 +1,13 @@
-"""
-User controller handling HTTP requests for user operations.
-"""
-
+import logging
 from typing import Any, Dict
 
-from ..api.dependencies import get_user_service
 from fastapi import APIRouter, Depends, HTTPException
+
+from ..api.dependencies import get_user_service
 from ..models.user import User
 from ..services.user_service import UserService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -54,11 +54,16 @@ async def get_user(
         HTTPException: If user not found
     """
     try:
+        logger.info(f"🔍 [UserController] Fetching user {user_id}")
         user = await user_service.get_user(user_id)
         if not user:
+            logger.warning(f"⚠️ [UserController] User {user_id} not found")
             raise HTTPException(status_code=404, detail="User not found")
         return user
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"❌ [UserController] Error fetching user {user_id}: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 

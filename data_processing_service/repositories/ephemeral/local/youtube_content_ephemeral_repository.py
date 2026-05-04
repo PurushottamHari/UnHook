@@ -1,19 +1,21 @@
 import os
 
-from data_processing_service.models.youtube.subtitle_data import (
-    SubtitleData,
-    SubtitleMap,
-)
-from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import (
-    YoutubeContentEphemeralRepository,
-)
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
+from data_collector_service.models.youtube.subtitle_models import (
+    SubtitleData, SubtitleMap)
+from data_processing_service.repositories.ephemeral.youtube_content_ephemeral_repository import \
+    YoutubeContentEphemeralRepository
 
 
+@injectable()
 class LocalYoutubeContentEphemeralRepository(YoutubeContentEphemeralRepository):
     """
     Local implementation of YoutubeContentEphemeralRepository that stores subtitles on the local filesystem.
     """
 
+    @inject
     def __init__(self, base_dir: str = None):
         if base_dir is None:
             base_dir = os.path.join(

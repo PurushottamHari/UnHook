@@ -3,54 +3,57 @@ Service for handling content rejection.
 """
 
 import asyncio
+import logging
 from typing import List
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
+from data_collector_service.external.user_service.client import \
+    UserServiceClient
 from data_collector_service.models.enums import ContentType
-from .youtube.ai_agent.moderator import (
-    ContentModerator,
-)
-
-from data_collector_service.external.user_service.client import UserServiceClient
 from data_collector_service.repositories.mongodb.config.database import MongoDB
-from data_collector_service.repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
-from data_collector_service.repositories.user_collected_content_repository import (
-    UserCollectedContentRepository,
-)
+from data_collector_service.repositories.mongodb.user_collected_content_repository import \
+    MongoDBUserCollectedContentRepository
+from data_collector_service.repositories.user_collected_content_repository import \
+    UserCollectedContentRepository
+
 from .service_context import RejectionServiceContext
-from .youtube.rejection_content_service_youtube import RejectionContentServiceYoutube
+from .youtube.ai_agent.moderator import ContentModerator
+from .youtube.rejection_content_service_youtube import \
+    RejectionContentServiceYoutube
+
+logger = logging.getLogger(__name__)
 
 
+@injectable()
 class RejectContentService:
     """Service for handling content rejection."""
 
+    @inject
     def __init__(
         self,
         user_service_client: UserServiceClient,
+        user_content_repository: UserCollectedContentRepository,
+        service_context: RejectionServiceContext,
+        rejection_content_service_youtube: RejectionContentServiceYoutube,
     ):
         """
         Initialize the service.
 
         Args:
             user_service_client: Client for user service
+            user_content_repository: Repository for user collected content
+            service_context: Service context for rejection
+            rejection_content_service_youtube: YouTube-specific rejection service
         """
         self.user_service_client = user_service_client
-        # Initialize MongoDB connection
-        MongoDB.connect_to_database()
-        # Create MongoDB repository instance
-        self.user_content_repository = MongoDBUserCollectedContentRepository()
-
-        # Initialize service-specific context (auto-initializes metrics processor)
-        self.service_context = RejectionServiceContext()
+        self.user_content_repository = user_content_repository
+        self.service_context = service_context
+        self.rejection_content_service_youtube = rejection_content_service_youtube
 
         # Get the auto-initialized metrics processor
         self.metrics_processor = self.service_context.get_rejection_metrics_processor()
-
-        # Initialize YouTube rejection service with service context
-        self.rejection_content_service_youtube = RejectionContentServiceYoutube(
-            moderator_agent=ContentModerator(), service_context=self.service_context
-        )
 
     async def reject(self, user_id: str) -> None:
         """
@@ -61,7 +64,10 @@ class RejectContentService:
         """
         try:
             # Get user object from user service
-            user = self.user_service_client.get_user(user_id)
+            user = await self.user_service_client.get_user(user_id)
+            if not user:
+                logger.error(f"User {user_id} not found.")
+                raise ValueError(f"User {user_id} not found.")
 
             # Get unprocessed content for the user
             unprocessed_content_list = (
@@ -119,7 +125,7 @@ class RejectContentService:
                         )
 
             if len(rejected_content) != 0:
-                self.user_content_repository.update_user_collected_content_batch(
+                self.user_content_repository.upsert_user_collected_content_batch(
                     rejected_content
                 )
 

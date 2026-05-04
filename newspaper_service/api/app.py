@@ -2,11 +2,15 @@
 FastAPI application setup for newspaper service.
 """
 
+import os
+
 from fastapi import FastAPI
 
+from ..infra.dependency_injection.registration import create_injector
 from ..repositories.mongodb.config.database import MongoDB
 from ..repositories.mongodb.config.settings import get_mongodb_settings
-from .controllers.generated_content_controller import router as interaction_router
+from .controllers.generated_content_controller import \
+    router as interaction_router
 from .controllers.newspaper_controller import router as newspaper_router
 
 app = FastAPI(
@@ -27,23 +31,21 @@ async def health_check():
 
 
 @app.on_event("startup")
-async def startup_db_client():
-    """Initialize database connection on startup."""
-    # MongoDB connection is initialized lazily via singleton pattern
-    # Ensure database is accessible
-    settings = get_mongodb_settings()
-    database = MongoDB.get_database()
+async def startup_event():
+    """Initialize resources on startup."""
+    print("PORT FROM ENV:", os.environ.get("PORT"))
+    # Initialize DI injector
+    app.state.injector = create_injector()
 
-    # Create unique compound index on interaction collection
-    interaction_collection = database[
-        settings.GENERATED_CONTENT_INTERACTION_COLLECTION_NAME
-    ]
-    try:
-        interaction_collection.create_index(
-            [("generated_content_id", 1), ("user_id", 1), ("interaction_type", 1)],
-            unique=True,
-            name="unique_interaction",
-        )
-    except Exception:
-        # Index might already exist, which is fine
-        pass
+
+if __name__ == "__main__":
+    import uvicorn
+
+    from newspaper_service.config.config import Config
+
+    config = Config()
+    port = config.service_port
+    print(f"Starting Newspaper Service API on port {port}")
+    uvicorn.run(
+        "newspaper_service.api.app:app", host="0.0.0.0", port=port, reload=False
+    )
