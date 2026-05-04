@@ -14,4 +14,7 @@ metrics_data/
 
 scripts/daily_disciple/*/
 
+.env
+.env.staging
+data/
 
