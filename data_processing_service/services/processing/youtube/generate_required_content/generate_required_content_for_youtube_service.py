@@ -11,7 +11,7 @@ from injector import inject
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.models.user_collected_content import (
-    ContentSubStatus, ContentType, UserCollectedContent)
+    ContentType, UserCollectedContent, YouTubeCollectedContentStatus)
 from data_processing_service.config.config import Config
 from data_processing_service.messaging.models.commands import (
     CategorizeGeneratedYoutubeContentAggregationCommand,
@@ -77,12 +77,6 @@ class GenerateRequiredContentForYoutubeService:
                 f"Unsupported content type: {user_collected_content.content_type}"
             )
 
-        if user_collected_content.sub_status != ContentSubStatus.SUBTITLES_STORED:
-            raise ValueError(
-                f"Content {user_collected_content.id} is not in SUBTITLES_STORED status. "
-                f"Current sub_status: {user_collected_content.sub_status}"
-            )
-
         # Verify no generated content exists yet for this external_id
         existing_generated_content = (
             self.generated_content_repository.get_generated_content_by_external_id(
@@ -106,6 +100,15 @@ class GenerateRequiredContentForYoutubeService:
             if not youtube_video_details:
                 raise ValueError(
                     f"YouTube details not found for video_id: {user_collected_content.external_id}"
+                )
+
+            if (
+                youtube_video_details.status
+                != YouTubeCollectedContentStatus.SUBTITLES_STORED
+            ):
+                raise ValueError(
+                    f"Content {youtube_video_details.video_id} is not in SUBTITLES_STORED status. "
+                    f"Current status: {youtube_video_details.status}"
                 )
 
             # Fetch subtitle data
