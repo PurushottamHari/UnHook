@@ -128,9 +128,7 @@ class RejectionContentServiceYoutube:
                     ContentStatus.PROCESSING, "Moderation passed."
                 )
                 updated_processed_content.set_sub_status(
-                    ContentSubStatus.MODERATION_PASSED,
-                    "first moderation passed",
-                    increment_version=False,
+                    ContentSubStatus.MODERATION_PASSED, "first moderation passed"
                 )
                 final_moderated_content_list.append(updated_processed_content)
         return final_moderated_content_list

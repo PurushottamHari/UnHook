@@ -85,8 +85,3 @@ class SubmitYoutubeContentForProcessingService:
         )
         video_details.version += 1
         self.youtube_repository.upsert_videos([video_details])
-
-        # 4. Update sub-status in content
-        content.set_sub_status(
-            ContentSubStatus.SUBTITLES_STORED, "YouTube subtitles processed"
-        )
