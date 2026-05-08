@@ -25,6 +25,17 @@ async function fetchUserCategories(userId: string, date: string): Promise<string
   return data.categories || [];
 }
 
+async function fetchUserProfile(userId: string): Promise<any> {
+  const response = await fetch(`/api/users/${userId}`);
+  const data = await response.json();
+
+  if (!data.success) {
+    throw new Error(data.error || 'Failed to fetch user profile');
+  }
+
+  return data.user;
+}
+
 interface GuestViewProps {
   userId: string;
 }
@@ -73,6 +84,16 @@ export default function GuestView({ userId }: GuestViewProps) {
     staleTime: 5 * 60 * 1000, 
   });
 
+  const {
+    data: userProfile,
+    isLoading: isLoadingProfile,
+  } = useQuery({
+    queryKey: ['userProfile', userId],
+    queryFn: () => fetchUserProfile(userId),
+    enabled: !!userId,
+    staleTime: 60 * 60 * 1000, // Profile doesn't change often
+  });
+
   return (
     <div className='min-h-screen bg-yellow-50 dark:bg-amber-50 md:snap-none snap-container'>
       <ModeBanner mode="guest" />
@@ -97,7 +118,7 @@ export default function GuestView({ userId }: GuestViewProps) {
                 </div>
               </div>
 
-              <DashboardTitle title="Puru's Space" />
+              <DashboardTitle title={isLoadingProfile ? "Loading Space..." : `${userProfile?.name || 'User'}'s Space`} />
 
               {isLoadingCategories && !userCategories ? (
                 <CategoryTagsSkeleton />

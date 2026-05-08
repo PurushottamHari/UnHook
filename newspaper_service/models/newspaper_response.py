@@ -7,14 +7,9 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from .newspaper import (
-    ConsideredContent,
-    ConsideredContentStatus,
-    ConsideredContentStatusDetail,
-    Newspaper,
-    NewspaperStatus,
-    StatusDetail,
-)
+from .newspaper import (ConsideredContent, ConsideredContentStatus,
+                        ConsideredContentStatusDetail, Newspaper,
+                        NewspaperStatus, StatusDetail)
 
 
 class StatusDetailResponse(BaseModel):

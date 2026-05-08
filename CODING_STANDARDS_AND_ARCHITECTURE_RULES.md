@@ -35,6 +35,11 @@ This document defines the coding standards, architectural patterns, and developm
   - `python-dotenv>=0.19.0` - Environment configuration
   - `typing-extensions>=4.0.0` - Type hints
 
+- **Internal Dependencies (CRITICAL)**:
+  - **NEVER** transition internal dependencies (`commons`, `user_service`, etc.) to local path-based references (e.g., `file://./../commons`).
+  - All internal dependencies **MUST** remain git-based to ensure architectural consistency across environments.
+  - To update internal dependencies, use `uv lock --upgrade` to refresh the pinned commits in `uv.lock`.
+
 ### Project Structure
 ```
 service_name/

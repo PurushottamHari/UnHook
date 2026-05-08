@@ -6,8 +6,9 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
+from data_collector_service.models.user_collected_content import \
+    UserCollectedContent
 from data_processing_service.models.generated_content import GeneratedContent
-from data_collector_service.models.user_collected_content import UserCollectedContent
 
 from .generated_content_interaction import GeneratedContentInteraction
 from .generated_content_response import GeneratedContentResponse

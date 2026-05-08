@@ -21,29 +21,26 @@ export async function GET(request: NextRequest) {
     // Use provided date or default to today
     const targetDate = date || new Date().toISOString().split('T')[0];
     
-    // Get newspaper ID first
-    const newspaperId = await newspaperService.getNewspaperIdByDate(targetDate, userId);
+    // Fetch single page of articles using date (V2)
+    const pageData = await newspaperService.getNewspaperArticlesPage(
+      targetDate,
+      userId,
+      startingAfter || null
+    );
     
-    if (!newspaperId) {
+    if (pageData.articles.length === 0 && !startingAfter) {
       return NextResponse.json(
         { error: 'No digest available for this date' },
         { status: 404 }
       );
     }
     
-    // Fetch single page of articles
-    const pageData = await newspaperService.getNewspaperArticlesPage(
-      newspaperId,
-      userId,
-      startingAfter || null,
-      pageLimit
-    );
-    
     return NextResponse.json({
       success: true,
       articles: pageData.articles,
       hasNext: pageData.hasNext,
-      lastExternalId: pageData.lastExternalId,
+      nextCursor: pageData.nextCursor,
+      newspaperId: pageData.newspaperId,
     });
   } catch (error) {
     console.error('Error fetching newspaper page:', error);

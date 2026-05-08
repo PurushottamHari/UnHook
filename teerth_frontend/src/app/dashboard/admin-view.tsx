@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useAuthStore } from '@/store/auth-store';
 import TeerthLogo from '@/components/TeerthLogo';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import CategoryTagsSkeleton from '@/components/CategoryTagsSkeleton';
@@ -32,6 +33,7 @@ export default function AdminView({ userId }: AdminViewProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuthStore();
   const dateParam = searchParams.get('date');
 
   const [selectedDate, setSelectedDate] = useState<string>(() => {
@@ -96,7 +98,7 @@ export default function AdminView({ userId }: AdminViewProps) {
                 </div>
               </div>
 
-              <DashboardTitle title="Welcome Puru" />
+              <DashboardTitle title={`Welcome ${user?.name || "User"}`} />
 
               {isLoadingCategories && !userCategories ? (
                 <CategoryTagsSkeleton />

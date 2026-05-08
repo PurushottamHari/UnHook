@@ -13,7 +13,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Try to import from main project, fallback to local definitions
 try:
-    from data_processing_service.models.generated_content import GeneratedContentStatus
+    from data_processing_service.models.generated_content import \
+        GeneratedContentStatus
     from user_service.models.enums import CategoryName, OutputType, Weekday
 except ImportError:
     # Fallback definitions for deployment

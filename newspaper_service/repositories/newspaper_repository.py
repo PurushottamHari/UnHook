@@ -6,7 +6,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Optional
 
-from data_collector_service.models.user_collected_content import UserCollectedContent
+from data_collector_service.models.user_collected_content import \
+    UserCollectedContent
 
 from ..models import Newspaper
 

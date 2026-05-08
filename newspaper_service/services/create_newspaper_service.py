@@ -10,54 +10,47 @@ from typing import List, Tuple
 from uuid import uuid4
 
 import pytz
+from injector import inject
 
+from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentType,
-    UserCollectedContent,
-)
+    ContentStatus, ContentType, UserCollectedContent)
 from newspaper_service.external.user_service import UserServiceClient
-from newspaper_service.models import (
-    ConsideredContent,
-    ConsideredContentStatus,
-    Newspaper,
-    NewspaperStatus,
-)
-from newspaper_service.repositories import (
-    GeneratedContentRepository,
-    NewspaperRepository,
-    UserCollectedContentRepository,
-)
-from newspaper_service.repositories.mongodb.generated_content_repository import (
-    MongoDBGeneratedContentRepository,
-)
-from newspaper_service.repositories.mongodb.newspaper_repository import (
-    MongoDBNewspaperRepository,
-)
-from newspaper_service.repositories.mongodb.user_collected_content_repository import (
-    MongoDBUserCollectedContentRepository,
-)
+from newspaper_service.models import (ConsideredContent,
+                                      ConsideredContentStatus, Newspaper,
+                                      NewspaperStatus)
+from newspaper_service.repositories import (GeneratedContentRepository,
+                                            NewspaperRepository,
+                                            UserCollectedContentRepository)
+from newspaper_service.repositories.mongodb.generated_content_repository import \
+    MongoDBGeneratedContentRepository
+from newspaper_service.repositories.mongodb.newspaper_repository import \
+    MongoDBNewspaperRepository
+from newspaper_service.repositories.mongodb.user_collected_content_repository import \
+    MongoDBUserCollectedContentRepository
 from newspaper_service.service_context import NewspaperServiceContext
-from newspaper_service.services.metrics_processor.newspaper_metrics_processor import (
-    NewspaperMetricsProcessor,
-)
+from newspaper_service.services.metrics_processor.newspaper_metrics_processor import \
+    NewspaperMetricsProcessor
 from user_service.models.enums import CategoryName, Weekday
 
 
+@injectable()
 class CreateNewspaperService:
     """Main service for newspaper creation and management."""
 
+    @inject
     def __init__(
         self,
         newspaper_repository: NewspaperRepository,
         user_collected_content_repository: UserCollectedContentRepository,
         generated_content_repository: GeneratedContentRepository,
+        user_service_client: UserServiceClient,
     ):
         self.newspaper_repository = newspaper_repository
         self.user_collected_content_repository = user_collected_content_repository
         self.generated_content_repository = generated_content_repository
         self.logger = logging.getLogger(__name__)
-        self.user_service_client = UserServiceClient()
+        self.user_service_client = user_service_client
 
         # Initialize service context and metrics processor
         self.service_context = NewspaperServiceContext(NewspaperMetricsProcessor)
@@ -82,7 +75,9 @@ class CreateNewspaperService:
             newspaper = self._get_or_create_newspaper(user_id, for_date)
 
             # Step 2: Get candidates that need to be considered
-            new_candidates = self._get_new_candidates(user_id, for_date, newspaper)
+            new_candidates = await self._get_new_candidates(
+                user_id, for_date, newspaper
+            )
 
             # Record total content considered
             if self.metrics_processor:
@@ -209,12 +204,12 @@ class CreateNewspaperService:
         newspaper.set_status(NewspaperStatus.COLLATING, "Starting collation")
         return newspaper
 
-    def _get_new_candidates(
+    async def _get_new_candidates(
         self, user_id: str, for_date: datetime, newspaper: Newspaper
     ) -> List[UserCollectedContent]:
         """Get candidates that need to be considered (not already in newspaper)."""
         # Fetch user to determine interests
-        user = self.user_service_client.get_user(user_id)
+        user = await self.user_service_client.get_user(user_id)
         if not user:
             raise RuntimeError(f"User not found: {user_id}")
 

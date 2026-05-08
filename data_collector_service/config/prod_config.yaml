@@ -1,12 +1,28 @@
 service:
-  service_name: "data-collector-service"
+  service_name: "data_collector_service"
   service_port: 443
 
 external:
   user_service:
-    base_url: "https://unhook-production-0e0c.up.railway.app"
-    port: 443
     timeout: 120.0 # 2 minutes timeout
 
 proxy:
   base_url: "api.zyte.com:8011"
+
+
+s3:
+  account_id: "3a16fd5fe268c9357783c8e2a1ecf1e2"
+  bucket_name: "unhook-ephemeral"
+  endpoint_url: "https://3a16fd5fe268c9357783c8e2a1ecf1e2.r2.cloudflarestorage.com"
+
+messaging:
+  commands:
+    data_collector_service:
+      topic: "data_collector_service:commands"
+    data_processing_service:
+      topic: "data_processing_service:commands"
+  events:
+    data_processing_service:
+      topic: "data_processing_service:events"
+    data_collector_service:
+      topic: "data_collector_service:events"

@@ -2,25 +2,19 @@
 Controller handling HTTP requests for generated content interaction operations.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from data_processing_service.models.generated_content import GeneratedContent
-
 from ...models.generated_content_interaction import GeneratedContentInteraction
-from ...models.generated_content_interaction_list import (
-    GeneratedContentInteractionListResponse,
-)
+from ...models.generated_content_interaction_list import \
+    GeneratedContentInteractionListResponse
 from ...models.generated_content_response import GeneratedContentResponse
-from ...services.generated_content_interaction_service import ContentInteractionService
+from ...services.generated_content_interaction_service import \
+    ContentInteractionService
 from ...services.generated_content_service import GeneratedContentService
-from ..dependencies import (
-    get_generated_content_interaction_service,
-    get_generated_content_service,
-    get_user_id_from_header,
-)
+from ..dependencies import get_user_id_from_header
 
 router = APIRouter(tags=["content-interactions"])
 
@@ -33,49 +27,119 @@ class InteractionRequest(BaseModel):
     metadata: Optional[Dict[str, str]] = None
 
 
+class GeneratedContentController:
+    """Controller handling HTTP requests for generated content interaction operations."""
+
+    def __init__(self, request: Request):
+        # Resolve services once from the injector in the constructor
+        injector = request.app.state.injector
+        self.interaction_service = injector.get(ContentInteractionService)
+        self.content_service = injector.get(GeneratedContentService)
+
+    async def create_interaction(
+        self,
+        generated_content_id: str,
+        request: InteractionRequest,
+    ) -> GeneratedContentInteraction:
+        """
+        Create a user interaction for generated content.
+        """
+        try:
+            return await self.interaction_service.create_interaction(
+                generated_content_id=generated_content_id,
+                user_id=request.user_id,
+                interaction_type=request.interaction_type,
+                metadata=request.metadata,
+            )
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    async def list_user_interactions_for_content(
+        self,
+        content_id: str,
+        starting_after: Optional[str],
+        page_limit: int,
+    ) -> GeneratedContentInteractionListResponse:
+        """
+        List interactions for specific content with pagination.
+        """
+        try:
+            return await self.interaction_service.list_user_interactions_for_content(
+                generated_content_id=content_id,
+                starting_after=starting_after,
+                page_limit=page_limit,
+            )
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    async def list_user_interactions(
+        self,
+        user_id: str,
+        interaction_type: Optional[str],
+        starting_after: Optional[str],
+        page_limit: int,
+    ) -> GeneratedContentInteractionListResponse:
+        """
+        List user's interactions with pagination, optionally filtered by type.
+        """
+        try:
+            return await self.interaction_service.list_user_interactions(
+                user_id=user_id,
+                interaction_type=interaction_type,
+                starting_after=starting_after,
+                page_limit=page_limit,
+            )
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    async def get_generated_content(
+        self,
+        content_id: str,
+    ) -> GeneratedContentResponse:
+        """
+        Get generated content by its ID.
+        """
+        try:
+            content, user_collected_content = (
+                await self.content_service.get_generated_content_by_id(
+                    content_id=content_id
+                )
+            )
+            return GeneratedContentResponse.from_generated_content(
+                content, user_collected_content
+            )
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+
+# Native FastAPI route registration
 @router.post(
     "/generated_content/{generated_content_id}/user_interaction",
     response_model=GeneratedContentInteraction,
 )
-async def create_interaction(
+async def create_interaction_endpoint(
     generated_content_id: str,
     request: InteractionRequest,
-    interaction_service: ContentInteractionService = Depends(
-        get_generated_content_interaction_service
-    ),
+    controller: GeneratedContentController = Depends(),
 ) -> GeneratedContentInteraction:
-    """
-    Create a user interaction for generated content.
-
-    Args:
-        generated_content_id: MongoDB _id of the generated content
-        request: Interaction request data
-        interaction_service: Injected interaction service
-
-    Returns:
-        Created interaction object
-
-    Raises:
-        HTTPException: If interaction creation fails
-    """
-    try:
-        return await interaction_service.create_interaction(
-            generated_content_id=generated_content_id,
-            user_id=request.user_id,
-            interaction_type=request.interaction_type,
-            metadata=request.metadata,
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return await controller.create_interaction(
+        generated_content_id=generated_content_id, request=request
+    )
 
 
 @router.get(
     "/list_user_interactions_for_content/{content_id}",
     response_model=GeneratedContentInteractionListResponse,
 )
-async def list_user_interactions_for_content(
+async def list_user_interactions_for_content_endpoint(
     content_id: str,
     starting_after: Optional[str] = Query(
         None, description="Cursor ID to start after (for pagination)"
@@ -83,41 +147,21 @@ async def list_user_interactions_for_content(
     page_limit: int = Query(
         10, le=10, description="Maximum number of items to return (max 10)"
     ),
-    interaction_service: ContentInteractionService = Depends(
-        get_generated_content_interaction_service
-    ),
+    controller: GeneratedContentController = Depends(),
 ) -> GeneratedContentInteractionListResponse:
-    """
-    List interactions for specific content with pagination.
-
-    Args:
-        content_id: MongoDB _id of the generated content
-        starting_after: Optional cursor ID to start after (for pagination)
-        page_limit: Maximum number of items to return (default=10, max=10)
-        interaction_service: Injected interaction service
-
-    Returns:
-        Paginated list response with interactions and hasNext flag
-    """
-    try:
-        return await interaction_service.list_user_interactions_for_content(
-            generated_content_id=content_id,
-            starting_after=starting_after,
-            page_limit=page_limit,
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return await controller.list_user_interactions_for_content(
+        content_id=content_id, starting_after=starting_after, page_limit=page_limit
+    )
 
 
 @router.get(
     "/list_user_interactions",
     response_model=GeneratedContentInteractionListResponse,
 )
-async def list_user_interactions(
+async def list_user_interactions_endpoint(
     interaction_type: Optional[str] = Query(
-        None, description="Filter by interaction type (LIKE, DISLIKE, REPORT, SAVED)"
+        None,
+        description="Filter by interaction type (LIKE, DISLIKE, REPORT, SAVED)",
     ),
     starting_after: Optional[str] = Query(
         None, description="Cursor ID to start after (for pagination)"
@@ -126,65 +170,22 @@ async def list_user_interactions(
         10, le=10, description="Maximum number of items to return (max 10)"
     ),
     user_id: str = Depends(get_user_id_from_header),
-    interaction_service: ContentInteractionService = Depends(
-        get_generated_content_interaction_service
-    ),
+    controller: GeneratedContentController = Depends(),
 ) -> GeneratedContentInteractionListResponse:
-    """
-    List user's interactions with pagination, optionally filtered by type.
-
-    Args:
-        interaction_type: Optional filter by interaction type
-        starting_after: Optional cursor ID to start after (for pagination)
-        page_limit: Maximum number of items to return (default=10, max=10)
-        user_id: User ID from X-User-ID header
-        interaction_service: Injected interaction service
-
-    Returns:
-        Paginated list response with interactions and hasNext flag
-    """
-    try:
-        return await interaction_service.list_user_interactions(
-            user_id=user_id,
-            interaction_type=interaction_type,
-            starting_after=starting_after,
-            page_limit=page_limit,
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return await controller.list_user_interactions(
+        user_id=user_id,
+        interaction_type=interaction_type,
+        starting_after=starting_after,
+        page_limit=page_limit,
+    )
 
 
 @router.get(
     "/generated_content/{content_id}",
     response_model=GeneratedContentResponse,
 )
-async def get_generated_content(
+async def get_generated_content_endpoint(
     content_id: str,
-    content_service: GeneratedContentService = Depends(get_generated_content_service),
+    controller: GeneratedContentController = Depends(),
 ) -> GeneratedContentResponse:
-    """
-    Get generated content by its ID.
-
-    Args:
-        content_id: MongoDB _id of the generated content
-        content_service: Injected content service
-
-    Returns:
-        GeneratedContentResponse: The generated content object with Unix timestamps
-
-    Raises:
-        HTTPException: If content not found or retrieval fails
-    """
-    try:
-        content, user_collected_content = (
-            await content_service.get_generated_content_by_id(content_id=content_id)
-        )
-        return GeneratedContentResponse.from_generated_content(
-            content, user_collected_content
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return await controller.get_generated_content(content_id=content_id)

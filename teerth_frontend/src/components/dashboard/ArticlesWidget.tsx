@@ -19,9 +19,8 @@ import { GeneratedContentInteraction } from '@/types';
 /**
  * Transform paginated articles to CachedNewspaperArticle format
  */
-function transformArticles(contentWithInteractions: any[]): CachedNewspaperArticle[] {
-  return contentWithInteractions.map((item: { generated_content: any; active_user_interactions?: GeneratedContentInteraction[] }) => {
-    const article = item.generated_content;
+function transformArticles(rawArticles: any[]): CachedNewspaperArticle[] {
+  return rawArticles.map((article: any) => {
     const generated = article.generated || {};
 
     let title = '';
@@ -42,7 +41,7 @@ function transformArticles(contentWithInteractions: any[]): CachedNewspaperArtic
         : '5 min read';
 
     const articleId = article.id;
-    const interactions = item.active_user_interactions || [];
+    const interactions = article.interactions || [];
 
     return {
       id: articleId,
@@ -68,14 +67,10 @@ function transformToArticle(article: any): Article {
   }
 
   let content = '';
-  if (generated.LONG && generated.LONG.markdown_string) {
-    content = generated.LONG.markdown_string;
-  } else if (generated.LONG && generated.LONG.string) {
-    content = generated.LONG.string;
-  } else if (generated.MEDIUM && generated.MEDIUM.markdown_string) {
-    content = generated.MEDIUM.markdown_string;
-  } else if (generated.MEDIUM && generated.MEDIUM.string) {
-    content = generated.MEDIUM.string;
+  if (generated.LONG && (generated.LONG.markdown_string || generated.LONG.string)) {
+    content = generated.LONG.markdown_string || generated.LONG.string;
+  } else if (generated.MEDIUM && (generated.MEDIUM.markdown_string || generated.MEDIUM.string)) {
+    content = generated.MEDIUM.markdown_string || generated.MEDIUM.string;
   } else if (generated.SHORT && generated.SHORT.string) {
     content = generated.SHORT.string;
   }
@@ -93,11 +88,8 @@ function transformToArticle(article: any): Article {
     published_at = new Date(article.created_at * 1000).toISOString();
   }
 
-  const external_id = article.external_id || '';
-  let youtube_channel = '';
-  if (article.youtube_channel) {
-    youtube_channel = article.youtube_channel;
-  }
+  const external_id = article.source_details?.external_id || article.external_id || '';
+  let youtube_channel = article.source_details?.metadata?.channel_name || article.youtube_channel || '';
 
   const articleId = article.id;
   const article_source = 'Teerth';
@@ -126,7 +118,7 @@ async function fetchNewspaperPage(
   date: string,
   pageParam: string | null,
   pageLimit?: number
-): Promise<{ articles: any[], hasNext: boolean, lastExternalId: string | null }> {
+): Promise<{ articles: any[], hasNext: boolean, nextCursor: string | null }> {
   try {
     const url = new URL('/api/newspapers/today/page', window.location.origin);
     url.searchParams.set('userId', userId);
@@ -142,7 +134,7 @@ async function fetchNewspaperPage(
 
     if (!response.ok) {
       if (response.status === 404) {
-        return { articles: [], hasNext: false, lastExternalId: null };
+        return { articles: [], hasNext: false, nextCursor: null };
       }
       throw new Error(`Failed to fetch newspaper page: ${response.statusText}`);
     }
@@ -151,7 +143,7 @@ async function fetchNewspaperPage(
 
     if (!data.success) {
       if (response.status === 404) {
-        return { articles: [], hasNext: false, lastExternalId: null };
+        return { articles: [], hasNext: false, nextCursor: null };
       }
       throw new Error(data.error || 'Failed to fetch newspaper page');
     }
@@ -159,11 +151,11 @@ async function fetchNewspaperPage(
     return {
       articles: Array.isArray(data.articles) ? data.articles : [],
       hasNext: Boolean(data.hasNext),
-      lastExternalId: data.lastExternalId || null,
+      nextCursor: data.nextCursor || null,
     };
   } catch (error) {
     console.error('Error fetching newspaper page:', error);
-    return { articles: [], hasNext: false, lastExternalId: null };
+    return { articles: [], hasNext: false, nextCursor: null };
   }
 }
 
@@ -221,7 +213,7 @@ export default function ArticlesWidget({ userId, selectedDate, isGuestMode }: Ar
       if (!lastPage || typeof lastPage !== 'object' || !('hasNext' in lastPage)) {
         return undefined;
       }
-      return lastPage.hasNext ? lastPage.lastExternalId : undefined;
+      return lastPage.hasNext ? lastPage.nextCursor : undefined;
     },
     initialPageParam: null as string | null,
     enabled: !!userId && !!selectedDate,
@@ -243,8 +235,7 @@ export default function ArticlesWidget({ userId, selectedDate, isGuestMode }: Ar
 
     const cachedArticles = transformArticles(allContentWithInteractions);
 
-    allContentWithInteractions.forEach((item: { generated_content: any }) => {
-      const article = item.generated_content;
+    allContentWithInteractions.forEach((article: any) => {
       if (!article.id) {
         return; 
       }

@@ -10,7 +10,13 @@ import yaml
 
 
 class Config:
-    """Configuration class for user service."""
+    """
+    Configuration class for user service.
+
+    CRITICAL PHILOSOPHY: Never use fallbacks or default values for configuration.
+    If a configuration key is missing, the service MUST fail fast and raise an error
+    on startup to avoid unpredictable behavior in different environments.
+    """
 
     def __init__(self, config_path: Optional[str] = None):
         """
@@ -30,15 +36,6 @@ class Config:
     def _get_config_path(self, config_dir: Path) -> Path:
         """
         Get the appropriate config file path based on environment variable.
-
-        Args:
-            config_dir: Directory containing config files
-
-        Returns:
-            Path to the appropriate config file
-
-        Raises:
-            ValueError: If environment is not 'local' or 'production'
         """
         environment = os.getenv("environment", "local").lower()
 
@@ -59,23 +56,13 @@ class Config:
         with open(self.config_path, "r", encoding="utf-8") as file:
             return yaml.safe_load(file)
 
-    @property
-    def service_name(self) -> str:
-        """Get service name."""
-        return self._config_data.get("service", {}).get("service_name", "user-service")
+    def get(self, key: str):
+        """
+        Get configuration value by key using dot notation.
 
-    @property
-    def service_port(self) -> int:
-        """Get service port."""
-        return self._config_data.get("service", {}).get("service_port", 8000)
-
-    @property
-    def user_service_url(self) -> str:
-        """Get complete user service URL."""
-        return f"{self.user_service_base_url}:{self.user_service_port}"
-
-    def get(self, key: str, default=None):
-        """Get configuration value by key using dot notation."""
+        Raises:
+            ValueError: If the key is missing from the configuration.
+        """
         keys = key.split(".")
         value = self._config_data
 
@@ -83,6 +70,45 @@ class Config:
             if isinstance(value, dict) and k in value:
                 value = value[k]
             else:
-                return default
+                raise ValueError(
+                    f"CRITICAL CONFIGURATION ERROR: Key '{key}' is missing in {self.config_path}. "
+                    "Service cannot start without all required configurations."
+                )
+
+        if value is None:
+            raise ValueError(
+                f"CRITICAL CONFIGURATION ERROR: Key '{key}' is defined but has no value in {self.config_path}."
+            )
 
         return value
+
+    @property
+    def service_name(self) -> str:
+        """Get service name."""
+        return self.get("service.service_name")
+
+    @property
+    def service_port(self) -> int:
+        """Get service port, prioritizing PORT environment variable."""
+        env_port = os.getenv("PORT")
+        if env_port:
+            print("PORT FROM ENV:", env_port)
+            return int(env_port)
+        return self.get("service.service_port")
+
+    @property
+    def mongodb_uri(self) -> str:
+        """Get MongoDB URI."""
+        return self.get("mongodb.uri")
+
+    @property
+    def database_name(self) -> str:
+        """Get database name."""
+        return self.get("mongodb.database_name")
+
+    @property
+    def user_service_url(self) -> str:
+        """Get complete user service URL (for internal consistency)."""
+        # User service usually just needs its own port for binding,
+        # but this might be used for generating self-referential links.
+        return f"http://localhost:{self.service_port}"

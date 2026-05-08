@@ -15,10 +15,11 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "python-dotenv>=0.19.0",
     "typing-extensions>=4.0.0",
-    "data-processing-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_processing_service",
-    "user-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=user_service",
-    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=data_collector_service",
-    "commons @ git+https://github.com/PurushottamHari/UnHook.git#subdirectory=commons",
+    # CRITICAL: DO NOT transition to local dependencies. Internal packages must remain git-based for architecture consistency.
+    "data-processing-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=data_processing_service",
+    "user-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=user_service",
+    "data-collector-service @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=data_collector_service",
+    "commons @ git+https://github.com/PurushottamHari/UnHook.git@setupAyncPipelineForServices#subdirectory=commons",
     "fastapi>=0.68.0",
     "uvicorn>=0.15.0",
     "apscheduler>=3.10.0",
@@ -27,7 +28,10 @@ dependencies = [
     "curl-cffi",
     "black>=23.0.0",
     "isort>=5.12.0",
-    "PyYAML>=6.0.0"  # Required for YAML configuration files
+    "PyYAML>=6.0.0",
+    "injector>=0.21.0",
+    "redis>=5.0.0",
+    "fastapi-class>=1.1.0"
 ]
 
 [tool.black]

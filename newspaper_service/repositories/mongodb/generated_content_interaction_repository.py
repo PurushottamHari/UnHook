@@ -6,49 +6,45 @@ import logging
 from typing import Dict, List, Optional, Tuple
 from uuid import uuid4
 
+from injector import inject
 from pymongo.errors import DuplicateKeyError
 
+from commons.infra.dependency_injection.injectable import injectable
+
 from ...models.generated_content_interaction import (
-    GeneratedContentInteraction,
-    InteractionType,
-)
-from ..generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
-from .adapters.generated_content_interaction_adapter import (
-    GeneratedContentInteractionAdapter,
-)
+    GeneratedContentInteraction, InteractionType)
+from ..generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
+from .adapters.generated_content_interaction_adapter import \
+    GeneratedContentInteractionAdapter
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
-from .models.generated_content_interaction_db_model import (
-    GeneratedContentInteractionDBModel,
-)
+from .models.generated_content_interaction_db_model import \
+    GeneratedContentInteractionDBModel
 
 
+@injectable()
 class MongoDBGeneratedContentInteractionRepository(
     GeneratedContentInteractionRepository
 ):
     """MongoDB implementation of generated content interaction repository."""
 
-    def __init__(self):
+    @inject
+    def __init__(self, mongodb: MongoDB):
         """Initialize the repository."""
         self.settings = get_mongodb_settings()
-        self.database = MongoDB.get_database()
+        self.database = mongodb.get_database()
         self.collection = self.database[
             self.settings.GENERATED_CONTENT_INTERACTION_COLLECTION_NAME
         ]
         self.logger = logging.getLogger(__name__)
 
         # Create unique compound index on (generated_content_id, user_id, interaction_type)
-        try:
-            self.collection.create_index(
-                [("generated_content_id", 1), ("user_id", 1), ("interaction_type", 1)],
-                unique=True,
-                name="unique_interaction",
-            )
-            self.logger.info("Created unique index on interaction fields")
-        except Exception as e:
-            self.logger.warning(f"Index creation warning: {str(e)}")
+        self.collection.create_index(
+            [("generated_content_id", 1), ("user_id", 1), ("interaction_type", 1)],
+            unique=True,
+            name="unique_interaction",
+        )
 
     def create_generated_content_interaction(
         self, interaction: GeneratedContentInteraction

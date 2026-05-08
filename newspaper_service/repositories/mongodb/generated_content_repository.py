@@ -4,37 +4,34 @@ MongoDB implementation of generated content repository.
 
 from typing import List
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-)
-from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
-    GeneratedContentAdapter,
-)
-from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
-    GeneratedContentDBModel,
-)
-from newspaper_service.repositories.generated_content_repository import (
-    GeneratedContentRepository,
-)
+    GeneratedContent, GeneratedContentStatus)
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
+    GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
+    GeneratedContentDBModel
+from newspaper_service.repositories.generated_content_repository import \
+    GeneratedContentRepository
 from newspaper_service.repositories.mongodb.config.database import MongoDB
 from user_service.models.enums import CategoryName
 
 
+@injectable()
 class MongoDBGeneratedContentRepository(GeneratedContentRepository):
     """MongoDB implementation of generated content repository."""
 
-    def __init__(self, database=None):
+    @inject
+    def __init__(self, mongodb: MongoDB):
         """
         Initialize the repository.
 
         Args:
-            database: MongoDB database instance (optional, will use default if not provided)
+            mongodb: MongoDB connection manager
         """
-        if database is None:
-            self.database = MongoDB.get_database()
-        else:
-            self.database = database
+        self.database = mongodb.get_database()
 
         self.generated_content_collection = self.database.generated_content
 
@@ -157,6 +154,30 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
         cursor = self.generated_content_collection.find(
             {"external_id": {"$in": external_ids}}
         )
+
+        contents = []
+        for doc in cursor:
+            db_model = GeneratedContentDBModel(**doc)
+            contents.append(
+                GeneratedContentAdapter.from_generated_content_db_model(db_model)
+            )
+
+        return contents
+
+    def get_contents_by_ids(self, content_ids: List[str]) -> List[GeneratedContent]:
+        """
+        Fetch multiple GeneratedContent objects by MongoDB _ids.
+
+        Args:
+            content_ids: List of MongoDB _ids to fetch
+
+        Returns:
+            List[GeneratedContent]: List of generated content objects
+        """
+        if not content_ids:
+            return []
+
+        cursor = self.generated_content_collection.find({"_id": {"$in": content_ids}})
 
         contents = []
         for doc in cursor:

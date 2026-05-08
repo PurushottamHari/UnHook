@@ -3,20 +3,14 @@ Abstract base class for user content repository.
 """
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus,
-    ContentSubStatus,
-    ContentType,
-    UserCollectedContent,
-)
+    ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-)
+    GeneratedContent, GeneratedContentStatus)
 
 
 class UserContentRepository(ABC):
@@ -34,6 +28,22 @@ class UserContentRepository(ABC):
 
         Returns:
             List[Dict]: List of unprocessed content items
+        """
+        pass
+
+    @abstractmethod
+    def get_user_collected_content_by_id(
+        self, user_id: str, content_id: str
+    ) -> Optional[UserCollectedContent]:
+        """
+        Get a single user collected content item by its ID.
+
+        Args:
+            user_id: The ID of the user
+            content_id: The ID of the content item
+
+        Returns:
+            Optional[UserCollectedContent]: The content item or None if not found
         """
         pass
 
@@ -67,38 +77,6 @@ class UserContentRepository(ABC):
         sub_status: ContentSubStatus,
         content_type: ContentType,
     ) -> List[UserCollectedContent]:
-        pass
-
-    @abstractmethod
-    def add_generated_content(self, generated_content: GeneratedContent):
-        pass
-
-    @abstractmethod
-    def get_generated_content(
-        self,
-        status: GeneratedContentStatus,
-        content_type: ContentType,
-    ) -> List[GeneratedContent]:
-        pass
-
-    @abstractmethod
-    def get_generated_content_by_user_collected_content_status(
-        self,
-        user_id: str,
-        status: GeneratedContentStatus,
-        content_type: ContentType,
-        user_collected_content_status: ContentStatus,
-    ) -> List[GeneratedContent]:
-        pass
-
-    @abstractmethod
-    def update_generated_content(self, updated_generated_content: GeneratedContent):
-        pass
-
-    @abstractmethod
-    def update_generated_content_batch(
-        self, updated_generated_content_list: List[GeneratedContent]
-    ):
         pass
 
     @abstractmethod

@@ -6,18 +6,21 @@ import logging
 from datetime import datetime
 from typing import Dict, Optional, Tuple
 
+from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
+
 from ...models.generated_content_interaction import (
-    GeneratedContentInteraction,
-    InteractionType,
-)
-from ...repositories.generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
+    GeneratedContentInteraction, InteractionType)
+from ...repositories.generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
 
 
+@injectable()
 class ValidateCreateArticleInteractionRequestService:
     """Service for validating create content interaction requests."""
 
+    @inject
     def __init__(
         self,
         interaction_repository: GeneratedContentInteractionRepository,

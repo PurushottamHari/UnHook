@@ -86,3 +86,16 @@ class GeneratedContentRepository(ABC):
             List[GeneratedContent]: List of generated content objects with ARTICLE_GENERATED status
         """
         pass
+
+    @abstractmethod
+    def get_contents_by_ids(self, content_ids: List[str]) -> List[GeneratedContent]:
+        """
+        Fetch multiple GeneratedContent objects by MongoDB _ids.
+
+        Args:
+            content_ids: List of MongoDB _ids to fetch
+
+        Returns:
+            List[GeneratedContent]: List of generated content objects
+        """
+        pass

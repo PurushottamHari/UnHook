@@ -1,12 +1,28 @@
 service:
-  service_name: "data-collector-service"
+  service_name: "data_collector_service"
   service_port: 8001
 
 external:
   user_service:
-    base_url: "https://unhook-production-0e0c.up.railway.app"
-    port: 443
     timeout: 120.0 # 2 minutes timeout
 
 proxy:
   base_url: "api.zyte.com:8011"
+
+
+s3:
+  account_id: "minioadmin"
+  bucket_name: "unhook-ephemeral"
+  endpoint_url: "http://minio:9000"
+
+messaging:
+  commands:
+    data_collector_service:
+      topic: "data_collector_service:commands"
+    data_processing_service:
+      topic: "data_processing_service:commands"
+  events:
+    data_processing_service:
+      topic: "data_processing_service:events"
+    data_collector_service:
+      topic: "data_collector_service:events"

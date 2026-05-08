@@ -1,9 +1,7 @@
 from typing import List
 
-from data_processing_service.models.generated_content import (
-    CategoryInfo,
-    GeneratedContent,
-)
+from data_processing_service.models.generated_content import (CategoryInfo,
+                                                              GeneratedContent)
 from user_service.models.enums import CategoryName, ShelfLife
 
 from ..models.output import CategorizationDataOutput, CategoryOutputItem

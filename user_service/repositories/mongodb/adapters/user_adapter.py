@@ -11,19 +11,15 @@ from ....models.interests import Interest, NotInterested
 from ....models.manual_config import ManualConfig
 from ....models.user import ScheduledContent, ScheduleRule, User, UserSchedule
 from ....models.youtube_config import YoutubeChannelConfig, YoutubeConfig
-
 from ..models.interests_db_model import InterestDBModel, NotInterestedDBModel
 from ..models.manual_config_db_model import ManualConfigDBModel
-from ..models.user_db_model import (
-    ScheduledContentDBModel,
-    ScheduleRuleDBModel,
-    UserDBModel,
-    UserScheduleDBModel,
-)
-from ..models.youtube_config_db_model import (
-    YoutubeChannelConfig as YoutubeChannelConfigDBModel,
-)
-from ..models.youtube_config_db_model import YoutubeConfig as YoutubeConfigDBModel
+from ..models.user_db_model import (ScheduledContentDBModel,
+                                    ScheduleRuleDBModel, UserDBModel,
+                                    UserScheduleDBModel)
+from ..models.youtube_config_db_model import \
+    YoutubeChannelConfig as YoutubeChannelConfigDBModel
+from ..models.youtube_config_db_model import \
+    YoutubeConfig as YoutubeConfigDBModel
 
 
 class UserAdapter:

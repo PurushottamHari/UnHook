@@ -7,11 +7,10 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
+from data_collector_service.models.user_collected_content import \
+    UserCollectedContent
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-)
-from data_collector_service.models.user_collected_content import UserCollectedContent
+    GeneratedContent, GeneratedContentStatus)
 
 
 class SourceDetails(BaseModel):

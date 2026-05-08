@@ -1,0 +1,204 @@
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - unhook-backend
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    environment:
+      - RI_ACCEPT_TERMS_AND_CONDITIONS=true
+      - RI_REDIS_HOST=redis
+      - RI_REDIS_PORT=6379
+      - RI_REDIS_ALIAS=Unhook-Redis
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=purushottam
+      - MONGO_INITDB_ROOT_PASSWORD=test123
+    ports:
+      - "27017:27017"
+    networks:
+      - unhook-backend
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_URL=mongodb://purushottam:test123@mongodb:27017/
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    networks:
+      - unhook-backend
+    depends_on:
+      - mongodb
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"    # MinIO API
+      - "9001:9001"    # MinIO Console (Visual Layer)
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - unhook-backend
+
+  user_service_api:
+    build:
+      context: .
+      dockerfile: user_service/Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    image: user_service
+    container_name: user_service_api
+    env_file:
+      - .env
+    environment:
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - REDIS_URL=redis://redis:6379/0
+      - environment=local
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    networks:
+      - unhook-backend
+    depends_on:
+      - mongodb
+
+  data_collector_service_worker:
+    build:
+      context: .
+      dockerfile: data_collector_service/Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    image: data_collector_service
+    container_name: data_collector_service_worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - USER_SERVICE_BASE_URL=http://user_service_api
+      - USER_SERVICE_PORT=8000
+      - S3_ENDPOINT_URL=http://minio:9000
+      - R2_ACCESS_KEY_ID=minioadmin
+      - R2_SECRET_ACCESS_KEY=minioadmin
+      - environment=local
+    stdin_open: true
+    tty: true
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+      - mongodb
+      - user_service_api
+
+  data_processing_service_worker:
+    build:
+      context: .
+      dockerfile: data_processing_service/Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    image: data_processing_service
+    container_name: data_processing_service_worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - USER_SERVICE_BASE_URL=http://user_service_api
+      - USER_SERVICE_PORT=8000
+      - S3_ENDPOINT_URL=http://minio:9000
+      - R2_ACCESS_KEY_ID=minioadmin
+      - R2_SECRET_ACCESS_KEY=minioadmin
+      - environment=local
+    stdin_open: true
+    tty: true
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+      - mongodb
+      - user_service_api
+
+  newspaper_service_api:
+    build:
+      context: .
+      dockerfile: newspaper_service/Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - SERVICE_TYPE=api
+    image: newspaper_service_api
+    container_name: newspaper_api
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - USER_SERVICE_BASE_URL=http://user_service_api
+      - USER_SERVICE_PORT=8000
+      - environment=local
+      - PORT=8003
+    ports:
+      - "8003:8003"
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+      - mongodb
+      - user_service_api
+
+  newspaper_service_worker:
+    build:
+      context: .
+      dockerfile: newspaper_service/Dockerfile
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+        - SERVICE_TYPE=worker
+    image: newspaper_service_worker
+    container_name: newspaper_worker
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - MONGODB_URI=mongodb://purushottam:test123@mongodb:27017/youtube_newspaper?authSource=admin
+      - USER_SERVICE_BASE_URL=http://user_service_api
+      - USER_SERVICE_PORT=8000
+      - environment=local
+    networks:
+      - unhook-backend
+    depends_on:
+      - redis
+      - mongodb
+      - user_service_api
+
+networks:
+  unhook-backend:
+    name: unhook-backend
+    driver: bridge
+
+volumes:
+  minio_data:
+

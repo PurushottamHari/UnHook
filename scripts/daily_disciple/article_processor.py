@@ -33,15 +33,11 @@ from pymongo import MongoClient
 
 from data_processing_service.models import ContentType
 from data_processing_service.models.generated_content import (
-    GeneratedContent,
-    GeneratedContentStatus,
-)
-from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import (
-    GeneratedContentAdapter,
-)
-from data_processing_service.repositories.mongodb.models.generated_content_db_model import (
-    GeneratedContentDBModel,
-)
+    GeneratedContent, GeneratedContentStatus)
+from data_processing_service.repositories.mongodb.adapters.generated_content_adapter import \
+    GeneratedContentAdapter
+from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
+    GeneratedContentDBModel
 from user_service.models import OutputType
 
 

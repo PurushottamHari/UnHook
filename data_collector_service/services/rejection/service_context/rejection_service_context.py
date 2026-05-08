@@ -5,11 +5,14 @@ Rejection service-specific context.
 import os
 from typing import Optional
 
+from commons.infra.dependency_injection.injectable import injectable
 from commons.service_context import BaseServiceContext
 
-from ..metrics_processor.rejection_metrics_processor import RejectionMetricsProcessor
+from ..metrics_processor.rejection_metrics_processor import \
+    RejectionMetricsProcessor
 
 
+@injectable()
 class RejectionServiceContext(BaseServiceContext):
     """
     Rejection service-specific context.
