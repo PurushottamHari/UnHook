@@ -4,12 +4,14 @@ import { User } from '@/types';
 const HARDCODED_USERS: User[] = [
   {
     id: '1',
+    name: 'Admin User',
     username: 'admin',
     role: 'admin',
     createdAt: new Date().toISOString(),
   },
   {
     id: '2',
+    name: 'Customer User',
     username: 'customer',
     role: 'user',
     createdAt: new Date().toISOString(),
