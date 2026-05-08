@@ -11,7 +11,9 @@ from injector import inject
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.models.user_collected_content import (
-    ContentType, UserCollectedContent, YouTubeCollectedContentStatus)
+    ContentType, UserCollectedContent)
+from data_collector_service.models.youtube.youtube_video_details import \
+    YouTubeVideoStatus
 from data_processing_service.config.config import Config
 from data_processing_service.messaging.models.commands import (
     CategorizeGeneratedYoutubeContentAggregationCommand,
@@ -102,10 +104,7 @@ class GenerateRequiredContentForYoutubeService:
                     f"YouTube details not found for video_id: {user_collected_content.external_id}"
                 )
 
-            if (
-                youtube_video_details.status
-                != YouTubeCollectedContentStatus.SUBTITLES_STORED
-            ):
+            if youtube_video_details.status != YouTubeVideoStatus.SUBTITLES_STORED:
                 raise ValueError(
                     f"Content {youtube_video_details.video_id} is not in SUBTITLES_STORED status. "
                     f"Current status: {youtube_video_details.status}"
