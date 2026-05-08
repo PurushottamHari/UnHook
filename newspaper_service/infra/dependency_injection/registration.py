@@ -32,6 +32,8 @@ from newspaper_service.repositories.mongodb.newspaper_v2_repository import \
     MongoDBNewspaperV2Repository
 from newspaper_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
+from newspaper_service.repositories.mongodb.youtube_collected_content_repository import \
+    MongoDBYouTubeCollectedContentRepository
 from newspaper_service.repositories.newspaper_article_candidate_repository import \
     NewspaperArticleCandidateRepository
 from newspaper_service.repositories.newspaper_repository import \
@@ -40,6 +42,8 @@ from newspaper_service.repositories.newspaper_v2_repository import \
     NewspaperV2Repository
 from newspaper_service.repositories.user_collected_content_repository import \
     UserCollectedContentRepository
+from newspaper_service.repositories.youtube_collected_content_repository import \
+    YouTubeCollectedContentRepository
 
 
 class NewspaperModule(Module):
@@ -78,6 +82,11 @@ class NewspaperModule(Module):
         binder.bind(
             NewspaperArticleCandidateRepository,
             to=MongoDBNewspaperArticleCandidateRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            YouTubeCollectedContentRepository,
+            to=MongoDBYouTubeCollectedContentRepository,
             scope=singleton,
         )
 

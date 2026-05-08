@@ -163,3 +163,27 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
             )
 
         return contents
+
+    def get_contents_by_ids(self, content_ids: List[str]) -> List[GeneratedContent]:
+        """
+        Fetch multiple GeneratedContent objects by MongoDB _ids.
+
+        Args:
+            content_ids: List of MongoDB _ids to fetch
+
+        Returns:
+            List[GeneratedContent]: List of generated content objects
+        """
+        if not content_ids:
+            return []
+
+        cursor = self.generated_content_collection.find({"_id": {"$in": content_ids}})
+
+        contents = []
+        for doc in cursor:
+            db_model = GeneratedContentDBModel(**doc)
+            contents.append(
+                GeneratedContentAdapter.from_generated_content_db_model(db_model)
+            )
+
+        return contents

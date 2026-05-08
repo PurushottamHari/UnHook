@@ -2,6 +2,8 @@ import os
 import sys
 from calendar import weekday
 
+from pymongo import UpdateOne
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
@@ -597,6 +599,124 @@ def update_used_content_to_processed():
         raise
 
 
+def migrate_candidate_links_to_include_source_list():
+    """
+    Migration script to populate links.source_list in NewspaperArticleCandidate.
+    Uses links.user_collected_content_id to fetch external_id and content_type
+    from the collected_content collection.
+    """
+    try:
+        from data_collector_service.models.enums import ContentType
+        from newspaper_service.models import SourceType
+
+        # Get database connection
+        db = MongoDB.get_database()
+        settings = get_mongodb_settings()
+
+        candidates_collection = db[settings.NEWSPAPER_ARTICLE_CANDIDATE_COLLECTION_NAME]
+        content_collection = db[settings.USER_COLLECTED_CONTENT_COLLECTION_NAME]
+
+        generated_content_collection = db["generated_content"]
+
+        # Find candidates where source_list is missing or empty
+        # We also want to make sure user_collected_content_id is present
+        query = {
+            "$or": [
+                {"links.source_list": {"$exists": False}},
+                {"links.source_list": {"$size": 0}},
+                {"links.source_list": None},
+            ],
+            "links.user_collected_content_id": {"$exists": True, "$ne": None},
+        }
+
+        candidates = list(candidates_collection.find(query))
+        print(f"Found {len(candidates)} candidates to migrate")
+
+        updated_count = 0
+        operations = []
+
+        for candidate_doc in candidates:
+            candidate_id = candidate_doc["_id"]
+            user_collected_content_id = candidate_doc["links"][
+                "user_collected_content_id"
+            ]
+
+            # Fetch the content document
+            content_doc = content_collection.find_one(
+                {"_id": user_collected_content_id}
+            )
+
+            if not content_doc:
+                print(
+                    f"Content document {user_collected_content_id} not found for candidate {candidate_id}"
+                )
+                continue
+
+            external_id = content_doc.get("external_id")
+            content_type_str = content_doc.get("content_type")
+
+            if not external_id:
+                print(f"External ID not found for content {user_collected_content_id}")
+                continue
+
+            # Fetch generated content to get generated_content_id
+            generated_content_doc = generated_content_collection.find_one(
+                {"external_id": external_id}
+            )
+            generated_content_id = (
+                generated_content_doc["_id"] if generated_content_doc else None
+            )
+
+            # Map content_type to source_type
+            source_type = SourceType.YOUTUBE_VIDEO.value  # Default
+            if content_type_str == ContentType.YOUTUBE_VIDEO.value:
+                source_type = SourceType.YOUTUBE_VIDEO.value
+
+            # Create source_list entry
+            source_detail = {
+                "external_id": external_id,
+                "source_type": source_type,
+                "metadata": {},
+            }
+
+            # Prepare update document
+            update_fields = {
+                "links.source_list": [source_detail],
+                "updated_at": datetime.utcnow().replace(tzinfo=pytz.UTC).timestamp(),
+            }
+
+            update_fields["links.generated_content_id"] = generated_content_id
+            update_fields["links.generated_content_id_list"] = (
+                [generated_content_id] if generated_content_id else []
+            )
+
+            # Collect update operation
+            operations.append(
+                UpdateOne(
+                    {"_id": candidate_id},
+                    {
+                        "$set": update_fields,
+                        "$inc": {"version": 1},
+                    },
+                )
+            )
+
+        # Execute bulk update
+        if operations:
+            print(f"Executing bulk update for {len(operations)} candidates...")
+            result = candidates_collection.bulk_write(operations)
+            updated_count = result.modified_count
+            print(f"Successfully migrated {updated_count} candidates")
+        else:
+            print("No candidates found to migrate.")
+
+        pass
+
+    except Exception as e:
+        print(f"Error in migrate_candidate_links_to_include_source_list: {str(e)}")
+        raise
+
+
 if __name__ == "__main__":
     # Example usage for the migration functions
 
@@ -617,4 +737,6 @@ if __name__ == "__main__":
     # import pytz
     # for_date = datetime.now(pytz.timezone("Asia/Kolkata"))
     # filter_newspaper_considered_items_by_weekday(newspaper_id, for_date)
+    # To migrate candidate links to include source_list:
+    migrate_candidate_links_to_include_source_list()
     pass

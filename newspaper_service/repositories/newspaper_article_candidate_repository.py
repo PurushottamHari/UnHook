@@ -43,3 +43,10 @@ class NewspaperArticleCandidateRepository(ABC):
     ) -> List[NewspaperArticleCandidate]:
         """List candidates for a user with a specific status."""
         pass
+
+    @abstractmethod
+    def list_candidates_by_newspaper_id(
+        self, newspaper_id: str, status: Optional[CandidateStatus] = None
+    ) -> List[NewspaperArticleCandidate]:
+        """List candidates for a specific newspaper ID."""
+        pass

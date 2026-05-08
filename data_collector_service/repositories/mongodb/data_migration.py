@@ -739,6 +739,50 @@ def migrate_youtube_data_to_new_collection():
     MongoDB.close_database_connection()
 
 
+def migrate_add_versioning():
+    """
+    Migration script to add version=1 to all documents in all collections
+    that don't already have a version field.
+    """
+    print("Starting data migration for versioning...")
+
+    # Connect to MongoDB
+    MongoDB.connect_to_database()
+    db = MongoDB.get_database()
+
+    # Get all collection names in the database
+    collections = db.list_collection_names()
+    print(f"Found {len(collections)} collections to process.")
+
+    for collection_name in collections:
+        # Skip system collections and explicitly excluded collections
+        if collection_name.startswith("system.") or collection_name in [
+            "users",
+            "waitlist",
+        ]:
+            continue
+
+        collection = db[collection_name]
+
+        # Update documents missing the version field
+        query = {"version": {"$exists": False}}
+        update = {"$set": {"version": 1}}
+
+        result = collection.update_many(query, update)
+        if result.modified_count > 0:
+            print(
+                f"Updated {result.modified_count} documents in collection '{collection_name}' with version=1."
+            )
+        else:
+            print(f"No documents needed versioning in collection '{collection_name}'.")
+
+    print("Versioning migration complete.")
+
+    # Close the connection
+    MongoDB.close_database_connection()
+    print("Database connection closed.")
+
+
 if __name__ == "__main__":
     # migrate_timestamps()
     # migrate_status_details_timestamps()
@@ -749,3 +793,4 @@ if __name__ == "__main__":
     # migrate_add_missing_sub_status()
     # migrate_add_content_created_at()
     migrate_youtube_data_to_new_collection()
+    migrate_add_versioning()

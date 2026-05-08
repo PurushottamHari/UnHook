@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 
 class CandidateStatus(str, Enum):
@@ -25,6 +25,21 @@ class CandidateType(str, Enum):
     USER_COLLECTED_CONTENT = "USER_COLLECTED_CONTENT"
 
 
+class SourceType(str, Enum):
+    """Type of the source (e.g. YOUTUBE_VIDEO)."""
+
+    YOUTUBE_VIDEO = "YOUTUBE_VIDEO"
+
+
+@dataclass
+class CandidateSourceDetail:
+    """Detail about a source for the candidate."""
+
+    external_id: str
+    source_type: SourceType
+    metadata: Dict[str, str] = field(default_factory=dict)
+
+
 @dataclass
 class CandidateStatusDetail:
     """Detail information about a status change for a candidate."""
@@ -41,6 +56,7 @@ class CandidateLinks:
     user_collected_content_id: Optional[str] = None
     generated_content_id: Optional[str] = None
     generated_content_id_list: List[str] = field(default_factory=list)
+    source_list: List[CandidateSourceDetail] = field(default_factory=list)
 
 
 @dataclass

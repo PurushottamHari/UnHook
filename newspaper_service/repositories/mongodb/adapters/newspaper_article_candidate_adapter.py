@@ -5,12 +5,12 @@ Newspaper article candidate adapter for converting between domain and database m
 from datetime import datetime, timezone
 from typing import Optional
 
-from ....models import (CandidateLinks, CandidateSource, CandidateStatus,
-                        CandidateStatusDetail, CandidateType,
-                        NewspaperArticleCandidate)
+from ....models import (CandidateLinks, CandidateSource, CandidateSourceDetail,
+                        CandidateStatus, CandidateStatusDetail, CandidateType,
+                        NewspaperArticleCandidate, SourceType)
 from ..models.newspaper_article_candidate_db_model import (
-    CandidateLinksDBModel, CandidateStatusDetailDBModel,
-    NewspaperArticleCandidateDBModel)
+    CandidateLinksDBModel, CandidateSourceDetailDBModel,
+    CandidateStatusDetailDBModel, NewspaperArticleCandidateDBModel)
 
 
 class NewspaperArticleCandidateAdapter:
@@ -32,6 +32,14 @@ class NewspaperArticleCandidateAdapter:
                 generated_content_id_list=list(
                     candidate.links.generated_content_id_list
                 ),
+                source_list=[
+                    CandidateSourceDetailDBModel(
+                        external_id=s.external_id,
+                        source_type=s.source_type.value,
+                        metadata=dict(s.metadata),
+                    )
+                    for s in candidate.links.source_list
+                ],
             ),
             newspaper_id=candidate.newspaper_id,
             status=candidate.status.value,
@@ -64,6 +72,14 @@ class NewspaperArticleCandidateAdapter:
                 generated_content_id_list=list(
                     db_model.links.generated_content_id_list
                 ),
+                source_list=[
+                    CandidateSourceDetail(
+                        external_id=s.external_id,
+                        source_type=SourceType(s.source_type),
+                        metadata=dict(s.metadata),
+                    )
+                    for s in db_model.links.source_list
+                ],
             ),
             newspaper_id=db_model.newspaper_id,
             status=CandidateStatus(db_model.status),

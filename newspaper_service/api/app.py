@@ -11,7 +11,9 @@ from ..repositories.mongodb.config.database import MongoDB
 from ..repositories.mongodb.config.settings import get_mongodb_settings
 from .controllers.generated_content_controller import \
     router as interaction_router
+from .controllers.messaging_controller import router as messaging_router
 from .controllers.newspaper_controller import router as newspaper_router
+from .controllers.newspaper_v2_controller import router as newspaper_v2_router
 
 app = FastAPI(
     title="Newspaper Service API",
@@ -22,6 +24,8 @@ app = FastAPI(
 # Include routers
 app.include_router(interaction_router)
 app.include_router(newspaper_router)
+app.include_router(newspaper_v2_router)
+app.include_router(messaging_router)
 
 
 @app.get("/health")

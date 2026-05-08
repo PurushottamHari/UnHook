@@ -2,7 +2,7 @@
 Newspaper article candidate database model for MongoDB.
 """
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -13,10 +13,17 @@ class CandidateStatusDetailDBModel(BaseModel):
     reason: str = Field(default="", description="Status change reason")
 
 
+class CandidateSourceDetailDBModel(BaseModel):
+    external_id: str = Field(..., description="External ID from the source")
+    source_type: str = Field(..., description="Type of the source")
+    metadata: Dict[str, str] = Field(default_factory=dict)
+
+
 class CandidateLinksDBModel(BaseModel):
     user_collected_content_id: Optional[str] = Field(default=None)
     generated_content_id: Optional[str] = Field(default=None)
     generated_content_id_list: List[str] = Field(default_factory=list)
+    source_list: List[CandidateSourceDetailDBModel] = Field(default_factory=list)
 
 
 class NewspaperArticleCandidateDBModel(BaseModel):

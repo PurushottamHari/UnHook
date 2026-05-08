@@ -111,3 +111,19 @@ class MongoDBNewspaperArticleCandidateRepository(NewspaperArticleCandidateReposi
                 NewspaperArticleCandidateAdapter.to_internal_model(db_model)
             )
         return candidates
+
+    def list_candidates_by_newspaper_id(
+        self, newspaper_id: str, status: Optional[CandidateStatus] = None
+    ) -> List[NewspaperArticleCandidate]:
+        """List candidates for a specific newspaper ID."""
+        query = {"newspaper_id": newspaper_id}
+        if status:
+            query["status"] = status.value
+        cursor = self.collection.find(query)
+        candidates = []
+        for doc in cursor:
+            db_model = NewspaperArticleCandidateDBModel(**doc)
+            candidates.append(
+                NewspaperArticleCandidateAdapter.to_internal_model(db_model)
+            )
+        return candidates

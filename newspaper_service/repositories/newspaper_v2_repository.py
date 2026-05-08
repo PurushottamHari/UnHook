@@ -17,3 +17,10 @@ class NewspaperV2Repository(ABC):
     def get_by_id(self, newspaper_id: str) -> Optional[NewspaperV2]:
         """Get a single NewspaperV2 instance by ID."""
         pass
+
+    @abstractmethod
+    def get_by_user_and_date(
+        self, user_id: str, for_date: datetime
+    ) -> Optional[NewspaperV2]:
+        """Get a NewspaperV2 instance for a specific user and date."""
+        pass
