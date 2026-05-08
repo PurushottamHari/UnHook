@@ -1,0 +1,443 @@
+{
+	"info": {
+		"_postman_id": "a9a3b6e8-7c1a-4d2b-8e5f-f3a2b1c0d9e8",
+		"name": "Teerth API Collection",
+		"description": "API collection for the UnHook project services.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Newspaper Service",
+			"item": [
+				{
+					"name": "Get Newspaper by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{newspaper_service_url}}/newspapers/:newspaper_id",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"newspapers",
+								":newspaper_id"
+							],
+							"variable": [
+								{
+									"key": "newspaper_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Newspapers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{newspaper_service_url}}/newspapers?date=DD/MM/YYYY&starting_after=uuid&page_limit=10",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"newspapers"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "DD/MM/YYYY"
+								},
+								{
+									"key": "starting_after",
+									"value": "uuid"
+								},
+								{
+									"key": "page_limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Generated Content for Newspaper",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{newspaper_service_url}}/newspapers/:newspaper_id/generated_content?starting_after=uuid&page_limit=10",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"newspapers",
+								":newspaper_id",
+								"generated_content"
+							],
+							"query": [
+								{
+									"key": "starting_after",
+									"value": "uuid"
+								},
+								{
+									"key": "page_limit",
+									"value": "10"
+								}
+							],
+							"variable": [
+								{
+									"key": "newspaper_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Newspaper with Articles V2",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{newspaper_service_url}}/v2/newspapers/by-date?date=DD/MM/YYYY&starting_after=uuid",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"v2",
+								"newspapers",
+								"by-date"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "DD/MM/YYYY"
+								},
+								{
+									"key": "starting_after",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Generated Content by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{newspaper_service_url}}/generated_content/:content_id",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"generated_content",
+								":content_id"
+							],
+							"variable": [
+								{
+									"key": "content_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User Interaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": \"{{user_id}}\",\n    \"interaction_type\": \"LIKE\",\n    \"metadata\": {}\n}"
+						},
+						"url": {
+							"raw": "{{newspaper_service_url}}/generated_content/:content_id/user_interaction",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"generated_content",
+								":content_id",
+								"user_interaction"
+							],
+							"variable": [
+								{
+									"key": "content_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List User Interactions for Content",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{newspaper_service_url}}/list_user_interactions_for_content/:content_id?starting_after=uuid&page_limit=10",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"list_user_interactions_for_content",
+								":content_id"
+							],
+							"query": [
+								{
+									"key": "starting_after",
+									"value": "uuid"
+								},
+								{
+									"key": "page_limit",
+									"value": "10"
+								}
+							],
+							"variable": [
+								{
+									"key": "content_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List User Interactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-ID",
+								"value": "{{user_id}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{newspaper_service_url}}/list_user_interactions?interaction_type=LIKE&starting_after=uuid&page_limit=10",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"list_user_interactions"
+							],
+							"query": [
+								{
+									"key": "interaction_type",
+									"value": "LIKE"
+								},
+								{
+									"key": "starting_after",
+									"value": "uuid"
+								},
+								{
+									"key": "page_limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Internal: Start User Collection",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{newspaper_service_url}}/internal/start_user_collection/:user_id",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"internal",
+								"start_user_collection",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Internal: Process Newspaper for User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{newspaper_service_url}}/internal/process_newspaper_for_user/:user_id",
+							"host": [
+								"{{newspaper_service_url}}"
+							],
+							"path": [
+								"internal",
+								"process_newspaper_for_user",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "{{user_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Service",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"uuid\",\n    \"name\": \"Puru\",\n    \"email\": \"puru@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{user_service_url}}/users/",
+							"host": [
+								"{{user_service_url}}"
+							],
+							"path": [
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{user_service_url}}/users/:user_id",
+							"host": [
+								"{{user_service_url}}"
+							],
+							"path": [
+								"users",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Puru Updated\"\n}"
+						},
+						"url": {
+							"raw": "{{user_service_url}}/users/:user_id",
+							"host": [
+								"{{user_service_url}}"
+							],
+							"path": [
+								"users",
+								":user_id"
+							],
+							"variable": [
+								{
+									"key": "user_id",
+									"value": "uuid"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "newspaper_service_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_service_url",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
