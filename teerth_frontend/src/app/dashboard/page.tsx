@@ -12,7 +12,13 @@ export default function DashboardRedirect() {
     if (isAuthenticated && user?.id && user.role !== "guest") {
       router.replace(`/dashboard/${user.id}`);
     } else {
-      router.replace("/dashboard/607d95f0-47ef-444c-89d2-d05f257d1265");
+      const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_GUEST_USER_ID;
+      if (!defaultUserId) {
+        throw new Error(
+          "NEXT_PUBLIC_DEFAULT_GUEST_USER_ID is not set. Please configure the environment.",
+        );
+      }
+      router.replace(`/dashboard/${defaultUserId}`);
     }
   }, [isAuthenticated, user, router]);
 

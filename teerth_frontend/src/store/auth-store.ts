@@ -12,6 +12,7 @@ interface AuthState {
 // Default guest user
 const GUEST_USER: User = {
   id: 'guest',
+  name: 'Guest',
   username: 'Guest',
   role: 'guest',
   createdAt: new Date().toISOString(),

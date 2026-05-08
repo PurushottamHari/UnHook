@@ -33,14 +33,10 @@ export class NewspaperService {
 
     // Get content - prefer LONG, then MEDIUM, then SHORT
     let content = '';
-    if (generated.LONG && generated.LONG.markdown_string) {
-      content = generated.LONG.markdown_string;
-    } else if (generated.LONG && generated.LONG.string) {
-      content = generated.LONG.string;
-    } else if (generated.MEDIUM && generated.MEDIUM.markdown_string) {
-      content = generated.MEDIUM.markdown_string;
-    } else if (generated.MEDIUM && generated.MEDIUM.string) {
-      content = generated.MEDIUM.string;
+    if (generated.LONG && (generated.LONG.markdown_string || generated.LONG.string)) {
+      content = generated.LONG.markdown_string || generated.LONG.string;
+    } else if (generated.MEDIUM && (generated.MEDIUM.markdown_string || generated.MEDIUM.string)) {
+      content = generated.MEDIUM.markdown_string || generated.MEDIUM.string;
     } else if (generated.SHORT && generated.SHORT.string) {
       content = generated.SHORT.string;
     }
@@ -63,14 +59,13 @@ export class NewspaperService {
     }
 
     // Get external_id (YouTube video ID) from source_details if available
-    const external_id = article.source_details?.video_id || article.external_id || '';
+    // V2 uses external_id field or source_details.external_id
+    const external_id = article.source_details?.external_id || article.external_id || '';
 
-    // Get youtube_channel from source_details if available
+    // Get youtube_channel from source_details.metadata if available
     let youtube_channel = '';
-    if (article.source_details?.channel_name) {
-      youtube_channel = article.source_details.channel_name;
-    } else if (article.youtube_channel) {
-      youtube_channel = article.youtube_channel;
+    if (article.source_details?.metadata?.channel_name) {
+      youtube_channel = article.source_details.metadata.channel_name;
     }
 
     // Use MongoDB _id as the Article ID (backend endpoint expects MongoDB _id)
@@ -96,230 +91,122 @@ export class NewspaperService {
   }
 
   /**
-   * Fetch a single page of articles for a newspaper
-   * @param newspaperId - Newspaper ID
+   * Fetch a single page of articles for a newspaper using V2 API
+   * @param date - Date in YYYY-MM-DD format
    * @param userId - User ID
-   * @param startingAfter - Optional cursor for pagination (external_id of last item)
-   * @param pageLimit - Number of items per page (default: 10)
+   * @param startingAfter - Optional cursor for pagination (nextCursor from previous response)
    * @returns Object with articles and hasNext flag
    */
   async getNewspaperArticlesPage(
-    newspaperId: string,
+    date: string,
     userId: string,
-    startingAfter?: string | null,
-    pageLimit: number = 10
-  ): Promise<{ articles: any[], hasNext: boolean, lastExternalId: string | null }> {
-    const articlesUrl = new URL(
-      `${NEWSPAPER_SERVICE_URL}/newspapers/${newspaperId}/generated_content`
-    );
-
+    startingAfter?: string | null
+  ): Promise<{ articles: any[], hasNext: boolean, nextCursor: string | null, newspaperId: string }> {
+    const convertedDate = this.convertDateFormat(date);
+    const articlesUrl = new URL(`${NEWSPAPER_SERVICE_URL}/v2/newspapers/by-date`);
+    
+    articlesUrl.searchParams.set('date', convertedDate);
     if (startingAfter) {
       articlesUrl.searchParams.set('starting_after', startingAfter);
     }
-    articlesUrl.searchParams.set('page_limit', pageLimit.toString());
 
-    const articlesResponse = await fetch(articlesUrl.toString(), {
+    const response = await fetch(articlesUrl.toString(), {
       headers: {
         'X-User-ID': userId,
       },
     });
 
-    if (!articlesResponse.ok) {
-      if (articlesResponse.status === 404) {
-        return { articles: [], hasNext: false, lastExternalId: null };
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { articles: [], hasNext: false, nextCursor: null, newspaperId: '' };
       }
-      throw new Error(`Failed to fetch articles: ${articlesResponse.statusText}`);
+      throw new Error(`Failed to fetch articles page: ${response.statusText}`);
     }
 
-    const articlesData = await articlesResponse.json();
-    const contentWithInteractions = articlesData?.data?.list_response || [];
-    const hasNext = articlesData?.data?.hasNext || false;
-
-    // Get last item's external_id for next page cursor
-    const lastExternalId = contentWithInteractions.length > 0
-      ? contentWithInteractions[contentWithInteractions.length - 1]?.generated_content?.external_id || null
-      : null;
+    const v2Data = await response.json();
+    const articles = v2Data.articles?.data || [];
+    const hasNext = v2Data.articles?.hasNext || false;
+    const nextCursor = v2Data.articles?.nextCursor || null;
 
     return {
-      articles: contentWithInteractions,
+      articles,
       hasNext,
-      lastExternalId,
+      nextCursor,
+      newspaperId: v2Data.id,
     };
   }
 
-  /**
-   * Get newspaper ID by date
-   * @param date - Date in YYYY-MM-DD format
-   * @param userId - User ID to filter newspapers
-   * @returns Newspaper ID or null if not found
-   */
   async getNewspaperIdByDate(date: string, userId: string): Promise<string | null> {
     try {
-      // Convert date format from YYYY-MM-DD to DD/MM/YYYY
       const convertedDate = this.convertDateFormat(date);
-
-      // Fetch newspapers for the date
-      const newspapersUrl = `${NEWSPAPER_SERVICE_URL}/newspapers?date=${encodeURIComponent(convertedDate)}`;
-      const newspapersResponse = await fetch(newspapersUrl, {
+      const url = `${NEWSPAPER_SERVICE_URL}/v2/newspapers/by-date?date=${encodeURIComponent(convertedDate)}`;
+      
+      const response = await fetch(url, {
         headers: {
           'X-User-ID': userId,
         },
       });
 
-      if (!newspapersResponse.ok) {
-        if (newspapersResponse.status === 404) {
-          return null;
-        }
-        throw new Error(`Failed to fetch newspapers: ${newspapersResponse.statusText}`);
-      }
-
-      const newspapersData = await newspapersResponse.json();
-      const newspapers = newspapersData?.data?.list_response || [];
-
-      if (newspapers.length === 0) {
+      if (!response.ok) {
         return null;
       }
 
-      // Return the first newspaper ID (assuming backend filters correctly by date)
-      return newspapers[0].id;
+      const data = await response.json();
+      return data.id || null;
     } catch (error) {
       console.error('Error fetching newspaper ID:', error);
       return null;
     }
   }
 
-  /**
-   * Fetch a newspaper by date and user ID
-   * @param date - Date in YYYY-MM-DD format
-   * @param userId - User ID to filter newspapers
-   * @returns CachedNewspaper model or null if not found
-   */
   async getNewspaperByDate(date: string, userId: string): Promise<CachedNewspaper | null> {
     try {
-      // Convert date format from YYYY-MM-DD to DD/MM/YYYY
       const convertedDate = this.convertDateFormat(date);
-
-      // Step 1: Fetch newspapers for the date
-      const newspapersUrl = `${NEWSPAPER_SERVICE_URL}/newspapers?date=${encodeURIComponent(convertedDate)}`;
-      const newspapersResponse = await fetch(newspapersUrl, {
+      const url = `${NEWSPAPER_SERVICE_URL}/v2/newspapers/by-date?date=${encodeURIComponent(convertedDate)}`;
+      
+      const response = await fetch(url, {
         headers: {
           'X-User-ID': userId,
         },
       });
 
-      if (!newspapersResponse.ok) {
-        if (newspapersResponse.status === 404) {
-          return null;
-        }
-        throw new Error(`Failed to fetch newspapers: ${newspapersResponse.statusText}`);
+      if (!response.ok) {
+        if (response.status === 404) return null;
+        throw new Error(`Failed to fetch newspaper V2: ${response.statusText}`);
       }
 
-      const newspapersData = await newspapersResponse.json();
-      const newspapers = newspapersData?.data?.list_response || [];
+      const v2Data = await response.json();
+      const rawArticles = v2Data.articles?.data || [];
 
-      // Step 2: Find the newspaper matching the date
-      // The backend filters by date, so we should get the first one (or none)
-      if (newspapers.length === 0) {
-        return null;
-      }
+      // Single-pass mapping and hydration
+      const cachedArticles: CachedNewspaperArticle[] = rawArticles.map((article: any) => {
+        // A. Transform to FULL Article and hydrate cache
+        const fullArticle = this.transformToArticle(article);
+        articleCache.set(fullArticle);
 
-      // Use the first newspaper (assuming backend filters correctly by date)
-      const newspaper = newspapers[0];
-      const newspaperId = newspaper.id;
-
-      // Step 3: Fetch articles for this newspaper
-      const articlesUrl = `${NEWSPAPER_SERVICE_URL}/newspapers/${newspaperId}/generated_content`;
-      const articlesResponse = await fetch(articlesUrl, {
-        headers: {
-          'X-User-ID': userId,
-        },
+        // B. Return lightweight summary for the dashboard
+        return {
+          id: fullArticle.id,
+          title: fullArticle.title,
+          category: fullArticle.category,
+          time_to_read: fullArticle.time_to_read,
+          summary: article.generated?.SHORT?.string || '',
+          youtube_channel: fullArticle.youtube_channel,
+          published_at: fullArticle.published_at,
+          interactions: article.interactions || [],
+          cached_at: new Date().toISOString(),
+        };
       });
 
-      if (!articlesResponse.ok) {
-        if (articlesResponse.status === 404) {
-          // Newspaper exists but has no articles
-          return {
-            date: date,
-            topics: [],
-            total_time_to_read: '0m read',
-            articles: [],
-            cached_at: new Date().toISOString(),
-          };
-        }
-        throw new Error(`Failed to fetch articles: ${articlesResponse.statusText}`);
-      }
-
-      const articlesData = await articlesResponse.json();
-      const contentWithInteractions = articlesData?.data?.list_response || [];
-
-      // Step 4: Transform articles to CachedNewspaperArticle format
-      const cachedArticles: CachedNewspaperArticle[] = contentWithInteractions.map(
-        (item: { generated_content: any }) => {
-          const article = item.generated_content;
-          const generated = article.generated || {};
-
-          // Title should ONLY come from VERY_SHORT, never extracted from SHORT
-          let title = '';
-          if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
-            title = generated.VERY_SHORT.string;
-          }
-
-          // Summary should be the full SHORT content (for expandable card)
-          // SHORT is the summary shown in the dashboard cards
-          let summary = '';
-          if (generated.SHORT && generated.SHORT.string) {
-            summary = generated.SHORT.string;
-          }
-
-          const category = article.category?.category || 'Uncategorized';
-          const readingTimeSeconds = article.reading_time_seconds || 0;
-          const timeToRead =
-            readingTimeSeconds > 0
-              ? `${Math.ceil(readingTimeSeconds / 60)}m read`
-              : '5 min read';
-
-          // Use MongoDB _id as the article ID (backend endpoint expects MongoDB _id)
-          const articleId = article.id;
-
-          return {
-            id: articleId,
-            title: title || 'Untitled Article',
-            category: category,
-            time_to_read: timeToRead,
-            summary: summary || '', // Return empty string if no SHORT content
-            cached_at: new Date().toISOString(),
-          };
-        }
-      );
-
-      // Step 4.5: Transform articles to full Article objects and populate cache
-      // This allows other pages (like article detail pages) to use cached data
-      // Cache uses MongoDB _id as key (matching CachedNewspaperArticle.id)
-      contentWithInteractions.forEach((item: { generated_content: any }) => {
-        const article = item.generated_content;
-        if (!article.id) {
-          return; // Skip articles without MongoDB _id
-        }
-        try {
-          const fullArticle = this.transformToArticle(article);
-          articleCache.set(fullArticle);
-        } catch (error) {
-          console.warn('Failed to cache article:', error);
-        }
-      });
-
-      // Step 5: Calculate total time to read
-      const totalMinutes = cachedArticles.reduce((total, article) => {
-        const timeMatch = article.time_to_read.match(/(\d+)/);
-        return total + (timeMatch ? parseInt(timeMatch[1]) : 5);
-      }, 0);
-
+      // Calculate total reading time from newspaper level (V2 provides this)
+      const totalReadingTimeSeconds = v2Data.reading_time_in_seconds || 0;
+      const totalMinutes = Math.ceil(totalReadingTimeSeconds / 60);
       const totalTimeToRead =
         totalMinutes > 60
           ? `${Math.floor(totalMinutes / 60)}h ${totalMinutes % 60}m read`
           : `${totalMinutes}m read`;
 
-      // Step 6: Extract unique topics from article categories
+      // Extract unique topics
       const topics = [...new Set(cachedArticles.map((article) => article.category))];
 
       return {
@@ -330,7 +217,7 @@ export class NewspaperService {
         cached_at: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Error fetching newspaper:', error);
+      console.error('Error fetching newspaper V2:', error);
       return null;
     }
   }
