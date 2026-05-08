@@ -67,7 +67,11 @@ class StartDataProcessingService:
             )
 
         # 3. Verify status
-        if content.status != ContentStatus.PROCESSING:
+        # Todo: Puru this is not a good status check and can complicated while scaling
+        if (
+            content.status != ContentStatus.PROCESSING
+            and content.status != ContentStatus.PROCESSED
+        ):
             raise ValueError(
                 f"Content {user_collected_content_id} is not in PROCESSING status. "
                 f"Current status: {content.status}"
