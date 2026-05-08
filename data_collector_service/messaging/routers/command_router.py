@@ -14,8 +14,6 @@ from data_collector_service.services.collection.youtube.collect_youtube_content_
     CollectYouTubeContentService
 from data_collector_service.services.collection.youtube.enrich_youtube_video_content_service import \
     EnrichYouTubeVideoContentService
-from data_collector_service.services.rejection.reject_content_service import \
-    RejectContentService
 from data_collector_service.services.rejection.youtube.process_youtube_channel_rejection_aggregation_service import \
     ProcessYoutubeChannelRejectionAggregationService
 from data_collector_service.services.submit.submit_for_processing_service import \
@@ -31,7 +29,6 @@ class CommandRouter(BaseCommandRouter):
         self,
         start_user_collection_service: StartUserCollectionService,
         collect_youtube_content_service: CollectYouTubeContentService,
-        reject_content_service: RejectContentService,
         enrich_youtube_video_content_service: EnrichYouTubeVideoContentService,
         process_youtube_channel_rejection_aggregation_service: ProcessYoutubeChannelRejectionAggregationService,
         submit_for_processing_service: SubmitForProcessingService,
@@ -40,7 +37,6 @@ class CommandRouter(BaseCommandRouter):
         super().__init__(aggregated_schedule_service)
         self.start_user_collection_service = start_user_collection_service
         self.collect_youtube_content_service = collect_youtube_content_service
-        self.reject_content_service = reject_content_service
         self.enrich_youtube_video_content_service = enrich_youtube_video_content_service
         self.process_youtube_channel_rejection_aggregation_service = (
             process_youtube_channel_rejection_aggregation_service

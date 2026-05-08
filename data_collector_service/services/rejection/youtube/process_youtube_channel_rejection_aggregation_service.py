@@ -24,9 +24,8 @@ from data_collector_service.repositories.user_collected_content_repository impor
 from data_collector_service.repositories.youtube_collected_content_repository import \
     YouTubeCollectedContentRepository
 
-from .ai_agent import ContentModerator
+from .ai_agent import ContentModerator, ModerationOutput
 from .ai_agent.adaptors.input_adaptor import InputAdaptor
-from .rejection_content_service_youtube import get_content_by_video_id
 
 logger = logging.getLogger(__name__)
 
@@ -224,3 +223,22 @@ class ProcessYoutubeChannelRejectionAggregationService:
             print(
                 f"🚀 [ProcessYoutubeChannelRejectionAggregationService] Published {len(commands_to_send)} commands."
             )
+
+
+def get_content_by_video_id(
+    moderation_output: ModerationOutput, contents: List[UserCollectedContent]
+) -> List[Tuple[UserCollectedContent, str]]:
+    """
+    Given a ModerationOutput and a list of UserCollectedContent, return a list of tuples (UserCollectedContent, reason)
+    whose external_id matches any id in moderation_output.rejected_items, along with the rejection reason.
+
+    Returns:
+        List[Tuple[UserCollectedContent, str]]: Each tuple contains a UserCollectedContent object and the corresponding rejection reason string.
+    """
+    # Map rejected id to reason
+    id_to_reason = {item.id: item.reason for item in moderation_output.rejected_items}
+    result = []
+    for content in contents:
+        if content.external_id in id_to_reason:
+            result.append((content, id_to_reason[content.external_id]))
+    return result
