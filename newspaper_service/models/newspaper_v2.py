@@ -1,8 +1,26 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import List
 
-from .newspaper import NewspaperStatus, StatusDetail
+
+class NewspaperStatus(str, Enum):
+    """Status of a newspaper throughout its lifecycle."""
+
+    COLLATING = "COLLATING"
+    COLLATION_COMPLETE = "COLLATION_COMPLETE"
+    CURATED = "CURATED"
+    DELIVERED = "DELIVERED"
+    FAILED = "FAILED"
+
+
+@dataclass
+class StatusDetail:
+    """Detail information about a status change for a newspaper."""
+
+    status: NewspaperStatus
+    created_at: datetime
+    reason: str = ""
 
 
 @dataclass
