@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Trigger Data Collection for User 1
         run: |
-          curl --location --request POST 'https://unhook-production-b172.up.railway.app/internal/start_user_collection/cb2c7bc0-ff3b-4773-86d6-38b5ea8bfa48'
+          curl --fail --location --request POST --retry 3 --retry-delay 2 --retry-all-errors 'https://unhook-production-b172.up.railway.app/internal/start_user_collection/607d95f0-47ef-444c-89d2-d05f257d1265'
 
       - name: Trigger Data Collection for User 2
         run: |
-          curl --location --request POST 'https://unhook-production-b172.up.railway.app/internal/start_user_collection/1824c83a-308b-47e2-a098-0fc5bb03f4df'
+          curl --fail --location --request POST --retry 3 --retry-delay 2 --retry-all-errors 'https://unhook-production-b172.up.railway.app/internal/start_user_collection/91f21ebd-73bb-49b0-82cf-a78dae3caebd'
