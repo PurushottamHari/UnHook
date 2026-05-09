@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timezone
-from typing import Optional
+from typing import List, Optional
 
 from injector import inject
 
@@ -84,20 +84,42 @@ class MongoDBNewspaperV2Repository(NewspaperV2Repository):
                 hour=23, minute=59, second=59, microsecond=999999
             )
 
-            start_timestamp = start_of_day.astimezone(timezone.utc).timestamp()
-            end_timestamp = end_of_day.astimezone(timezone.utc).timestamp()
+            return (
+                self.list_by_user_and_date_range(user_id, start_of_day, end_of_day)[0]
+                if self.list_by_user_and_date_range(user_id, start_of_day, end_of_day)
+                else None
+            )
+        except Exception as e:
+            self.logger.error(f"Error getting NewspaperV2 by user and date: {str(e)}")
+            raise
 
-            document = self.collection.find_one(
+    def list_by_user_and_date_range(
+        self, user_id: str, start_date: datetime, end_date: datetime
+    ) -> List[NewspaperV2]:
+        """List NewspaperV2 instances for a specific user within a date range."""
+        try:
+            if start_date.tzinfo is None:
+                start_date = start_date.replace(tzinfo=timezone.utc)
+            if end_date.tzinfo is None:
+                end_date = end_date.replace(tzinfo=timezone.utc)
+
+            start_timestamp = start_date.astimezone(timezone.utc).timestamp()
+            end_timestamp = end_date.astimezone(timezone.utc).timestamp()
+
+            cursor = self.collection.find(
                 {
                     "user_id": user_id,
                     "created_at": {"$gte": start_timestamp, "$lte": end_timestamp},
                 }
-            )
+            ).sort("created_at", 1)
 
-            if document:
-                db_model = NewspaperV2DBModel(**document)
-                return NewspaperV2Adapter.to_internal_model(db_model)
-            return None
+            newspapers = []
+            for doc in cursor:
+                db_model = NewspaperV2DBModel(**doc)
+                newspapers.append(NewspaperV2Adapter.to_internal_model(db_model))
+            return newspapers
         except Exception as e:
-            self.logger.error(f"Error getting NewspaperV2 by user and date: {str(e)}")
+            self.logger.error(
+                f"Error listing NewspaperV2 by user and date range: {str(e)}"
+            )
             raise

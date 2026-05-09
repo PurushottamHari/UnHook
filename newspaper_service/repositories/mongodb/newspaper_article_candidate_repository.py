@@ -116,7 +116,13 @@ class MongoDBNewspaperArticleCandidateRepository(NewspaperArticleCandidateReposi
         self, newspaper_id: str, status: Optional[CandidateStatus] = None
     ) -> List[NewspaperArticleCandidate]:
         """List candidates for a specific newspaper ID."""
-        query = {"newspaper_id": newspaper_id}
+        return self.list_candidates_by_newspaper_ids([newspaper_id], status)
+
+    def list_candidates_by_newspaper_ids(
+        self, newspaper_ids: List[str], status: Optional[CandidateStatus] = None
+    ) -> List[NewspaperArticleCandidate]:
+        """List candidates for multiple newspaper IDs."""
+        query = {"newspaper_id": {"$in": newspaper_ids}}
         if status:
             query["status"] = status.value
         cursor = self.collection.find(query)

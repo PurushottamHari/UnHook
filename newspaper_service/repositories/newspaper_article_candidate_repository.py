@@ -50,3 +50,10 @@ class NewspaperArticleCandidateRepository(ABC):
     ) -> List[NewspaperArticleCandidate]:
         """List candidates for a specific newspaper ID."""
         pass
+
+    @abstractmethod
+    def list_candidates_by_newspaper_ids(
+        self, newspaper_ids: List[str], status: Optional[CandidateStatus] = None
+    ) -> List[NewspaperArticleCandidate]:
+        """List candidates for multiple newspaper IDs."""
+        pass

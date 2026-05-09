@@ -22,11 +22,15 @@ class NewspaperV2Controller:
         date: str,
         starting_after: Optional[str],
         user_id: str,
+        timezone: str = "UTC",
     ) -> NewspaperV2Response:
         """Core logic for getting newspaper with articles."""
         try:
             return await self.newspaper_api_service.get_newspaper_with_articles_v2(
-                user_id=user_id, date_str=date, starting_after=starting_after
+                user_id=user_id,
+                date_str=date,
+                starting_after=starting_after,
+                timezone_str=timezone,
             )
         except HTTPException:
             raise
@@ -44,9 +48,12 @@ async def get_newspaper_with_articles_v2_endpoint(
     starting_after: Optional[str] = Query(
         None, description="External ID cursor for pagination"
     ),
+    timezone: str = Query(
+        "UTC", description="Timezone for the request (e.g. Asia/Kolkata)"
+    ),
     user_id: str = Depends(get_user_id_from_header),
     controller: NewspaperV2Controller = Depends(),
 ) -> NewspaperV2Response:
     return await controller.get_newspaper_with_articles_v2(
-        date=date, starting_after=starting_after, user_id=user_id
+        date=date, starting_after=starting_after, user_id=user_id, timezone=timezone
     )
