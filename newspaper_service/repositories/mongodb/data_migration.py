@@ -13,146 +13,12 @@ from datetime import datetime
 import pytz
 
 from data_collector_service.models.user_collected_content import ContentStatus
-from newspaper_service.external.user_service import UserServiceClient
 from newspaper_service.repositories.mongodb.config.database import MongoDB
 from newspaper_service.repositories.mongodb.config.settings import \
     get_mongodb_settings
-from newspaper_service.repositories.mongodb.generated_content_repository import \
-    MongoDBGeneratedContentRepository
-from newspaper_service.repositories.mongodb.newspaper_repository import \
-    MongoDBNewspaperRepository
 from newspaper_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
 from user_service.models.enums import Weekday
-
-
-async def filter_newspaper_considered_items_by_weekday(
-    newspaper_id: str, for_date: datetime
-):
-    """
-    Migration script to fetch a newspaper by ID and date, then filter the considered items
-    using weekday logic from create_newspaper_service.py.
-    """
-    # Initialize repositories
-    user_collected_content_repository = MongoDBUserCollectedContentRepository()
-    generated_content_repository = MongoDBGeneratedContentRepository()
-    newspaper_repository = MongoDBNewspaperRepository(
-        user_collected_content_repository=user_collected_content_repository
-    )
-    user_service_client = UserServiceClient()
-
-    # Get weekday from date (same logic as in create_newspaper_service.py)
-    def get_weekday_from_date(date: datetime) -> Weekday:
-        """Get the weekday enum from a datetime object."""
-        weekday_map = {
-            0: Weekday.MONDAY,
-            1: Weekday.TUESDAY,
-            2: Weekday.WEDNESDAY,
-            3: Weekday.THURSDAY,
-            4: Weekday.FRIDAY,
-            5: Weekday.SATURDAY,
-            6: Weekday.SUNDAY,
-        }
-        # Convert to local timezone if needed and get weekday (0=Monday, 6=Sunday)
-        local_date = date.astimezone(pytz.timezone("Asia/Kolkata"))
-        weekday_num = local_date.weekday()
-        return weekday_map[weekday_num]
-
-    def get_allowed_categories_for_date(user, for_date: datetime):
-        """Get categories that should be considered for the given date based on user interests and weekdays."""
-        weekday = get_weekday_from_date(for_date)
-        allowed_categories = []
-
-        for interest in user.interested:
-            if weekday in interest.weekdays:
-                allowed_categories.append(interest.category_name)
-
-        return allowed_categories
-
-    try:
-        # Fetch the newspaper by ID
-        newspaper = newspaper_repository.get_newspaper(newspaper_id)
-        if not newspaper:
-            print(f"Newspaper with ID {newspaper_id} not found")
-            return
-
-        # Fetch user to get interests
-        user = await user_service_client.get_user(newspaper.user_id)
-        if not user:
-            print(f"User not found: {newspaper.user_id}")
-            return
-
-        # Get allowed categories for the given date
-        allowed_categories = get_allowed_categories_for_date(user, for_date)
-        weekday = get_weekday_from_date(for_date)
-        print(f"Allowed categories for {weekday} on {for_date}: {allowed_categories}")
-
-        # Get considered content items
-        considered_items = newspaper.considered_content_list
-        print(f"Found {len(considered_items)} considered articles")
-
-        # Get external IDs from considered items
-        considered_content_ids = [
-            item.user_collected_content_id for item in considered_items
-        ]
-
-        # Fetch the actual user collected content to get external IDs
-        user_collected_contents = []
-        for content_id in considered_content_ids:
-            content = user_collected_content_repository.get_content_by_id(content_id)
-            if content:
-                user_collected_contents.append(content)
-
-        # Get external IDs
-        external_ids = [content.external_id for content in user_collected_contents]
-
-        # Filter external IDs by categories using generated content repository
-        filtered_external_ids = (
-            generated_content_repository.filter_external_ids_by_category(
-                external_ids=external_ids,
-                categories=allowed_categories,
-            )
-        )
-        print(f"Filtered {len(filtered_external_ids)} external IDs")
-        print(f"Filtered external IDs: {filtered_external_ids}")
-
-        # Filter the considered items to only include those with matching external IDs
-        filtered_considered_items = []
-        non_filtered_content_ids = []
-
-        for item in considered_items:
-            # Find the corresponding user collected content
-            corresponding_content = next(
-                (
-                    content
-                    for content in user_collected_contents
-                    if content.id == item.user_collected_content_id
-                ),
-                None,
-            )
-            if (
-                corresponding_content
-                and corresponding_content.external_id in filtered_external_ids
-            ):
-                filtered_considered_items.append(item)
-            else:
-                non_filtered_content_ids.append(item.user_collected_content_id)
-
-        print(f"Filtered {len(filtered_considered_items)} articles")
-        print(f"Non-filtered content IDs: {non_filtered_content_ids}")
-
-        # Update non-filtered content to PROCESSED status
-        if non_filtered_content_ids:
-            update_non_filtered_content_to_processed(non_filtered_content_ids)
-
-        # Update newspaper to remove non-filtered items from considered list
-        update_newspaper_considered_list(newspaper_id, filtered_considered_items)
-
-        return filtered_considered_items
-
-    except Exception as e:
-        print(f"Error filtering newspaper considered items: {str(e)}")
-        raise
 
 
 def update_non_filtered_content_to_processed(content_ids: list):
@@ -190,177 +56,6 @@ def update_non_filtered_content_to_processed(content_ids: list):
 
     except Exception as e:
         print(f"Error updating non-filtered content to PROCESSED: {str(e)}")
-        raise
-
-
-def update_newspaper_considered_list(
-    newspaper_id: str, filtered_considered_items: list
-):
-    """Update newspaper to only include filtered considered items."""
-    try:
-        # Get database connection using the newspaper service pattern
-        db = MongoDB.get_database()
-        settings = get_mongodb_settings()
-        collection = db[settings.NEWSPAPER_COLLECTION_NAME]
-
-        current_timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC).timestamp()
-
-        # Convert filtered considered items to database format
-        from newspaper_service.models import ConsideredContent
-        from newspaper_service.repositories.mongodb.adapters.newspaper_adapter import \
-            NewspaperAdapter
-
-        filtered_considered_db_items = []
-        for item in filtered_considered_items:
-            db_item = NewspaperAdapter._considered_to_db_model(item)
-            filtered_considered_db_items.append(db_item.model_dump())
-
-        # Update the newspaper document
-        update_result = collection.update_one(
-            {"_id": newspaper_id},
-            {
-                "$set": {
-                    "considered_content_list": filtered_considered_db_items,
-                    "updated_at": current_timestamp,
-                }
-            },
-        )
-
-        print(
-            f"Updated newspaper {newspaper_id} with {len(filtered_considered_items)} filtered considered items"
-        )
-
-    except Exception as e:
-        print(f"Error updating newspaper considered list: {str(e)}")
-        raise
-
-
-def process_newspaper_acceptance(newspaper_id: str):
-    """
-    Migration script to process a newspaper by:
-    1. Setting all considered content status to ACCEPTED
-    2. Marking user collected content as USED
-    3. Updating newspaper read time based on generated content reading times
-    """
-    # Initialize repositories
-    user_collected_content_repository = MongoDBUserCollectedContentRepository()
-    generated_content_repository = MongoDBGeneratedContentRepository()
-    newspaper_repository = MongoDBNewspaperRepository(
-        user_collected_content_repository=user_collected_content_repository
-    )
-
-    try:
-        # Fetch the newspaper by ID
-        newspaper = newspaper_repository.get_newspaper(newspaper_id)
-        if not newspaper:
-            print(f"Newspaper with ID {newspaper_id} not found")
-            return
-
-        print(
-            f"Processing newspaper {newspaper_id} with {len(newspaper.considered_content_list)} considered items"
-        )
-
-        # Get considered content items
-        considered_items = newspaper.considered_content_list
-        considered_content_ids = [
-            item.user_collected_content_id for item in considered_items
-        ]
-
-        # Fetch the actual user collected content to get external IDs
-        user_collected_contents = []
-        for content_id in considered_content_ids:
-            content = user_collected_content_repository.get_content_by_id(content_id)
-            if content:
-                user_collected_contents.append(content)
-
-        # Get external IDs
-        external_ids = [content.external_id for content in user_collected_contents]
-        print(f"Found {len(external_ids)} external IDs")
-
-        # Calculate total reading time from generated content
-        total_reading_time = 0
-        for external_id in external_ids:
-            generated_content = generated_content_repository.get_content_by_external_id(
-                external_id
-            )
-            if generated_content and generated_content.reading_time_seconds:
-                total_reading_time += generated_content.reading_time_seconds
-                print(
-                    f"External ID {external_id}: {generated_content.reading_time_seconds} seconds"
-                )
-
-        print(f"Total reading time: {total_reading_time} seconds")
-
-        # Update considered content status to ACCEPTED
-        update_considered_content_to_accepted(newspaper_id, considered_items)
-
-        # Update user collected content to USED status
-        update_user_collected_content_to_used(considered_content_ids)
-
-        # Update newspaper reading time
-        update_newspaper_reading_time(newspaper_id, total_reading_time)
-
-        print(f"Successfully processed newspaper {newspaper_id}")
-        print(f"- Updated {len(considered_items)} considered items to ACCEPTED")
-        print(
-            f"- Updated {len(considered_content_ids)} user collected content items to USED"
-        )
-        print(f"- Updated newspaper reading time to {total_reading_time} seconds")
-
-    except Exception as e:
-        print(f"Error processing newspaper acceptance: {str(e)}")
-        raise
-
-
-def update_considered_content_to_accepted(newspaper_id: str, considered_items: list):
-    """Update considered content status to ACCEPTED."""
-    try:
-        # Get database connection using the newspaper service pattern
-        db = MongoDB.get_database()
-        settings = get_mongodb_settings()
-        collection = db[settings.NEWSPAPER_COLLECTION_NAME]
-
-        current_timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC).timestamp()
-
-        # Convert considered items to database format with ACCEPTED status
-        from newspaper_service.models import (ConsideredContent,
-                                              ConsideredContentStatus)
-        from newspaper_service.repositories.mongodb.adapters.newspaper_adapter import \
-            NewspaperAdapter
-
-        accepted_considered_db_items = []
-        for item in considered_items:
-            # Create new item with ACCEPTED status
-            accepted_item = ConsideredContent(
-                user_collected_content_id=item.user_collected_content_id,
-                considered_content_status=ConsideredContentStatus.ACCEPTED,
-            )
-            # Set status with reason
-            accepted_item.set_status(
-                ConsideredContentStatus.ACCEPTED,
-                reason="Migration: Content accepted for newspaper",
-            )
-            # Convert to database format
-            db_item = NewspaperAdapter._considered_to_db_model(accepted_item)
-            accepted_considered_db_items.append(db_item.model_dump())
-
-        # Update the newspaper document
-        update_result = collection.update_one(
-            {"_id": newspaper_id},
-            {
-                "$set": {
-                    "considered_content_list": accepted_considered_db_items,
-                    "updated_at": current_timestamp,
-                }
-            },
-        )
-
-        print(
-            f"Updated newspaper {newspaper_id} with {len(accepted_considered_db_items)} accepted considered items"
-        )
-
-    except Exception as e:
-        print(f"Error updating considered content to ACCEPTED: {str(e)}")
         raise
 
 
@@ -429,106 +124,6 @@ def update_newspaper_reading_time(newspaper_id: str, reading_time_seconds: int):
 
     except Exception as e:
         print(f"Error updating newspaper reading time: {str(e)}")
-        raise
-
-
-def fix_newspaper_created_at_dates():
-    """
-    Migration script to fix newspaper created_at dates by using the most recent
-    content_created_at date from the considered articles, set to midnight (0,0,0).
-    """
-    try:
-        # Initialize repositories
-        user_collected_content_repository = MongoDBUserCollectedContentRepository()
-        newspaper_repository = MongoDBNewspaperRepository(
-            user_collected_content_repository=user_collected_content_repository
-        )
-
-        # Get database connection
-        db = MongoDB.get_database()
-        settings = get_mongodb_settings()
-        newspaper_collection = db[settings.NEWSPAPER_COLLECTION_NAME]
-
-        # Get all newspapers
-        newspapers = list(newspaper_collection.find())
-        print(f"Found {len(newspapers)} newspapers to process")
-
-        updated_count = 0
-
-        for newspaper_doc in newspapers:
-            newspaper_id = newspaper_doc["_id"]
-            considered_items = newspaper_doc.get("considered_content_list", [])
-
-            if not considered_items:
-                print(f"Skipping newspaper {newspaper_id} - no considered content")
-                continue
-
-            print(
-                f"Processing newspaper {newspaper_id} with {len(considered_items)} considered items"
-            )
-
-            # Get user_collected_content_ids from considered items
-            content_ids = []
-            for item in considered_items:
-                if "user_collected_content_id" in item:
-                    content_ids.append(item["user_collected_content_id"])
-
-            if not content_ids:
-                print(f"Skipping newspaper {newspaper_id} - no valid content IDs")
-                continue
-
-            # Fetch the user collected content to get content_created_at dates
-            most_recent_date = None
-            for content_id in content_ids:
-                content = user_collected_content_repository.get_content_by_id(
-                    content_id
-                )
-                if content and content.content_created_at:
-                    content_date = content.content_created_at
-                    if most_recent_date is None or content_date > most_recent_date:
-                        most_recent_date = content_date
-
-            if most_recent_date is None:
-                print(
-                    f"Skipping newspaper {newspaper_id} - no content creation dates found"
-                )
-                continue
-
-            # Set the date to midnight (0,0,0) of that day
-            newspaper_date = most_recent_date.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
-            newspaper_timestamp = newspaper_date.timestamp()
-
-            # Use current timestamp for updated_at
-            current_timestamp = datetime.utcnow().replace(tzinfo=pytz.UTC).timestamp()
-
-            current_created_at = datetime.fromtimestamp(newspaper_doc["created_at"])
-            print(f"Updating newspaper {newspaper_id}:")
-            print(f"  From: {current_created_at}")
-            print(f"  To: {newspaper_date}")
-
-            # Update the newspaper document
-            update_result = newspaper_collection.update_one(
-                {"_id": newspaper_id},
-                {
-                    "$set": {
-                        "created_at": newspaper_timestamp,
-                        "updated_at": current_timestamp,
-                    }
-                },
-            )
-            if update_result.modified_count > 0:
-                updated_count += 1
-                print(f"  ✓ Updated successfully")
-            else:
-                print(f"  ✗ Update failed")
-
-        print(f"\nMigration completed!")
-        print(f"Updated {updated_count} out of {len(newspapers)} newspapers")
-
-    except Exception as e:
-        print(f"Error fixing newspaper created_at dates: {str(e)}")
         raise
 
 
@@ -717,26 +312,196 @@ def migrate_candidate_links_to_include_source_list():
         raise
 
 
+def migrate_newspapers_v1_to_v2():
+    """
+    Migration script to migrate newspapers from V1 to V2 and create
+    corresponding NewspaperArticleCandidate documents.
+    """
+    import uuid
+
+    from data_collector_service.models.enums import ContentType
+    from newspaper_service.models import (CandidateSource, CandidateStatus,
+                                          CandidateType, NewspaperV2,
+                                          SourceType)
+
+    try:
+        # Get database connection
+        db = MongoDB.get_database()
+        settings = get_mongodb_settings()
+
+        v1_collection = db[settings.NEWSPAPER_COLLECTION_NAME]
+        v2_collection = db[settings.NEWSPAPER_V2_COLLECTION_NAME]
+        candidates_collection = db[settings.NEWSPAPER_ARTICLE_CANDIDATE_COLLECTION_NAME]
+        content_collection = db[settings.USER_COLLECTED_CONTENT_COLLECTION_NAME]
+        youtube_collection = db[settings.YOUTUBE_COLLECTED_CONTENT_COLLECTION_NAME]
+        generated_content_collection = db["generated_content"]
+
+        # Fetch all V1 newspapers
+        print("Fetching V1 newspapers...")
+        v1_newspapers = list(v1_collection.find())
+        print(f"Found {len(v1_newspapers)} V1 newspapers to migrate")
+
+        v2_operations = []
+        candidate_operations = []
+
+        batch_size = 15
+        for i, v1_doc in enumerate(v1_newspapers):
+            newspaper_id = v1_doc["_id"]
+            user_id = v1_doc["user_id"]
+            print(
+                f"[{i+1}/{len(v1_newspapers)}] Processing newspaper {newspaper_id} for user {user_id}..."
+            )
+
+            # 1. Create NewspaperV2 document
+            # Preserve metadata exactly
+            v2_doc = {
+                "_id": newspaper_id,
+                "user_id": user_id,
+                "status": v1_doc["status"],
+                "status_details": v1_doc.get("status_details", []),
+                "reading_time_in_seconds": v1_doc.get("reading_time_in_seconds", 0),
+                "version": 1,
+                "created_at": v1_doc["created_at"],
+                "updated_at": v1_doc["updated_at"],
+            }
+
+            v2_operations.append(
+                UpdateOne({"_id": newspaper_id}, {"$set": v2_doc}, upsert=True)
+            )
+
+            # 2. Process considered_content_list to create candidates
+            considered_items = v1_doc.get("considered_content_list", [])
+            print(
+                f"Processing {len(considered_items)} considered_content_list items for newspaper {newspaper_id}..."
+            )
+            for item in considered_items:
+                content_id = item["user_collected_content_id"]
+                v1_status = item.get("considered_content_status")
+
+                # Only process if status is ACCEPTED (to be marked as USED)
+                # or as requested by the user to mark them as USED.
+                if v1_status != "ACCEPTED":
+                    continue
+
+                # Fetch collected content
+                content_doc = content_collection.find_one({"_id": content_id})
+                if not content_doc:
+                    raise ValueError(
+                        f"Collected content {content_id} not found for newspaper {newspaper_id}"
+                    )
+
+                external_id = content_doc["external_id"]
+                content_type_str = content_doc["content_type"]
+
+                # Fetch generated content
+                gen_content_doc = generated_content_collection.find_one(
+                    {"external_id": external_id}
+                )
+                if not gen_content_doc:
+                    raise ValueError(
+                        f"Generated content not found for external_id {external_id}"
+                    )
+
+                # Fetch source details
+                metadata = {}
+                source_type = SourceType.YOUTUBE_VIDEO.value  # Default
+                if content_type_str == ContentType.YOUTUBE_VIDEO.value:
+                    source_type = SourceType.YOUTUBE_VIDEO.value
+                    youtube_doc = youtube_collection.find_one({"video_id": external_id})
+                    if not youtube_doc:
+                        raise ValueError(
+                            f"YouTube details not found for video_id {external_id}"
+                        )
+
+                    metadata = {
+                        "youtube_video_link": f"https://www.youtube.com/watch?v={external_id}",
+                        "channel_name": youtube_doc.get("channel_name", ""),
+                    }
+                else:
+                    # If not YouTube, we still check for other sources if they exist, but here we expect clean migration
+                    raise ValueError(
+                        f"Unsupported content type {content_type_str} for clean migration"
+                    )
+
+                # Construct Candidate
+                candidate_id = str(uuid.uuid4())
+
+                # Status details
+                # 1. CONSIDERED at newspaper created_at
+                # 2. USED at newspaper updated_at
+                status_details = [
+                    {
+                        "status": CandidateStatus.CONSIDERED.value,
+                        "created_at": v1_doc["created_at"],
+                        "reason": "Migration: Initial state from V1 newspaper",
+                    },
+                    {
+                        "status": CandidateStatus.USED.value,
+                        "created_at": v1_doc["updated_at"],
+                        "reason": "Migration: Marked as USED based on V1 final_content_list",
+                    },
+                ]
+
+                candidate_doc = {
+                    "_id": candidate_id,
+                    "linked_id": content_id,
+                    "source": CandidateSource.USER_COLLECTED_CONTENT.value,
+                    "type": CandidateType.USER_COLLECTED_CONTENT.value,
+                    "user_id": user_id,
+                    "links": {
+                        "user_collected_content_id": content_id,
+                        "generated_content_id": gen_content_doc["_id"],
+                        "generated_content_id_list": [gen_content_doc["_id"]],
+                        "source_list": [
+                            {
+                                "external_id": external_id,
+                                "source_type": source_type,
+                                "metadata": metadata,
+                            }
+                        ],
+                    },
+                    "newspaper_id": newspaper_id,
+                    "status": CandidateStatus.USED.value,
+                    "status_details": status_details,
+                    "version": 1,
+                    "created_at": v1_doc["created_at"],
+                    "updated_at": v1_doc["updated_at"],
+                }
+
+                candidate_operations.append(
+                    UpdateOne(
+                        {"linked_id": content_id}, {"$set": candidate_doc}, upsert=True
+                    )
+                )
+
+            # Execute batch writes every batch_size newspapers
+            if (i + 1) % batch_size == 0 or (i + 1) == len(v1_newspapers):
+                if v2_operations:
+                    print(f"Upserting batch of {len(v2_operations)} V2 newspapers...")
+                    v2_collection.bulk_write(v2_operations)
+                    v2_operations = []
+
+                if candidate_operations:
+                    print(
+                        f"Upserting batch of {len(candidate_operations)} candidates..."
+                    )
+                    candidates_collection.bulk_write(candidate_operations)
+                    candidate_operations = []
+
+        print("Migration completed successfully!")
+
+    except Exception as e:
+        print(f"Error during migration: {str(e)}")
+        raise
+
+
 if __name__ == "__main__":
+
     # Example usage for the migration functions
+
+    # To run the V1 to V2 migration:
+    print("Starting V1 to V2 migration...")
+    migrate_newspapers_v1_to_v2()
 
     # To fix newspaper created_at dates based on content dates:
     # fix_newspaper_created_at_dates()
-
-    # To run the USED to PROCESSED migration:
-    # update_used_content_to_processed()
-
-    # To process newspaper acceptance:
-    # newspaper_id = (
-    #     "a9082976-9352-49bb-b643-c845f04fa7d1"  # Replace with actual newspaper ID
-    # )
-    # process_newspaper_acceptance(newspaper_id)
-
-    # To filter newspaper considered items by weekday:
-    # from datetime import datetime
-    # import pytz
-    # for_date = datetime.now(pytz.timezone("Asia/Kolkata"))
-    # filter_newspaper_considered_items_by_weekday(newspaper_id, for_date)
-    # To migrate candidate links to include source_list:
-    migrate_candidate_links_to_include_source_list()
-    pass

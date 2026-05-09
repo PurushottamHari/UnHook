@@ -26,8 +26,6 @@ from newspaper_service.repositories.mongodb.mongodb_aggregated_schedule_reposito
     MongoDBAggregatedScheduleRepository
 from newspaper_service.repositories.mongodb.newspaper_article_candidate_repository import \
     MongoDBNewspaperArticleCandidateRepository
-from newspaper_service.repositories.mongodb.newspaper_repository import \
-    MongoDBNewspaperRepository
 from newspaper_service.repositories.mongodb.newspaper_v2_repository import \
     MongoDBNewspaperV2Repository
 from newspaper_service.repositories.mongodb.user_collected_content_repository import \
@@ -36,8 +34,6 @@ from newspaper_service.repositories.mongodb.youtube_collected_content_repository
     MongoDBYouTubeCollectedContentRepository
 from newspaper_service.repositories.newspaper_article_candidate_repository import \
     NewspaperArticleCandidateRepository
-from newspaper_service.repositories.newspaper_repository import \
-    NewspaperRepository
 from newspaper_service.repositories.newspaper_v2_repository import \
     NewspaperV2Repository
 from newspaper_service.repositories.user_collected_content_repository import \
@@ -48,12 +44,6 @@ from newspaper_service.repositories.youtube_collected_content_repository import 
 
 class NewspaperModule(Module):
     def configure(self, binder: Binder) -> None:
-        # Repository Bindings
-        binder.bind(
-            NewspaperRepository,
-            to=MongoDBNewspaperRepository,
-            scope=singleton,
-        )
         binder.bind(
             NewspaperV2Repository,
             to=MongoDBNewspaperV2Repository,
