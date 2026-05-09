@@ -209,9 +209,12 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
         if operations:
             result = self.generated_content_collection.bulk_write(operations)
             if result.matched_count < len(operations):
-                # Only check if versions are > 1
-                if any(c.version > 1 for c in updated_generated_content_list):
-                    self.logger.warning(
-                        f"Optimistic lock failure detected in batch update. "
-                        f"Matched {result.matched_count} out of {len(operations)}."
-                    )
+                self.logger.error(
+                    f"❌ Optimistic lock failure detected in batch update. "
+                    f"Matched {result.matched_count} out of {len(operations)} operations."
+                )
+                raise ValueError(
+                    f"Optimistic lock failure in batch update: matched {result.matched_count} "
+                    f"out of {len(operations)} documents. Some documents may have been updated "
+                    f"by another process."
+                )

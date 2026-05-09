@@ -49,6 +49,16 @@ class MongoDBYouTubeCollectedContentRepository(YouTubeCollectedContentRepository
 
         if operations:
             result = self.collection.bulk_write(operations)
+            if result.matched_count + result.upserted_count < len(operations):
+                print(
+                    f"❌ Optimistic lock failure detected in batch upsert. "
+                    f"Matched {result.matched_count}, Upserted {result.upserted_count} out of {len(operations)} operations."
+                )
+                raise ValueError(
+                    f"Optimistic lock failure in batch upsert for YouTubeCollectedContent: "
+                    f"matched {result.matched_count}, upserted {result.upserted_count} out of {len(operations)} documents."
+                )
+
             print(
                 f"✅ [YouTubeRepository] Upserted {len(videos)} videos (Matched: {result.matched_count}, Upserted: {result.upserted_count})"
             )

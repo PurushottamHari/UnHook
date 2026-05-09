@@ -70,6 +70,16 @@ class MongoDBNewspaperArticleCandidateRepository(NewspaperArticleCandidateReposi
 
             if ops:
                 result = self.collection.bulk_write(ops)
+                if result.matched_count < len(ops):
+                    self.logger.error(
+                        f"❌ Optimistic lock failure detected in batch upsert. "
+                        f"Matched {result.matched_count}, Upserted {result.upserted_count} out of {len(ops)} operations."
+                    )
+                    raise ValueError(
+                        f"Optimistic lock failure in batch upsert for NewspaperArticleCandidate: "
+                        f"matched {result.matched_count}, upserted {result.upserted_count} out of {len(ops)} documents."
+                    )
+
                 self.logger.info(
                     f"✅ [CandidateRepository] Upserted {len(candidates)} items (Matched: {result.matched_count}, Upserted: {result.upserted_count})"
                 )

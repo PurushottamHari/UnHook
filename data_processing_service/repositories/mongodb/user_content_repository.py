@@ -144,14 +144,14 @@ class MongoDBUserContentRepository(UserContentRepository):
         if operations:
             result = self.collected_content_collection.bulk_write(operations)
             if result.matched_count < len(operations):
-                # This check is slightly loose as it doesn't tell which one failed,
-                # but it ensures we know if something went wrong.
-                # Only check if versions are > 1
-                if any(c.version > 1 for c in updated_user_collected_content_list):
-                    self.logger.warning(
-                        f"Optimistic lock failure detected in batch update. "
-                        f"Matched {result.matched_count} out of {len(operations)}."
-                    )
+                self.logger.error(
+                    f"❌ Optimistic lock failure detected in batch update. "
+                    f"Matched {result.matched_count} out of {len(operations)} operations."
+                )
+                raise ValueError(
+                    f"Optimistic lock failure in batch update for UserCollectedContent: "
+                    f"matched {result.matched_count} out of {len(operations)} documents."
+                )
 
     def get_user_collected_content(
         self,
