@@ -7,6 +7,8 @@ from typing import List, Optional
 from injector import inject
 from pymongo import UpdateOne
 
+from commons.repository.mongo.optimistic_locking_utils import (
+    create_optimistic_locking_update_op, validate_bulk_write_result)
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, UserCollectedContent)
 from data_collector_service.models.youtube.youtube_video_details import \
@@ -18,8 +20,6 @@ from data_collector_service.repositories.mongodb.config.settings import \
     get_mongodb_settings
 from data_collector_service.repositories.mongodb.models.collected_content_db_model import \
     CollectedContentDBModel
-from data_collector_service.repositories.mongodb.utils.optimistic_locking import \
-    create_optimistic_locking_update_op
 from data_collector_service.repositories.user_collected_content_repository import \
     UserCollectedContentRepository
 from data_collector_service.services.collection.collectors.youtube.adapters.youtube_to_user_content_adapter import \
@@ -170,15 +170,11 @@ class MongoDBUserCollectedContentRepository(UserCollectedContentRepository):
 
         if operations:
             result = self.collection.bulk_write(operations)
-            if result.matched_count + result.upserted_count < len(operations):
-                print(
-                    f"❌ Optimistic lock failure detected in batch upsert. "
-                    f"Matched {result.matched_count}, Upserted {result.upserted_count} out of {len(operations)} operations."
-                )
-                raise ValueError(
-                    f"Optimistic lock failure in batch upsert for UserCollectedContent: "
-                    f"matched {result.matched_count}, upserted {result.upserted_count} out of {len(operations)} documents."
-                )
+            validate_bulk_write_result(
+                result=result,
+                expected_count=len(operations),
+                model_name="UserCollectedContent",
+            )
 
             print(
                 f"✅ [UserContentRepository] Upserted {len(user_collected_content_list)} items (Matched: {result.matched_count}, Upserted: {result.upserted_count})"

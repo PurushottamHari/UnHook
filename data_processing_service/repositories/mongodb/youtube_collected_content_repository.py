@@ -3,14 +3,14 @@ from typing import List, Optional
 from injector import inject
 from pymongo import UpdateOne
 
+from commons.repository.mongo.optimistic_locking_utils import (
+    create_optimistic_locking_update_op, validate_bulk_write_result)
 from data_collector_service.models.youtube.youtube_video_details import \
     YouTubeVideoDetails
 from data_collector_service.repositories.mongodb.adapters.youtube_collected_content_adapter import \
     YouTubeCollectedContentAdapter
 from data_collector_service.repositories.mongodb.models.youtube_collected_content_db_model import \
     YouTubeCollectedContentDBModel
-from data_collector_service.repositories.mongodb.utils.optimistic_locking import \
-    create_optimistic_locking_update_op
 from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
 from data_processing_service.repositories.mongodb.config.settings import \
@@ -51,15 +51,11 @@ class MongoDBYouTubeCollectedContentRepository(YouTubeCollectedContentRepository
 
         if operations:
             result = self.collection.bulk_write(operations)
-            if result.matched_count + result.upserted_count < len(operations):
-                print(
-                    f"❌ Optimistic lock failure detected in batch upsert. "
-                    f"Matched {result.matched_count}, Upserted {result.upserted_count} out of {len(operations)} operations."
-                )
-                raise ValueError(
-                    f"Optimistic lock failure in batch upsert for YouTubeCollectedContent: "
-                    f"matched {result.matched_count}, upserted {result.upserted_count} out of {len(operations)} documents."
-                )
+            validate_bulk_write_result(
+                result=result,
+                expected_count=len(operations),
+                model_name="YouTubeCollectedContent",
+            )
 
             print(
                 f"✅ [YouTubeRepository] Upserted {len(videos)} videos (Matched: {result.matched_count}, Upserted: {result.upserted_count})"

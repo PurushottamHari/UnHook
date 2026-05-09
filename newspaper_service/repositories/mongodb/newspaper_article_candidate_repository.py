@@ -8,6 +8,8 @@ from typing import List, Optional
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
+from commons.repository.mongo.optimistic_locking_utils import (
+    create_optimistic_locking_update_op, validate_bulk_write_result)
 
 from ...models import CandidateStatus, NewspaperArticleCandidate
 from ..newspaper_article_candidate_repository import \
@@ -18,7 +20,6 @@ from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
 from .models.newspaper_article_candidate_db_model import \
     NewspaperArticleCandidateDBModel
-from .utils.optimistic_locking import create_optimistic_locking_update_op
 
 
 @injectable()
@@ -70,15 +71,11 @@ class MongoDBNewspaperArticleCandidateRepository(NewspaperArticleCandidateReposi
 
             if ops:
                 result = self.collection.bulk_write(ops)
-                if result.matched_count < len(ops):
-                    self.logger.error(
-                        f"❌ Optimistic lock failure detected in batch upsert. "
-                        f"Matched {result.matched_count}, Upserted {result.upserted_count} out of {len(ops)} operations."
-                    )
-                    raise ValueError(
-                        f"Optimistic lock failure in batch upsert for NewspaperArticleCandidate: "
-                        f"matched {result.matched_count}, upserted {result.upserted_count} out of {len(ops)} documents."
-                    )
+                validate_bulk_write_result(
+                    result=result,
+                    expected_count=len(ops),
+                    model_name="NewspaperArticleCandidate",
+                )
 
                 self.logger.info(
                     f"✅ [CandidateRepository] Upserted {len(candidates)} items (Matched: {result.matched_count}, Upserted: {result.upserted_count})"

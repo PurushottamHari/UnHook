@@ -5,6 +5,8 @@ from typing import List, Optional
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
+from commons.repository.mongo.optimistic_locking_utils import (
+    create_optimistic_locking_update_op, validate_bulk_write_result)
 
 from ...models import NewspaperV2
 from ..newspaper_v2_repository import NewspaperV2Repository
@@ -12,7 +14,6 @@ from .adapters.newspaper_v2_adapter import NewspaperV2Adapter
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
 from .models.newspaper_v2_db_model import NewspaperV2DBModel
-from .utils.optimistic_locking import create_optimistic_locking_update_op
 
 
 @injectable()
@@ -45,15 +46,9 @@ class MongoDBNewspaperV2Repository(NewspaperV2Repository):
 
             # Execute update
             result = self.collection.bulk_write([update_op])
-
-            if result.matched_count == 0 and newspaper.version > 1:
-                self.logger.error(
-                    f"Optimistic lock failure for NewspaperV2 {newspaper_id}. "
-                    f"Expected version {newspaper.version - 1} not found."
-                )
-                raise ValueError(
-                    f"Optimistic lock failure for NewspaperV2 {newspaper_id}"
-                )
+            validate_bulk_write_result(
+                result=result, expected_count=1, model_name="NewspaperV2"
+            )
 
             self.logger.info(
                 f"Upserted NewspaperV2 with ID: {newspaper_id}, Version: {newspaper.version}"

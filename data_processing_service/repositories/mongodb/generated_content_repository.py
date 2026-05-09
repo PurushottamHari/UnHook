@@ -8,6 +8,8 @@ from typing import List, Optional
 from injector import inject
 
 from commons.infra.dependency_injection.injectable import injectable
+from commons.repository.mongo.optimistic_locking_utils import (
+    create_optimistic_locking_update_op, validate_bulk_write_result)
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentType)
 from data_processing_service.models.generated_content import (
@@ -18,8 +20,6 @@ from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
 from data_processing_service.repositories.mongodb.models.generated_content_db_model import \
     GeneratedContentDBModel
-from data_processing_service.repositories.mongodb.utils.optimistic_locking import \
-    create_optimistic_locking_update_op
 
 from ..generated_content_repository import GeneratedContentRepository
 
@@ -208,13 +208,8 @@ class MongoDBGeneratedContentRepository(GeneratedContentRepository):
             )
         if operations:
             result = self.generated_content_collection.bulk_write(operations)
-            if result.matched_count < len(operations):
-                self.logger.error(
-                    f"❌ Optimistic lock failure detected in batch update. "
-                    f"Matched {result.matched_count} out of {len(operations)} operations."
-                )
-                raise ValueError(
-                    f"Optimistic lock failure in batch update: matched {result.matched_count} "
-                    f"out of {len(operations)} documents. Some documents may have been updated "
-                    f"by another process."
-                )
+            validate_bulk_write_result(
+                result=result,
+                expected_count=len(operations),
+                model_name="GeneratedContent",
+            )

@@ -9,6 +9,8 @@ from injector import inject
 from pymongo import UpdateOne
 
 from commons.infra.dependency_injection.injectable import injectable
+from commons.repository.mongo.optimistic_locking_utils import (
+    create_optimistic_locking_update_op, validate_bulk_write_result)
 from data_collector_service.models.user_collected_content import (
     ContentStatus, ContentSubStatus, ContentType, UserCollectedContent)
 from data_collector_service.repositories.mongodb.adapters.collected_content_adapter import \
@@ -20,8 +22,6 @@ from data_processing_service.repositories.mongodb.adapters.generated_content_ada
     GeneratedContentAdapter
 from data_processing_service.repositories.mongodb.config.database import \
     MongoDB
-from data_processing_service.repositories.mongodb.utils.optimistic_locking import \
-    create_optimistic_locking_update_op
 
 from ..user_content_repository import UserContentRepository
 
@@ -143,15 +143,11 @@ class MongoDBUserContentRepository(UserContentRepository):
             )
         if operations:
             result = self.collected_content_collection.bulk_write(operations)
-            if result.matched_count < len(operations):
-                self.logger.error(
-                    f"❌ Optimistic lock failure detected in batch update. "
-                    f"Matched {result.matched_count} out of {len(operations)} operations."
-                )
-                raise ValueError(
-                    f"Optimistic lock failure in batch update for UserCollectedContent: "
-                    f"matched {result.matched_count} out of {len(operations)} documents."
-                )
+            validate_bulk_write_result(
+                result=result,
+                expected_count=len(operations),
+                model_name="UserCollectedContent",
+            )
 
     def get_user_collected_content(
         self,
