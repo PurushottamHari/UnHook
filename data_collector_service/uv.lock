@@ -335,7 +335,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices#a84a6357f7ceedd8a989f37c940bc5ef524c6445" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#6589fac8ea1c53a69f05f5aec6c1f50e6e22cdd9" }
 dependencies = [
     { name = "injector" },
     { name = "langchain-core" },
@@ -397,7 +397,7 @@ dependencies = [
 requires-dist = [
     { name = "black", specifier = ">=23.0.0" },
     { name = "boto3", specifier = ">=1.26.0" },
-    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=setupAyncPipelineForServices" },
+    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons" },
     { name = "curl-cffi" },
     { name = "httpx", specifier = ">=0.24.0" },
     { name = "injector", specifier = ">=0.21.0" },
@@ -410,7 +410,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=0.19.0" },
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "redis", specifier = ">=5.0.0" },
-    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices" },
+    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service" },
     { name = "yt-dlp", extras = ["curl-cffi"] },
 ]
 
@@ -1614,7 +1614,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=setupAyncPipelineForServices#a84a6357f7ceedd8a989f37c940bc5ef524c6445" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#6589fac8ea1c53a69f05f5aec6c1f50e6e22cdd9" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },
