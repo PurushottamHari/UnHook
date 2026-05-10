@@ -16,8 +16,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    const searchParams = request.nextUrl.searchParams;
+    const userId = searchParams.get('userId') || undefined;
+
     const articleService = new ArticleService();
-    const article = await articleService.getArticleById(id);
+    const article = await articleService.getArticleById(id, userId);
 
     if (!article) {
       return NextResponse.json(

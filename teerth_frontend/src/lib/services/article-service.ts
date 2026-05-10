@@ -1,5 +1,6 @@
 import { Article } from '@/models/article.model';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
+import { ArticleAdaptor } from '../adaptors/article-adaptor';
 
 const NEWSPAPER_SERVICE_URL = process.env.NEWSPAPER_SERVICE_URL;
 
@@ -17,13 +18,14 @@ export class ArticleService {
    * On server: uses direct DB access
    * 
    * @param articleId - The article identifier
+   * @param userId - Optional User ID for personalized data (interactions)
    * @returns Article model or null if not found
    */
-  async getArticleById(articleId: string): Promise<Article | null> {
+  async getArticleById(articleId: string, userId?: string): Promise<Article | null> {
     if (this.isClient()) {
       return this.getArticleByIdClient(articleId);
     } else {
-      return this.getArticleByIdServer(articleId);
+      return this.getArticleByIdServer(articleId, userId);
     }
   }
 
@@ -69,11 +71,17 @@ export class ArticleService {
    * Server-side article fetching (REST API)
    * @private
    */
-  private async getArticleByIdServer(articleId: string): Promise<Article | null> {
+  private async getArticleByIdServer(articleId: string, userId?: string): Promise<Article | null> {
     try {
       // The backend endpoint expects MongoDB _id (generated_content_id)
       const articleUrl = `${NEWSPAPER_SERVICE_URL}/generated_content/${articleId}`;
-      const response = await fetch(articleUrl);
+      
+      // Backend REQUIRES X-User-ID header now
+      const headers: Record<string, string> = {
+        'X-User-ID': userId || process.env.NEXT_PUBLIC_DEFAULT_GUEST_USER_ID || '607d95f0-47ef-444c-89d2-d05f257d1265'
+      };
+
+      const response = await fetch(articleUrl, { headers });
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -87,84 +95,8 @@ export class ArticleService {
         throw new Error(`Failed to fetch article: ${response.statusText}`);
       }
 
-      const article = await response.json();
-
-      // Title should ONLY come from VERY_SHORT, never extracted from SHORT
-      let title = '';
-      const generated = article.generated || {};
-      if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
-        title = generated.VERY_SHORT.string;
-      }
-
-      // Get content - prefer LONG, then MEDIUM, then SHORT
-      let content = '';
-      if (generated.LONG && generated.LONG.markdown_string) {
-        content = generated.LONG.markdown_string;
-      } else if (generated.LONG && generated.LONG.string) {
-        content = generated.LONG.string;
-      } else if (generated.MEDIUM && generated.MEDIUM.markdown_string) {
-        content = generated.MEDIUM.markdown_string;
-      } else if (generated.MEDIUM && generated.MEDIUM.string) {
-        content = generated.MEDIUM.string;
-      } else if (generated.SHORT && generated.SHORT.string) {
-        content = generated.SHORT.string;
-      }
-
-      // Get category
-      const category = article.category?.category || 'TECHNOLOGY';
-
-      // Get summary
-      let summary = '';
-      if (generated.SHORT && generated.SHORT.string) {
-        summary = generated.SHORT.string;
-      }
-
-      // Get reading time
-      const readingTimeSeconds = article.reading_time_seconds || 0;
-      const minutes = Math.ceil(readingTimeSeconds / 60);
-      const time_to_read =
-        minutes < 1 ? 'Less than 1 min read' : `${minutes} min read`;
-
-      // Get published date
-      let published_at = new Date().toISOString();
-      if (article.content_generated_at) {
-        published_at = new Date(article.content_generated_at * 1000).toISOString();
-      } else if (article.created_at) {
-        published_at = new Date(article.created_at * 1000).toISOString();
-      }
-
-      // Get external_id (YouTube video ID) from source_details if available
-      const external_id = article.source_details?.video_id || article.external_id || '';
-
-      // Get youtube_channel from source_details if available
-      let youtube_channel = '';
-      if (article.source_details?.channel_name) {
-        youtube_channel = article.source_details.channel_name;
-      } else if (article.youtube_channel) {
-        youtube_channel = article.youtube_channel;
-      }
-
-      // Set article source and link
-      const article_source = 'Teerth';
-      const article_link = `https://unhook-production.up.railway.app/article/${articleId}`;
-
-      // Use MongoDB _id if available, otherwise use external_id or the provided articleId
-      const articleIdToUse = article.id || article.external_id || articleId;
-
-      return {
-        id: articleIdToUse,
-        title: title || 'Article Not Found',
-        content: content || '',
-        summary,
-        category,
-        time_to_read,
-        article_link,
-        article_source,
-        external_id,
-        youtube_channel,
-        published_at,
-        cached_at: new Date().toISOString(),
-      };
+      const articleData = await response.json();
+      return ArticleAdaptor.toArticle(articleData);
     } catch (error) {
       console.error('Error fetching article:', error);
       return null;

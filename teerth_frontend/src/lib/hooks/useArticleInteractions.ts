@@ -15,7 +15,7 @@ export function useArticleInteractions(
   initialInteractions?: GeneratedContentInteraction[]
 ) {
   const { user } = useAuthStore();
-  const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
+  const userId = user?.id || process.env.NEXT_PUBLIC_DEFAULT_GUEST_USER_ID || '607d95f0-47ef-444c-89d2-d05f257d1265';
   const queryClient = useQueryClient();
   const queryKey = ['article-interactions', articleId, userId];
   

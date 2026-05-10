@@ -62,22 +62,6 @@ export default function ArticleShareCard({
         className="w-full flex justify-center items-center flex-wrap flex-shrink-0 pt-0 pb-4 gap-10 text-[35px] leading-[40px]"
         style={{ color: "#b45309" }} // amber-700
       >
-        {article.youtube_channel ? (
-          <YoutubeBadge
-            channelName={article.youtube_channel}
-            className="flex items-center gap-3"
-            iconClassName="flex-shrink-0"
-            iconSize={40}
-          />
-        ) : (
-          <SourceBadge
-            sourceName={article.article_source || article.category || "Teerth"}
-            className="flex items-center gap-3"
-            iconClassName="flex-shrink-0"
-            iconSize={34}
-          />
-        )}
-
         <ReadTimeBadge
           timeToRead={article.time_to_read}
           className="flex items-center justify-center gap-3"

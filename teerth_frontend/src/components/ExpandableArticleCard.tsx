@@ -14,10 +14,12 @@ import {
 import { articleCache } from '@/lib/services/cache/article/article-cache';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { useArticleInteractions } from '@/lib/hooks/useArticleInteractions';
+import CategoryTag from './CategoryTag';
+import ReadTimeBadge from './ReadTimeBadge';
+import YoutubeBadge from './YoutubeBadge';
+import SourceBadge from './SourceBadge';
 import DislikeModal from './DislikeModal';
 import ReportModal from './ReportModal';
-import CategoryTag from './CategoryTag';
-import ReadTimeBadge from '@/components/ReadTimeBadge';
 
 interface ExpandableArticleCardProps {
   /**
@@ -59,7 +61,6 @@ async function fetchFullArticle(
   if (!data.success) {
     throw new Error(data.error || 'Failed to fetch article');
   }
-  
   const article: Article = data.article;
   
   return {
@@ -67,6 +68,8 @@ async function fetchFullArticle(
     title: article.title,
     category: article.category,
     time_to_read: article.time_to_read,
+    youtube_channel: article.youtube_channel,
+    published_at: article.published_at,
     summary: existingSummary || '',
     cached_at: article.cached_at,
   };
@@ -89,7 +92,7 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
   const [isPopDislike, setIsPopDislike] = useState(false);
 
   const { user } = useAuthStore();
-  const userId = user?.id || '607d95f0-47ef-444c-89d2-d05f257d1265';
+  const userId = user?.id || process.env.NEXT_PUBLIC_DEFAULT_GUEST_USER_ID || '607d95f0-47ef-444c-89d2-d05f257d1265';
 
   // Use shared interactions hook
   const { interactions, getInteractionState, updateInteractionsOptimistically, handleInteractionUpdate } = useArticleInteractions(
@@ -476,6 +479,19 @@ export default function ExpandableArticleCard({ article, isGuestMode }: Expandab
                 className='flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-700'
                 iconClassName='w-4 h-4'
               />
+              {displayArticle.youtube_channel ? (
+                <YoutubeBadge
+                  channelName={displayArticle.youtube_channel}
+                  className="flex items-center gap-1.5 text-xs"
+                  iconClassName="w-3.5 h-3.5"
+                />
+              ) : (
+                <SourceBadge
+                  sourceName={displayArticle.article_source || 'Teerth'}
+                  className="flex items-center gap-1.5 text-xs"
+                  iconClassName="w-3.5 h-3.5"
+                />
+              )}
             </div>
 
             {/* Article Summary */}

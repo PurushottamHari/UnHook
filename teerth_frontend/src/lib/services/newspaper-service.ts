@@ -1,6 +1,7 @@
 import { CachedNewspaper, CachedNewspaperArticle } from '@/models/newspaper.model';
 import { Article } from '@/models/article.model';
 import { articleCache } from '@/lib/services/cache/article/article-cache';
+import { ArticleAdaptor } from '../adaptors/article-adaptor';
 
 const NEWSPAPER_SERVICE_URL = process.env.NEWSPAPER_SERVICE_URL;
 
@@ -15,79 +16,6 @@ export class NewspaperService {
       throw new Error(`Invalid date format: ${date}. Expected YYYY-MM-DD`);
     }
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  }
-
-  /**
-   * Transform GeneratedContent object to full Article object
-   * Used to populate ArticleCache when fetching newspapers
-   * @private
-   */
-  private transformToArticle(article: any): Article {
-    const generated = article.generated || {};
-
-    // Title should ONLY come from VERY_SHORT, never extracted from SHORT
-    let title = '';
-    if (generated.VERY_SHORT && generated.VERY_SHORT.string) {
-      title = generated.VERY_SHORT.string;
-    }
-
-    // Get content - prefer LONG, then MEDIUM, then SHORT
-    let content = '';
-    if (generated.LONG && (generated.LONG.markdown_string || generated.LONG.string)) {
-      content = generated.LONG.markdown_string || generated.LONG.string;
-    } else if (generated.MEDIUM && (generated.MEDIUM.markdown_string || generated.MEDIUM.string)) {
-      content = generated.MEDIUM.markdown_string || generated.MEDIUM.string;
-    } else if (generated.SHORT && generated.SHORT.string) {
-      content = generated.SHORT.string;
-    }
-
-    // Get category
-    const category = article.category?.category || 'TECHNOLOGY';
-
-    // Get reading time
-    const readingTimeSeconds = article.reading_time_seconds || 0;
-    const minutes = Math.ceil(readingTimeSeconds / 60);
-    const time_to_read =
-      minutes < 1 ? 'Less than 1 min read' : `${minutes} min read`;
-
-    // Get published date
-    let published_at = new Date().toISOString();
-    if (article.content_generated_at) {
-      published_at = new Date(article.content_generated_at * 1000).toISOString();
-    } else if (article.created_at) {
-      published_at = new Date(article.created_at * 1000).toISOString();
-    }
-
-    // Get external_id (YouTube video ID) from source_details if available
-    // V2 uses external_id field or source_details.external_id
-    const external_id = article.source_details?.external_id || article.external_id || '';
-
-    // Get youtube_channel from source_details.metadata if available
-    let youtube_channel = '';
-    if (article.source_details?.metadata?.channel_name) {
-      youtube_channel = article.source_details.metadata.channel_name;
-    }
-
-    // Use MongoDB _id as the Article ID (backend endpoint expects MongoDB _id)
-    const articleId = article.id;
-
-    // Set article source and link
-    const article_source = 'Teerth';
-    const article_link = `https://unhook-production.up.railway.app/article/${articleId}`;
-
-    return {
-      id: articleId,
-      title: title || 'Untitled Article',
-      content: content || '',
-      category,
-      time_to_read,
-      article_link,
-      article_source,
-      external_id,
-      youtube_channel,
-      published_at,
-      cached_at: new Date().toISOString(),
-    };
   }
 
   /**
@@ -181,7 +109,7 @@ export class NewspaperService {
       // Single-pass mapping and hydration
       const cachedArticles: CachedNewspaperArticle[] = rawArticles.map((article: any) => {
         // A. Transform to FULL Article and hydrate cache
-        const fullArticle = this.transformToArticle(article);
+        const fullArticle = ArticleAdaptor.toArticle(article);
         articleCache.set(fullArticle);
 
         // B. Return lightweight summary for the dashboard
@@ -190,7 +118,7 @@ export class NewspaperService {
           title: fullArticle.title,
           category: fullArticle.category,
           time_to_read: fullArticle.time_to_read,
-          summary: article.generated?.SHORT?.string || '',
+          summary: fullArticle.summary || '',
           youtube_channel: fullArticle.youtube_channel,
           published_at: fullArticle.published_at,
           interactions: article.interactions || [],
