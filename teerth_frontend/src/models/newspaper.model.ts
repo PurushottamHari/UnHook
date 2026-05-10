@@ -14,6 +14,7 @@ export interface CachedNewspaperArticle {
   published_at?: string;
   summary?: string;
   cached_at: string;
+  article_source?: string;
   interactions?: GeneratedContentInteraction[];
 }
 
