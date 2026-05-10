@@ -16,6 +16,7 @@ async def main():
 
     # Get the BaseMessagingHandler from the injector
     messaging_handler = injector.get(BaseMessagingHandler)
+    await debug_command(injector)
 
     try:
         # Start the messaging orchestrator
@@ -32,9 +33,9 @@ async def debug_command(injector):
     # Construct the exact command from the DLQ message
     payload = EnrichYouTubeVideoForUserPayload(
         user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
-        video_id="rsFtzI9-j08",
-        user_collected_content_id="efb00bb6-f8f9-46cb-8f45-1d90ecd59f58",
-        channel_name="StudyIQEducationLtd",
+        video_id="60Cf_y6Jmw4",
+        user_collected_content_id="75a29d18-bf42-4a7a-8fce-b75998c49b3f",
+        channel_name="sadhguru",
     )
 
     command = EnrichYouTubeVideoForUserCommand(payload=payload)

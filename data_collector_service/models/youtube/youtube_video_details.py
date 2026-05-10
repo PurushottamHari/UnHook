@@ -11,6 +11,7 @@ class YouTubeVideoStatus(str, Enum):
     COLLECTED = "collected"
     ENRICHED = "enriched"
     SUBTITLES_STORED = "subtitles_stored"
+    FAILED_BECAUSE_RESTRICTED = "failed_because_restricted"
 
 
 @dataclass

@@ -14,6 +14,8 @@ from yt_dlp.networking.impersonate import ImpersonateTarget
 
 from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.config.config import Config
+from data_collector_service.services.collection.collectors.youtube.tools.clients.exceptions import (
+    PremiumYoutubeVideoException, YoutubeClientError)
 
 logger = logging.getLogger(__name__)
 
@@ -182,12 +184,15 @@ class YtDlpClient:
                     )
                     return None
                 return video_info
-        except yt_dlp.utils.DownloadError as e:
-            logger.error(f"YouTube-DL download error for video_id {video_id}: {str(e)}")
-            return None
         except Exception as e:
-            logger.error(f"Unexpected error fetching video {video_id}: {str(e)}")
-            return None
+            error_msg = str(e)
+            if "members-only content" in error_msg.lower():
+                logger.error(f"Video {video_id} is members-only")
+                raise PremiumYoutubeVideoException(error_msg)
+            logger.error(f"Error fetching video {video_id}: {error_msg}")
+            raise YoutubeClientError(
+                f"Error fetching video {video_id}: {error_msg}", error_msg
+            )
 
     def download_subtitles(
         self,

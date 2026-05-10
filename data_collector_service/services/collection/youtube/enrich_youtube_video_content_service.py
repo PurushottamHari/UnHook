@@ -17,6 +17,8 @@ from data_collector_service.models.youtube.youtube_video_details import \
     YouTubeVideoStatus
 from data_collector_service.repositories.youtube_collected_content_repository import \
     YouTubeCollectedContentRepository
+from data_collector_service.services.collection.collectors.youtube.tools.clients.exceptions.premium_youtube_video_exception import \
+    PremiumYoutubeVideoException
 from data_collector_service.services.collection.collectors.youtube.tools.youtube_external_tool import \
     YouTubeExternalTool
 
@@ -89,17 +91,30 @@ class EnrichYouTubeVideoContentService:
         # If status is enriched or subtitles_stored skip this step
         if video.status == YouTubeVideoStatus.COLLECTED:
             # Fetch data and enrich using YouTubeExternalTool
-            enriched_videos = self.youtube_tool.enrich_video_data_with_details([video])
-            if not enriched_videos:
-                logger.error(f"No enrichment data found for video {video_id}")
-                raise ValueError(f"No enrichment data found for video {video_id}")
-            enriched_video = enriched_videos[0]
-            enriched_video.set_status(
-                YouTubeVideoStatus.ENRICHED, "Video metadata enriched via external tool"
-            )
-            enriched_video.version += 1
-            self.youtube_repository.upsert_videos([enriched_video])
-            logger.info(f"✅ Video {video_id} enriched and updated in repository")
+            try:
+                enriched_videos = self.youtube_tool.enrich_video_data_with_details(
+                    [video]
+                )
+                if not enriched_videos:
+                    logger.error(f"No enrichment data found for video {video_id}")
+                    raise ValueError(f"No enrichment data found for video {video_id}")
+                enriched_video = enriched_videos[0]
+                enriched_video.set_status(
+                    YouTubeVideoStatus.ENRICHED,
+                    "Video metadata enriched via external tool",
+                )
+                enriched_video.version += 1
+                self.youtube_repository.upsert_videos([enriched_video])
+                logger.info(f"✅ Video {video_id} enriched and updated in repository")
+            except PremiumYoutubeVideoException as e:
+                logger.warning(f"Premium video detected for {video_id}: {e.raw_output}")
+                video.set_status(
+                    YouTubeVideoStatus.FAILED_BECAUSE_RESTRICTED, e.raw_output
+                )
+                video.version += 1
+                self.youtube_repository.upsert_videos([video])
+                logger.info(f"Returning gracefully as video {video_id} is premium")
+                return
 
         elif video.status in [
             YouTubeVideoStatus.ENRICHED,
