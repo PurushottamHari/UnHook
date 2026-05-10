@@ -16,7 +16,7 @@ async def main():
 
     # Get the BaseMessagingHandler from the injector
     messaging_handler = injector.get(BaseMessagingHandler)
-    await debug_command(injector)
+    # await debug_command(injector)
 
     try:
         # Start the messaging orchestrator
