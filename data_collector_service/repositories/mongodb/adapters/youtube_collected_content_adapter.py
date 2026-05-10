@@ -49,6 +49,7 @@ class YouTubeCollectedContentAdapter:
                 )
                 for detail in entity.status_details
             ],
+            version=entity.version,
         )
 
     @staticmethod
@@ -88,6 +89,7 @@ class YouTubeCollectedContentAdapter:
                 )
                 for detail in db_model.status_details
             ],
+            version=db_model.version,
         )
 
     @staticmethod
