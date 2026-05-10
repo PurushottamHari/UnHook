@@ -10,11 +10,11 @@ from pydantic import BaseModel
 from ...models.generated_content_interaction import GeneratedContentInteraction
 from ...models.generated_content_interaction_list import \
     GeneratedContentInteractionListResponse
-from ...models.generated_content_response import GeneratedContentResponse
 from ...services.generated_content_interaction_service import \
     ContentInteractionService
 from ...services.generated_content_service import GeneratedContentService
 from ..dependencies import get_user_id_from_header
+from ..models.article_response import ArticleResponse
 
 router = APIRouter(tags=["content-interactions"])
 
@@ -100,19 +100,15 @@ class GeneratedContentController:
 
     async def get_generated_content(
         self,
+        user_id: str,
         content_id: str,
-    ) -> GeneratedContentResponse:
+    ) -> ArticleResponse:
         """
         Get generated content by its ID.
         """
         try:
-            content, user_collected_content = (
-                await self.content_service.get_generated_content_by_id(
-                    content_id=content_id
-                )
-            )
-            return GeneratedContentResponse.from_generated_content(
-                content, user_collected_content
+            return await self.content_service.get_generated_content_by_id(
+                user_id=user_id, content_id=content_id
             )
         except HTTPException:
             raise
@@ -182,10 +178,13 @@ async def list_user_interactions_endpoint(
 
 @router.get(
     "/generated_content/{content_id}",
-    response_model=GeneratedContentResponse,
+    response_model=ArticleResponse,
 )
 async def get_generated_content_endpoint(
     content_id: str,
+    user_id: str = Depends(get_user_id_from_header),
     controller: GeneratedContentController = Depends(),
-) -> GeneratedContentResponse:
-    return await controller.get_generated_content(content_id=content_id)
+) -> ArticleResponse:
+    return await controller.get_generated_content(
+        user_id=user_id, content_id=content_id
+    )
