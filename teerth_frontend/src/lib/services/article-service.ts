@@ -81,7 +81,14 @@ export class ArticleService {
         'X-User-ID': userId || process.env.NEXT_PUBLIC_DEFAULT_GUEST_USER_ID || '607d95f0-47ef-444c-89d2-d05f257d1265'
       };
 
-      const response = await fetch(articleUrl, { headers });
+      console.log(`[DEBUG] Fetching article from ${articleUrl} with headers:`, headers);
+
+      const response = await fetch(articleUrl, { 
+        headers,
+        cache: 'no-store' // Ensure we don't get a cached error response
+      });
+
+      console.log(`[DEBUG] Fetch article response: ${response.status} ${response.statusText}`);
 
       if (!response.ok) {
         if (response.status === 404) {
