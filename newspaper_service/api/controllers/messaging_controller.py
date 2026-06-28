@@ -6,8 +6,10 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from ...services.messaging import (ProcessNewspaperForUserMessagingService,
-                                   StartUserCollectionMessagingService)
+from ...services.messaging import (
+    ProcessNewspaperForUserMessagingService,
+    StartUserCollectionMessagingService,
+)
 
 router = APIRouter(prefix="/internal", tags=["internal"])
 

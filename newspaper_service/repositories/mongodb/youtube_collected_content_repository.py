@@ -1,17 +1,18 @@
 from typing import List, Optional
 
+from commons.infra.dependency_injection.injectable import injectable
+from data_collector_service.models.youtube.youtube_video_details import (
+    YouTubeVideoDetails,
+)
+from data_collector_service.repositories.mongodb.adapters.youtube_collected_content_adapter import (
+    YouTubeCollectedContentAdapter,
+)
+from data_collector_service.repositories.mongodb.models.youtube_collected_content_db_model import (
+    YouTubeCollectedContentDBModel,
+)
 from injector import inject
 
-from commons.infra.dependency_injection.injectable import injectable
-from data_collector_service.models.youtube.youtube_video_details import \
-    YouTubeVideoDetails
-from data_collector_service.repositories.mongodb.adapters.youtube_collected_content_adapter import \
-    YouTubeCollectedContentAdapter
-from data_collector_service.repositories.mongodb.models.youtube_collected_content_db_model import \
-    YouTubeCollectedContentDBModel
-
-from ..youtube_collected_content_repository import \
-    YouTubeCollectedContentRepository
+from ..youtube_collected_content_repository import YouTubeCollectedContentRepository
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
 

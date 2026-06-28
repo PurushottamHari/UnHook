@@ -1,45 +1,62 @@
+from commons.infra.dependency_injection.registration import (
+    discover_and_register_injectables,
+)
+from commons.messaging import (
+    BaseCommandRouter,
+    BaseEventRouter,
+    BaseMessagingConfig,
+    MessageConsumer,
+    MessageProducer,
+)
+from commons.messaging.aggregated_schedule.repository import (
+    AggregatedScheduleRepository,
+)
 from injector import Binder, Injector, Module, provider, singleton
 
-from commons.infra.dependency_injection.registration import \
-    discover_and_register_injectables
-from commons.messaging import (BaseCommandRouter, BaseEventRouter,
-                               BaseMessagingConfig, MessageConsumer,
-                               MessageProducer)
-from commons.messaging.aggregated_schedule.repository import \
-    AggregatedScheduleRepository
 from newspaper_service.config.config import Config
 from newspaper_service.messaging.config.messaging_config import MessagingConfig
 from newspaper_service.messaging.redis.consumer import RedisMessageConsumer
 from newspaper_service.messaging.redis.producer import RedisMessageProducer
 from newspaper_service.messaging.routers.command_router import CommandRouter
 from newspaper_service.messaging.routers.event_router import EventRouter
-from newspaper_service.repositories.generated_content_interaction_repository import \
-    GeneratedContentInteractionRepository
-from newspaper_service.repositories.generated_content_repository import \
-    GeneratedContentRepository
+from newspaper_service.repositories.generated_content_interaction_repository import (
+    GeneratedContentInteractionRepository,
+)
+from newspaper_service.repositories.generated_content_repository import (
+    GeneratedContentRepository,
+)
 from newspaper_service.repositories.mongodb.config.database import MongoDB
-from newspaper_service.repositories.mongodb.generated_content_interaction_repository import \
-    MongoDBGeneratedContentInteractionRepository
-from newspaper_service.repositories.mongodb.generated_content_repository import \
-    MongoDBGeneratedContentRepository
-from newspaper_service.repositories.mongodb.mongodb_aggregated_schedule_repository import \
-    MongoDBAggregatedScheduleRepository
-from newspaper_service.repositories.mongodb.newspaper_article_candidate_repository import \
-    MongoDBNewspaperArticleCandidateRepository
-from newspaper_service.repositories.mongodb.newspaper_v2_repository import \
-    MongoDBNewspaperV2Repository
-from newspaper_service.repositories.mongodb.user_collected_content_repository import \
-    MongoDBUserCollectedContentRepository
-from newspaper_service.repositories.mongodb.youtube_collected_content_repository import \
-    MongoDBYouTubeCollectedContentRepository
-from newspaper_service.repositories.newspaper_article_candidate_repository import \
-    NewspaperArticleCandidateRepository
-from newspaper_service.repositories.newspaper_v2_repository import \
-    NewspaperV2Repository
-from newspaper_service.repositories.user_collected_content_repository import \
-    UserCollectedContentRepository
-from newspaper_service.repositories.youtube_collected_content_repository import \
-    YouTubeCollectedContentRepository
+from newspaper_service.repositories.mongodb.generated_content_interaction_repository import (
+    MongoDBGeneratedContentInteractionRepository,
+)
+from newspaper_service.repositories.mongodb.generated_content_repository import (
+    MongoDBGeneratedContentRepository,
+)
+from newspaper_service.repositories.mongodb.mongodb_aggregated_schedule_repository import (
+    MongoDBAggregatedScheduleRepository,
+)
+from newspaper_service.repositories.mongodb.newspaper_article_candidate_repository import (
+    MongoDBNewspaperArticleCandidateRepository,
+)
+from newspaper_service.repositories.mongodb.newspaper_v2_repository import (
+    MongoDBNewspaperV2Repository,
+)
+from newspaper_service.repositories.mongodb.user_collected_content_repository import (
+    MongoDBUserCollectedContentRepository,
+)
+from newspaper_service.repositories.mongodb.youtube_collected_content_repository import (
+    MongoDBYouTubeCollectedContentRepository,
+)
+from newspaper_service.repositories.newspaper_article_candidate_repository import (
+    NewspaperArticleCandidateRepository,
+)
+from newspaper_service.repositories.newspaper_v2_repository import NewspaperV2Repository
+from newspaper_service.repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
+from newspaper_service.repositories.youtube_collected_content_repository import (
+    YouTubeCollectedContentRepository,
+)
 
 
 class NewspaperModule(Module):

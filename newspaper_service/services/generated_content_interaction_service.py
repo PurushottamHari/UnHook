@@ -7,22 +7,26 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import uuid4
 
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
+from injector import inject
 
 from ..external.user_service import UserServiceClient
 from ..models.generated_content_interaction import (
-    GeneratedContentInteraction, InteractionStatus, InteractionType)
+    GeneratedContentInteraction,
+    InteractionStatus,
+    InteractionType,
+)
 from ..models.generated_content_interaction_list import (
     GeneratedContentInteractionListData,
-    GeneratedContentInteractionListResponse)
-from ..repositories.generated_content_interaction_repository import \
-    GeneratedContentInteractionRepository
-from ..repositories.generated_content_repository import \
-    GeneratedContentRepository
-from .validations.validate_create_article_interaction_request_service import \
-    ValidateCreateArticleInteractionRequestService
+    GeneratedContentInteractionListResponse,
+)
+from ..repositories.generated_content_interaction_repository import (
+    GeneratedContentInteractionRepository,
+)
+from ..repositories.generated_content_repository import GeneratedContentRepository
+from .validations.validate_create_article_interaction_request_service import (
+    ValidateCreateArticleInteractionRequestService,
+)
 
 
 @injectable()

@@ -2,11 +2,12 @@ import logging
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from commons.repository.mongo.optimistic_locking_utils import (
-    create_optimistic_locking_update_op, validate_bulk_write_result)
+    create_optimistic_locking_update_op,
+    validate_bulk_write_result,
+)
+from injector import inject
 
 from ...models import NewspaperV2
 from ..newspaper_v2_repository import NewspaperV2Repository

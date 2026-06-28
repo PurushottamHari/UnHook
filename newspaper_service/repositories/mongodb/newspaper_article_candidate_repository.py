@@ -5,21 +5,23 @@ MongoDB implementation of NewspaperArticleCandidateRepository.
 import logging
 from typing import List, Optional
 
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from commons.repository.mongo.optimistic_locking_utils import (
-    create_optimistic_locking_update_op, validate_bulk_write_result)
+    create_optimistic_locking_update_op,
+    validate_bulk_write_result,
+)
+from injector import inject
 
 from ...models import CandidateStatus, NewspaperArticleCandidate
-from ..newspaper_article_candidate_repository import \
-    NewspaperArticleCandidateRepository
-from .adapters.newspaper_article_candidate_adapter import \
-    NewspaperArticleCandidateAdapter
+from ..newspaper_article_candidate_repository import NewspaperArticleCandidateRepository
+from .adapters.newspaper_article_candidate_adapter import (
+    NewspaperArticleCandidateAdapter,
+)
 from .config.database import MongoDB
 from .config.settings import get_mongodb_settings
-from .models.newspaper_article_candidate_db_model import \
-    NewspaperArticleCandidateDBModel
+from .models.newspaper_article_candidate_db_model import (
+    NewspaperArticleCandidateDBModel,
+)
 
 
 @injectable()

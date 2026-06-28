@@ -6,7 +6,9 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Tuple
 
 from ..models.generated_content_interaction import (
-    GeneratedContentInteraction, InteractionType)
+    GeneratedContentInteraction,
+    InteractionType,
+)
 
 
 class GeneratedContentInteractionRepository(ABC):

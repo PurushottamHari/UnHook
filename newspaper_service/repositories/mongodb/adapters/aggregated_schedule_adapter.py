@@ -1,8 +1,12 @@
 from commons.messaging.aggregated_schedule.models import (
-    AggregatedSchedule, AggregatedStatusDetail)
+    AggregatedSchedule,
+    AggregatedStatusDetail,
+)
 
 from ..models.aggregated_schedule_db_model import (
-    AggregatedScheduleDBModel, AggregatedStatusDetailDBModel)
+    AggregatedScheduleDBModel,
+    AggregatedStatusDetailDBModel,
+)
 
 
 class AggregatedScheduleAdapter:

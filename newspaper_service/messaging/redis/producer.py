@@ -1,11 +1,11 @@
 import time
 from datetime import datetime
 
+from commons.infra.dependency_injection.injectable import injectable
+from commons.messaging import BaseMessage, Command, Event, MessageProducer
 from injector import inject
 from redis import asyncio as aioredis
 
-from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import BaseMessage, Command, Event, MessageProducer
 from newspaper_service.config.config import Config
 
 

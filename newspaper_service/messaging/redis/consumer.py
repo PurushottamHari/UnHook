@@ -5,12 +5,12 @@ import time
 from enum import Enum
 from typing import Awaitable, Callable, Dict, List
 
+from commons.infra.dependency_injection.injectable import injectable
+from commons.messaging import BaseMessage, Command, Event, MessageConsumer
 from injector import inject
 from redis import asyncio as aioredis
 from redis.exceptions import ResponseError
 
-from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import BaseMessage, Command, Event, MessageConsumer
 from newspaper_service.config.config import Config
 
 

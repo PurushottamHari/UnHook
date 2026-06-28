@@ -1,13 +1,14 @@
 import logging
 
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import MessageProducer
+from injector import inject
 
 from ...external.user_service import UserServiceClient
-from ...messaging.models.commands import (CreateNewspaperForUserCommand,
-                                          CreateNewspaperForUserPayload)
+from ...messaging.models.commands import (
+    CreateNewspaperForUserCommand,
+    CreateNewspaperForUserPayload,
+)
 
 
 @injectable()

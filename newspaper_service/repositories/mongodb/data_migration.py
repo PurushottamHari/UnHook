@@ -11,14 +11,14 @@ if project_root not in sys.path:
 from datetime import datetime
 
 import pytz
-
 from data_collector_service.models.user_collected_content import ContentStatus
-from newspaper_service.repositories.mongodb.config.database import MongoDB
-from newspaper_service.repositories.mongodb.config.settings import \
-    get_mongodb_settings
-from newspaper_service.repositories.mongodb.user_collected_content_repository import \
-    MongoDBUserCollectedContentRepository
 from user_service.models.enums import Weekday
+
+from newspaper_service.repositories.mongodb.config.database import MongoDB
+from newspaper_service.repositories.mongodb.config.settings import get_mongodb_settings
+from newspaper_service.repositories.mongodb.user_collected_content_repository import (
+    MongoDBUserCollectedContentRepository,
+)
 
 
 def update_non_filtered_content_to_processed(content_ids: list):
@@ -202,6 +202,7 @@ def migrate_candidate_links_to_include_source_list():
     """
     try:
         from data_collector_service.models.enums import ContentType
+
         from newspaper_service.models import SourceType
 
         # Get database connection
@@ -320,9 +321,14 @@ def migrate_newspapers_v1_to_v2():
     import uuid
 
     from data_collector_service.models.enums import ContentType
-    from newspaper_service.models import (CandidateSource, CandidateStatus,
-                                          CandidateType, NewspaperV2,
-                                          SourceType)
+
+    from newspaper_service.models import (
+        CandidateSource,
+        CandidateStatus,
+        CandidateType,
+        NewspaperV2,
+        SourceType,
+    )
 
     try:
         # Get database connection

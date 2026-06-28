@@ -1,15 +1,21 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from data_collector_service.models.youtube.youtube_video_details import \
-    YouTubeVideoDetails
+from data_collector_service.models.youtube.youtube_video_details import (
+    YouTubeVideoDetails,
+)
 from data_processing_service.models.generated_content import GeneratedContent
 
 from ...models import CandidateSourceDetail, GeneratedContentInteraction
 from ...models.newspaper_v2 import NewspaperV2
-from ..models.article_response import (ArticleResponse, ArticleV2ListResponse,
-                                       CategoryInfo, GeneratedData,
-                                       SourceDetails, StatusDetail)
+from ..models.article_response import (
+    ArticleResponse,
+    ArticleV2ListResponse,
+    CategoryInfo,
+    GeneratedData,
+    SourceDetails,
+    StatusDetail,
+)
 from ..models.newspaper_v2_response import NewspaperV2Response
 
 

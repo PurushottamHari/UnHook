@@ -1,12 +1,14 @@
+from commons.infra.dependency_injection.injectable import injectable
+from commons.messaging import BaseEventRouter, Event
+from commons.messaging.contracts.events.data_collector_service.models import (
+    UserCollectedContentReadyToBeUsedEvent,
+)
 from injector import inject
 from pydantic import ValidationError
 
-from commons.infra.dependency_injection.injectable import injectable
-from commons.messaging import BaseEventRouter, Event
-from commons.messaging.contracts.events.data_collector_service.models import \
-    UserCollectedContentReadyToBeUsedEvent
-from newspaper_service.services.consider_article_candidate.consider_user_collected_content_article_candidate_service import \
-    ConsiderUserCollectedContentArticleCandidateService
+from newspaper_service.services.consider_article_candidate.consider_user_collected_content_article_candidate_service import (
+    ConsiderUserCollectedContentArticleCandidateService,
+)
 
 
 @injectable()

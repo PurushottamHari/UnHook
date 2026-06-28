@@ -1,16 +1,19 @@
-from injector import inject
-from pydantic import ValidationError
-
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseCommandRouter, Command
 from commons.messaging.aggregated_schedule import AggregatedScheduleService
+from injector import inject
+from pydantic import ValidationError
 
-from ...services.collate_articles.collate_articles_for_newspaper_service import \
-    CollateArticlesForNewspaperService
-from ...services.create_newspaper.create_newspaper_for_user_service import \
-    CreateNewspaperForUserService
-from ..models.commands import (CreateNewspaperForUserCommand,
-                               StartCollationForNewspaperCommand)
+from ...services.collate_articles.collate_articles_for_newspaper_service import (
+    CollateArticlesForNewspaperService,
+)
+from ...services.create_newspaper.create_newspaper_for_user_service import (
+    CreateNewspaperForUserService,
+)
+from ..models.commands import (
+    CreateNewspaperForUserCommand,
+    StartCollationForNewspaperCommand,
+)
 
 
 @injectable()

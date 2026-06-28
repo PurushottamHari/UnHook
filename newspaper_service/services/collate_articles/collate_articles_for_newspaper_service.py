@@ -7,23 +7,29 @@ from datetime import datetime
 from typing import List, Tuple
 
 import pytz
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import MessageProducer
 from commons.messaging.contracts.events.newspaper_service.models import (
-    CandidateLinksPayload, ContentAddedToNewspaperEvent,
-    ContentAddedToNewspaperPayload)
+    CandidateLinksPayload,
+    ContentAddedToNewspaperEvent,
+    ContentAddedToNewspaperPayload,
+)
 from data_collector_service.models.user_collected_content import (
-    ContentType, UserCollectedContent)
-from newspaper_service.external.user_service import UserServiceClient
-from newspaper_service.models import (CandidateStatus, NewspaperStatus,
-                                      NewspaperV2)
-from newspaper_service.repositories import (
-    GeneratedContentRepository, NewspaperArticleCandidateRepository,
-    NewspaperV2Repository, UserCollectedContentRepository)
+    ContentType,
+    UserCollectedContent,
+)
+from injector import inject
 from user_service.models.enums import CategoryName, Weekday
 from user_service.models.user import User
+
+from newspaper_service.external.user_service import UserServiceClient
+from newspaper_service.models import CandidateStatus, NewspaperStatus, NewspaperV2
+from newspaper_service.repositories import (
+    GeneratedContentRepository,
+    NewspaperArticleCandidateRepository,
+    NewspaperV2Repository,
+    UserCollectedContentRepository,
+)
 
 
 @injectable()

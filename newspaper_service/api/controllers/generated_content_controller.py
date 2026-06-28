@@ -8,10 +8,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ...models.generated_content_interaction import GeneratedContentInteraction
-from ...models.generated_content_interaction_list import \
-    GeneratedContentInteractionListResponse
-from ...services.generated_content_interaction_service import \
-    ContentInteractionService
+from ...models.generated_content_interaction_list import (
+    GeneratedContentInteractionListResponse,
+)
+from ...services.generated_content_interaction_service import ContentInteractionService
 from ...services.generated_content_service import GeneratedContentService
 from ..dependencies import get_user_id_from_header
 from ..models.article_response import ArticleResponse

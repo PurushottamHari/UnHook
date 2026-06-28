@@ -7,7 +7,9 @@ from datetime import datetime
 from typing import Any, List, Optional
 
 from data_collector_service.models.user_collected_content import (
-    ContentStatus, UserCollectedContent)
+    ContentStatus,
+    UserCollectedContent,
+)
 from user_service.models.enums import CategoryName
 
 

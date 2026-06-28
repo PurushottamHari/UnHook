@@ -2,14 +2,15 @@ import logging
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import MessageProducer
+from injector import inject
 
 from ...external.user_service import UserServiceClient
-from ...messaging.models.commands import (StartCollationForNewspaperCommand,
-                                          StartCollationForNewspaperPayload)
+from ...messaging.models.commands import (
+    StartCollationForNewspaperCommand,
+    StartCollationForNewspaperPayload,
+)
 from ...models import NewspaperStatus, NewspaperV2
 from ...repositories import NewspaperV2Repository
 

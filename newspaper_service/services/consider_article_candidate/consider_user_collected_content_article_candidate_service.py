@@ -5,22 +5,29 @@ Service for considering and tracking user collected content article candidates f
 import logging
 import uuid
 
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models.enums import ContentType
+from injector import inject
 
-from ...models import (CandidateLinks, CandidateSource, CandidateSourceDetail,
-                       CandidateStatus, CandidateType,
-                       NewspaperArticleCandidate, SourceType)
-from ...repositories.generated_content_repository import \
-    GeneratedContentRepository
-from ...repositories.newspaper_article_candidate_repository import \
-    NewspaperArticleCandidateRepository
-from ...repositories.user_collected_content_repository import \
-    UserCollectedContentRepository
-from ...repositories.youtube_collected_content_repository import \
-    YouTubeCollectedContentRepository
+from ...models import (
+    CandidateLinks,
+    CandidateSource,
+    CandidateSourceDetail,
+    CandidateStatus,
+    CandidateType,
+    NewspaperArticleCandidate,
+    SourceType,
+)
+from ...repositories.generated_content_repository import GeneratedContentRepository
+from ...repositories.newspaper_article_candidate_repository import (
+    NewspaperArticleCandidateRepository,
+)
+from ...repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
+from ...repositories.youtube_collected_content_repository import (
+    YouTubeCollectedContentRepository,
+)
 
 
 class ContentNotFoundError(Exception):

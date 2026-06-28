@@ -5,28 +5,29 @@ Service for handling generated content business logic.
 import logging
 from typing import List, Optional
 
-from fastapi import HTTPException
-from injector import inject
-
 from commons.infra.dependency_injection.injectable import injectable
 from data_collector_service.models import ContentType
-from data_collector_service.models.user_collected_content import \
-    UserCollectedContent
-from data_collector_service.models.youtube.youtube_video_details import \
-    YouTubeVideoDetails
+from data_collector_service.models.user_collected_content import UserCollectedContent
+from data_collector_service.models.youtube.youtube_video_details import (
+    YouTubeVideoDetails,
+)
 from data_processing_service.models.generated_content import GeneratedContent
+from fastapi import HTTPException
+from injector import inject
 
 from ..api.adaptors.newspaper_v2_adaptor import NewspaperV2Adaptor
 from ..api.models.article_response import ArticleResponse
 from ..external.user_service import UserServiceClient
-from ..repositories.generated_content_interaction_repository import \
-    GeneratedContentInteractionRepository
-from ..repositories.generated_content_repository import \
-    GeneratedContentRepository
-from ..repositories.user_collected_content_repository import \
-    UserCollectedContentRepository
-from ..repositories.youtube_collected_content_repository import \
-    YouTubeCollectedContentRepository
+from ..repositories.generated_content_interaction_repository import (
+    GeneratedContentInteractionRepository,
+)
+from ..repositories.generated_content_repository import GeneratedContentRepository
+from ..repositories.user_collected_content_repository import (
+    UserCollectedContentRepository,
+)
+from ..repositories.youtube_collected_content_repository import (
+    YouTubeCollectedContentRepository,
+)
 
 
 @injectable()

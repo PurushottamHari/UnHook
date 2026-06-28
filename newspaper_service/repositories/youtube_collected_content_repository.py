@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from data_collector_service.models.youtube.youtube_video_details import \
-    YouTubeVideoDetails
+from data_collector_service.models.youtube.youtube_video_details import (
+    YouTubeVideoDetails,
+)
 
 
 class YouTubeCollectedContentRepository(ABC):
