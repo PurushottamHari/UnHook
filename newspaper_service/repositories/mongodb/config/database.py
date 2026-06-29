@@ -2,9 +2,10 @@
 MongoDB database connection configuration.
 """
 
-from commons.infra.dependency_injection.injectable import injectable
 from injector import inject
 from pymongo import MongoClient
+
+from commons.infra.dependency_injection.injectable import injectable
 
 from .settings import get_mongodb_settings
 

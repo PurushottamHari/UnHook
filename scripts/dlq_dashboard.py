@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Dict, List, Optional
 
@@ -13,30 +14,34 @@ from redis.asyncio import Redis
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Unhook DLQ Dashboard")
-
-# Redis configuration
 REDIS_URL = os.getenv("REDIS_URL")
 if not REDIS_URL:
     print("❌ REDIS_URL not found in environment variables.")
     exit(1)
+
+# Strip external quotes if they exist in the env value
+if REDIS_URL.startswith('"') and REDIS_URL.endswith('"'):
+    REDIS_URL = REDIS_URL[1:-1]
+elif REDIS_URL.startswith("'") and REDIS_URL.endswith("'"):
+    REDIS_URL = REDIS_URL[1:-1]
 
 redis_client: Optional[Redis] = None
 
 SERVICES = ["data_collector_service", "data_processing_service", "newspaper_service"]
 
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global redis_client
     redis_client = Redis.from_url(REDIS_URL, decode_responses=True)
     print(f"🚀 Connected to Redis at {REDIS_URL}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
+    yield
     if redis_client:
         await redis_client.close()
+        print("🛑 Closed Redis connection.")
+
+
+app = FastAPI(title="Unhook DLQ Dashboard", lifespan=lifespan)
 
 
 async def get_dlq_messages(service: str):
@@ -113,6 +118,56 @@ async def reprocess_message(service: str, msg_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/api/reprocess-insufficient-balance")
+async def reprocess_insufficient_balance_messages():
+    reprocessed_count = 0
+    errors = []
+
+    for service in SERVICES:
+        stream_name = f"{service}:dead_letter_queue"
+        try:
+            # Fetch up to 1000 messages from the DLQ stream to scan
+            messages = await redis_client.xrange(stream_name, count=1000)
+            for msg_id, data in messages:
+                reason = data.get("reason", "")
+                # Match "Insufficient Balance" or error "402"
+                if "Insufficient Balance" in reason or "402" in reason:
+                    try:
+                        message_json = json.loads(data.get("payload", "{}"))
+
+                        # Transform the message
+                        if "context" in message_json:
+                            message_json["context"]["retry_count"] = 0
+                            message_json["context"]["attempts"] = []
+
+                        target_service = message_json.get("target_service") or service
+                        new_topic = f"{target_service}:commands"
+                        message_json["topic"] = new_topic
+
+                        # Add to active commands stream
+                        clean_json = json.dumps(message_json, separators=(",", ":"))
+                        await redis_client.xadd(new_topic, {"payload": clean_json})
+
+                        # Remove from DLQ
+                        await redis_client.xdel(stream_name, msg_id)
+                        reprocessed_count += 1
+                    except Exception as e:
+                        errors.append(
+                            f"Error reprocessing {msg_id} in {service}: {str(e)}"
+                        )
+        except Exception as e:
+            errors.append(f"Error reading stream {stream_name}: {str(e)}")
+
+    if errors and reprocessed_count == 0:
+        raise HTTPException(status_code=500, detail="; ".join(errors))
+
+    return {
+        "status": "success",
+        "reprocessed_count": reprocessed_count,
+        "errors": errors,
+    }
+
+
 @app.delete("/api/messages/{service}/{msg_id}")
 async def delete_message(service: str, msg_id: str):
     stream_name = f"{service}:dead_letter_queue"
@@ -163,18 +218,26 @@ async def dashboard_ui():
     </style>
 </head>
 <body class="bg-[#0b0f1a] text-gray-100 min-h-screen">
-    <div x-data="dlqApp()" x-init="fetchMessages()" class="max-w-6xl mx-auto p-6 md:p-12">
+    <div x-data="dlqApp()" x-init="fetchMessages()" class="max-w-7xl mx-auto p-6 md:p-12">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-12">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
             <div>
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-indigo-500 bg-clip-text text-transparent">
                     DLQ Processor
                 </h1>
                 <p class="text-gray-400 mt-2">Manage and reprocess failed messages across UnHook services.</p>
             </div>
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
+                <!-- Reprocess Insufficient Balance Errors -->
+                <button @click="reprocessBalanceErrors()" 
+                        :disabled="reprocessingBalance"
+                        class="px-5 py-2.5 rounded-xl flex items-center gap-2 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 hover:from-amber-500/35 hover:via-orange-500/35 hover:to-red-500/35 border border-amber-500/30 hover:border-amber-500/50 text-amber-300 font-medium transition-all shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:shadow-[0_0_25px_rgba(245,158,11,0.2)] active:scale-[0.98] disabled:opacity-50">
+                    <i data-lucide="coins" :class="{ 'animate-bounce': reprocessingBalance }" class="w-5 h-5"></i>
+                    Reprocess Balance Errors
+                </button>
+
                 <button @click="fetchMessages()" 
-                        class="glass px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-gray-800 transition-colors">
+                        class="glass px-5 py-2.5 rounded-xl flex items-center gap-2 hover:bg-gray-800 transition-colors">
                     <i data-lucide="refresh-cw" :class="{ 'animate-spin': loading }" class="w-4 h-4"></i>
                     Refresh
                 </button>
@@ -182,11 +245,14 @@ async def dashboard_ui():
         </header>
 
         <!-- Stats/Filters -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-8">
             <template x-for="stat in stats" :key="stat.label">
-                <div class="glass p-6 rounded-2xl">
+                <div class="glass p-6 rounded-2xl transition-all hover:scale-[1.02]"
+                     :class="stat.label === 'Balance Errors' && stat.value > 0 ? 'border-amber-500/30 bg-amber-500/5 shadow-[0_0_15px_rgba(245,158,11,0.05)]' : ''">
                     <p class="text-gray-400 text-sm mb-1" x-text="stat.label"></p>
-                    <p class="text-2xl font-bold" x-text="stat.value"></p>
+                    <p class="text-3xl font-bold" 
+                       :class="stat.label === 'Balance Errors' && stat.value > 0 ? 'text-amber-400' : 'text-gray-100'"
+                       x-text="stat.value"></p>
                 </div>
             </template>
         </div>
@@ -214,18 +280,25 @@ async def dashboard_ui():
                 </template>
 
                 <template x-for="msg in messages" :key="msg.id">
-                    <div class="p-6 message-card cursor-pointer" @click="selectedMessage = msg">
-                        <div class="flex justify-between items-start">
+                    <div class="p-6 message-card cursor-pointer" @click="selectedMessage = msg"
+                         :class="msg.reason && (msg.reason.includes('Insufficient Balance') || msg.reason.includes('402')) ? 'border-l-4 border-amber-500/40 bg-amber-500/2' : ''">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                             <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-2">
+                                <div class="flex flex-wrap items-center gap-3 mb-2">
                                     <span class="px-2 py-1 rounded text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-400"
                                           x-text="msg.service.replace('_service', '')"></span>
                                     <span class="text-gray-500 text-sm" x-text="formatDate(msg.timestamp)"></span>
+                                    <template x-if="msg.reason && (msg.reason.includes('Insufficient Balance') || msg.reason.includes('402'))">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                                            <i data-lucide="alert-circle" class="w-3 h-3"></i>
+                                            Balance Error
+                                        </span>
+                                    </template>
                                 </div>
                                 <h3 class="text-lg font-medium text-gray-200" x-text="msg.payload.action_name || 'Unknown Action'"></h3>
                                 <p class="text-red-400 text-sm mt-1 line-clamp-1" x-text="msg.reason"></p>
                             </div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 self-end md:self-auto">
                                 <button @click.stop="copyCommand(msg)" 
                                         class="p-2 rounded-lg hover:bg-white/10 text-gray-400 transition-colors"
                                         title="Copy Redis Command">
@@ -255,7 +328,7 @@ async def dashboard_ui():
                  @click.away="selectedMessage = null">
                 <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                     <div>
-                        <h2 class="text-2xl font-bold" x-text="selectedMessage?.payload?.action_name || 'Message Details'"></h2>
+                        <h2 class="text-2xl font-bold" x-text="selectedMessage?.payload?.action_name || 'Message Details'"></h2 >
                         <p class="text-gray-400 text-sm" x-text="'ID: ' + selectedMessage?.id"></p>
                     </div>
                     <button @click="selectedMessage = null" class="p-2 hover:bg-white/10 rounded-full transition-colors">
@@ -266,7 +339,8 @@ async def dashboard_ui():
                 <div class="p-8 overflow-y-auto flex-1">
                     <div class="mb-8">
                         <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-3">Error Reason</h3>
-                        <div class="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 font-mono text-sm"
+                        <div class="p-4 rounded-xl border font-mono text-sm"
+                             :class="selectedMessage?.reason && (selectedMessage.reason.includes('Insufficient Balance') || selectedMessage.reason.includes('402')) ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-red-500/10 border-red-500/20 text-red-400'"
                              x-text="selectedMessage?.reason"></div>
                     </div>
 
@@ -277,7 +351,7 @@ async def dashboard_ui():
                                  x-text="JSON.stringify(selectedMessage?.payload, null, 2)"></pre>
                             <button @click="copyText(JSON.stringify(selectedMessage?.payload, null, 2))"
                                     class="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 transition-colors opacity-0 group-hover:opacity-100">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </div>
@@ -320,6 +394,7 @@ async def dashboard_ui():
         function dlqApp() {
             return {
                 loading: false,
+                reprocessingBalance: false,
                 messages: [],
                 selectedMessage: null,
                 toast: { show: false, message: '' },
@@ -328,6 +403,7 @@ async def dashboard_ui():
                     { label: 'Collector', value: 0 },
                     { label: 'Processor', value: 0 },
                     { label: 'Newspaper', value: 0 },
+                    { label: 'Balance Errors', value: 0 },
                 ],
 
                 async fetchMessages() {
@@ -348,11 +424,13 @@ async def dashboard_ui():
                     const collector = this.messages.filter(m => m.service === 'data_collector_service').length;
                     const processor = this.messages.filter(m => m.service === 'data_processing_service').length;
                     const newspaper = this.messages.filter(m => m.service === 'newspaper_service').length;
+                    const balance = this.messages.filter(m => m.reason && (m.reason.includes('Insufficient Balance') || m.reason.includes('402'))).length;
                     
                     this.stats[0].value = this.messages.length;
                     this.stats[1].value = collector;
                     this.stats[2].value = processor;
                     this.stats[3].value = newspaper;
+                    this.stats[4].value = balance;
                 },
 
                 formatDate(timestamp) {
@@ -375,6 +453,39 @@ async def dashboard_ui():
                         }
                     } catch (e) {
                         alert('Reprocessing failed: ' + e.message);
+                    }
+                },
+
+                async reprocessBalanceErrors() {
+                    const balanceErrorCount = this.messages.filter(m => 
+                        m.reason && (m.reason.includes('Insufficient Balance') || m.reason.includes('402'))
+                    ).length;
+
+                    if (balanceErrorCount === 0) {
+                        alert('No insufficient balance errors found in the current DLQ view.');
+                        return;
+                    }
+
+                    if (!confirm(`Are you sure you want to reprocess all ${balanceErrorCount} commands with "Insufficient Balance" / 402 errors?`)) {
+                        return;
+                    }
+
+                    this.reprocessingBalance = true;
+                    try {
+                        const response = await fetch('/api/reprocess-insufficient-balance', { method: 'POST' });
+                        const result = await response.json();
+                        
+                        if (result.status === 'success') {
+                            const count = result.reprocessed_count;
+                            this.showToast(`Successfully reprocessed ${count} balance-related messages!`);
+                            await this.fetchMessages();
+                        } else {
+                            alert('Reprocessing completed with errors: ' + (result.errors || []).join(', '));
+                        }
+                    } catch (e) {
+                        alert('Bulk reprocessing failed: ' + e.message);
+                    } finally {
+                        this.reprocessingBalance = false;
                     }
                 },
 

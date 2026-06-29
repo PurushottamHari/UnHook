@@ -17,7 +17,7 @@ class CategorizationAgent(BaseAIClient[CategorizationDataOutput]):
 
     def __init__(self):
         model_config = ModelConfig.create_deepseek_config(
-            model_name="deepseek-chat", temperature=0.5
+            model_name="deepseek-v4-flash", temperature=0.5
         )
         log_dir = os.path.join(os.path.dirname(__file__), "generated")
         super().__init__(CategorizationDataOutput, model_config, log_dir=log_dir)

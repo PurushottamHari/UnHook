@@ -9,7 +9,8 @@ from fastapi import FastAPI
 from ..infra.dependency_injection.registration import create_injector
 from ..repositories.mongodb.config.database import MongoDB
 from ..repositories.mongodb.config.settings import get_mongodb_settings
-from .controllers.generated_content_controller import router as interaction_router
+from .controllers.generated_content_controller import \
+    router as interaction_router
 from .controllers.messaging_controller import router as messaging_router
 from .controllers.newspaper_v2_controller import router as newspaper_v2_router
 

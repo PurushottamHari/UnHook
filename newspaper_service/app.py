@@ -2,8 +2,8 @@ import asyncio
 import logging
 
 from commons.messaging import BaseMessagingHandler
-
-from newspaper_service.infra.dependency_injection.registration import create_injector
+from newspaper_service.infra.dependency_injection.registration import \
+    create_injector
 
 # Configure logging
 logging.basicConfig(

@@ -1,13 +1,12 @@
 from typing import List
 
+from injector import inject
+
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseMessagingConfig, Event
 from commons.messaging.contracts.events.data_collector_service.models import (
     UserCollectedContentReadyToBeUsedEvent,
-    UserCollectedContentReadyToUsedPayload,
-)
-from injector import inject
-
+    UserCollectedContentReadyToUsedPayload)
 from newspaper_service.config.config import Config
 
 

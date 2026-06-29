@@ -1,12 +1,11 @@
 import logging
 
+from injector import inject
+
 from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import MessageProducer
 from commons.messaging.contracts.commands.data_collector_service.models import (
-    StartUserCollectionCommand,
-    StartUserCollectionPayload,
-)
-from injector import inject
+    StartUserCollectionCommand, StartUserCollectionPayload)
 
 from ...external.user_service import UserServiceClient
 

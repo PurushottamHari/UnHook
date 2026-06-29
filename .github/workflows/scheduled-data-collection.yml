@@ -2,8 +2,8 @@ name: Scheduled Data Collection
 
 on:
   schedule:
-    # 9 AM and 4 PM UK local time (BST is UTC+1)
-    - cron: "0 8,15 * * *"
+    # 11 AM and 4 PM UK local time (BST is UTC+1)
+    - cron: "0 10,15 * * *"
   workflow_dispatch: # Allows manual triggering
 
 jobs:

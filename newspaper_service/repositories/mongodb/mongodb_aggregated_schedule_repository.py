@@ -1,13 +1,11 @@
 from typing import Optional
 
-from commons.messaging.aggregated_schedule.models import (
-    AggregatedSchedule,
-    AggregatedScheduleStatus,
-)
-from commons.messaging.aggregated_schedule.repository import (
-    AggregatedScheduleRepository,
-)
 from injector import inject
+
+from commons.messaging.aggregated_schedule.models import (
+    AggregatedSchedule, AggregatedScheduleStatus)
+from commons.messaging.aggregated_schedule.repository import \
+    AggregatedScheduleRepository
 
 from .adapters.aggregated_schedule_adapter import AggregatedScheduleAdapter
 from .config.database import MongoDB

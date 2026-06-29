@@ -2,9 +2,12 @@ import asyncio
 import os
 
 from commons.messaging import BaseMessagingHandler
+from commons.messaging.contracts.commands.data_collector_service.models import (
+    StartUserCollectionCommand, StartUserCollectionPayload)
 from data_collector_service.infra.dependency_injection.registration import \
     create_injector
 from data_collector_service.messaging.models.commands import (
+    CollectYouTubeChannelForUserCommand, CollectYouTubeChannelForUserPayload,
     EnrichYouTubeVideoForUserCommand, EnrichYouTubeVideoForUserPayload)
 from data_collector_service.messaging.routers.command_router import \
     CommandRouter
@@ -31,14 +34,21 @@ async def debug_command(injector):
     command_router = injector.get(CommandRouter)
 
     # Construct the exact command from the DLQ message
-    payload = EnrichYouTubeVideoForUserPayload(
-        user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
-        video_id="60Cf_y6Jmw4",
-        user_collected_content_id="75a29d18-bf42-4a7a-8fce-b75998c49b3f",
-        channel_name="sadhguru",
-    )
+    # payload = EnrichYouTubeVideoForUserPayload(
+    #     user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
+    #     video_id="60Cf_y6Jmw4",
+    #     user_collected_content_id="75a29d18-bf42-4a7a-8fce-b75998c49b3f",
+    #     channel_name="sadhguru",
+    # )
+    # command = EnrichYouTubeVideoForUserCommand(payload=payload)
 
-    command = EnrichYouTubeVideoForUserCommand(payload=payload)
+    payload = CollectYouTubeChannelForUserPayload(
+        user_id="607d95f0-47ef-444c-89d2-d05f257d1265",
+        channel_id="StudyIQEducationLtd",
+        max_videos=2,
+    )
+    command = CollectYouTubeChannelForUserCommand(payload=payload)
+
     try:
         await command_router.handle_domain_command(command)
         print("✅ [Debug] Command executed successfully")

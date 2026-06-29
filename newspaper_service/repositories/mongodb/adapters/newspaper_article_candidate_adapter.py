@@ -5,22 +5,12 @@ Newspaper article candidate adapter for converting between domain and database m
 from datetime import datetime, timezone
 from typing import Optional
 
-from ....models import (
-    CandidateLinks,
-    CandidateSource,
-    CandidateSourceDetail,
-    CandidateStatus,
-    CandidateStatusDetail,
-    CandidateType,
-    NewspaperArticleCandidate,
-    SourceType,
-)
+from ....models import (CandidateLinks, CandidateSource, CandidateSourceDetail,
+                        CandidateStatus, CandidateStatusDetail, CandidateType,
+                        NewspaperArticleCandidate, SourceType)
 from ..models.newspaper_article_candidate_db_model import (
-    CandidateLinksDBModel,
-    CandidateSourceDetailDBModel,
-    CandidateStatusDetailDBModel,
-    NewspaperArticleCandidateDBModel,
-)
+    CandidateLinksDBModel, CandidateSourceDetailDBModel,
+    CandidateStatusDetailDBModel, NewspaperArticleCandidateDBModel)
 
 
 class NewspaperArticleCandidateAdapter:

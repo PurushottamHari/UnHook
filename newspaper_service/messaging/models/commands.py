@@ -1,7 +1,8 @@
 from typing import ClassVar
 
-from commons.messaging import Command
 from pydantic import BaseModel, Field
+
+from commons.messaging import Command
 
 
 class StartCollationForNewspaperPayload(BaseModel):

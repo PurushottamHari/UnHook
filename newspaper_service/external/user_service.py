@@ -6,11 +6,11 @@ import logging
 from typing import Dict, List, Optional
 
 import httpx
-from commons.infra.dependency_injection.injectable import injectable
 from injector import inject
-from user_service.models.user import User
 
+from commons.infra.dependency_injection.injectable import injectable
 from newspaper_service.config.config import Config
+from user_service.models.user import User
 
 
 @injectable()

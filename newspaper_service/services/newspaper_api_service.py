@@ -3,21 +3,21 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 import pytz
-from commons.infra.dependency_injection.injectable import injectable
 from fastapi import HTTPException
 from injector import inject
+
+from commons.infra.dependency_injection.injectable import injectable
 
 from ..api.adaptors.newspaper_v2_adaptor import NewspaperV2Adaptor
 from ..api.models.newspaper_v2_response import NewspaperV2Response
 from ..external.user_service import UserServiceClient
 from ..models import CandidateStatus, NewspaperV2
-from ..repositories.generated_content_interaction_repository import (
-    GeneratedContentInteractionRepository,
-)
-from ..repositories.generated_content_repository import GeneratedContentRepository
-from ..repositories.newspaper_article_candidate_repository import (
-    NewspaperArticleCandidateRepository,
-)
+from ..repositories.generated_content_interaction_repository import \
+    GeneratedContentInteractionRepository
+from ..repositories.generated_content_repository import \
+    GeneratedContentRepository
+from ..repositories.newspaper_article_candidate_repository import \
+    NewspaperArticleCandidateRepository
 from ..repositories.newspaper_v2_repository import NewspaperV2Repository
 from .newspaper_utils import aggregate_newspapers
 

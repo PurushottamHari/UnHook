@@ -18,7 +18,7 @@ class ContentModerator(BaseAIClient[ModerationOutput]):
 
     def __init__(self):
         model_config = ModelConfig.create_deepseek_config(
-            model_name="deepseek-chat",
+            model_name="deepseek-v4-flash",
             temperature=0.2,  # Lower temperature for more consistent moderation
         )
         log_dir = os.path.join(os.path.dirname(__file__), "generated")

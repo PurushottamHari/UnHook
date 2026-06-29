@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 import yaml
+
 from commons.infra.dependency_injection.injectable import injectable
 
 

@@ -38,7 +38,7 @@ class ModelConfig(BaseModel):
     """Configuration for AI model settings."""
 
     provider: ModelProvider = Field(default=ModelProvider.DEEPSEEK)
-    model_name: str = Field(default="deepseek-chat")
+    model_name: str = Field(default="deepseek-v4-flash")
     temperature: float = Field(default=0.7)
     max_tokens: int = Field(default=1000)
     api_key: Optional[str] = None
@@ -48,7 +48,7 @@ class ModelConfig(BaseModel):
     @classmethod
     def create_deepseek_config(
         cls,
-        model_name: str = "deepseek-chat",
+        model_name: str = "deepseek-v4-flash",
         temperature: float = 0.7,
         max_tokens: int = 62000,  # 64k but tbs
         api_base: Optional[str] = None,
