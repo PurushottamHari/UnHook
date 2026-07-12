@@ -1,7 +1,10 @@
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ArticleLikeDislike from '@/components/article/ArticleLikeDislike';
 import CTAButton from '@/components/CTAButton';
+import { slugify } from '@/lib/slugify';
+import ArticleTableOfContents from './ArticleTableOfContents';
 
 interface ArticleContentProps {
   /** The markdown content of the article */
@@ -37,24 +40,26 @@ export default function ArticleContent({
 }: ArticleContentProps) {
 
   return (
-    <article className={`prose prose-lg max-w-none dark:prose-invert mb-8 pb-8 ${className}`}>
-      <div className="relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 p-6 md:p-8 lg:p-10">
-        <div className="relative prose dark:prose-invert max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
-          <ReactMarkdown
+    <>
+      <ArticleTableOfContents content={content} />
+      <article className={`prose prose-lg max-w-none dark:prose-invert mb-8 pb-8 ${className}`}>
+        <div className="relative bg-white/80 dark:bg-amber-100/80 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200/50 dark:border-amber-300/50 p-6 md:p-8 lg:p-10">
+          <div className="relative prose dark:prose-invert max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto">
+            <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
               h1: ({ children }) => (
-                <h1 className="text-2xl font-bold text-amber-900 dark:text-amber-900 mb-4">
+                <h1 id={slugify(React.Children.toArray(children).join(''))} className="text-2xl font-bold text-amber-900 dark:text-amber-900 mb-4 scroll-mt-[5vh]">
                   {children}
                 </h1>
               ),
               h2: ({ children }) => (
-                <h2 className="text-xl font-semibold text-amber-900 dark:text-amber-900 mb-3 mt-6">
+                <h2 id={slugify(React.Children.toArray(children).join(''))} className="text-xl font-semibold text-amber-900 dark:text-amber-900 mb-3 mt-6 scroll-mt-[5vh]">
                   {children}
                 </h2>
               ),
               h3: ({ children }) => (
-                <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-900 mb-2 mt-4">
+                <h3 id={slugify(React.Children.toArray(children).join(''))} className="text-lg font-semibold text-amber-900 dark:text-amber-900 mb-2 mt-4 scroll-mt-[5vh]">
                   {children}
                 </h3>
               ),
@@ -270,6 +275,7 @@ export default function ArticleContent({
         </section>
       </div>
     </article>
+    </>
   );
 }
 

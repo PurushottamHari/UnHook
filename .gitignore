@@ -17,4 +17,5 @@ scripts/daily_disciple/*/
 .env
 .env.staging
 data/
+downloads/
 
