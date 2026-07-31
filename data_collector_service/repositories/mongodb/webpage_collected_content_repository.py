@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from injector import inject
 from pymongo import UpdateOne
@@ -30,8 +30,6 @@ class MongoDBWebpageCollectedContentRepository(WebpageCollectedContentRepository
 
     def upsert_webpages(self, webpages: List[WebpageCollectedContent]) -> None:
         """Add or update webpages in the collection."""
-        if not webpages:
-            return
 
         operations = []
         for webpage in webpages:
@@ -86,11 +84,10 @@ class MongoDBWebpageCollectedContentRepository(WebpageCollectedContentRepository
 
         return [sha for sha in shas if sha not in existing_shas]
 
-    def get_webpage_by_sha(self, sha: str) -> WebpageCollectedContent:
+    def get_webpage_by_sha(self, sha: str) -> Optional[WebpageCollectedContent]:
         """Retrieve a webpage by its SHA hash."""
         doc = self.collection.find_one({"sha": sha})
         if not doc:
-            raise ValueError(f"Webpage with SHA {sha} not found")
-
+            return None
         db_model = WebpageCollectedContentDBModel(**doc)
         return WebpageCollectedContentAdapter.from_db_model(db_model)

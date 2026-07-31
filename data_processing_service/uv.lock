@@ -335,7 +335,7 @@ wheels = [
 [[package]]
 name = "commons"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons#64874db82dcd37e2820166e08ef034958258dbcd" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=DiscoverFeature#e614ed05efecbf192b0be2e865efce1336b10d57" }
 dependencies = [
     { name = "injector" },
     { name = "langchain-core" },
@@ -372,7 +372,7 @@ wheels = [
 [[package]]
 name = "data-collector-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service#64874db82dcd37e2820166e08ef034958258dbcd" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=DiscoverFeature#e614ed05efecbf192b0be2e865efce1336b10d57" }
 dependencies = [
     { name = "black" },
     { name = "boto3" },
@@ -419,9 +419,9 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "black", specifier = ">=23.0.0" },
-    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons" },
+    { name = "commons", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=commons&rev=DiscoverFeature" },
     { name = "curl-cffi" },
-    { name = "data-collector-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service" },
+    { name = "data-collector-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=data_collector_service&rev=DiscoverFeature" },
     { name = "httpx", specifier = ">=0.24.0" },
     { name = "injector", specifier = ">=0.21.0" },
     { name = "isort", specifier = ">=5.12.0" },
@@ -433,7 +433,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "redis", specifier = ">=5.0.0" },
     { name = "requests" },
-    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service" },
+    { name = "user-service", git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=DiscoverFeature" },
 ]
 
 [[package]]
@@ -1636,7 +1636,7 @@ wheels = [
 [[package]]
 name = "user-service"
 version = "0.1.0"
-source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service#64874db82dcd37e2820166e08ef034958258dbcd" }
+source = { git = "https://github.com/PurushottamHari/UnHook.git?subdirectory=user_service&rev=DiscoverFeature#e614ed05efecbf192b0be2e865efce1336b10d57" }
 dependencies = [
     { name = "black" },
     { name = "curl-cffi" },

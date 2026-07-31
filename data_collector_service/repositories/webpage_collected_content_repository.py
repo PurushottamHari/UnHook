@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from data_collector_service.models.webpage.webpage_collected_content import \
     WebpageCollectedContent
@@ -58,7 +58,7 @@ class WebpageCollectedContentRepository(ABC):
         pass
 
     @abstractmethod
-    def get_webpage_by_sha(self, sha: str) -> WebpageCollectedContent:
+    def get_webpage_by_sha(self, sha: str) -> Optional[WebpageCollectedContent]:
         """
         Retrieve a webpage by its SHA hash.
 

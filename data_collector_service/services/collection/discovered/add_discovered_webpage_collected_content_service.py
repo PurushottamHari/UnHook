@@ -81,30 +81,27 @@ class AddDiscoveredWebpageCollectedContentService:
         webpage_content = None
 
         # Check if content already exists by SHA
-        try:
-            webpage_content = self.webpage_repository.get_webpage_by_sha(webpage.sha)
+        webpage_content = self.webpage_repository.get_webpage_by_sha(webpage.sha)
+        if webpage_content:
             logger.info(
                 f"[AddDiscoveredWebpageCollectedContentService] Webpage with SHA {webpage.sha} "
                 f"already exists, skipping storage"
             )
-
-        except ValueError:
+        else:
             logger.info(
                 f"[AddDiscoveredWebpageCollectedContentService] New webpage with SHA {webpage.sha}, "
                 f"persisting to repository"
             )
-
-            # 4. Persist to repository
-            # 1. Set business logic fields
             webpage.id = str(uuid.uuid4())
             webpage.status = WebpageStatus.COLLECTED
             webpage.created_at = now_timestamp
             webpage.updated_at = now_timestamp
             webpage.version = 1
-            self.webpage_repository.upsert_webpages([webpage])[0]
+            self.webpage_repository.upsert_webpages([webpage])
             webpage_content = webpage
 
         # Create UserCollectedContent entry and upsert for the user
+        print("DEBUG: Creating UserCollectedContent entry")
         user_collected_content = UserCollectedContent(
             id=str(uuid.uuid4()),
             content_type=ContentType.DISCOVERED_WEBPAGE,
@@ -159,8 +156,6 @@ class AddDiscoveredWebpageCollectedContentService:
         Raises:
             ValueError: If any required field is missing or invalid.
         """
-        if not webpage.id or not webpage.id.strip():
-            raise ValueError("Webpage ID must not be empty")
 
         if not webpage.sha or not webpage.sha.strip():
             raise ValueError("Webpage SHA must not be empty")
