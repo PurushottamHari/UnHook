@@ -79,6 +79,24 @@ class StartDataProcessingService:
 
         # 4. Based on content type, generate required content
         generated_content_id = None
+        match content.content_type:
+            case ContentType.YOUTUBE_VIDEO:
+                generated_content_id = (
+                    await self.youtube_generation_service.generate_required_content(
+                        user_collected_content=content
+                    )
+                )
+            case ContentType.DISCOVERED_WEBPAGE:
+                # TODO: Implement discovered webpage processing
+                raise NotImplementedError(
+                    f"Processing for content type {content.content_type} is not implemented yet."
+                )
+
+            case _:
+                raise NotImplementedError(
+                    f"Processing for content type {content.content_type} is not implemented yet."
+                )
+
         if content.content_type == ContentType.YOUTUBE_VIDEO:
             generated_content_id = (
                 await self.youtube_generation_service.generate_required_content(

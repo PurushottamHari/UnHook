@@ -20,6 +20,7 @@ class MongoDBSettings(BaseSettings):
     DATABASE_NAME: str = "youtube_newspaper"
     COLLECTION_NAME: str = "collected_content"
     YOUTUBE_COLLECTION_NAME: str = "youtube_collected_content"
+    WEBPAGE_COLLECTION_NAME: str = "webpage_collected_content"
 
     class Config:
         env_file = ENV_FILE_PATH

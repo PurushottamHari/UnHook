@@ -30,10 +30,14 @@ from data_collector_service.repositories.mongodb.mongodb_aggregated_schedule_rep
     MongoDBAggregatedScheduleRepository
 from data_collector_service.repositories.mongodb.user_collected_content_repository import \
     MongoDBUserCollectedContentRepository
+from data_collector_service.repositories.mongodb.webpage_collected_content_repository import \
+    MongoDBWebpageCollectedContentRepository
 from data_collector_service.repositories.mongodb.youtube_collected_content_repository import \
     MongoDBYouTubeCollectedContentRepository
 from data_collector_service.repositories.user_collected_content_repository import \
     UserCollectedContentRepository
+from data_collector_service.repositories.webpage_collected_content_repository import \
+    WebpageCollectedContentRepository
 from data_collector_service.repositories.youtube_collected_content_repository import \
     YouTubeCollectedContentRepository
 from data_collector_service.repositories.youtube_content_ephemeral_repository import \
@@ -50,6 +54,11 @@ class DataCollectorModule(Module):
         binder.bind(
             YouTubeCollectedContentRepository,
             to=MongoDBYouTubeCollectedContentRepository,
+            scope=singleton,
+        )
+        binder.bind(
+            WebpageCollectedContentRepository,
+            to=MongoDBWebpageCollectedContentRepository,
             scope=singleton,
         )
         binder.bind(
