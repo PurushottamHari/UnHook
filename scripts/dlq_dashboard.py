@@ -75,13 +75,22 @@ async def get_dlq_messages(service: str):
 @app.get("/api/messages")
 async def list_messages():
     all_messages = []
+    total_counts = {}
     for service in SERVICES:
         messages = await get_dlq_messages(service)
         all_messages.extend(messages)
 
+        # Get true length of stream using XLEN
+        stream_name = f"{service}:dead_letter_queue"
+        try:
+            total_counts[service] = await redis_client.xlen(stream_name)
+        except Exception as e:
+            print(f"Error fetching XLEN for {stream_name}: {e}")
+            total_counts[service] = len(messages)
+
     # Sort by timestamp descending
     all_messages.sort(key=lambda x: x["timestamp"], reverse=True)
-    return all_messages
+    return {"messages": all_messages, "total_counts": total_counts}
 
 
 @app.post("/api/reprocess/{service}/{msg_id}")
@@ -132,6 +141,78 @@ async def reprocess_insufficient_balance_messages():
                 reason = data.get("reason", "")
                 # Match "Insufficient Balance" or error "402"
                 if "Insufficient Balance" in reason or "402" in reason:
+                    try:
+                        message_json = json.loads(data.get("payload", "{}"))
+
+                        # Transform the message
+                        if "context" in message_json:
+                            message_json["context"]["retry_count"] = 0
+                            message_json["context"]["attempts"] = []
+
+                        target_service = message_json.get("target_service") or service
+                        new_topic = f"{target_service}:commands"
+                        message_json["topic"] = new_topic
+
+                        # Add to active commands stream
+                        clean_json = json.dumps(message_json, separators=(",", ":"))
+                        await redis_client.xadd(new_topic, {"payload": clean_json})
+
+                        # Remove from DLQ
+                        await redis_client.xdel(stream_name, msg_id)
+                        reprocessed_count += 1
+                    except Exception as e:
+                        errors.append(
+                            f"Error reprocessing {msg_id} in {service}: {str(e)}"
+                        )
+        except Exception as e:
+            errors.append(f"Error reading stream {stream_name}: {str(e)}")
+
+    if errors and reprocessed_count == 0:
+        raise HTTPException(status_code=500, detail="; ".join(errors))
+
+    return {
+        "status": "success",
+        "reprocessed_count": reprocessed_count,
+        "errors": errors,
+    }
+
+
+@app.get("/api/count-by-error")
+async def count_by_error(error: str):
+    count = 0
+    errors = []
+
+    for service in SERVICES:
+        stream_name = f"{service}:dead_letter_queue"
+        try:
+            # Fetch up to 1000 messages from the DLQ stream to scan
+            messages = await redis_client.xrange(stream_name, count=1000)
+            for msg_id, data in messages:
+                reason = data.get("reason", "")
+                if error.lower() in reason.lower():
+                    count += 1
+        except Exception as e:
+            errors.append(f"Error reading stream {stream_name}: {str(e)}")
+
+    if errors and count == 0:
+        raise HTTPException(status_code=500, detail="; ".join(errors))
+
+    return {"count": count, "errors": errors}
+
+
+@app.post("/api/reprocess-by-error")
+async def reprocess_by_error(error: str):
+    reprocessed_count = 0
+    errors = []
+
+    for service in SERVICES:
+        stream_name = f"{service}:dead_letter_queue"
+        try:
+            # Fetch up to 1000 messages from the DLQ stream to scan
+            messages = await redis_client.xrange(stream_name, count=1000)
+            for msg_id, data in messages:
+                reason = data.get("reason", "")
+                if error.lower() in reason.lower():
                     try:
                         message_json = json.loads(data.get("payload", "{}"))
 
@@ -234,6 +315,14 @@ async def dashboard_ui():
                         class="px-5 py-2.5 rounded-xl flex items-center gap-2 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 hover:from-amber-500/35 hover:via-orange-500/35 hover:to-red-500/35 border border-amber-500/30 hover:border-amber-500/50 text-amber-300 font-medium transition-all shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:shadow-[0_0_25px_rgba(245,158,11,0.2)] active:scale-[0.98] disabled:opacity-50">
                     <i data-lucide="coins" :class="{ 'animate-bounce': reprocessingBalance }" class="w-5 h-5"></i>
                     Reprocess Balance Errors
+                </button>
+
+                <!-- Reprocess Commands By Custom Error -->
+                <button @click="reprocessCommandsPrompt()" 
+                        :disabled="reprocessingCommands"
+                        class="px-5 py-2.5 rounded-xl flex items-center gap-2 bg-gradient-to-r from-indigo-500/20 via-blue-500/20 to-cyan-500/20 hover:from-indigo-500/35 hover:via-blue-500/35 hover:to-cyan-500/35 border border-indigo-500/30 hover:border-indigo-500/50 text-indigo-300 font-medium transition-all shadow-[0_0_15px_rgba(99,102,241,0.05)] hover:shadow-[0_0_25px_rgba(99,102,241,0.2)] active:scale-[0.98] disabled:opacity-50">
+                    <i data-lucide="play" :class="{ 'animate-pulse': reprocessingCommands }" class="w-5 h-5"></i>
+                    reprocess-commands
                 </button>
 
                 <button @click="fetchMessages()" 
@@ -395,7 +484,9 @@ async def dashboard_ui():
             return {
                 loading: false,
                 reprocessingBalance: false,
+                reprocessingCommands: false,
                 messages: [],
+                totalCounts: {},
                 selectedMessage: null,
                 toast: { show: false, message: '' },
                 stats: [
@@ -410,7 +501,9 @@ async def dashboard_ui():
                     this.loading = true;
                     try {
                         const response = await fetch('/api/messages');
-                        this.messages = await response.json();
+                        const data = await response.json();
+                        this.messages = data.messages;
+                        this.totalCounts = data.total_counts || {};
                         this.updateStats();
                         setTimeout(() => lucide.createIcons(), 50);
                     } catch (e) {
@@ -421,12 +514,13 @@ async def dashboard_ui():
                 },
 
                 updateStats() {
-                    const collector = this.messages.filter(m => m.service === 'data_collector_service').length;
-                    const processor = this.messages.filter(m => m.service === 'data_processing_service').length;
-                    const newspaper = this.messages.filter(m => m.service === 'newspaper_service').length;
+                    const collector = this.totalCounts['data_collector_service'] || 0;
+                    const processor = this.totalCounts['data_processing_service'] || 0;
+                    const newspaper = this.totalCounts['newspaper_service'] || 0;
+                    const total = collector + processor + newspaper;
                     const balance = this.messages.filter(m => m.reason && (m.reason.includes('Insufficient Balance') || m.reason.includes('402'))).length;
                     
-                    this.stats[0].value = this.messages.length;
+                    this.stats[0].value = total;
                     this.stats[1].value = collector;
                     this.stats[2].value = processor;
                     this.stats[3].value = newspaper;
@@ -448,6 +542,9 @@ async def dashboard_ui():
                         if (result.status === 'success') {
                             this.showToast('Message sent to ' + result.target);
                             this.messages = this.messages.filter(m => m.id !== msg.id);
+                            if (this.totalCounts[msg.service] && this.totalCounts[msg.service] > 0) {
+                                this.totalCounts[msg.service]--;
+                            }
                             this.updateStats();
                             this.selectedMessage = null;
                         }
@@ -489,6 +586,53 @@ async def dashboard_ui():
                     }
                 },
 
+                async reprocessCommandsPrompt() {
+                    const errorText = prompt("Enter the error message to search for:");
+                    if (errorText === null) return;
+                    const trimmed = errorText.trim();
+                    if (!trimmed) {
+                        alert("Error message cannot be empty.");
+                        return;
+                    }
+
+                    this.reprocessingCommands = true;
+                    try {
+                        const countResponse = await fetch(`/api/count-by-error?error=${encodeURIComponent(trimmed)}`);
+                        if (!countResponse.ok) {
+                            throw new Error(await countResponse.text());
+                        }
+                        const countResult = await countResponse.json();
+                        const count = countResult.count;
+
+                        if (count === 0) {
+                            alert(`No commands found matching error: "${trimmed}"`);
+                            return;
+                        }
+
+                        if (!confirm(`Found ${count} commands matching error: "${trimmed}". Do you want to reprocess them?`)) {
+                            return;
+                        }
+
+                        const reprocessResponse = await fetch(`/api/reprocess-by-error?error=${encodeURIComponent(trimmed)}`, { method: 'POST' });
+                        if (!reprocessResponse.ok) {
+                            throw new Error(await reprocessResponse.text());
+                        }
+                        const reprocessResult = await reprocessResponse.json();
+
+                        if (reprocessResult.status === 'success') {
+                            const reprocessedCount = reprocessResult.reprocessed_count;
+                            this.showToast(`Successfully reprocessed ${reprocessedCount} messages!`);
+                            await this.fetchMessages();
+                        } else {
+                            alert('Reprocessing completed with errors: ' + (reprocessResult.errors || []).join(', '));
+                        }
+                    } catch (e) {
+                        alert('Operation failed: ' + e.message);
+                    } finally {
+                        this.reprocessingCommands = false;
+                    }
+                },
+
                 async deleteMessage(msg) {
                     if (!confirm('Are you sure you want to permanently delete this message from the DLQ?')) return;
                     
@@ -499,6 +643,9 @@ async def dashboard_ui():
                         if (result.status === 'success') {
                             this.showToast('Message deleted successfully');
                             this.messages = this.messages.filter(m => m.id !== msg.id);
+                            if (this.totalCounts[msg.service] && this.totalCounts[msg.service] > 0) {
+                                this.totalCounts[msg.service]--;
+                            }
                             this.updateStats();
                             this.selectedMessage = null;
                         }

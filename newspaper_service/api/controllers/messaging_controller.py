@@ -4,10 +4,15 @@ Controller for internal messaging operations.
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
 
-from ...services.messaging import (ProcessNewspaperForUserMessagingService,
-                                   StartUserCollectionMessagingService)
+from commons.messaging.contracts.commands.data_collector_service.models import \
+    AddDiscoveredCollectedContentPayload
+
+from ...services.messaging import (
+    AddDiscoveredCollectedContentMessagingService,
+    ProcessNewspaperForUserMessagingService,
+    StartUserCollectionMessagingService)
 
 router = APIRouter(prefix="/internal", tags=["internal"])
 
@@ -23,6 +28,9 @@ class MessagingController:
         )
         self.process_newspaper_service = injector.get(
             ProcessNewspaperForUserMessagingService
+        )
+        self.add_discovered_collected_content_service = injector.get(
+            AddDiscoveredCollectedContentMessagingService
         )
         self.logger = logging.getLogger(__name__)
 
@@ -58,6 +66,28 @@ class MessagingController:
             self.logger.error(f"Error triggering newspaper creation: {e}")
             raise HTTPException(status_code=500, detail="Internal server error")
 
+    async def add_discovered_collected_content(
+        self, payload: AddDiscoveredCollectedContentPayload
+    ):
+        """
+        Publish an AddDiscoveredCollectedContentCommand for the given user.
+        """
+        try:
+            await self.add_discovered_collected_content_service.execute(
+                payload=payload,
+            )
+            return {
+                "status": "success",
+                "message": f"AddDiscoveredCollectedContent command published for user {payload.user_id}",
+            }
+        except ValueError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+        except Exception as e:
+            self.logger.error(
+                f"Error publishing AddDiscoveredCollectedContentCommand: {e}"
+            )
+            raise HTTPException(status_code=500, detail="Internal server error")
+
 
 # Native FastAPI route registration
 @router.post("/start_user_collection/{user_id}")
@@ -74,3 +104,15 @@ async def process_newspaper_for_user_endpoint(
     controller: MessagingController = Depends(),
 ):
     return await controller.process_newspaper_for_user(user_id=user_id)
+
+
+@router.post("/add_discovered_collected_content")
+async def add_discovered_collected_content_endpoint(
+    payload: AddDiscoveredCollectedContentPayload = Body(
+        ..., description="UserCollectedContent data to be processed"
+    ),
+    controller: MessagingController = Depends(),
+):
+    return await controller.add_discovered_collected_content(
+        payload=payload,
+    )

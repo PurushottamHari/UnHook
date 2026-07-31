@@ -5,9 +5,12 @@ from commons.infra.dependency_injection.injectable import injectable
 from commons.messaging import BaseCommandRouter, Command
 from commons.messaging.aggregated_schedule import AggregatedScheduleService
 from data_collector_service.messaging.models.commands import (
-    CollectYouTubeChannelForUserCommand, EnrichYouTubeVideoForUserCommand,
+    AddDiscoveredCollectedContentCommand, CollectYouTubeChannelForUserCommand,
+    EnrichYouTubeVideoForUserCommand,
     ProcessYoutubeChannelRejectionAggregationCommand,
     StartUserCollectionCommand, SubmitModeratedContentForProcessingCommand)
+from data_collector_service.services.collection.add_discovered_collected_content_service import \
+    AddDiscoveredCollectedContentService
 from data_collector_service.services.collection.start_user_collection_service import \
     StartUserCollectionService
 from data_collector_service.services.collection.youtube.collect_youtube_content_service import \
@@ -32,6 +35,7 @@ class CommandRouter(BaseCommandRouter):
         enrich_youtube_video_content_service: EnrichYouTubeVideoContentService,
         process_youtube_channel_rejection_aggregation_service: ProcessYoutubeChannelRejectionAggregationService,
         submit_for_processing_service: SubmitForProcessingService,
+        add_discovered_collected_content_service: AddDiscoveredCollectedContentService,
         aggregated_schedule_service: AggregatedScheduleService,
     ):
         super().__init__(aggregated_schedule_service)
@@ -42,6 +46,9 @@ class CommandRouter(BaseCommandRouter):
             process_youtube_channel_rejection_aggregation_service
         )
         self.submit_for_processing_service = submit_for_processing_service
+        self.add_discovered_collected_content_service = (
+            add_discovered_collected_content_service
+        )
 
     async def handle_domain_command(self, command: Command):
         """Dispatches the command based on action_name and enforces strict typing."""
@@ -132,7 +139,18 @@ class CommandRouter(BaseCommandRouter):
                     print(
                         f"✅ [CommandRouter] Submit moderated content for processing completed"
                     )
+                case AddDiscoveredCollectedContentCommand.ACTION_NAME:
+                    add_discovered_command = (
+                        AddDiscoveredCollectedContentCommand.model_validate(
+                            command.model_dump()
+                        )
+                    )
+                    print(f"🎬 [CommandRouter] Processing discovered content")
 
+                    await self.add_discovered_collected_content_service.add_discovered_content(
+                        payload=add_discovered_command.payload,
+                    )
+                    print(f"✅ [CommandRouter] Discovered content processed")
                 case _:
                     raise NotImplementedError(
                         f"Command '{command.action_name}' is unimplemented in CommandRouter"

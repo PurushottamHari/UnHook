@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from commons.messaging import Command
 from commons.messaging.contracts.commands.data_collector_service.models import (
+    AddDiscoveredCollectedContentCommand, AddDiscoveredCollectedContentPayload,
     StartUserCollectionCommand, StartUserCollectionPayload)
 
 
